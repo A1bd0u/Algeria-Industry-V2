@@ -65,7 +65,8 @@ const ConsolePro = () => {
   const navigate = useNavigate();
   const { profile, visits, events, totalTimeSpentSec, clearLogs } = useTracking();
   const [activeTab, setActiveTab] = useState('gov-overview');
-  const [chartTimeframe, setChartTimeframe] = useState<'6m' | '1y'>('6m');
+  const [chartTimeframe, setChartTimeframe] = useState<'7' | '30' | '90' | '365'>('30');
+  const [isDashboardLoading, setIsDashboardLoading] = useState(true);
   const [showArticleForm, setShowArticleForm] = useState(false);
   const [exhibitors, setExhibitors] = useState<any[]>([
     { id: 1, name: "Sonatrach", category: "Énergie & Mines", type: "Grande Entreprise", region: "Alger", status: "Premium", added: "2023-11-20" },
@@ -275,20 +276,46 @@ const ConsolePro = () => {
   };
 
   const [statsAdmin, setStatsAdmin] = useState<any[]>([
-    { label: 'Utilisateurs Plateforme', value: '8,432', trend: '+12% ce mois', icon: Users, color: 'text-blue-600', bg: 'bg-blue-50' },
-    { label: 'Flux d\'Affaires Estimé', value: '45.2M DZD', trend: '+8.4%', icon: TrendingUp, color: 'text-emerald-600', bg: 'bg-emerald-50' },
-    { label: 'Taux de Conversion Pro', value: '18.5%', trend: '+2.1%', icon: Zap, color: 'text-orange-600', bg: 'bg-orange-50' },
-    { label: 'Satisfaction B2B', value: '4.8/5', trend: 'Excellent', icon: ShieldCheck, color: 'text-secondary', bg: 'bg-secondary/10' },
+    { label: 'Utilisateurs Plateforme', value: '-', trend: '-', icon: Users, color: 'text-blue-600', bg: 'bg-blue-50' },
+    { label: 'Entreprises Validées', value: '-', trend: '-', icon: Building2, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+    { label: 'Produits au Catalogue', value: '-', trend: '-', icon: PackagePlus, color: 'text-orange-600', bg: 'bg-orange-50' },
+    { label: 'Appels d\'Offres', value: '-', trend: '-', icon: FileText, color: 'text-indigo-600', bg: 'bg-indigo-50' },
+    { label: 'Revenus Mensuels', value: '-', trend: '-', icon: TrendingUp, color: 'text-purple-600', bg: 'bg-purple-50' },
   ]);
 
-  const revenueData = [
-    { period: 'Jan', revenue: 420000 },
-    { period: 'Fév', revenue: 580000 },
-    { period: 'Mar', revenue: 710000 },
-    { period: 'Avr', revenue: 1250000 },
-    { period: 'Mai', revenue: 1800000 },
-    { period: 'Juin', revenue: 2400000 },
-  ];
+  const [revenueData, setRevenueData] = useState<any[]>([]);
+  const [registrationsData, setRegistrationsData] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchDashboard = async () => {
+      setIsDashboardLoading(true);
+      try {
+        const res = await fetch(`/api/admin/dashboard?days=${chartTimeframe}`);
+        if (res.ok) {
+          const data = await res.json();
+          setStatsAdmin([
+            { label: 'Utilisateurs Plateforme', value: data.kpis.total_users || 0, trend: data.trends?.users || '0%', icon: Users, color: 'text-blue-600', bg: 'bg-blue-50', link: 'gov-users', tooltip: 'Nombre total d\'inscrits' },
+            { label: 'Entreprises Validées', value: data.kpis.approved_companies || 0, trend: data.trends?.companies || '0%', icon: Building2, color: 'text-emerald-600', bg: 'bg-emerald-50', link: 'gov-companies', tooltip: 'Sociétés vérifiées et actives' },
+            { label: 'Produits au Catalogue', value: data.kpis.active_products || 0, trend: data.trends?.products || '0%', icon: PackagePlus, color: 'text-orange-600', bg: 'bg-orange-50', link: 'gov-products', tooltip: 'Produits en ligne dans le catalogue' },
+            { label: 'Appels d\'Offres', value: data.kpis.published_tenders || 0, trend: data.trends?.tenders || '0%', icon: FileText, color: 'text-indigo-600', bg: 'bg-indigo-50', link: 'gov-ads', tooltip: 'Appels d\'offres publiés' },
+            { label: 'Revenus Mensuels', value: (data.kpis.total_revenue || 0).toLocaleString() + ' DZD', trend: '+8.4%', icon: TrendingUp, color: 'text-purple-600', bg: 'bg-purple-50', link: 'gov-revenue', tooltip: 'Revenus générés sur la période' },
+          ]);
+          
+          if (data.charts.registrations && data.charts.registrations.length > 0) {
+            setRegistrationsData(data.charts.registrations.map((d: any) => ({ day: d.date.split('-').slice(1).join('/'), inscriptions: d.count })));
+          }
+          if (data.charts.revenue && data.charts.revenue.length > 0) {
+            setRevenueData(data.charts.revenue.map((d: any) => ({ period: d.date.split('-').slice(1).join('/'), revenue: d.revenue })));
+          }
+        }
+      } catch (e) {
+        console.error('Error fetching admin dashboard stats:', e);
+      } finally {
+        setIsDashboardLoading(false);
+      }
+    };
+    fetchDashboard();
+  }, [chartTimeframe]);
 
 
 
@@ -303,8 +330,8 @@ const ConsolePro = () => {
     editingCategoryName, setEditingCategoryName, handleApproveProduct, handleRejectProduct,
     handleApproveAd, handleRejectAd, handleAddCategory, handleOpenCategorySettings,
     handleSaveCategorySettings, handleAddSubCategory, handleRemoveSubCategory, showNotify,
-    handleApproveKYC, handleRejectKYC, statsAdmin, revenueData, profile, visits, events,
-    totalTimeSpentSec, clearLogs, logout, navigate
+    handleApproveKYC, handleRejectKYC, statsAdmin, revenueData, registrationsData, profile, visits, events,
+    totalTimeSpentSec, clearLogs, logout, navigate, isDashboardLoading
   };
 
   return <ConsoleLayout state={consoleState} />;

@@ -57,3 +57,22 @@
     @apply text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-1 block;
   }
 }
+
+@media print {
+  body {
+    background-color: white;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .bg-white\/70, .backdrop-blur-md {
+    background: white !important;
+    border: 1px solid #e5e7eb !important;
+    box-shadow: none !important;
+  }
+  button {
+    display: none !important;
+  }
+  .recharts-wrapper {
+    max-width: 100% !important;
+  }
+}

@@ -66,18 +66,20 @@ export default function GovAnalytics({ state }: { state: any }) {
         <h3 className="text-xl font-black text-primary uppercase italic px-4">Synthèse Analytique</h3>
         <div className="flex items-center gap-4">
           <div className="flex bg-gray-50 p-1 rounded-lg">
-            <button 
-              onClick={() => setChartTimeframe('6m')}
-              className={cn("px-4 py-2 rounded-md text-[10px] font-black uppercase transition-all", chartTimeframe === '6m' ? "bg-white shadow-sm text-primary" : "text-gray-400 hover:text-primary")}
-            >
-              6 mois
-            </button>
-            <button 
-              onClick={() => setChartTimeframe('1y')}
-              className={cn("px-4 py-2 rounded-md text-[10px] font-black uppercase transition-all", chartTimeframe === '1y' ? "bg-white shadow-sm text-primary" : "text-gray-400 hover:text-primary")}
-            >
-              1 an
-            </button>
+            {[
+              { id: '7', label: '7 Jours' },
+              { id: '30', label: '30 Jours' },
+              { id: '90', label: '3 Mois' },
+              { id: '365', label: '1 An' }
+            ].map(tf => (
+              <button 
+                key={tf.id}
+                onClick={() => setChartTimeframe(tf.id)}
+                className={cn("px-4 py-2 rounded-md text-[10px] font-black uppercase transition-all", chartTimeframe === tf.id ? "bg-white shadow-sm text-primary" : "text-gray-400 hover:text-primary")}
+              >
+                {tf.label}
+              </button>
+            ))}
           </div>
           
           <button

@@ -1,0 +1,76 @@
+--- server/routes/users.ts
++++ server/routes/users.ts
+@@ -87,4 +87,83 @@
+   }
+ });
+ 
++
++// GET /api/users/:id/details - Get user details
++router.get('/:id/details', verifyRole(['admin']), async (req, res) => {
++  try {
++    const { id } = req.params;
++    const supabase = getSupabase();
++    
++    const [userRes, companiesRes, productsRes, messagesRes] = await Promise.all([
++      supabase.from('users').select('*').eq('id', id).single(),
++      supabase.from('companies').select('*').eq('owner_id', id),
++      supabase.from('products').select('*, companies!inner(owner_id)').eq('companies.owner_id', id),
++      supabase.from('messages').select('*').or(`sender_id.eq.${id},receiver_id.eq.${id}`)
++    ]);
++
++    if (userRes.error) throw userRes.error;
++
++    return res.json({
++      profile: userRes.data,
++      companies: companiesRes.data || [],
++      products: productsRes.data || [],
++      messages: messagesRes.data || [],
++    });
++  } catch (err: any) {
++    console.error("Error GET /api/users/:id/details:", err);
++    return res.status(500).json({ error: err.message });
++  }
++});
++
++// DELETE /api/users/:id - Delete user
++router.delete('/:id', verifyRole(['admin']), async (req, res) => {
++  try {
++    const { id } = req.params;
++    const supabase = getSupabase();
++    
++    // First delete user from auth.users (this should cascade if configured, but let's do public.users cleanup)
++    // Let's manually cleanup some tables if there's no cascade
++    await supabase.from('messages').delete().or(`sender_id.eq.${id},receiver_id.eq.${id}`);
++    await supabase.from('favorites').delete().eq('user_id', id);
++    await supabase.from('kyc_requests').delete().eq('user_id', id);
++    
++    const { data: companies } = await supabase.from('companies').select('id').eq('owner_id', id);
++    if (companies && companies.length > 0) {
++      const companyIds = companies.map(c => c.id);
++      await supabase.from('products').delete().in('company_id', companyIds);
++      await supabase.from('tenders').delete().in('company_id', companyIds);
++      await supabase.from('companies').delete().in('id', companyIds);
++    }
++
++    const { error } = await supabase.from('users').delete().eq('id', id);
++    
++    if (error) {
++      console.error("Delete public.users error:", error);
++      throw error;
++    }
++
++    // Optionally delete from auth
++    const { error: authError } = await supabase.auth.admin.deleteUser(id);
++    if (authError) {
++      console.error("Auth user delete error:", authError);
++      // Non-fatal if public user is deleted
++    }
++
++    return res.json({ success: true, message: 'Utilisateur supprimé avec succès' });
++  } catch (err: any) {
++    console.error("Error DELETE /api/users/:id:", err);
++    return res.status(500).json({ error: err.message });
++  }
++});
++
+ export default router;
