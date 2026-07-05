@@ -35,7 +35,7 @@ const Navbar = () => {
   const profileMenuItems = [
     { label: i18n.language === 'ar' ? 'ملفي الشخصي' : 'Mon profil', path: '/dashboard', icon: UserCircle },
     { label: i18n.language === 'ar' ? 'اشتراكي' : 'Mon abonnement', path: '/subscriptions', icon: Award },
-    { label: i18n.language === 'ar' ? 'مفضلاتي' : 'Mes favoris', path: '/dashboard?tab=favorites', icon: Zap },
+    { label: i18n.language === 'ar' ? 'مفضلاتي' : 'Mes favoris', path: '/favorites', icon: Zap },
     { label: i18n.language === 'ar' ? 'طلباتي' : 'Mes demandes', path: '/dashboard?tab=orders', icon: FileText },
   ];
 

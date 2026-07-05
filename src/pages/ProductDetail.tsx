@@ -33,7 +33,7 @@ const ProductDetail = () => {
   const [isLoading, setIsLoading] = useState(true);
   const { isAuthenticated } = useAuth();
   const [product, setProduct] = useState<any>(null);
-  const [isFavorite, setIsFavorite] = useState(false);
+  const [favoriteId, setFavoriteId] = useState<string | null>(null);
 
   
   const [showReport, setShowReport] = useState(false);
@@ -73,7 +73,8 @@ const ProductDetail = () => {
         const res = await fetch('/api/favorites');
         if (res.ok) {
           const data = await res.json();
-          setIsFavorite(data.some((f: any) => f.item_id === id));
+          const fav = data.find((f: any) => f.item_id === id);
+          if (fav) setFavoriteId(fav.id);
         }
       } catch (err) {
         console.error(err);
@@ -128,9 +129,9 @@ const ProductDetail = () => {
     }
     
     try {
-      if (isFavorite) {
-        await fetch(`/api/favorites/item/${id}`, { method: 'DELETE' });
-        setIsFavorite(false);
+      if (favoriteId) {
+        await fetch(`/api/favorites/${favoriteId}`, { method: 'DELETE' });
+        setFavoriteId(null);
       } else {
         const res = await fetch('/api/favorites', {
           method: 'POST',
@@ -138,7 +139,8 @@ const ProductDetail = () => {
           body: JSON.stringify({ item_type: 'product', item_id: id })
         });
         if (res.ok) {
-          setIsFavorite(true);
+          const data = await res.json();
+          setFavoriteId(data.id);
         }
       }
     } catch (e) {
@@ -190,11 +192,11 @@ const ProductDetail = () => {
                 <button 
                   className={cn(
                     "bg-white/80 backdrop-blur-md p-3 rounded-full shadow-lg transition-colors",
-                    isFavorite ? "text-red-500" : "text-gray-400 hover:text-red-500"
+                    favoriteId !== null ? "text-red-500" : "text-gray-400 hover:text-red-500"
                   )} 
                   onClick={(e) => { e.preventDefault(); toggleFavorite(); }}
                 >
-                  <Heart className="h-5 w-5" fill={isFavorite ? "currentColor" : "none"} />
+                  <Heart className="h-5 w-5" fill={favoriteId ? "currentColor" : "none"} />
                 </button>
                 <button className="bg-white/80 backdrop-blur-md p-3 rounded-full shadow-lg text-gray-400 hover:text-primary transition-colors" onClick={(e) => { 
                   e.preventDefault(); 

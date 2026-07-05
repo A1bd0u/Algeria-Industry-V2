@@ -34,6 +34,7 @@ import NotFound from './pages/NotFound';
 import Privacy from './pages/Privacy';
 import ProductDetail from './pages/ProductDetail';
 import Products from './pages/Products';
+import Favorites from './pages/Favorites';
 import Register from './pages/Register';
 import RegisterSuccess from './pages/RegisterSuccess';
 import Resources from './pages/Resources';
@@ -107,6 +108,7 @@ export default function App() {
                       <Route path="/directory" element={<PageTransition><Directory /></PageTransition>} />
                       <Route path="/directory/:id" element={<PageTransition><CompanyProfile /></PageTransition>} />
                       <Route path="/products" element={<PageTransition><Products /></PageTransition>} />
+                      <Route path="/favorites" element={<PageTransition><Favorites /></PageTransition>} />
                       <Route path="/products/:id" element={<PageTransition><ProductDetail /></PageTransition>} />
                       <Route path="/exhibitors" element={<PageTransition><Exhibitors /></PageTransition>} />
                       <Route path="/search" element={<PageTransition><SearchResults /></PageTransition>} />

@@ -55,7 +55,13 @@ const Directory = () => {
           }
         ];
         
-        const res = await fetch('/api/companies').catch(() => null);
+        const params = new URLSearchParams();
+        if (searchQuery) params.append('search', searchQuery);
+        if (isCertifiedOnly) params.append('certified', 'true');
+        if (selectedRegion !== t('common.all') && selectedRegion) params.append('region', selectedRegion);
+        if (selectedSectors.length > 0) params.append('sectors', selectedSectors.join(','));
+        
+        const res = await fetch(`/api/companies?${params.toString()}`).catch(() => null);
         let data = fallbackData;
         
         if (res && res.ok) {
@@ -84,8 +90,12 @@ const Directory = () => {
       }
     };
     
-    fetchCompanies();
-  }, []);
+    const timeoutId = setTimeout(() => {
+      fetchCompanies();
+    }, 300);
+    
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery, isCertifiedOnly, selectedRegion, selectedSectors, t]);
 
   const sectors = [t('categories.agrifood'), t('categories.btph'), t('categories.chemistry'), t('categories.energy'), t('categories.pharma'), t('categories.metallurgy'), t('categories.plastics'), t('categories.textile'), t('categories.electronics'), t('categories.auto'), t('categories.renewable')];
   const regions = ["Alger", "Oran", "Constantine", "Béjaïa", "Sétif", "Bordj Bou Arreridj"];

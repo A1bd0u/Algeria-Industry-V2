@@ -31,8 +31,8 @@ import {
   Zap
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
-import MessagingInterface from '../components/MessagingInterface';
-import AddProduct from '../components/AddProduct';
+import Messages from './Messages';
+import AddProduct from './AddProduct';
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import {
@@ -125,6 +125,8 @@ const Dashboard = () => {
   const [products, setProducts] = useState<any[]>([]);
   const [messages, setMessages] = useState<any[]>([]);
   const [favorites, setFavorites] = useState<any[]>([]);
+  const [showAddProduct, setShowAddProduct] = useState(false);
+  const [editProduct, setEditProduct] = useState<any>(null);
   
   useEffect(() => {
      const fetchData = async () => {
@@ -135,12 +137,7 @@ const Dashboard = () => {
              fetch('/api/favorites')
            ]);
            if (prodRes.ok) {
-              let data = await prodRes.json();
-              if (data.length === 0) {
-                 data = [
-                   { id: "550e8400-e29b-41d4-a716-446655440000", reference_id: "PRD-A45B81", name: "Pompe Centrifuge Industrielle", status: "Actif", price: "Sur devis", views: 120, leads: 5 }
-                 ];
-              }
+              const data = await prodRes.json();
               setProducts(data);
            }
            if (msgRes.ok) {
@@ -148,12 +145,7 @@ const Dashboard = () => {
               setMessages(data);
            }
            if (favRes.ok) {
-              let data = await favRes.json();
-              if (data.length === 0) {
-                 data = [
-                   { item_id: "a12b8400-d29b-41d4-a716-446655440333", item_type: "product", name: "Vanne Papillon Motorisée", reference_id: "PRD-5XQPL2" }
-                 ];
-              }
+              const data = await favRes.json();
               setFavorites(data);
            }
         } catch (e) {
@@ -527,7 +519,7 @@ const Dashboard = () => {
           </motion.div>
         );
       case 'messages':
-        return <MessagingInterface />;
+        return <Messages />;
       case 'favorites':
         return (
           <motion.div 
@@ -760,6 +752,82 @@ const Dashboard = () => {
                    ))}
                 </div>
              </div>
+          </motion.div>
+        );
+      case 'products':
+        return (
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+          >
+            <div className="flex justify-between items-center mb-8">
+               <h3 className="text-2xl font-black text-primary uppercase italic">Mes Produits</h3>
+               <button 
+                 onClick={() => setShowAddProduct(true)}
+                 className="bg-primary text-white px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-widest flex items-center space-x-2 hover:bg-secondary transition-all"
+               >
+                 <Package className="h-4 w-4" />
+                 <span>Ajouter</span>
+               </button>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+               {products.map(p => (
+                 <div key={p.id} className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm relative group hover:shadow-md transition-all flex flex-col">
+                   {p.file_url ? (
+                     <img src={p.file_url} className="w-full h-40 object-cover rounded-2xl mb-4" alt={p.name} />
+                   ) : (
+                     <div className="w-full h-40 bg-gray-50 rounded-2xl mb-4 flex items-center justify-center">
+                       <Package className="h-10 w-10 text-gray-300" />
+                     </div>
+                   )}
+                   <h4 className="font-bold text-primary mb-1">{p.name}</h4>
+                   <p className="text-xs text-gray-500 mb-2">{p.category}</p>
+                   <div className="mt-auto pt-4 border-t border-gray-50 flex justify-between items-center">
+                     <span className={cn("text-[10px] font-black uppercase tracking-widest", p.status === 'Actif' ? 'text-success' : 'text-orange-500')}>{p.status}</span>
+                     <div className="flex gap-2">
+                       <button 
+                         onClick={async () => {
+                           if(window.confirm('Supprimer ce produit ?')) {
+                             const res = await fetch(`/api/products/${p.id}`, { method: 'DELETE' });
+                             if (res.ok) {
+                               setProducts(products.filter(prod => prod.id !== p.id));
+                             }
+                           }
+                         }}
+                         className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                       >
+                         <button 
+                         onClick={() => {
+                           setEditProduct(p);
+                           setShowAddProduct(true);
+                         }}
+                         className="p-2 text-primary hover:bg-primary/5 rounded-lg transition-colors mr-2"
+                       >
+                         <Edit2 className="h-4 w-4" />
+                       </button>
+                       <Trash2 className="h-4 w-4" />
+                       </button>
+                     </div>
+                   </div>
+                 </div>
+               ))}
+               {products.length === 0 && (
+                 <div className="col-span-full py-12 flex flex-col items-center justify-center text-center bg-gray-50 rounded-3xl border border-dashed border-gray-200">
+                    <Package className="h-12 w-12 text-gray-300 mb-4" />
+                    <p className="text-gray-500 font-bold uppercase tracking-widest text-sm">Aucun produit</p>
+                    <p className="text-gray-400 text-xs mt-2 max-w-xs">Vous n'avez pas encore ajouté de produits à votre catalogue.</p>
+                 </div>
+               )}
+            </div>
+            <AddProduct 
+              isOpen={showAddProduct}
+              initialData={editProduct}
+              onClose={() => { setShowAddProduct(false); setEditProduct(null); }}
+              onSuccess={(newProd) => {
+                if (editProduct) { setProducts(products.map(p => p.id === newProd.id ? newProd : p)); } else { setProducts([newProd, ...products]); }
+              }}
+            />
           </motion.div>
         );
       case 'company':

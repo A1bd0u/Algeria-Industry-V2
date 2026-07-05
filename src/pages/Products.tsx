@@ -19,6 +19,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { ProductSkeleton } from '../components/Skeleton';
 import { useAuth } from '../context/AuthContext';
 import { cn, generateSlugUrl } from '../lib/utils';
+import AddProduct from './AddProduct';
 
 const Products = () => {
   const [activePage, setActivePage] = React.useState(1);
@@ -103,52 +104,6 @@ const Products = () => {
         
         let data = await res.json();
         
-        // Formatter les données
-        if (data.length === 0) {
-          // Fallback to hardcoded mock data if database is empty
-          data = [
-            {
-              id: "550e8400-e29b-41d4-a716-446655440000",
-              reference_id: "PRD-A45B81",
-              name: "Pompe Centrifuge Industrielle",
-              brand: "Global Flow",
-              price: "Sur devis",
-              cat: "Équipement",
-              region: "Alger",
-              image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=800",
-              features: ["Haut débit", "Acier Inox"],
-              verified: true,
-              owner_id: "system"
-            },
-            {
-              id: "c98b8400-e29b-41d4-a716-446655440111",
-              reference_id: "PRD-91BC2A",
-              name: "Filtre à Cartouche Haute Pression",
-              brand: "AquaTech",
-              price: "120 000 DZD",
-              cat: "Pièces mécaniques : Engrenages, roulements, joints.",
-              region: "Oran",
-              image: "https://images.unsplash.com/photo-1532522750741-628fde798c73?auto=format&fit=crop&q=80&w=800",
-              features: ["5 Microns", "Maintenance facile"],
-              verified: true,
-              owner_id: "system"
-            },
-            {
-               id: "a12b8400-d29b-41d4-a716-446655440333",
-               reference_id: "PRD-5XQPL2",
-               name: "Vanne Papillon Motorisée",
-               brand: "ValvePro",
-               price: "Sur devis",
-               cat: "Composants électroniques : Capteurs, microcontrôleurs, cartes.",
-               region: "Sétif",
-               image: "https://images.unsplash.com/photo-1563851509-0ee216d6fcb2?auto=format&fit=crop&q=80&w=800",
-               features: ["Commande électrique", "Étanchéité totale"],
-               verified: false,
-               owner_id: "system"
-             }
-          ];
-        }
-
         // Formatter les données pour le catalogue complet
         data = data.map((p: any) => ({
            id: p.id,
@@ -187,7 +142,7 @@ const Products = () => {
     try {
       if (isFav) {
         // Remove favorite
-        await fetch(`/api/favorites/item/${productId}`, { method: 'DELETE' });
+        await fetch(`/api/favorites/${isFav.id}`, { method: 'DELETE' });
         setFavorites(prev => prev.filter(f => f.item_id !== productId));
       } else {
         // Add favorite
@@ -222,21 +177,14 @@ const Products = () => {
 
   return (
     <React.Fragment>
-      {showAddModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-           <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl relative">
-              <button onClick={() => setShowAddModal(false)} className="absolute top-4 right-4 text-gray-400 hover:text-primary">✕</button>
-              <h3 className="text-2xl font-black uppercase text-primary mb-2">Ajouter un produit</h3>
-              <p className="text-sm text-gray-500 mb-6">Veuillez renseigner les informations de base pour votre nouveau produit.</p>
-              <form onSubmit={(e) => { e.preventDefault(); setShowAddModal(false); alert("Le produit a été ajouté au catalogue en attente de modération."); }}>
-                 <input type="text" placeholder="Nom du produit" required className="w-full mb-4 p-4 border border-gray-200 rounded-xl outline-none focus:border-primary focus:ring-1 focus:ring-primary/20" />
-                 <textarea placeholder="Description" rows={3} required className="w-full mb-4 p-4 border border-gray-200 rounded-xl outline-none focus:border-primary focus:ring-1 focus:ring-primary/20"></textarea>
-                 <button type="submit" className="w-full py-4 bg-primary text-white rounded-xl font-black uppercase tracking-widest text-xs hover:bg-secondary transition-all">Enregistrer</button>
-              </form>
-           </div>
-        </div>
-      )}
-  
+            <AddProduct 
+         isOpen={showAddModal} 
+         onClose={() => setShowAddModal(false)} 
+         onSuccess={(prod) => {
+            setProducts([prod, ...products]);
+         }}
+      />
+      
     <div className={cn("min-h-screen bg-neutral-bg pt-32 pb-20", i18n.language === 'ar' && "font-arabic")}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header Section */}

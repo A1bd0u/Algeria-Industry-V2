@@ -3,22 +3,42 @@ import { X, Upload, Loader2, CheckCircle2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface AddProductProps {
+  initialData?: any;
   isOpen: boolean;
   onClose: () => void;
   onSuccess: (product: any) => void;
-  productCategories: any[];
+  productCategories?: any[];
 }
 
 const STORAGE_KEY = 'addProductFormDraft';
 
-const AddProduct: React.FC<AddProductProps> = ({ isOpen, onClose, onSuccess, productCategories }) => {
-  const [formData, setFormData] = useState({
+const DEFAULT_CATEGORIES = [
+  {
+    id: 1,
+    name: 'Équipements Industriels',
+    subCategories: [
+      { id: 101, name: 'Machines-Outils' },
+      { id: 102, name: 'Pompes & Vannes' }
+    ]
+  },
+  {
+    id: 2,
+    name: 'Matières Premières',
+    subCategories: [
+      { id: 201, name: 'Métaux' },
+      { id: 202, name: 'Chimie' }
+    ]
+  }
+];
+
+const AddProduct: React.FC<AddProductProps> = ({ isOpen, onClose, onSuccess, productCategories = DEFAULT_CATEGORIES, initialData }) => {
+  const [formData, setFormData] = useState(initialData || {
     name: '',
     category: '',
     price: '',
     description: ''
   });
-  const [fileUrl, setFileUrl] = useState<string | null>(null);
+  const [fileUrl, setFileUrl] = useState<string | null>(initialData?.file_url || initialData?.image || null);
   
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -28,18 +48,35 @@ const AddProduct: React.FC<AddProductProps> = ({ isOpen, onClose, onSuccess, pro
   // Charger le brouillon
   useEffect(() => {
     if (isOpen) {
+      if (initialData) {
+         setFormData({ name: initialData.name || '', category: initialData.category || '', price: initialData.price || '', description: initialData.description || '' });
+         setFileUrl(initialData.file_url || initialData.image || null);
+      } else {
+         const saved = localStorage.getItem(STORAGE_KEY);
+         if (saved) {
+           setFormData(JSON.parse(saved));
+         } else {
+           setFormData({ name: '', category: '', price: '', description: '' });
+         }
+         setFileUrl(null);
+      }
+    }
+  }, [isOpen, initialData]);
+
+  useEffect(() => {
+    if (!initialData) {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
-          setFormData(parsed.formData || { name: '', category: '', price: '', description: '' });
-          if (parsed.fileUrl) setFileUrl(parsed.fileUrl);
-        } catch (e) {
-          console.error("Erreur lecture brouillon", e);
-        }
+          if (parsed && typeof parsed === 'object') {
+             setFormData(parsed.formData || { name: '', category: '', price: '', description: '' });
+             if (parsed.fileUrl) setFileUrl(parsed.fileUrl);
+          }
+        } catch(e) {}
       }
     }
-  }, [isOpen]);
+  }, [initialData]);
 
   // Sauvegarder le brouillon
   useEffect(() => {
@@ -97,7 +134,7 @@ const AddProduct: React.FC<AddProductProps> = ({ isOpen, onClose, onSuccess, pro
       setError('Erreur réseau lors de l\'upload.');
     });
 
-    xhr.open('POST', '/api/upload');
+    xhr.open('POST', '/api/upload?bucket=product-images');
     // Assuming auth is handled via cookies which are sent automatically, if JWT in header is needed, add it here.
     xhr.send(data);
   };
@@ -113,14 +150,16 @@ const AddProduct: React.FC<AddProductProps> = ({ isOpen, onClose, onSuccess, pro
     };
 
     try {
-      const res = await fetch('/api/products', {
-        method: 'POST',
+      const url = initialData ? `/api/products/${initialData.id}` : '/api/products';
+      const method = initialData ? 'PUT' : 'POST';
+      const res = await fetch(url, {
+        method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.error || 'Erreur lors de la création du produit');
+        throw new Error(data.error || 'Erreur lors de la sauvegarde du produit');
       }
       const addedProd = await res.json();
       
@@ -152,7 +191,7 @@ const AddProduct: React.FC<AddProductProps> = ({ isOpen, onClose, onSuccess, pro
         <div className="p-10 overflow-y-auto">
           <div className="flex justify-between items-center mb-8">
             <div>
-              <h3 className="text-2xl font-black text-primary uppercase tracking-tighter italic">Nouveau Produit</h3>
+              <h3 className="text-2xl font-black text-primary uppercase tracking-tighter italic">{initialData ? 'Modifier le Produit' : 'Nouveau Produit'}</h3>
               <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Référencement au catalogue (Brouillon sauvegardé)</p>
             </div>
             <button onClick={onClose} className="p-3 text-gray-400 hover:text-primary transition-all">
@@ -266,7 +305,7 @@ const AddProduct: React.FC<AddProductProps> = ({ isOpen, onClose, onSuccess, pro
                 disabled={isLoading || isUploading}
                 className="flex-1 bg-primary text-white py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl hover:bg-secondary transition-all flex items-center justify-center space-x-3 disabled:opacity-50"
               >
-                {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <span>Ajouter au catalogue</span>}
+                {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <span>{initialData ? 'Mettre à jour' : 'Ajouter au catalogue'}</span>}
               </button>
               <button 
                 type="button"

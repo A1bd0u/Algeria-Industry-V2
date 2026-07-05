@@ -14,48 +14,42 @@ interface Message {
   time: string;
 }
 
-export default function MessagingInterface() {
+export default function Messages() {
   const queryClient = useQueryClient();
   const [selectedContact, setSelectedContact] = useState<string | null>(null);
   const [inputText, setInputText] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const { data: messages = [], isLoading } = useQuery<Message[]>({
-    queryKey: ['messages'],
+    const { data: conversations = [], isLoading: isLoadingConvos } = useQuery({
+    queryKey: ['conversations'],
     queryFn: async () => {
-      const res = await fetch('/api/messages');
+      const res = await fetch('/api/messages/conversations');
+      if (!res.ok) throw new Error('Failed to fetch conversations');
+      return res.json();
+    },
+    refetchInterval: 15000,
+  });
+
+  const { data: activeMessages = [], isLoading: isLoadingMessages } = useQuery<Message[]>({
+    queryKey: ['messages', selectedContact],
+    queryFn: async () => {
+      if (!selectedContact) return [];
+      const res = await fetch(`/api/messages/${selectedContact}`);
       if (!res.ok) throw new Error('Failed to fetch messages');
       return res.json();
     },
-    refetchInterval: 10000,
+    enabled: !!selectedContact,
+    refetchInterval: 5000, // Polling frequent for active chat
   });
 
-  const conversationsMap = new Map<string, { lastMessage: Message, unread: number }>();
-  messages.forEach(m => {
-    const otherId = m.sender === 'me' ? m.receiver_id : m.sender_id;
-    const contactId = otherId || 'general';
-    if (!conversationsMap.has(contactId) || new Date(m.created_at) > new Date(conversationsMap.get(contactId)!.lastMessage.created_at)) {
-      conversationsMap.set(contactId, { lastMessage: m, unread: 0 }); 
-    }
-  });
-
-  const conversations = Array.from(conversationsMap.entries()).map(([id, data]) => ({
-    id,
-    name: id === 'general' ? 'Discussion Générale' : `Contact ${id.substring(0,4)}`,
-    ...data
-  })).sort((a, b) => new Date(b.lastMessage.created_at).getTime() - new Date(a.lastMessage.created_at).getTime());
+  const isLoading = isLoadingConvos || isLoadingMessages;
 
   useEffect(() => {
     if (!selectedContact && conversations.length > 0) {
       setSelectedContact(conversations[0].id);
     }
   }, [conversations, selectedContact]);
-
-  const activeMessages = messages.filter(m => {
-    const otherId = m.sender === 'me' ? m.receiver_id : m.sender_id;
-    return (otherId || 'general') === selectedContact;
-  });
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -72,7 +66,8 @@ export default function MessagingInterface() {
       return res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['messages'] });
+      queryClient.invalidateQueries({ queryKey: ['messages', selectedContact] });
+      queryClient.invalidateQueries({ queryKey: ['conversations'] });
       setInputText('');
     }
   });

@@ -23,15 +23,37 @@ router.get('/', async (req, res) => {
   try {
     const supabase = getSupabase();
     
-    const { data: companies, error } = await supabase
-      .from('companies')
-      .select('*');
+    let query = supabase.from('companies').select('*');
+    const { search, region, sectors, certified } = req.query;
+
+    if (search && typeof search === 'string') {
+      query = query.ilike('name', `%${search}%`);
+    }
+
+    if (sectors && typeof sectors === 'string') {
+      const sectorList = sectors.split(',');
+      query = query.in('activity_sector', sectorList);
+    }
+
+    if (certified === 'true') {
+      query = query.eq('status', 'approved');
+    }
+
+    const { data: companies, error } = await query;
 
     if (error) {
       throw error;
     }
+    
+    let result = companies || [];
+    
+    // Fallback in-memory filter for region if the column doesn't exist on schema
+    // assuming it might be stored in address or doesn't exist
+    if (region && typeof region === 'string') {
+       result = result.filter(c => (c.region === region) || (c.address && c.address.includes(region)));
+    }
 
-    return res.json(companies || []);
+    return res.json(result);
   } catch (err: any) {
     console.error("Supabase Error GET /companies:", err);
     return res.status(500).json({ error: err.message });
