@@ -43,7 +43,7 @@ const resendCodeSchema = z.object({
   email: z.string().email('Email invalide')
 });
 
-const JWT_SECRET = process.env.JWT_SECRET || 'algiers_industry_super_secure_secret_2026';
+const JWT_SECRET = process.env.JWT_SECRET as string;
 
 const emailVerifications = new Map<string, boolean>();
 const verificationCodes = new Map<string, string>();
