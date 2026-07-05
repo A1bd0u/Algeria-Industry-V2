@@ -141,7 +141,7 @@ const Contact = () => {
 
             {/* Support SLA Card */}
             <div className="bg-secondary p-8 rounded-3xl text-white shadow-xl relative overflow-hidden">
-              <div className="absolute -right-4 -bottom-4 opacity-10">
+              <div className="absolute -end-4 -bottom-4 opacity-10">
                 <Clock className="h-32 w-32" />
               </div>
               <h3 className="text-xl font-bold mb-4">Support Premium</h3>
@@ -271,7 +271,7 @@ const Contact = () => {
               >
                 <button 
                   onClick={() => setOpenFaq(openFaq === index ? null : index)}
-                  className="w-full px-6 py-5 text-left flex items-center justify-between hover:bg-gray-50 transition-colors"
+                  className="w-full px-6 py-5 text-start flex items-center justify-between hover:bg-gray-50 transition-colors"
                 >
                   <span className="font-bold text-primary">{faq.question}</span>
                   {openFaq === index ? <ChevronUp className="h-5 w-5 text-secondary" /> : <ChevronDown className="h-5 w-5 text-gray-400" />}

@@ -11,7 +11,7 @@ const ComparisonBar = () => {
   if (comparedProducts.length === 0) return null;
 
   return (
-    <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-[9999] w-full max-w-4xl px-4">
+    <div className="fixed bottom-24 start-1/2 -translate-x-1/2 z-[9999] w-full max-w-4xl px-4">
       <AnimatePresence>
         {isExpanded ? (
           <motion.div
@@ -43,7 +43,7 @@ const ComparisonBar = () => {
                       </div>
                       <button 
                         onClick={() => removeFromCompare(product.id)}
-                        className="absolute -top-2 -right-2 bg-white text-error p-1.5 rounded-full shadow-lg hover:scale-110 transition-all"
+                        className="absolute -top-2 -end-2 bg-white text-error p-1.5 rounded-full shadow-lg hover:scale-110 transition-all"
                       >
                         <X className="h-4 w-4" />
                       </button>
@@ -93,10 +93,10 @@ const ComparisonBar = () => {
             onClick={() => setIsExpanded(true)}
             className="bg-primary text-white p-4 rounded-3xl shadow-2xl flex items-center space-x-6 border border-white/10 backdrop-blur-md"
           >
-            <div className="flex items-center space-x-3 pr-4 border-r border-white/10">
+            <div className="flex items-center space-x-3 pe-4 border-r border-white/10">
               <div className="relative">
                 <GitCompare className="h-6 w-6 text-secondary" />
-                <span className="absolute -top-2 -right-2 bg-secondary text-white text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full border-2 border-primary">
+                <span className="absolute -top-2 -end-2 bg-secondary text-white text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full border-2 border-primary">
                   {comparedProducts.length}
                 </span>
               </div>

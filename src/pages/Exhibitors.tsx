@@ -125,12 +125,12 @@ const Exhibitors = () => {
           </div>
           
           <div className="flex items-center space-x-4 bg-white p-3 rounded-2xl border border-gray-100 shadow-sm">
-            <div className="text-right">
+            <div className="text-end">
               <p className="text-[10px] font-black text-primary uppercase tracking-widest">Exposants Actifs</p>
               <p className="text-2xl font-black text-secondary tracking-tighter">542+</p>
             </div>
             <div className="w-px h-8 bg-gray-100" />
-            <div className="text-right">
+            <div className="text-end">
               <p className="text-[10px] font-black text-primary uppercase tracking-widest">Secteurs</p>
               <p className="text-2xl font-black text-secondary tracking-tighter">18</p>
             </div>
@@ -141,7 +141,7 @@ const Exhibitors = () => {
         <div className="mb-12">
           <div className="flex flex-col lg:flex-row gap-4">
             <div className="flex-1 flex items-center bg-white p-2 rounded-2xl border border-gray-100 shadow-sm focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary transition-all">
-              <Search className="h-5 w-5 text-gray-400 ml-3" />
+              <Search className="h-5 w-5 text-gray-400 ms-3" />
               <input 
                 type="text" 
                 placeholder="Rechercher une entreprise par nom ou activité..."
@@ -158,17 +158,17 @@ const Exhibitors = () => {
               <div className="relative" ref={sectorRef}>
                 <button
                   onClick={() => setIsSectorOpen(!isSectorOpen)}
-                  className="w-full sm:w-auto flex items-center justify-between bg-white px-5 py-3 rounded-xl border border-gray-100 shadow-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all cursor-pointer text-gray-800 hover:border-gray-300 min-w-[260px] text-left"
+                  className="w-full sm:w-auto flex items-center justify-between bg-white px-5 py-3 rounded-xl border border-gray-100 shadow-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all cursor-pointer text-gray-800 hover:border-gray-300 min-w-[260px] text-start"
                 >
                   <div className="flex flex-col gap-0.5">
                     <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{i18n.language === 'ar' ? 'القطاع' : 'Secteur d\'activité'}</span>
                     <span className="text-xs font-black uppercase tracking-widest truncate">{activeSector === 'Tous' ? 'Tous les Secteurs' : activeSector}</span>
                   </div>
-                  <ChevronDown className={cn("w-4 h-4 text-gray-400 transition-transform ml-4 shrink-0", isSectorOpen && "rotate-180")} />
+                  <ChevronDown className={cn("w-4 h-4 text-gray-400 transition-transform ms-4 shrink-0", isSectorOpen && "rotate-180")} />
                 </button>
                 
                 {isSectorOpen && (
-                  <div className="absolute top-full left-0 z-50 w-full mt-2 bg-white rounded-xl shadow-xl border border-gray-100 py-2 overflow-hidden transform origin-top animate-in fade-in slide-in-from-top-2 duration-200">
+                  <div className="absolute top-full start-0 z-50 w-full mt-2 bg-white rounded-xl shadow-xl border border-gray-100 py-2 overflow-hidden transform origin-top animate-in fade-in slide-in-from-top-2 duration-200">
                     <div className="px-4 py-2">
                        <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{i18n.language === 'ar' ? 'القطاعات' : 'Secteurs'}</span>
                     </div>
@@ -176,7 +176,7 @@ const Exhibitors = () => {
                       <button
                         key={s}
                         className={cn(
-                          "w-full text-left px-4 py-3 text-xs font-bold uppercase tracking-widest hover:bg-gray-50 transition-colors flex items-center justify-between group",
+                          "w-full text-start px-4 py-3 text-xs font-bold uppercase tracking-widest hover:bg-gray-50 transition-colors flex items-center justify-between group",
                           activeSector === s ? "text-primary bg-primary/5" : "text-gray-600"
                         )}
                         onClick={() => {
@@ -195,17 +195,17 @@ const Exhibitors = () => {
               <div className="relative" ref={regionRef}>
                 <button
                   onClick={() => setIsRegionOpen(!isRegionOpen)}
-                  className="w-full sm:w-auto flex items-center justify-between bg-white px-5 py-3 rounded-xl border border-gray-100 shadow-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all cursor-pointer text-gray-800 hover:border-gray-300 min-w-[200px] text-left"
+                  className="w-full sm:w-auto flex items-center justify-between bg-white px-5 py-3 rounded-xl border border-gray-100 shadow-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all cursor-pointer text-gray-800 hover:border-gray-300 min-w-[200px] text-start"
                 >
                   <div className="flex flex-col gap-0.5">
                     <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{i18n.language === 'ar' ? 'الولاية' : 'Wilaya'}</span>
                     <span className="text-xs font-black uppercase tracking-widest truncate">{activeRegion === 'Toutes' ? 'Toutes les Wilayas' : activeRegion}</span>
                   </div>
-                  <ChevronDown className={cn("w-4 h-4 text-gray-400 transition-transform ml-4 shrink-0", isRegionOpen && "rotate-180")} />
+                  <ChevronDown className={cn("w-4 h-4 text-gray-400 transition-transform ms-4 shrink-0", isRegionOpen && "rotate-180")} />
                 </button>
                 
                 {isRegionOpen && (
-                  <div className="absolute top-full left-0 z-50 w-full mt-2 bg-white rounded-xl shadow-xl border border-gray-100 py-2 overflow-hidden transform origin-top animate-in fade-in slide-in-from-top-2 duration-200">
+                  <div className="absolute top-full start-0 z-50 w-full mt-2 bg-white rounded-xl shadow-xl border border-gray-100 py-2 overflow-hidden transform origin-top animate-in fade-in slide-in-from-top-2 duration-200">
                     <div className="px-4 py-2">
                        <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{i18n.language === 'ar' ? 'الولايات' : 'Wilayas'}</span>
                     </div>
@@ -213,7 +213,7 @@ const Exhibitors = () => {
                       <button
                         key={r}
                         className={cn(
-                          "w-full text-left px-4 py-3 text-xs font-bold uppercase tracking-widest hover:bg-gray-50 transition-colors flex items-center justify-between group",
+                          "w-full text-start px-4 py-3 text-xs font-bold uppercase tracking-widest hover:bg-gray-50 transition-colors flex items-center justify-between group",
                           activeRegion === r ? "text-primary bg-primary/5" : "text-gray-600"
                         )}
                         onClick={() => {
@@ -280,10 +280,10 @@ const Exhibitors = () => {
                   {exhibitor.name}
                 </h3>
                 <div className="flex items-center text-gray-400 mb-6">
-                  <MapPin className="h-3.5 w-3.5 mr-2 shrink-0 text-secondary" />
+                  <MapPin className="h-3.5 w-3.5 me-2 shrink-0 text-secondary" />
                   <span className="text-[10px] font-bold uppercase tracking-widest truncate">{exhibitor.location}</span>
                 </div>
-                <p className="text-xs text-gray-500 font-medium leading-relaxed italic border-l-2 border-gray-100 pl-4">
+                <p className="text-xs text-gray-500 font-medium leading-relaxed italic border-l-2 border-gray-100 ps-4">
                   "{exhibitor.description}"
                 </p>
               </div>

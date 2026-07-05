@@ -114,7 +114,7 @@ const Subscriptions = () => {
             </div>
             
             <div className="flex items-center space-x-4">
-              <div className="text-right hidden md:block">
+              <div className="text-end hidden md:block">
                 <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Statut du compte</p>
                 <div className="flex items-center space-x-2 justify-end">
                   <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
@@ -135,8 +135,8 @@ const Subscriptions = () => {
             animate={{ opacity: 1, y: 0 }}
             className="lg:col-span-2 bg-primary rounded-[32px] p-8 md:p-12 text-white relative overflow-hidden shadow-2xl"
           >
-            <div className="absolute top-0 right-0 p-12 opacity-10">
-              <ShieldCheck className="w-64 h-64 -mr-20 -mt-20" />
+            <div className="absolute top-0 end-0 p-12 opacity-10">
+              <ShieldCheck className="w-64 h-64 -me-20 -mt-20" />
             </div>
             
             <div className="relative z-10">
@@ -232,13 +232,13 @@ const Subscriptions = () => {
                   <h4 className="text-xl font-black tracking-tighter uppercase mb-6">{plan.name}</h4>
                   <div className="mb-6">
                     <span className="text-4xl font-black tracking-tighter leading-none">{plan.price}</span>
-                    <span className="text-[10px] font-bold opacity-60 ml-2 uppercase tracking-widest">{plan.period}</span>
+                    <span className="text-[10px] font-bold opacity-60 ms-2 uppercase tracking-widest">{plan.period}</span>
                   </div>
                   <p className="text-xs opacity-60 font-medium mb-8 border-b border-gray-100/10 pb-8 min-h-[60px]">
                     {plan.description}
                   </p>
                   
-                  <ul className="space-y-4 mb-10 text-left">
+                  <ul className="space-y-4 mb-10 text-start">
                     {plan.features.map((feature, idx) => (
                       <li key={idx} className="flex items-start space-x-3 text-[11px] font-bold">
                         <Check className="h-4 w-4 text-secondary shrink-0" />
@@ -284,7 +284,7 @@ const Subscriptions = () => {
           </div>
           
           <div className="overflow-x-auto">
-            <table className="w-full text-left">
+            <table className="w-full text-start">
               <thead>
                 <tr className="bg-gray-50/50">
                   <th className="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Facture #</th>
@@ -292,7 +292,7 @@ const Subscriptions = () => {
                   <th className="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Description</th>
                   <th className="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Montant</th>
                   <th className="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Statut</th>
-                  <th className="px-8 py-6 text-right"></th>
+                  <th className="px-8 py-6 text-end"></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
@@ -310,7 +310,7 @@ const Subscriptions = () => {
                         <span className="text-[10px] font-black text-success uppercase">{t.status}</span>
                       </div>
                     </td>
-                    <td className="px-8 py-6 text-right">
+                    <td className="px-8 py-6 text-end">
                       <button onClick={(e) => { e.preventDefault(); const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['Facture'], {type: 'application/pdf'})); a.download = 'facture.pdf'; a.click(); }} className="text-primary hover:text-secondary p-2 hover:bg-primary/5 rounded-lg transition-all inline-block">
                         <Download className="h-5 w-5" />
                       </button>

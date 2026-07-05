@@ -100,7 +100,7 @@ export default function GovTelemetry({ state }: { state: any }) {
                 <div>
                   <p className="text-[9px] text-primary/30 font-black uppercase tracking-[0.2em]">Mode Réseau</p>
                   <p className="text-sm font-black text-primary flex items-center mt-1 uppercase tracking-tight">
-                    <span className={`w-2.5 h-2.5 rounded-full mr-2 ${profile.online ? 'bg-emerald-500 animate-pulse' : 'bg-red-500'}`} />
+                    <span className={`w-2.5 h-2.5 rounded-full me-2 ${profile.online ? 'bg-emerald-500 animate-pulse' : 'bg-red-500'}`} />
                     {profile.online ? 'En Ligne' : 'Hors Ligne'}
                   </p>
                 </div>
@@ -111,7 +111,7 @@ export default function GovTelemetry({ state }: { state: any }) {
             <div className="bg-white p-8 rounded-[40px] border border-gray-100 shadow-sm">
               <h4 className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-6 italic">Spécifications Techniques Appareil & Navigateur</h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8">
-                <div className="border-r border-gray-100 last:border-0 pr-4 w-full">
+                <div className="border-r border-gray-100 last:border-0 pe-4 w-full">
                   <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Système d'Exploitation</p>
                   <div className="flex items-center space-x-2 mt-2">
                     <Monitor className="h-5 w-5 text-gray-600" />
@@ -119,7 +119,7 @@ export default function GovTelemetry({ state }: { state: any }) {
                   </div>
                 </div>
 
-                <div className="border-r border-gray-100 last:border-0 pr-4 w-full">
+                <div className="border-r border-gray-100 last:border-0 pe-4 w-full">
                   <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Navigateur</p>
                   <div className="flex items-center space-x-2 mt-2">
                     <Globe className="h-5 w-5 text-gray-600" />
@@ -127,14 +127,14 @@ export default function GovTelemetry({ state }: { state: any }) {
                   </div>
                 </div>
 
-                <div className="border-r border-gray-100 last:border-0 pr-4 w-full">
+                <div className="border-r border-gray-100 last:border-0 pe-4 w-full">
                   <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Adresse IP</p>
                   <p className="font-bold text-sm text-emerald-600 mt-2 font-mono truncate" title={profile.ipAddress}>
                     {profile.ipAddress || 'Détection...'}
                   </p>
                 </div>
 
-                <div className="border-r border-gray-100 last:border-0 pr-4 w-full">
+                <div className="border-r border-gray-100 last:border-0 pe-4 w-full">
                   <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Langue & Résolution</p>
                   <p className="font-bold text-sm text-primary mt-2">
                     {profile.language.toUpperCase()} • {profile.screenWidth} x {profile.screenHeight} px
@@ -159,7 +159,7 @@ export default function GovTelemetry({ state }: { state: any }) {
                   <span className="bg-primary/5 text-primary text-[9px] font-black px-3 py-1 rounded-full uppercase">Total ({visits.length})</span>
                 </div>
 
-                <div className="space-y-4 max-h-[380px] overflow-y-auto pr-2 custom-scrollbar">
+                <div className="space-y-4 max-h-[380px] overflow-y-auto pe-2 custom-scrollbar">
                   {visits.slice().reverse().map((visit, index) => (
                     <div key={index} className="p-4 bg-gray-50 hover:bg-gray-100/50 rounded-2xl border-l-4 border-secondary transition-all">
                       <div className="flex justify-between items-start">
@@ -194,7 +194,7 @@ export default function GovTelemetry({ state }: { state: any }) {
                   <span className="bg-emerald-50 text-emerald-600 text-[9px] font-black px-3 py-1 rounded-full uppercase">En Direct ({events.length})</span>
                 </div>
 
-                <div className="space-y-3 max-h-[380px] overflow-y-auto pr-2 custom-scrollbar">
+                <div className="space-y-3 max-h-[380px] overflow-y-auto pe-2 custom-scrollbar">
                   {events.map((ev, index) => (
                     <div key={index} className="flex items-start space-x-3 p-3 bg-gray-50/50 hover:bg-gray-50 rounded-xl transition-all">
                       <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 flex items-center justify-center shrink-0">

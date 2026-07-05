@@ -93,7 +93,7 @@ const BlogDetail = () => {
               <div className="flex items-center space-x-6 border-t border-white/10 pt-6">
                  <div className="flex items-center space-x-3">
                     <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center font-black text-secondary">KB</div>
-                    <div className="text-left">
+                    <div className="text-start">
                        <p className="text-xs font-black text-white uppercase">{post.author}</p>
                        <p className="text-[10px] text-white/40 uppercase font-bold">{post.role}</p>
                     </div>
@@ -126,7 +126,7 @@ const BlogDetail = () => {
                         <button key={i} onClick={(e) => {
                           e.preventDefault();
                           alert("Partage non disponible");
-                        }} className="w-full flex items-center space-x-4 group text-gray-400 hover:text-primary transition-all text-left">
+                        }} className="w-full flex items-center space-x-4 group text-gray-400 hover:text-primary transition-all text-start">
                            <div className={cn("w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center transition-all group-hover:scale-110", social.color.replace('text', 'bg').concat('/10'), social.color)}>
                               <social.icon className="h-4 w-4" />
                            </div>
@@ -148,7 +148,7 @@ const BlogDetail = () => {
           {/* Main Article Text */}
           <article className="lg:col-span-2">
             <div className="prose prose-lg prose-primary max-w-none">
-              <div className="text-gray-600 font-medium text-lg leading-relaxed mb-12 italic border-l-4 border-secondary pl-8">
+              <div className="text-gray-600 font-medium text-lg leading-relaxed mb-12 italic border-l-4 border-secondary ps-8">
                 {post.excerpt}
               </div>
               
@@ -190,7 +190,7 @@ const BlogDetail = () => {
           {/* Right: Related Posts */}
           <aside className="lg:col-span-1">
              <h3 className="text-[10px] font-black text-primary uppercase tracking-[0.3em] mb-8 flex items-center">
-                <Newspaper className="h-4 w-4 mr-2 text-secondary" />
+                <Newspaper className="h-4 w-4 me-2 text-secondary" />
                 Derniers Articles
              </h3>
              <div className="space-y-8">

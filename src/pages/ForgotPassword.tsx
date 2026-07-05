@@ -44,7 +44,7 @@ const ForgotPassword = () => {
       >
         <div className="p-8">
           <Link to="/login" className="inline-flex items-center text-sm font-bold text-gray-400 hover:text-primary transition-colors mb-8">
-            <ArrowLeft className="h-4 w-4 mr-2" />
+            <ArrowLeft className="h-4 w-4 me-2" />
             Retour à la connexion
           </Link>
 
@@ -81,11 +81,11 @@ const ForgotPassword = () => {
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">Adresse Email</label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5" />
+                  <Mail className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5" />
                   <input 
                     type="email" 
                     required
-                    className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
+                    className="w-full ps-10 pe-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
                     placeholder="nom@entreprise.dz"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}

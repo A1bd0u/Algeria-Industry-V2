@@ -37,7 +37,7 @@ export default function GovRevenue({ state }: { state: any }) {
                   <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2">Revenu Mensuel (MRR)</p>
                   <h4 className="text-3xl font-black text-primary">2.4M <span className="text-sm font-bold text-gray-300">DZD</span></h4>
                   <div className="mt-4 flex items-center text-success text-[10px] font-black uppercase tracking-widest">
-                    <ArrowUpRight className="h-4 w-4 mr-1" />
+                    <ArrowUpRight className="h-4 w-4 me-1" />
                     +15.4% vs Mai
                   </div>
                </div>
@@ -45,7 +45,7 @@ export default function GovRevenue({ state }: { state: any }) {
                   <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2">Dépenses Marketing (GADS)</p>
                   <h4 className="text-3xl font-black text-primary">450k <span className="text-sm font-bold text-gray-300">DZD</span></h4>
                   <div className="mt-4 flex items-center text-primary text-[10px] font-black uppercase tracking-widest">
-                    <Activity className="h-4 w-4 mr-1" />
+                    <Activity className="h-4 w-4 me-1" />
                     ROI : 5.3x
                   </div>
                </div>
@@ -53,7 +53,7 @@ export default function GovRevenue({ state }: { state: any }) {
                   <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2">Frais de Transaction</p>
                   <h4 className="text-3xl font-black text-primary">1.2M <span className="text-sm font-bold text-gray-300">DZD</span></h4>
                   <div className="mt-4 flex items-center text-gray-400 text-[10px] font-black uppercase tracking-widest">
-                    <Clock className="h-4 w-4 mr-1" />
+                    <Clock className="h-4 w-4 me-1" />
                     Stabilité : 98%
                   </div>
                </div>
@@ -65,7 +65,7 @@ export default function GovRevenue({ state }: { state: any }) {
                   <button onClick={() => showNotify("Génération de l'export en cours...", "success")} className="text-[10px] font-black text-secondary uppercase tracking-widest underline decoration-2 underline-offset-4">Exporter le grand livre</button>
                </div>
                <div className="overflow-x-auto">
-                 <table className="w-full text-left">
+                 <table className="w-full text-start">
                     <thead>
                       <tr className="bg-gray-50/50">
                         <th className="px-8 py-5 text-[9px] font-black text-gray-400 uppercase tracking-widest">Client / Entreprise</th>

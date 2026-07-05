@@ -56,8 +56,8 @@ const Catalogues = () => {
       {/* Header */}
       <div className="bg-white border-b border-gray-200 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className={cn("flex flex-col md:flex-row md:items-center md:justify-between gap-8", i18n.language === 'ar' && "md:flex-row-reverse text-right")}>
-            <div className={cn(i18n.language === 'ar' && "ml-auto")}>
+          <div className={cn("flex flex-col md:flex-row md:items-center md:justify-between gap-8", i18n.language === 'ar' && "md:flex-row-reverse text-end")}>
+            <div className={cn(i18n.language === 'ar' && "ms-auto")}>
               <div className={cn("flex items-center space-x-2 text-secondary mb-4", i18n.language === 'ar' && "flex-row-reverse space-x-reverse justify-end")}>
                 <div className="w-8 h-[2px] bg-secondary" />
                 <span className="text-xs font-black uppercase tracking-[0.3em]">{t('catalogues.tech_doc')}</span>
@@ -109,7 +109,7 @@ const Catalogues = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  className={cn("bg-white border border-gray-200 group hover:border-secondary transition-all flex flex-col", i18n.language === 'ar' && "text-right")}
+                  className={cn("bg-white border border-gray-200 group hover:border-secondary transition-all flex flex-col", i18n.language === 'ar' && "text-end")}
                 >
                   <div className="aspect-[4/5] relative overflow-hidden bg-gray-100 border-b border-gray-200">
                     <img 
@@ -123,7 +123,7 @@ const Catalogues = () => {
                         <Download className="h-6 w-6" />
                       </button>
                     </div>
-                    <div className={cn("absolute top-4", i18n.language === 'ar' ? "right-4" : "left-4")}>
+                    <div className={cn("absolute top-4", i18n.language === 'ar' ? "end-4" : "start-4")}>
                       <span className="bg-primary text-white px-3 py-1 text-[9px] font-black uppercase tracking-tighter">
                         {t(`categories.${cat.categoryKey}`)}
                       </span>

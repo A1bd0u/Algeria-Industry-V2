@@ -45,7 +45,7 @@ export default function GovExhibitors({ state }: { state: any }) {
             
             <div className="bg-white rounded-[32px] border border-gray-100 shadow-sm overflow-hidden">
                <div className="overflow-x-auto">
-                 <table className="w-full text-left">
+                 <table className="w-full text-start">
                    <thead>
                       <tr className="border-b border-gray-50 bg-gray-50/30">
                          <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest">Entreprise</th>
@@ -54,7 +54,7 @@ export default function GovExhibitors({ state }: { state: any }) {
                          <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest">Type</th>
                          <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest">Statut</th>
                          <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest">Date d'ajout</th>
-                         <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Actions</th>
+                         <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest text-end">Actions</th>
                       </tr>
                    </thead>
                    <tbody className="divide-y divide-gray-50">
@@ -78,7 +78,7 @@ export default function GovExhibitors({ state }: { state: any }) {
                          <td className="px-8 py-5">
                             <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{ex.added}</span>
                          </td>
-                         <td className="px-8 py-5 text-right space-x-2">
+                         <td className="px-8 py-5 text-end space-x-2">
                            <button className="p-2 bg-gray-50 text-gray-400 hover:text-primary rounded-lg transition-colors"><Edit2 className="h-4 w-4" /></button>
                            <button onClick={() => {
                              if(window.confirm('Supprimer cet exposant ?')) {

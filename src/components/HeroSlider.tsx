@@ -10,7 +10,7 @@ interface HeroSliderProps {
 }
 
 const HeroSlider: React.FC<HeroSliderProps> = ({ slides }) => {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [current, setCurrent] = useState(0);
   const [dynamicSlides, setDynamicSlides] = useState<Slide[]>([]);
 
@@ -88,7 +88,7 @@ const HeroSlider: React.FC<HeroSliderProps> = ({ slides }) => {
           )}>
             
             {/* Left Content: Product */}
-            <div className={cn("flex items-center space-x-12", i18n.language === 'ar' && "flex-row-reverse space-x-reverse text-right")}>
+            <div className={cn("flex items-center space-x-12", i18n.language === 'ar' && "flex-row-reverse space-x-reverse text-end")}>
               <motion.div 
                 initial={{ x: i18n.language === 'ar' ? 50 : -50, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
@@ -148,7 +148,7 @@ const HeroSlider: React.FC<HeroSliderProps> = ({ slides }) => {
               transition={{ delay: 0.4, duration: 0.6 }}
               className={cn(
                 "hidden lg:flex flex-col items-center text-white border-white/10",
-                i18n.language === 'ar' ? "lg:items-start border-r pr-12 pl-0" : "lg:items-end border-l pl-12"
+                i18n.language === 'ar' ? "lg:items-start border-r pe-12 ps-0" : "lg:items-end border-l ps-12"
               )}
             >
               <div className="bg-white/10 backdrop-blur-sm p-4 border border-white/10 mb-4">
@@ -167,7 +167,7 @@ const HeroSlider: React.FC<HeroSliderProps> = ({ slides }) => {
       </AnimatePresence>
 
       {/* Slide Counter (Technical Style) */}
-      <div className={cn("absolute bottom-6 z-30 flex items-baseline space-x-2 text-white/40 font-mono", i18n.language === 'ar' ? "left-10 space-x-reverse" : "right-10")}>
+      <div className={cn("absolute bottom-6 z-30 flex items-baseline space-x-2 text-white/40 font-mono", i18n.language === 'ar' ? "start-10 space-x-reverse" : "end-10")}>
         <span className="text-xl font-black text-white">{(current + 1).toString().padStart(2, '0')}</span>
         <span className="text-[10px]">/</span>
         <span className="text-[10px]">{displaySlides.length.toString().padStart(2, '0')}</span>
@@ -175,7 +175,7 @@ const HeroSlider: React.FC<HeroSliderProps> = ({ slides }) => {
 
       {/* Navigation Dots */}
       {displaySlides.length > 1 && (
-        <div className={cn("absolute bottom-6 flex space-x-2 z-30", i18n.language === 'ar' ? "right-10 space-x-reverse" : "left-10")}>
+        <div className={cn("absolute bottom-6 flex space-x-2 z-30", i18n.language === 'ar' ? "end-10 space-x-reverse" : "start-10")}>
           {displaySlides.map((_, i) => (
             <button
               key={i}
@@ -194,13 +194,13 @@ const HeroSlider: React.FC<HeroSliderProps> = ({ slides }) => {
         <>
           <button 
             onClick={prev}
-            className={cn("absolute top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/10 text-white hover:bg-black/30 transition-all z-20", i18n.language === 'ar' ? "right-4" : "left-4")}
+            className={cn("absolute top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/10 text-white hover:bg-black/30 transition-all z-20", i18n.language === 'ar' ? "end-4" : "start-4")}
           >
             {i18n.language === 'ar' ? <ChevronRight className="h-6 w-6" /> : <ChevronLeft className="h-6 w-6" />}
           </button>
           <button 
             onClick={next}
-            className={cn("absolute top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/10 text-white hover:bg-black/30 transition-all z-20", i18n.language === 'ar' ? "left-4" : "right-4")}
+            className={cn("absolute top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/10 text-white hover:bg-black/30 transition-all z-20", i18n.language === 'ar' ? "start-4" : "end-4")}
           >
             {i18n.language === 'ar' ? <ChevronLeft className="h-6 w-6" /> : <ChevronRight className="h-6 w-6" />}
           </button>

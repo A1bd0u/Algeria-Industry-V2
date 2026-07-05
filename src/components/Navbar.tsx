@@ -33,10 +33,10 @@ const Navbar = () => {
   };
 
   const profileMenuItems = [
-    { label: i18n.language === 'ar' ? 'ملفي الشخصي' : 'Mon profil', path: '/dashboard', icon: UserCircle },
-    { label: i18n.language === 'ar' ? 'اشتراكي' : 'Mon abonnement', path: '/subscriptions', icon: Award },
-    { label: i18n.language === 'ar' ? 'مفضلاتي' : 'Mes favoris', path: '/favorites', icon: Zap },
-    { label: i18n.language === 'ar' ? 'طلباتي' : 'Mes demandes', path: '/dashboard?tab=orders', icon: FileText },
+    { label: t('nav.my_profile'), path: '/dashboard', icon: UserCircle },
+    { label: t('nav.subscription'), path: '/subscriptions', icon: Award },
+    { label: t('nav.favorites'), path: '/favorites', icon: Zap },
+    { label: t('nav.requests'), path: '/dashboard?tab=orders', icon: FileText },
   ];
 
   const languages = [
@@ -79,7 +79,7 @@ const Navbar = () => {
               <div className="w-11 h-11 bg-gradient-to-br from-secondary to-secondary/80 rounded-xl flex items-center justify-center group-hover:rotate-12 transition-all duration-500 shadow-lg">
                 <Globe className="h-7 w-7 text-white" />
               </div>
-              <div className={cn("hidden lg:block", i18n.language === 'ar' && "text-right")}>
+              <div className={cn("hidden lg:block", i18n.language === 'ar' && "text-end")}>
                 <span className="text-[11px] font-black uppercase tracking-[0.2em] text-white/20 leading-none">ALGERIA</span>
                 <p className="text-base font-black uppercase tracking-tight text-white leading-none mt-0.5 group-hover:text-secondary transition-colors">INDUSTRY</p>
               </div>
@@ -119,7 +119,7 @@ const Navbar = () => {
                 >
                   <item.icon className={cn("h-4 w-4 transition-all duration-500 group-hover:scale-125", location.pathname === item.path ? "text-[#1a1a1a] scale-110" : "text-secondary/60 group-hover:text-secondary")} />
                   <span className="relative z-10 uppercase">{item.name}</span>
-                  {item.hasMega && <ChevronDown className={cn("h-3 w-3 transition-transform duration-300 ml-1", location.pathname === item.path ? "text-[#1a1a1a]" : "group-hover:text-secondary", showMegaMenu && "rotate-180")} />}
+                  {item.hasMega && <ChevronDown className={cn("h-3 w-3 transition-transform duration-300 ms-1", location.pathname === item.path ? "text-[#1a1a1a]" : "group-hover:text-secondary", showMegaMenu && "rotate-180")} />}
                 </Link>
 
 
@@ -132,11 +132,11 @@ const Navbar = () => {
                       exit={{ opacity: 0, y: 10 }}
                       className={cn(
                         "absolute top-full w-[400px] bg-[#222] text-white shadow-2xl border border-white/10 overflow-hidden rounded-2xl mt-2",
-                        i18n.language === 'ar' ? "right-0" : "left-0"
+                        i18n.language === 'ar' ? "end-0" : "start-0"
                       )}
                     >
                       <div className="p-2">
-                        <div className={cn("px-4 py-2 mb-1", i18n.language === 'ar' && "text-right")}>
+                        <div className={cn("px-4 py-2 mb-1", i18n.language === 'ar' && "text-end")}>
                            <p className="text-[8px] font-black text-white/30 uppercase tracking-[0.2em]">{t('nav.browse_industries')}</p>
                         </div>
                         <div className="grid grid-cols-1">
@@ -184,7 +184,7 @@ const Navbar = () => {
               <span className={cn(i18n.language === 'ar' && "text-xs font-bold")}>{t('nav.become_exposant')}</span>
             </Link>
 
-            <div className="flex items-center space-x-2 ml-1 pl-1 border-l border-white/5 shrink-0">
+            <div className="flex items-center space-x-2 ms-1 ps-1 border-l border-white/5 shrink-0">
               {/* Language Selector */}
               <div 
                 className="relative group/lang py-2"
@@ -205,7 +205,7 @@ const Navbar = () => {
                       initial={{ opacity: 0, y: 5 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 5 }}
-                      className="absolute top-full right-0 mt-1 bg-[#222] border border-white/10 shadow-2xl min-w-[140px] rounded-xl overflow-hidden z-[60]"
+                      className="absolute top-full end-0 mt-1 bg-[#222] border border-white/10 shadow-2xl min-w-[140px] rounded-xl overflow-hidden z-[60]"
                     >
                       {languages.map(lang => (
                         <button
@@ -233,7 +233,7 @@ const Navbar = () => {
                 <button 
                   onClick={() => setIsProfileOpen(!isProfileOpen)}
                   onBlur={() => setTimeout(() => setIsProfileOpen(false), 200)}
-                  className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 border border-white/5 hover:bg-secondary/10 hover:border-secondary/20 hover:text-secondary transition-all group/profile ml-2"
+                  className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 border border-white/5 hover:bg-secondary/10 hover:border-secondary/20 hover:text-secondary transition-all group/profile ms-2"
                 >
                   <UserCircle className={cn("h-5 w-5 transition-colors", isProfileOpen ? "text-secondary" : "text-white/40 group-hover/profile:text-secondary")} />
                 </button>
@@ -246,7 +246,7 @@ const Navbar = () => {
                       exit={{ opacity: 0, y: 10, scale: 0.95 }}
                       className={cn(
                         "absolute top-full mt-4 w-72 bg-[#1a1a1a] border border-white/10 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] p-2 z-50",
-                        i18n.language === 'ar' ? "left-0" : "right-0"
+                        i18n.language === 'ar' ? "start-0" : "end-0"
                       )}
                     >
                       <div className="p-4 mb-2 bg-white/5 rounded-xl border border-white/5">
@@ -272,7 +272,7 @@ const Navbar = () => {
                           >
                             <div className="flex items-center space-x-3">
                               <item.icon className="h-4 w-4 text-white/20 group-hover:text-secondary transition-colors" />
-                              <span className={cn(i18n.language === 'ar' && "mr-3 ml-0")}>{item.label}</span>
+                              <span className={cn(i18n.language === 'ar' && "me-3 ms-0")}>{item.label}</span>
                             </div>
                             <ChevronRight className="h-3 w-3 text-white/5 group-hover:text-secondary transition-all group-hover:translate-x-1" />
                           </Link>
@@ -301,7 +301,7 @@ const Navbar = () => {
                             className="w-full flex items-center justify-center space-x-3 py-3 rounded-xl bg-red-500/10 hover:bg-red-500 text-[10px] font-black text-red-500 hover:text-white uppercase tracking-widest transition-all group/logout"
                           >
                             <LogOut className="h-4 w-4" />
-                            <span>{i18n.language === 'ar' ? 'خروج' : 'Déconnexion'}</span>
+                            <span>{t('nav.logout')}</span>
                           </button>
                         )}
                       </div>

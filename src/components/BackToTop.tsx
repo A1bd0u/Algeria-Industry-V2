@@ -35,7 +35,7 @@ const BackToTop = () => {
           exit={{ opacity: 0, scale: 0.5, y: 20 }}
           onClick={scrollToTop}
           className={cn(
-            "fixed bottom-8 right-8 z-50 p-3 rounded-full shadow-2xl transition-all",
+            "fixed bottom-8 end-8 z-50 p-3 rounded-full shadow-2xl transition-all",
             "bg-primary text-white hover:bg-secondary hover:-translate-y-1 active:scale-95"
           )}
           aria-label="Retour en haut"

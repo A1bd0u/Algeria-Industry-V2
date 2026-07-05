@@ -60,7 +60,7 @@ const Blog = () => {
           <div className="absolute inset-0 opacity-10">
           </div>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div className={cn("flex flex-col md:flex-row md:items-center justify-between gap-8", i18n.language === 'ar' && "md:flex-row-reverse text-right")}>
+            <div className={cn("flex flex-col md:flex-row md:items-center justify-between gap-8", i18n.language === 'ar' && "md:flex-row-reverse text-end")}>
               <div>
                 <h1 className="text-4xl font-extrabold mb-4">{t('blog.title').split(' ')[0]} <span className="text-secondary">{t('blog.title').split(' ')[1]}</span></h1>
                 <p className="text-primary-foreground/80 text-lg max-w-xl">
@@ -109,7 +109,7 @@ const Blog = () => {
               animate={{ opacity: 1, y: 0 }}
               className="mb-16"
             >
-              <div className={cn("bg-white rounded-[40px] overflow-hidden shadow-xl border border-gray-100 flex flex-col lg:flex-row group", i18n.language === 'ar' && "lg:flex-row-reverse text-right")}>
+              <div className={cn("bg-white rounded-[40px] overflow-hidden shadow-xl border border-gray-100 flex flex-col lg:flex-row group", i18n.language === 'ar' && "lg:flex-row-reverse text-end")}>
                 <Link to={`/blog/${generateSlugUrl(featuredPost.title, featuredPost.id)}`} className="lg:w-3/5 h-64 lg:h-auto overflow-hidden">
                   <img 
                     src={featuredPost.image} 
@@ -163,7 +163,7 @@ const Blog = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1 }}
-                className={cn("bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-xl transition-all group flex flex-col", i18n.language === 'ar' && "text-right")}
+                className={cn("bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-xl transition-all group flex flex-col", i18n.language === 'ar' && "text-end")}
               >
                 <Link to={`/blog/${generateSlugUrl(post.title, post.id)}`} className="h-48 overflow-hidden relative block">
                   <img 
@@ -172,7 +172,7 @@ const Blog = () => {
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     referrerPolicy="no-referrer"
                   />
-                  <div className={cn("absolute top-4", i18n.language === 'ar' ? "right-4" : "left-4")}>
+                  <div className={cn("absolute top-4", i18n.language === 'ar' ? "end-4" : "start-4")}>
                     <span className="bg-white/90 backdrop-blur-sm text-primary px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">
                       {post.category}
                     </span>
@@ -218,9 +218,9 @@ const Blog = () => {
 
           {/* Newsletter CTA */}
           <section className="mt-24 bg-primary p-12 rounded-[40px] text-white relative overflow-hidden text-center">
-            <div className="absolute top-0 left-0 w-full h-full opacity-5">
-              <div className="absolute top-0 left-0 w-64 h-64 bg-white rounded-full -translate-x-1/2 -translate-y-1/2"></div>
-              <div className="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full translate-x-1/2 translate-y-1/2"></div>
+            <div className="absolute top-0 start-0 w-full h-full opacity-5">
+              <div className="absolute top-0 start-0 w-64 h-64 bg-white rounded-full -translate-x-1/2 -translate-y-1/2"></div>
+              <div className="absolute bottom-0 end-0 w-96 h-96 bg-white rounded-full translate-x-1/2 translate-y-1/2"></div>
             </div>
             <div className="relative z-10 max-w-2xl mx-auto">
               <h2 className="text-3xl font-bold mb-4">{t('blog.newsletter_title')}</h2>
@@ -231,7 +231,7 @@ const Blog = () => {
                 <input 
                   type="email" 
                   placeholder="votre-email@entreprise.dz" 
-                  className={cn("flex-1 px-6 py-4 bg-white/10 border border-white/20 rounded-2xl text-white placeholder:text-white/40 outline-none focus:bg-white/20 transition-all", i18n.language === 'ar' && "text-right")}
+                  className={cn("flex-1 px-6 py-4 bg-white/10 border border-white/20 rounded-2xl text-white placeholder:text-white/40 outline-none focus:bg-white/20 transition-all", i18n.language === 'ar' && "text-end")}
                   required
                 />
                 <button className="bg-secondary text-white px-8 py-4 rounded-2xl font-bold hover:scale-105 transition-all shadow-xl" onClick={(e) => { e.preventDefault(); window.scrollTo(0,0); }}>

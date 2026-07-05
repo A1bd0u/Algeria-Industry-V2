@@ -54,14 +54,14 @@ export default function GovCompanies({ state }: { state: any }) {
       
       <div className="bg-white rounded-[40px] border border-gray-100 shadow-sm overflow-hidden pb-20">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
+          <table className="w-full text-start text-sm">
             <thead className="bg-gray-50 border-b border-gray-100">
               <tr>
                 <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Nom entreprise</th>
                 <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Propriétaire (email)</th>
                 <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Date soumission</th>
                 <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Documents</th>
-                <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Actions</th>
+                <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-end">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -118,10 +118,10 @@ export default function GovCompanies({ state }: { state: any }) {
                           )}
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-right">
+                      <td className="px-6 py-4 text-end">
                         <button
                           onClick={(e) => { e.preventDefault(); window.location.href = '/extranet/kyc/' + c.id; }}
-                          className="px-4 py-2 bg-secondary/10 text-secondary hover:bg-secondary hover:text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-colors flex items-center justify-center space-x-2 w-full max-w-[120px] ml-auto"
+                          className="px-4 py-2 bg-secondary/10 text-secondary hover:bg-secondary hover:text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-colors flex items-center justify-center space-x-2 w-full max-w-[120px] ms-auto"
                         >
                           <span>Examiner</span>
                           <ArrowRight className="h-3 w-3" />
@@ -264,7 +264,7 @@ export default function GovCompanies({ state }: { state: any }) {
                         <button 
                           key={d.document_type} 
                           onClick={() => setReviewDocUrl(d.file_url)}
-                          className={`px-4 py-3 border rounded-xl flex items-center justify-between group/doc transition-all w-full text-left ${reviewDocUrl === d.file_url ? 'bg-secondary/5 border-secondary/20' : 'bg-gray-50 border-gray-100 hover:bg-white hover:border-secondary/30'}`}
+                          className={`px-4 py-3 border rounded-xl flex items-center justify-between group/doc transition-all w-full text-start ${reviewDocUrl === d.file_url ? 'bg-secondary/5 border-secondary/20' : 'bg-gray-50 border-gray-100 hover:bg-white hover:border-secondary/30'}`}
                         >
                           <div className="flex items-center space-x-3">
                              <FileText className={`h-4 w-4 ${reviewDocUrl === d.file_url ? 'text-secondary' : 'text-gray-400 group-hover/doc:text-secondary'}`} />

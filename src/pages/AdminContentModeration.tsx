@@ -255,7 +255,7 @@ export default function AdminContentModeration() {
         ) : (
           <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm whitespace-nowrap">
+              <table className="w-full text-start text-sm whitespace-nowrap">
                 <thead className="bg-gray-50/50 border-b border-gray-100">
                   {table.getHeaderGroups().map(headerGroup => (
                     <tr key={headerGroup.id}>
@@ -299,7 +299,7 @@ export default function AdminContentModeration() {
             >
               <button 
                 onClick={() => setDeleteModal(null)}
-                className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-colors"
+                className="absolute top-4 end-4 p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-colors"
               >
                 <X className="h-4 w-4" />
               </button>

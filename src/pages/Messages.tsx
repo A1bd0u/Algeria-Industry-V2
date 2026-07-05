@@ -165,11 +165,11 @@ export default function Messages() {
       <div className="w-full lg:w-96 bg-white border border-gray-100 rounded-[32px] overflow-hidden flex flex-col">
         <div className="p-6 border-b border-gray-50 bg-gray-50/50">
           <div className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Search className="absolute start-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <input 
               type="text" 
               placeholder="Filtrer messages..."
-              className="w-full bg-white pl-10 pr-4 py-3 rounded-xl border border-gray-100 text-xs font-bold focus:outline-none focus:border-secondary transition-all"
+              className="w-full bg-white ps-10 pe-4 py-3 rounded-xl border border-gray-100 text-xs font-bold focus:outline-none focus:border-secondary transition-all"
             />
           </div>
         </div>
@@ -184,7 +184,7 @@ export default function Messages() {
               key={c.id}
               onClick={() => setSelectedContact(c.id)}
               className={cn(
-                "w-full p-6 text-left flex items-start space-x-4 border-b border-gray-50 transition-all",
+                "w-full p-6 text-start flex items-start space-x-4 border-b border-gray-50 transition-all",
                 selectedContact === c.id ? "bg-secondary text-white" : "hover:bg-gray-50"
               )} 
             >
@@ -192,7 +192,7 @@ export default function Messages() {
                 <div className="w-12 h-12 bg-gray-200 rounded-2xl flex items-center justify-center font-black text-primary">
                   {c.name.charAt(0)}
                 </div>
-                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-success border-2 border-white rounded-full" />
+                <div className="absolute -bottom-1 -end-1 w-4 h-4 bg-success border-2 border-white rounded-full" />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex justify-between items-center mb-1">
@@ -236,14 +236,14 @@ export default function Messages() {
 
             <div className="flex-1 p-8 overflow-y-auto no-scrollbar space-y-8 bg-gray-50/30">
               {activeMessages.map((m) => (
-                <div key={m.id} className={cn("flex space-x-4 max-w-[80%]", m.sender === 'me' ? "flex-row-reverse space-x-reverse ml-auto" : "")}>
+                <div key={m.id} className={cn("flex space-x-4 max-w-[80%]", m.sender === 'me' ? "flex-row-reverse space-x-reverse ms-auto" : "")}>
                   <div className={cn("w-8 h-8 rounded-lg shrink-0", m.sender === 'me' ? "bg-secondary" : "bg-gray-200")} />
                   <div className={cn(
                     "p-4 rounded-2xl text-[11px] font-medium leading-relaxed shadow-sm min-w-[120px]",
                     m.sender === 'me' ? "bg-primary text-white rounded-tr-none" : "bg-white text-gray-600 rounded-tl-none border border-gray-100"
                   )}>
                     {renderMessageContent(m.text)}
-                    <p className={cn("text-[8px] font-bold mt-2 uppercase opacity-40", m.sender === 'me' ? "text-right" : "")}>{m.time}</p>
+                    <p className={cn("text-[8px] font-bold mt-2 uppercase opacity-40", m.sender === 'me' ? "text-end" : "")}>{m.time}</p>
                   </div>
                 </div>
               ))}

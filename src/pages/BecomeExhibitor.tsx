@@ -194,7 +194,7 @@ const BecomeExhibitor = () => {
                 )}
               >
                 {plan.popular && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-secondary text-white px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest flex items-center space-x-1">
+                  <div className="absolute -top-4 start-1/2 -translate-x-1/2 bg-secondary text-white px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest flex items-center space-x-1">
                     <Star className="h-3 w-3 fill-current" />
                     <span>Recommandé</span>
                   </div>
@@ -204,7 +204,7 @@ const BecomeExhibitor = () => {
                   <h4 className="text-xl font-black uppercase tracking-widest mb-4">{plan.name}</h4>
                   <div className="flex items-baseline mb-2">
                     <span className="text-4xl font-black">{plan.price}</span>
-                    <span className="text-xs opacity-60 ml-2">{plan.period}</span>
+                    <span className="text-xs opacity-60 ms-2">{plan.period}</span>
                   </div>
                   <p className="text-xs opacity-70 leading-relaxed">{plan.desc}</p>
                 </div>
@@ -238,7 +238,7 @@ const BecomeExhibitor = () => {
         <div className="bg-white rounded-[60px] p-12 md:p-20 shadow-2xl border border-gray-100 overflow-hidden relative">
           
           <div className="relative z-10">
-            <h2 className="text-3xl font-black text-primary uppercase tracking-tight mb-12 text-center md:text-left">
+            <h2 className="text-3xl font-black text-primary uppercase tracking-tight mb-12 text-center md:text-start">
               Comment ça marche ?
             </h2>
             
@@ -250,11 +250,11 @@ const BecomeExhibitor = () => {
               ].map((step, i) => (
                 <div key={i} className="relative">
                   <div className="flex items-center mb-6">
-                    <span className="text-5xl font-black text-gray-100 absolute -top-4 -left-4">{step.step}</span>
+                    <span className="text-5xl font-black text-gray-100 absolute -top-4 -start-4">{step.step}</span>
                     <div className="w-12 h-12 bg-primary text-white rounded-xl flex items-center justify-center relative z-10">
                       <step.icon className="h-6 w-6" />
                     </div>
-                    <div className="flex-1 h-[1px] bg-gray-100 ml-4 hidden md:block" />
+                    <div className="flex-1 h-[1px] bg-gray-100 ms-4 hidden md:block" />
                   </div>
                   <h4 className="text-lg font-black text-primary uppercase mb-2">{step.title}</h4>
                   <p className="text-sm text-gray-500 leading-relaxed">{step.desc}</p>
@@ -276,12 +276,12 @@ const BecomeExhibitor = () => {
             Ne laissez pas vos concurrents prendre toute la place. L'industrie de demain se construit aujourd'hui, sur Algeria Industry.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="bg-white/5 p-6 rounded-3xl border border-white/10 text-left">
+            <div className="bg-white/5 p-6 rounded-3xl border border-white/10 text-start">
               <ShieldCheck className="h-8 w-8 text-secondary mb-4" />
               <h4 className="text-sm font-black text-white uppercase mb-2">Exposition Certifiée</h4>
               <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Membre vérifié de la plateforme</p>
             </div>
-            <div className="bg-white/5 p-6 rounded-3xl border border-white/10 text-left">
+            <div className="bg-white/5 p-6 rounded-3xl border border-white/10 text-start">
               <Zap className="h-8 w-8 text-secondary mb-4" />
               <h4 className="text-sm font-black text-white uppercase mb-2">Setup Express</h4>
               <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Mise en ligne en moins de 24h</p>

@@ -137,7 +137,7 @@ const Directory = () => {
       <div className="bg-white border-b border-border-tech py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className={cn("flex flex-col md:flex-row md:items-end md:justify-between gap-6", i18n.language === 'ar' && "md:flex-row-reverse")}>
-            <div className={i18n.language === 'ar' ? "text-right" : ""}>
+            <div className={i18n.language === 'ar' ? "text-end" : ""}>
               <div className={cn("flex items-center space-x-2 text-secondary mb-4", i18n.language === 'ar' && "space-x-reverse justify-end")}>
                 <div className="w-8 h-[2px] bg-secondary" />
                 <span className="text-xs font-black uppercase tracking-[0.3em] font-sans">{t('directory.db_label')}</span>
@@ -184,10 +184,10 @@ const Directory = () => {
                 <h3 className="text-sm font-black text-primary uppercase tracking-widest">{t('directory.search_params')}</h3>
               </div>
 
-              <div className={cn("mb-8", i18n.language === 'ar' && "text-right")}>
+              <div className={cn("mb-8", i18n.language === 'ar' && "text-end")}>
                 <span className="text-[10px] font-black text-primary uppercase tracking-widest">{t('common.search')}</span>
                 <div className="mt-4 flex items-center bg-white p-2 rounded-2xl border border-gray-100 shadow-sm focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary transition-all">
-                  <Search className="h-4 w-4 text-gray-400 ml-2" />
+                  <Search className="h-4 w-4 text-gray-400 ms-2" />
                   <input 
                     type="text" 
                     placeholder="Filtrer par nom..."
@@ -199,7 +199,7 @@ const Directory = () => {
               </div>
 
               {/* Sector Filter */}
-              <div className={cn("mb-8 pt-8 border-t border-gray-100", i18n.language === 'ar' && "text-right")}>
+              <div className={cn("mb-8 pt-8 border-t border-gray-100", i18n.language === 'ar' && "text-end")}>
                 <span className="text-[10px] font-black text-primary uppercase tracking-widest">{t('directory.sector')}</span>
                 <div className="space-y-3 mt-4">
                   {sectors.map((sector) => (
@@ -220,7 +220,7 @@ const Directory = () => {
               </div>
 
               {/* Region Filter */}
-              <div className={cn("mb-8 pt-8 border-t border-gray-100", i18n.language === 'ar' && "text-right")}>
+              <div className={cn("mb-8 pt-8 border-t border-gray-100", i18n.language === 'ar' && "text-end")}>
                 <span className="text-[10px] font-black text-primary uppercase tracking-widest">{t('directory.region')}</span>
                 <select 
                   value={selectedRegion}
@@ -233,7 +233,7 @@ const Directory = () => {
               </div>
 
               {/* Zones Industrielles */}
-              <div className={cn("mb-8 pt-8 border-t border-gray-100", i18n.language === 'ar' && "text-right")}>
+              <div className={cn("mb-8 pt-8 border-t border-gray-100", i18n.language === 'ar' && "text-end")}>
                 <span className="text-[10px] font-black text-primary uppercase tracking-widest">{t('directory.zones')}</span>
                 <div className={cn("flex flex-wrap gap-2 mt-4", i18n.language === 'ar' && "justify-end")}>
                   {["Rouiba", "Hassi Messaoud", "Arzew", "Chelghoum Laid"].map(zone => (
@@ -317,7 +317,7 @@ const Directory = () => {
                       className="bg-white p-8 border border-border-tech hover:bg-neutral-bg transition-all group relative overflow-hidden"
                     >
                       {/* Technical ID Watermark */}
-                      <div className={cn("absolute text-[80px] font-black text-gray-50/50 pointer-events-none tech-mono leading-none", i18n.language === 'ar' ? "-left-4 -top-4" : "-right-4 -top-4")}>
+                      <div className={cn("absolute text-[80px] font-black text-gray-50/50 pointer-events-none tech-mono leading-none", i18n.language === 'ar' ? "-start-4 -top-4" : "-end-4 -top-4")}>
                         {company.id.toString().padStart(3, '0')}
                       </div>
 
@@ -327,7 +327,7 @@ const Directory = () => {
                         </div>
                         <div className="flex-1">
                           <div className={cn("flex flex-col md:flex-row items-start justify-between gap-4", i18n.language === 'ar' && "md:flex-row-reverse")}>
-                            <div className={i18n.language === 'ar' ? "text-right" : ""}>
+                            <div className={i18n.language === 'ar' ? "text-end" : ""}>
                               <div className={cn("flex items-center space-x-3", i18n.language === 'ar' && "flex-row-reverse space-x-reverse justify-end")}>
                                 <h3 className="text-xl font-black text-primary uppercase tracking-tighter group-hover:text-secondary transition-colors">{company.name}</h3>
                                 {company.certified && (
@@ -352,18 +352,18 @@ const Directory = () => {
                               <ExternalLink className="h-5 w-5" />
                             </button>
                           </div>
-                          <p className={cn("text-gray-500 text-[13px] mt-4 leading-relaxed font-medium uppercase tracking-tight", i18n.language === 'ar' && "text-right")}>{company.description}</p>
+                          <p className={cn("text-gray-500 text-[13px] mt-4 leading-relaxed font-medium uppercase tracking-tight", i18n.language === 'ar' && "text-end")}>{company.description}</p>
                           
                           <div className={cn("mt-8 pt-6 border-t border-border-tech grid grid-cols-2 md:grid-cols-4 gap-6", i18n.language === 'ar' && "md:flex md:flex-row-reverse md:justify-between")}>
-                            <div className={i18n.language === 'ar' ? "text-right" : ""}>
+                            <div className={i18n.language === 'ar' ? "text-end" : ""}>
                               <span className="tech-label">{t('directory.id_reg')}</span>
                               <span className="text-[11px] font-mono font-bold text-primary">{company.reference_id ? company.reference_id : `${company.founded}-DZ-${company.id.toString().substring(0, 4)}`}</span>
                             </div>
-                            <div className={i18n.language === 'ar' ? "text-right" : ""}>
+                            <div className={i18n.language === 'ar' ? "text-end" : ""}>
                               <span className="tech-label">{t('directory.workforce')}</span>
                               <span className="text-[11px] font-mono font-bold text-primary">{company.employees}</span>
                             </div>
-                            <div className={i18n.language === 'ar' ? "text-right" : ""}>
+                            <div className={i18n.language === 'ar' ? "text-end" : ""}>
                               <span className="tech-label">{t('directory.founded')}</span>
                               <span className="text-[11px] font-mono font-bold text-primary">{company.founded}</span>
                             </div>
@@ -415,7 +415,7 @@ const Directory = () => {
                         <div className="w-4 h-4 bg-primary border-2 border-white rounded-full shadow-xl relative z-10 group-hover/pin:bg-secondary transition-colors" />
                         
                         {/* Tooltip */}
-                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 w-48 opacity-0 group-hover/pin:opacity-100 transition-all scale-95 group-hover/pin:scale-100 pointer-events-none z-50">
+                        <div className="absolute bottom-full start-1/2 -translate-x-1/2 mb-4 w-48 opacity-0 group-hover/pin:opacity-100 transition-all scale-95 group-hover/pin:scale-100 pointer-events-none z-50">
                           <div className="bg-white p-4 shadow-2xl border border-border-tech relative">
                             <p className="text-[10px] font-black text-secondary tracking-widest uppercase mb-1">{company.region}</p>
                             <p className="text-xs font-black text-primary uppercase truncate">{company.name}</p>
@@ -423,21 +423,21 @@ const Directory = () => {
                                <span>{company.sector}</span>
                                <ChevronRight className={cn("h-3 w-3", i18n.language === 'ar' && "rotate-180")} />
                             </div>
-                            <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[8px] border-t-white" />
+                            <div className="absolute -bottom-2 start-1/2 -translate-x-1/2 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[8px] border-t-white" />
                           </div>
                         </div>
                       </div>
                     </motion.div>
                   ))}
 
-                  <div className={cn("absolute bottom-12", i18n.language === 'ar' ? "right-12" : "left-12")}>
+                  <div className={cn("absolute bottom-12", i18n.language === 'ar' ? "end-12" : "start-12")}>
                      <div className={cn("flex items-center space-x-2 bg-white/80 backdrop-blur-md px-4 py-2 border border-border-tech", i18n.language === 'ar' && "flex-row-reverse space-x-reverse")}>
                         <div className="w-2 h-2 bg-primary rounded-full" />
                         <span className="text-[8px] font-black uppercase tracking-widest text-primary">{t('directory.headquarters')}</span>
                      </div>
                   </div>
                   
-                  <div className={cn("absolute top-12", i18n.language === 'ar' ? "left-12 text-left" : "right-12 text-right")}>
+                  <div className={cn("absolute top-12", i18n.language === 'ar' ? "start-12 text-start" : "end-12 text-end")}>
                     <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Coordonnées : 36.7538° N, 3.0588° E</p>
                     <p className="text-[8px] text-gray-300 font-mono">MAP ENGINE V1.0 - SYNCED</p>
                   </div>

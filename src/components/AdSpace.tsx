@@ -54,7 +54,7 @@ const AdSpace: React.FC<AdSpaceProps> = ({
       )}
       
       {/* Overlay info */}
-      <div className="absolute top-2 right-2 flex space-x-1">
+      <div className="absolute top-2 end-2 flex space-x-1">
         {isSponsor && (
           <span className="bg-black/20 backdrop-blur-md text-[8px] text-white px-2 py-0.5 rounded-full font-bold uppercase tracking-tighter">
             Sponsorisé
@@ -66,7 +66,7 @@ const AdSpace: React.FC<AdSpaceProps> = ({
       </div>
       
       {/* Ad Label */}
-      <div className="absolute bottom-2 left-2">
+      <div className="absolute bottom-2 start-2">
         <div className="flex items-center space-x-1 text-[8px] text-white/40 bg-black/5 px-1.5 py-0.5 rounded">
           <Info className="h-2 w-2" />
           <span>Annonce</span>

@@ -456,7 +456,7 @@ const Dashboard = () => {
                        }}
                      />
                   </div>
-                  <button className="absolute -bottom-2 -right-2 p-2 bg-secondary text-white rounded-xl shadow-lg border-2 border-white hover:scale-110 transition-all" onClick={(e) => { e.preventDefault(); alert("Fonctionnalité en cours de développement"); }}>
+                  <button className="absolute -bottom-2 -end-2 p-2 bg-secondary text-white rounded-xl shadow-lg border-2 border-white hover:scale-110 transition-all" onClick={(e) => { e.preventDefault(); alert("Fonctionnalité en cours de développement"); }}>
                      <Edit2 className="h-3 w-3" />
                   </button>
                </div>
@@ -551,7 +551,7 @@ const Dashboard = () => {
                   </div>
                   <button 
                     onClick={() => removeFavorite(fav.id)}
-                    className="p-3 bg-red-50 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all shrink-0 ml-4"
+                    className="p-3 bg-red-50 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all shrink-0 ms-4"
                   >
                     <Heart className="h-4 w-4 fill-current" />
                   </button>
@@ -663,8 +663,8 @@ const Dashboard = () => {
                      <button onClick={() => showNotify("Téléchargement de la facture...", "success")} className="bg-white/10 text-white px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-white/20 transition-all border border-white/20">Voir facture</button>
                   </div>
                </div>
-               <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/3" />
-               <div className="absolute bottom-0 right-20 w-40 h-40 bg-secondary/20 rounded-full translate-y-1/2" />
+               <div className="absolute top-0 end-0 w-96 h-96 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/3" />
+               <div className="absolute bottom-0 end-20 w-40 h-40 bg-secondary/20 rounded-full translate-y-1/2" />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -692,7 +692,7 @@ const Dashboard = () => {
                           <h4 className="text-xl font-black text-primary uppercase italic">{plan.name}</h4>
                           <div className="flex items-baseline mt-2">
                              <span className="text-2xl font-black text-primary">{plan.price}</span>
-                             <span className="text-xs font-bold text-gray-400 ml-1">{plan.period}</span>
+                             <span className="text-xs font-bold text-gray-400 ms-1">{plan.period}</span>
                           </div>
                        </div>
                        {plan.active && <div className="p-2 bg-secondary text-white rounded-xl shadow-lg"><CheckCircle className="h-5 w-5" /></div>}
@@ -802,7 +802,7 @@ const Dashboard = () => {
                            setEditProduct(p);
                            setShowAddProduct(true);
                          }}
-                         className="p-2 text-primary hover:bg-primary/5 rounded-lg transition-colors mr-2"
+                         className="p-2 text-primary hover:bg-primary/5 rounded-lg transition-colors me-2"
                        >
                          <Edit2 className="h-4 w-4" />
                        </button>
@@ -840,7 +840,7 @@ const Dashboard = () => {
           >
             <div className="bg-white rounded-[40px] border border-gray-100 shadow-sm overflow-hidden">
                <div className="h-32 bg-primary relative">
-                  <div className="absolute -bottom-10 left-10 w-24 h-24 bg-white rounded-[24px] border-4 border-white shadow-xl flex items-center justify-center group overflow-hidden">
+                  <div className="absolute -bottom-10 start-10 w-24 h-24 bg-white rounded-[24px] border-4 border-white shadow-xl flex items-center justify-center group overflow-hidden">
                      <Building2 className="h-10 w-10 text-primary group-hover:opacity-0 transition-opacity" />
                      <div className="absolute inset-0 bg-secondary/80 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                         <Edit2 className="h-6 w-6 text-white" />
@@ -1002,7 +1002,7 @@ const Dashboard = () => {
             
             <div className="flex-1 max-w-md hidden xl:block">
                <div className="relative group">
-                  <Search className="absolute left-6 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-secondary transition-colors" />
+                  <Search className="absolute start-6 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-secondary transition-colors" />
                   <input 
                     type="text" 
                     value={globalSearch}
@@ -1127,7 +1127,7 @@ const Dashboard = () => {
                           />
                           <span className="text-sm font-bold text-primary">Bannière Accueil</span>
                         </div>
-                        <span className="text-[10px] text-gray-500 ml-7">Visibilité maximale sur la première page</span>
+                        <span className="text-[10px] text-gray-500 ms-7">Visibilité maximale sur la première page</span>
                       </label>
                       <label className="flex flex-col p-4 bg-gray-50 rounded-2xl border-2 border-transparent hover:border-gray-200 cursor-pointer transition-all">
                         <div className="flex items-center space-x-3 mb-2">
@@ -1140,7 +1140,7 @@ const Dashboard = () => {
                           />
                           <span className="text-sm font-bold text-primary">Encart Annuaire</span>
                         </div>
-                        <span className="text-[10px] text-gray-500 ml-7">Ciblage précis lors des recherches B2B</span>
+                        <span className="text-[10px] text-gray-500 ms-7">Ciblage précis lors des recherches B2B</span>
                       </label>
                     </div>
                   </div>
@@ -1164,7 +1164,7 @@ const Dashboard = () => {
                           <span className="relative cursor-pointer rounded-md font-bold text-secondary focus-within:outline-none focus-within:ring-2 focus-within:ring-secondary focus-within:ring-offset-2 hover:text-secondary">
                             <span>Télécharger un fichier</span>
                           </span>
-                          <p className="pl-1">ou glisser-déposer</p>
+                          <p className="ps-1">ou glisser-déposer</p>
                         </div>
                         <p className="text-xs leading-5 text-gray-500 mt-2">PNG, JPG, GIF jusqu'à 10MB</p>
                         <p className="text-xs leading-5 text-gray-500">Dimensions recommandées : 1200x300px</p>
@@ -1228,7 +1228,7 @@ const Dashboard = () => {
             animate={{ opacity: 1, y: 0, x: '-50%' }}
             exit={{ opacity: 0, y: 20, x: '-50%' }}
             className={cn(
-              "fixed bottom-10 left-1/2 -translate-x-1/2 px-8 py-4 rounded-2xl shadow-2xl z-[101] flex items-center space-x-4 border",
+              "fixed bottom-10 start-1/2 -translate-x-1/2 px-8 py-4 rounded-2xl shadow-2xl z-[101] flex items-center space-x-4 border",
               notification.type === 'success' ? "bg-emerald-500 text-white border-emerald-400" : "bg-red-500 text-white border-red-400"
             )}
           >

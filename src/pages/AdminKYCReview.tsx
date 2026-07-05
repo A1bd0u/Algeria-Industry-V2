@@ -150,7 +150,7 @@ export default function AdminKYCReview() {
             {/* Company Info */}
             <section>
               <h2 className="text-sm font-black text-gray-400 uppercase tracking-widest mb-6 flex items-center">
-                <Building2 className="h-4 w-4 mr-2" />
+                <Building2 className="h-4 w-4 me-2" />
                 Informations de l'entreprise
               </h2>
               <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100 space-y-4">
@@ -182,7 +182,7 @@ export default function AdminKYCReview() {
             {/* Submitter Info */}
             <section>
               <h2 className="text-sm font-black text-gray-400 uppercase tracking-widest mb-6 flex items-center">
-                <User className="h-4 w-4 mr-2" />
+                <User className="h-4 w-4 me-2" />
                 Soumis par
               </h2>
               <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100 grid grid-cols-2 gap-4">
@@ -200,7 +200,7 @@ export default function AdminKYCReview() {
             {/* Documents List */}
             <section>
               <h2 className="text-sm font-black text-gray-400 uppercase tracking-widest mb-6 flex items-center">
-                <FileText className="h-4 w-4 mr-2" />
+                <FileText className="h-4 w-4 me-2" />
                 Documents fournis
               </h2>
               <div className="space-y-3">

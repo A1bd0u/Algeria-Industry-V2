@@ -101,11 +101,11 @@ const KYCUpload = () => {
         className="max-w-3xl w-full"
       >
          <button onClick={() => navigate(-1)} className="flex items-center text-gray-500 hover:text-primary mb-6 text-sm font-bold transition-colors">
-            <ArrowLeft className="h-4 w-4 mr-2" /> Retour
+            <ArrowLeft className="h-4 w-4 me-2" /> Retour
          </button>
          
          <div className="bg-white p-8 md:p-12 rounded-[40px] shadow-xl border border-gray-100 relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none">
+            <div className="absolute top-0 end-0 p-12 opacity-5 pointer-events-none">
                <Building2 className="h-40 w-40" />
             </div>
 
@@ -126,7 +126,7 @@ const KYCUpload = () => {
 
                   {error && (
                     <div className="mb-8 p-4 bg-red-50 border border-red-200 text-red-600 rounded-2xl flex items-center text-sm font-bold">
-                       <AlertTriangle className="h-5 w-5 mr-3 shrink-0" />
+                       <AlertTriangle className="h-5 w-5 me-3 shrink-0" />
                        {error}
                     </div>
                   )}
@@ -169,7 +169,7 @@ const KYCUpload = () => {
                                     ) : f.file ? (
                                        <span className="text-xs font-bold text-primary truncate px-4">{f.file.name}</span>
                                     ) : (
-                                       <span className="text-xs font-bold text-gray-400 uppercase tracking-widest flex items-center"><Upload className="h-4 w-4 mr-2" /> Uploader</span>
+                                       <span className="text-xs font-bold text-gray-400 uppercase tracking-widest flex items-center"><Upload className="h-4 w-4 me-2" /> Uploader</span>
                                     )}
                                  </div>
                               </div>

@@ -181,13 +181,13 @@ export default function GovUsers({ state }: { state: any }) {
       {/* Filters Bar */}
       <div className="flex flex-col md:flex-row gap-4 bg-white p-4 rounded-[24px] border border-gray-100 shadow-sm">
         <div className="flex-1 relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Search className="absolute start-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
           <input 
             type="text" 
             placeholder="Rechercher par nom, email, entreprise..." 
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-            className="w-full pl-12 pr-4 py-3 rounded-xl bg-gray-50 border-transparent focus:bg-white focus:border-secondary focus:ring-2 focus:ring-secondary/20 text-xs font-bold text-primary outline-none transition-all"
+            className="w-full ps-12 pe-4 py-3 rounded-xl bg-gray-50 border-transparent focus:bg-white focus:border-secondary focus:ring-2 focus:ring-secondary/20 text-xs font-bold text-primary outline-none transition-all"
           />
         </div>
         
@@ -228,14 +228,14 @@ export default function GovUsers({ state }: { state: any }) {
       {/* Table */}
       <div className="bg-white rounded-[32px] border border-gray-100 shadow-sm overflow-visible">
         <div className="overflow-x-auto min-h-[400px]">
-          <table className="w-full text-left">
+          <table className="w-full text-start">
             <thead className="bg-gray-50/50 border-b border-gray-50">
               <tr>
                 <th className="p-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Utilisateur</th>
                 <th className="p-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Entreprise</th>
                 <th className="p-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Rôle</th>
                 <th className="p-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Statut</th>
-                <th className="p-6 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Actions</th>
+                <th className="p-6 text-[10px] font-black text-gray-400 uppercase tracking-widest text-end">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
@@ -296,7 +296,7 @@ export default function GovUsers({ state }: { state: any }) {
                           <span>{statusStr}</span>
                         </span>
                       </td>
-                      <td className="p-6 text-right relative">
+                      <td className="p-6 text-end relative">
                         <button 
                           onClick={(e) => {
                             e.stopPropagation();
@@ -315,7 +315,7 @@ export default function GovUsers({ state }: { state: any }) {
                               animate={{ opacity: 1, y: 0, scale: 1 }}
                               exit={{ opacity: 0, y: 10, scale: 0.95 }}
                               transition={{ duration: 0.15 }}
-                              className="absolute right-6 top-14 w-48 bg-white rounded-2xl shadow-xl border border-gray-100 z-50 overflow-hidden text-left"
+                              className="absolute end-6 top-14 w-48 bg-white rounded-2xl shadow-xl border border-gray-100 z-50 overflow-hidden text-start"
                             >
                               <div className="p-2 border-b border-gray-50">
                                 <p className="px-3 py-1.5 text-[8px] font-black text-gray-400 uppercase tracking-widest">Changer le rôle</p>
@@ -324,7 +324,7 @@ export default function GovUsers({ state }: { state: any }) {
                                     key={r}
                                     onClick={() => handleUpdateRole(u.id, isSuspended ? r + '_suspended' : r)}
                                     className={cn(
-                                      "w-full text-left px-3 py-2 text-[10px] font-bold uppercase tracking-wide rounded-lg transition-colors",
+                                      "w-full text-start px-3 py-2 text-[10px] font-bold uppercase tracking-wide rounded-lg transition-colors",
                                       roleStr === r ? "bg-primary/5 text-primary" : "text-gray-500 hover:bg-gray-50"
                                     )}
                                   >
@@ -337,7 +337,7 @@ export default function GovUsers({ state }: { state: any }) {
                                 {isSuspended ? (
                                   <button
                                     onClick={() => handleUpdateStatus(u.id, 'reactivate')}
-                                    className="w-full flex items-center space-x-2 text-left px-3 py-2 text-[10px] font-bold uppercase tracking-wide text-emerald-600 rounded-lg hover:bg-emerald-50 transition-colors"
+                                    className="w-full flex items-center space-x-2 text-start px-3 py-2 text-[10px] font-bold uppercase tracking-wide text-emerald-600 rounded-lg hover:bg-emerald-50 transition-colors"
                                   >
                                     <CheckCircle className="h-3 w-3" />
                                     <span>Réactiver compte</span>
@@ -345,7 +345,7 @@ export default function GovUsers({ state }: { state: any }) {
                                 ) : (
                                   <button
                                     onClick={() => handleUpdateStatus(u.id, 'suspend')}
-                                    className="w-full flex items-center space-x-2 text-left px-3 py-2 text-[10px] font-bold uppercase tracking-wide text-red-600 rounded-lg hover:bg-red-50 transition-colors"
+                                    className="w-full flex items-center space-x-2 text-start px-3 py-2 text-[10px] font-bold uppercase tracking-wide text-red-600 rounded-lg hover:bg-red-50 transition-colors"
                                   >
                                     <AlertTriangle className="h-3 w-3" />
                                     <span>Suspendre compte</span>
@@ -359,7 +359,7 @@ export default function GovUsers({ state }: { state: any }) {
                                     setIsDeleteConfirmOpen(true);
                                     setActiveMenuId(null);
                                   }}
-                                  className="mt-1 w-full flex items-center space-x-2 text-left px-3 py-2 text-[10px] font-bold uppercase tracking-wide text-red-600 rounded-lg hover:bg-red-50 transition-colors"
+                                  className="mt-1 w-full flex items-center space-x-2 text-start px-3 py-2 text-[10px] font-bold uppercase tracking-wide text-red-600 rounded-lg hover:bg-red-50 transition-colors"
                                 >
                                   <Trash className="h-3 w-3" />
                                   <span>Supprimer compte</span>
@@ -449,7 +449,7 @@ export default function GovUsers({ state }: { state: any }) {
             >
               <button 
                 onClick={() => { setSelectedUser(null); setUserDetails(null); }}
-                className="absolute top-6 right-6 p-2 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 transition-colors"
+                className="absolute top-6 end-6 p-2 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 transition-colors"
               >
                 <X className="h-5 w-5" />
               </button>

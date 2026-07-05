@@ -62,14 +62,14 @@ const Compare = () => {
           <table className="w-full min-w-[800px] border-collapse">
             <thead>
               <tr className="border-b border-gray-50">
-                <th className="p-8 text-left bg-gray-50/50 w-64 shrink-0">
+                <th className="p-8 text-start bg-gray-50/50 w-64 shrink-0">
                   <span className="text-xs font-black text-primary uppercase tracking-[0.3em]">Spécifications</span>
                 </th>
                 {items.map((product) => (
-                  <th key={product.id} className="p-8 text-left relative min-w-[280px]">
+                  <th key={product.id} className="p-8 text-start relative min-w-[280px]">
                     <button 
                       onClick={() => removeItem(product.id)}
-                      className="absolute top-4 right-4 p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                      className="absolute top-4 end-4 p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
                     >
                       <X className="h-4 w-4" />
                     </button>
@@ -105,7 +105,7 @@ const Compare = () => {
                     <td key={product.id} className="p-8 font-medium text-gray-500 uppercase text-[11px] tracking-wider">
                       {spec.key === 'verified' ? (
                         <div className="flex items-center text-emerald-500 font-black">
-                          <ShieldCheck className="h-4 w-4 mr-2" />
+                          <ShieldCheck className="h-4 w-4 me-2" />
                           <span>OUI</span>
                         </div>
                       ) : (
@@ -121,7 +121,7 @@ const Compare = () => {
 
         {/* Action Bottom */}
         <div className="mt-20 bg-primary p-12 text-white text-center rounded-[48px] relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-full opacity-5 pointer-events-none" style={{ backgroundImage: 'repeating-linear-gradient(45deg, #fff, #fff 1px, transparent 1px, transparent 10px)', backgroundSize: '20px 20px' }} />
+          <div className="absolute top-0 start-0 w-full h-full opacity-5 pointer-events-none" style={{ backgroundImage: 'repeating-linear-gradient(45deg, #fff, #fff 1px, transparent 1px, transparent 10px)', backgroundSize: '20px 20px' }} />
           <h2 className="text-3xl md:text-4xl font-black uppercase tracking-tighter mb-6 relative z-10">Optimisez votre Par Industriel</h2>
           <p className="text-white/40 font-bold uppercase tracking-[0.2em] mb-10 text-xs relative z-10">Demandez un devis groupé pour ces configurations</p>
           <button className="bg-secondary px-12 py-5 rounded-2xl text-sm font-black uppercase tracking-widest shadow-2xl hover:scale-105 transition-all relative z-10" onClick={(e) => { e.preventDefault(); alert("Vos demandes de devis ont été envoyées aux fournisseurs."); }}>

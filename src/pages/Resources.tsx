@@ -49,7 +49,7 @@ const Resources = () => {
     <div className="bg-neutral-bg min-h-screen pb-20">
       {/* Header */}
       <div className="bg-primary py-16 text-white overflow-hidden relative">
-        <div className="absolute top-0 right-0 w-1/3 h-full bg-white/5 -skew-x-12 transform translate-x-1/2"></div>
+        <div className="absolute top-0 end-0 w-1/3 h-full bg-white/5 -skew-x-12 transform translate-x-1/2"></div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="max-w-2xl">
             <h1 className="text-4xl font-bold mb-4">Centre de Ressources</h1>
@@ -101,7 +101,7 @@ const Resources = () => {
                   <div key={i} className="bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 group">
                     <div className="h-48 overflow-hidden relative">
                       <img src={article.image} alt={article.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" referrerPolicy="no-referrer" />
-                      <div className="absolute top-4 left-4">
+                      <div className="absolute top-4 start-4">
                         <span className="bg-white/90 backdrop-blur-sm text-primary px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">
                           {article.category}
                         </span>
@@ -130,7 +130,7 @@ const Resources = () => {
 
             {/* E-Learning Section */}
             <section className="bg-secondary p-10 rounded-[40px] text-white relative overflow-hidden">
-              <div className="absolute -right-10 -bottom-10 opacity-10">
+              <div className="absolute -end-10 -bottom-10 opacity-10">
                 <GraduationCap className="h-64 w-64" />
               </div>
               <div className="relative z-10 max-w-lg">
@@ -171,7 +171,7 @@ const Resources = () => {
                         e.preventDefault();
                         alert("Téléchargement lancé...");
                     }} 
-                    className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-gray-50 transition-all group cursor-pointer text-left"
+                    className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-gray-50 transition-all group cursor-pointer text-start"
                   >
                     <span className="text-sm text-gray-600 font-medium group-hover:text-primary">{item}</span>
                     <Download className="h-4 w-4 text-gray-300 group-hover:text-secondary" />

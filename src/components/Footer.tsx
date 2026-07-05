@@ -15,7 +15,7 @@ const Footer = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className={cn("grid grid-cols-1 md:grid-cols-4 gap-16 mb-20", i18n.language === 'ar' && "md:flex md:flex-row-reverse md:justify-between")}>
           {/* Brand */}
-          <div className={cn("col-span-1 md:col-span-1", i18n.language === 'ar' && "text-right")}>
+          <div className={cn("col-span-1 md:col-span-1", i18n.language === 'ar' && "text-end")}>
             <div className={cn("flex items-center space-x-3 mb-8", i18n.language === 'ar' && "flex-row-reverse space-x-reverse justify-end")}>
               <div className="bg-secondary p-1.5 rounded-sm">
                 <Building2 className="h-6 w-6 text-white" />
@@ -35,7 +35,7 @@ const Footer = () => {
           </div>
 
           {/* Links */}
-          <div className={i18n.language === 'ar' ? "text-right" : ""}>
+          <div className={i18n.language === 'ar' ? "text-end" : ""}>
             <div className={cn("flex items-center space-x-2 mb-8", i18n.language === 'ar' && "flex-row-reverse space-x-reverse justify-end")}>
               <div className="w-4 h-[2px] bg-secondary" />
               <h4 className="text-xs font-black uppercase tracking-[0.3em] text-white">{i18n.language === 'ar' ? 'التنقل' : 'Navigation'}</h4>
@@ -52,7 +52,7 @@ const Footer = () => {
           </div>
 
           {/* Resources */}
-          <div className={i18n.language === 'ar' ? "text-right" : ""}>
+          <div className={i18n.language === 'ar' ? "text-end" : ""}>
             <div className={cn("flex items-center space-x-2 mb-8", i18n.language === 'ar' && "flex-row-reverse space-x-reverse justify-end")}>
               <div className="w-4 h-[2px] bg-secondary" />
               <h4 className="text-xs font-black uppercase tracking-[0.3em] text-white">{t('nav.resources')}</h4>
@@ -66,7 +66,7 @@ const Footer = () => {
           </div>
 
           {/* Contact */}
-          <div className={i18n.language === 'ar' ? "text-right" : ""}>
+          <div className={i18n.language === 'ar' ? "text-end" : ""}>
             <div className={cn("flex items-center space-x-2 mb-8", i18n.language === 'ar' && "flex-row-reverse space-x-reverse justify-end")}>
               <div className="w-4 h-[2px] bg-secondary" />
               <h4 className="text-xs font-black uppercase tracking-[0.3em] text-white">{i18n.language === 'ar' ? 'مركز الاتصال' : 'Contact Center'}</h4>

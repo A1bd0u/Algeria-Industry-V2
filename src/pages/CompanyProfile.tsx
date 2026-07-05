@@ -182,7 +182,7 @@ const CompanyProfile = () => {
                 <div className="flex items-center justify-center space-x-4 mb-8">
                   <div className="flex items-center text-yellow-500">
                     <Star className="h-4 w-4 fill-current" />
-                    <span className="text-sm font-bold ml-1 text-gray-700">{company.rating}</span>
+                    <span className="text-sm font-bold ms-1 text-gray-700">{company.rating}</span>
                   </div>
                   <span className="text-gray-300">|</span>
                   <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">{company.reviews} Avis</span>
@@ -361,7 +361,7 @@ const CompanyProfile = () => {
                       {isOwner && company.status === 'rejected' && company.rejection_reason && (
                         <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-r-xl">
                           <div className="flex items-start">
-                            <AlertCircle className="h-5 w-5 text-red-500 mr-3 mt-0.5" />
+                            <AlertCircle className="h-5 w-5 text-red-500 me-3 mt-0.5" />
                             <div>
                               <h4 className="text-sm font-bold text-red-800">Motif du rejet</h4>
                               <p className="text-sm text-red-600 mt-1">{company.rejection_reason}</p>
@@ -440,7 +440,7 @@ const CompanyProfile = () => {
                           <div className="w-16 h-16 bg-gray-50 rounded-xl flex-shrink-0 flex items-center justify-center text-gray-300">
                             <Package className="h-8 w-8" />
                           </div>
-                          <div className="ml-4 flex-1">
+                          <div className="ms-4 flex-1">
                             <h4 className="font-bold text-primary group-hover:text-secondary transition-colors">{product.name}</h4>
                             <p className="text-xs text-gray-400 uppercase font-bold">{product.category}</p>
                           </div>
@@ -455,7 +455,7 @@ const CompanyProfile = () => {
 
             {/* Download Brochure CTA */}
             <div className="bg-primary p-10 rounded-[40px] text-white flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden shadow-2xl">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+              <div className="absolute top-0 end-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2"></div>
               <div className="relative z-10">
                 <h3 className="text-2xl font-bold mb-2">Brochure Corporate</h3>
                 <p className="text-primary-foreground/80 text-sm">Téléchargez la présentation complète des activités de {company.name}.</p>

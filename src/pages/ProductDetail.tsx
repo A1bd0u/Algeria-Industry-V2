@@ -188,7 +188,7 @@ const ProductDetail = () => {
                 className="w-full h-full object-contain p-12"
                 referrerPolicy="no-referrer"
               />
-              <div className="absolute top-6 right-6 flex flex-col space-y-3">
+              <div className="absolute top-6 end-6 flex flex-col space-y-3">
                 <button 
                   className={cn(
                     "bg-white/80 backdrop-blur-md p-3 rounded-full shadow-lg transition-colors",
@@ -261,7 +261,7 @@ const ProductDetail = () => {
                     {formatPrice(product.price)}
                   </p>
                 </div>
-                <div className="text-right">
+                <div className="text-end">
                   <span className="bg-success/10 text-success text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">
                     {product.stock}
                   </span>
@@ -366,7 +366,7 @@ const ProductDetail = () => {
                      a.href = URL.createObjectURL(new Blob(['Fiche PDF'], {type: 'application/pdf'}));
                      a.download = `fiche_${product.name.toLowerCase().replace(/ /g, '_')}.pdf`;
                      a.click();
-                  }} className="flex items-center space-x-3 p-4 border border-gray-100 rounded-xl hover:bg-gray-50 transition-all text-left w-full">
+                  }} className="flex items-center space-x-3 p-4 border border-gray-100 rounded-xl hover:bg-gray-50 transition-all text-start w-full">
                      <span className="bg-primary/5 p-2 rounded-lg text-primary">📄</span>
                      <div>
                        <p className="text-sm font-bold text-primary">Manuel d'utilisation</p>
@@ -385,7 +385,7 @@ const ProductDetail = () => {
       {showReport && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <div className="bg-white rounded-3xl w-full max-w-md p-8 shadow-2xl relative">
-            <h3 className="text-xl font-bold text-primary mb-2 flex items-center"><AlertTriangle className="h-5 w-5 text-red-500 mr-2" /> Signaler un contenu inapproprié</h3>
+            <h3 className="text-xl font-bold text-primary mb-2 flex items-center"><AlertTriangle className="h-5 w-5 text-red-500 me-2" /> Signaler un contenu inapproprié</h3>
             <p className="text-sm text-gray-500 mb-6">Aidez-nous à garder Algiers Industry sûr. Pourquoi signalez-vous ce produit ?</p>
             <textarea
               value={reportReason}

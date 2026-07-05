@@ -24,7 +24,7 @@ import AddProduct from './AddProduct';
 const Products = () => {
   const [activePage, setActivePage] = React.useState(1);
   const [showAddModal, setShowAddModal] = React.useState(false);
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [view, setView] = useState<'grid' | 'list'>('grid');
   const [activeCategory, setActiveCategory] = useState('Tous');
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
@@ -196,10 +196,10 @@ const Products = () => {
               className="flex items-center space-x-2 text-secondary mb-4"
             >
               <Package className="h-4 w-4" />
-              <span className="text-[10px] font-black uppercase tracking-[0.4em]">Sourcing Industriel</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.4em]">{t('products.sourcing')}</span>
             </motion.div>
             <h1 className="text-4xl md:text-5xl font-black text-primary uppercase tracking-tighter leading-none mb-6">
-              Catalogue <span className="text-secondary">Équipements</span>
+              {t('products.equipment_catalog').split(' ')[0]} <span className="text-secondary">{t('products.equipment_catalog').split(' ').slice(1).join(' ')}</span>
             </h1>
             <p className="text-gray-500 font-medium max-w-lg">
               Explorez les meilleures technologies industrielles disponibles en Algérie. Comparez, demandez des devis et connectez-vous aux fournisseurs.
@@ -228,26 +228,26 @@ const Products = () => {
           <aside className="w-full lg:w-72 space-y-8">
             <div className="bg-white p-6 rounded-[32px] border border-gray-100 shadow-sm">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-sm font-black text-primary uppercase tracking-widest">Filtres</h3>
+                <h3 className="text-sm font-black text-primary uppercase tracking-widest">{t('products.filters')}</h3>
                 <SlidersHorizontal className="h-4 w-4 text-gray-400" />
               </div>
               
               <div className="space-y-6">
                 <div className="relative" ref={categoryRef}>
-                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 block">Catégorie</label>
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 block">{t('products.category')}</label>
                   <button
                     onClick={() => setIsCategoryOpen(!isCategoryOpen)}
-                    className="w-full flex items-center justify-between bg-gray-50 px-5 py-3 rounded-xl border border-transparent focus:ring-2 focus:ring-primary/20 focus:border-primary focus:bg-white transition-all cursor-pointer text-gray-800 hover:bg-gray-100 text-left"
+                    className="w-full flex items-center justify-between bg-gray-50 px-5 py-3 rounded-xl border border-transparent focus:ring-2 focus:ring-primary/20 focus:border-primary focus:bg-white transition-all cursor-pointer text-gray-800 hover:bg-gray-100 text-start"
                   >
                     <span className="text-xs font-black uppercase tracking-widest truncate">{activeCategory === 'Tous' ? 'Toutes les catégories' : activeCategory}</span>
-                    <ChevronDown className={cn("w-4 h-4 text-gray-400 transition-transform ml-4 shrink-0", isCategoryOpen && "rotate-180")} />
+                    <ChevronDown className={cn("w-4 h-4 text-gray-400 transition-transform ms-4 shrink-0", isCategoryOpen && "rotate-180")} />
                   </button>
                   
                   {isCategoryOpen && (
-                    <div className="absolute top-full left-0 z-50 w-full mt-2 bg-white rounded-xl shadow-xl border border-gray-100 py-2 max-h-64 overflow-y-auto overflow-x-hidden transform origin-top animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div className="absolute top-full start-0 z-50 w-full mt-2 bg-white rounded-xl shadow-xl border border-gray-100 py-2 max-h-64 overflow-y-auto overflow-x-hidden transform origin-top animate-in fade-in slide-in-from-top-2 duration-200">
                       <button
                         className={cn(
-                          "w-full text-left px-4 py-3 text-xs font-bold uppercase tracking-widest hover:bg-gray-50 transition-colors flex items-center justify-between group",
+                          "w-full text-start px-4 py-3 text-xs font-bold uppercase tracking-widest hover:bg-gray-50 transition-colors flex items-center justify-between group",
                           activeCategory === 'Tous' ? "text-primary bg-primary/5" : "text-gray-600"
                         )}
                         onClick={() => {
@@ -255,7 +255,7 @@ const Products = () => {
                           setIsCategoryOpen(false);
                         }}
                       >
-                        <span className={cn(activeCategory === 'Tous' ? "" : "group-hover:translate-x-1 transition-transform")}>Toutes les catégories</span>
+                        <span className={cn(activeCategory === 'Tous' ? "" : "group-hover:translate-x-1 transition-transform")}>{t('products.all_categories')}</span>
                         {activeCategory === 'Tous' && <Check className="w-4 h-4 text-primary" />}
                       </button>
                       
@@ -266,7 +266,7 @@ const Products = () => {
                             <button
                               key={sub.id}
                               className={cn(
-                                "w-full text-left px-4 py-2.5 text-[11px] font-bold tracking-wide hover:bg-gray-50 transition-colors flex items-center justify-between group",
+                                "w-full text-start px-4 py-2.5 text-[11px] font-bold tracking-wide hover:bg-gray-50 transition-colors flex items-center justify-between group",
                                 activeCategory === sub.name ? "text-primary bg-primary/5" : "text-gray-600"
                               )}
                               onClick={() => {
@@ -274,7 +274,7 @@ const Products = () => {
                                 setIsCategoryOpen(false);
                               }}
                             >
-                              <span className={cn(activeCategory === sub.name ? "" : "group-hover:translate-x-1 transition-transform", "line-clamp-2 leading-tight pr-2")}>{sub.name}</span>
+                              <span className={cn(activeCategory === sub.name ? "" : "group-hover:translate-x-1 transition-transform", "line-clamp-2 leading-tight pe-2")}>{sub.name}</span>
                               {activeCategory === sub.name && <Check className="w-3 h-3 text-primary shrink-0" />}
                             </button>
                           ))}
@@ -285,22 +285,22 @@ const Products = () => {
                 </div>
 
                 <div className="relative" ref={regionRef}>
-                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 block">Wilaya</label>
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 block">{t('products.wilaya')}</label>
                   <button
                     onClick={() => setIsRegionOpen(!isRegionOpen)}
-                    className="w-full flex items-center justify-between bg-gray-50 px-5 py-3 rounded-xl border border-transparent focus:ring-2 focus:ring-primary/20 focus:border-primary focus:bg-white transition-all cursor-pointer text-gray-800 hover:bg-gray-100 text-left"
+                    className="w-full flex items-center justify-between bg-gray-50 px-5 py-3 rounded-xl border border-transparent focus:ring-2 focus:ring-primary/20 focus:border-primary focus:bg-white transition-all cursor-pointer text-gray-800 hover:bg-gray-100 text-start"
                   >
                     <span className="text-xs font-black uppercase tracking-widest truncate">{selectedRegion === 'Toutes les wilayas' ? 'Toutes les wilayas' : selectedRegion}</span>
-                    <ChevronDown className={cn("w-4 h-4 text-gray-400 transition-transform ml-4 shrink-0", isRegionOpen && "rotate-180")} />
+                    <ChevronDown className={cn("w-4 h-4 text-gray-400 transition-transform ms-4 shrink-0", isRegionOpen && "rotate-180")} />
                   </button>
                   
                   {isRegionOpen && (
-                    <div className="absolute top-full left-0 z-50 w-full mt-2 bg-white rounded-xl shadow-xl border border-gray-100 py-2 max-h-64 overflow-y-auto overflow-x-hidden transform origin-top animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div className="absolute top-full start-0 z-50 w-full mt-2 bg-white rounded-xl shadow-xl border border-gray-100 py-2 max-h-64 overflow-y-auto overflow-x-hidden transform origin-top animate-in fade-in slide-in-from-top-2 duration-200">
                       {regionsList.map(r => (
                         <button
                           key={r}
                           className={cn(
-                            "w-full text-left px-4 py-3 text-xs font-bold uppercase tracking-widest hover:bg-gray-50 transition-colors flex items-center justify-between group",
+                            "w-full text-start px-4 py-3 text-xs font-bold uppercase tracking-widest hover:bg-gray-50 transition-colors flex items-center justify-between group",
                             selectedRegion === r ? "text-primary bg-primary/5" : "text-gray-600"
                           )}
                           onClick={() => {
@@ -317,7 +317,7 @@ const Products = () => {
                 </div>
 
                 <div>
-                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 block">Type de Vente</label>
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 block">{t('products.sales_type')}</label>
                   <div className="space-y-2">
                     {['Neuf', 'Occasions Rénovées', 'Déstockage'].map(type => (
                       <label key={type} className="flex items-center space-x-3 cursor-pointer group">
@@ -331,17 +331,17 @@ const Products = () => {
             </div>
 
             <div className="bg-primary rounded-[32px] p-8 text-white relative overflow-hidden">
-              <Zap className="absolute -right-4 -bottom-4 w-24 h-24 text-white/10" />
-              <h4 className="text-xl font-black mb-4 leading-tight uppercase">Vendez vos Machines</h4>
+              <Zap className="absolute -end-4 -bottom-4 w-24 h-24 text-white/10" />
+              <h4 className="text-xl font-black mb-4 leading-tight uppercase">{t('products.sell_machines')}</h4>
               <p className="text-white/60 text-[10px] font-medium mb-6 uppercase tracking-widest">Rejoignez 500+ fournisseurs en Algérie</p>
-              <button onClick={() => setShowAddModal(true)} className="w-full py-4 bg-secondary rounded-xl text-xs font-black uppercase tracking-widest shadow-xl hover:scale-105 transition-all text-center block text-white">Ajouter un produit</button>
+              <button onClick={() => setShowAddModal(true)} className="w-full py-4 bg-secondary rounded-xl text-xs font-black uppercase tracking-widest shadow-xl hover:scale-105 transition-all text-center block text-white">{t('products.add_product')}</button>
             </div>
           </aside>
 
           {/* Product Grid */}
           <main className="flex-1">
             <div className="mb-6 flex items-center bg-white p-2 rounded-2xl border border-gray-100 shadow-sm focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary transition-all">
-              <Search className="h-5 w-5 text-gray-400 ml-3" />
+              <Search className="h-5 w-5 text-gray-400 ms-3" />
               <input 
                 type="text"
                 placeholder="Rechercher une machine, une marque..."
@@ -365,7 +365,7 @@ const Products = () => {
               </div>
             ) : error ? (
               <div className="bg-red-50 text-red-500 p-8 border border-red-100 font-bold flex items-center mb-8">
-                 <AlertCircle className="h-6 w-6 mr-3" />
+                 <AlertCircle className="h-6 w-6 me-3" />
                  {error}
               </div>
             ) : filteredProducts.length === 0 ? (
@@ -392,7 +392,7 @@ const Products = () => {
                       alt={product.name}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                     />
-                    <div className="absolute top-4 left-4 flex gap-2">
+                    <div className="absolute top-4 start-4 flex gap-2">
                       <span className="bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-[9px] font-black uppercase text-primary border border-white/20">
                         {product.category}
                       </span>
@@ -446,7 +446,7 @@ const Products = () => {
 
                     <div className="flex items-center justify-between pt-6 border-t border-gray-50">
                       <div>
-                        <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Citations</p>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">{t('products.quotes')}</p>
                         <p className="text-lg font-black text-primary uppercase tracking-tighter">{product.price}</p>
                       </div>
                       <Link to={`/products/${generateSlugUrl(product.name, product.id)}`} className="w-12 h-12 rounded-2xl bg-primary text-white flex items-center justify-center hover:bg-secondary transition-all shadow-lg">

@@ -122,7 +122,7 @@ const Events = () => {
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                     referrerPolicy="no-referrer"
                   />
-                  <div className="absolute top-4 left-4">
+                  <div className="absolute top-4 start-4">
                     <span className={cn(
                       "px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider backdrop-blur-md",
                       event.type === 'Physique' ? "bg-primary/80 text-white" : "bg-secondary/80 text-white"

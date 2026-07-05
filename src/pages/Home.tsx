@@ -65,7 +65,7 @@ const Home = () => {
             "grid grid-cols-1 md:grid-cols-3 gap-0 border border-border-tech divide-y md:divide-y-0 md:divide-x divide-border-tech",
             i18n.language === 'ar' && "md:divide-x-reverse"
           )}>
-            <div className={cn("p-8 hover:bg-neutral-bg transition-colors group", i18n.language === 'ar' && "text-right")}>
+            <div className={cn("p-8 hover:bg-neutral-bg transition-colors group", i18n.language === 'ar' && "text-end")}>
               <span className="tech-label">{i18n.language === 'ar' ? 'قاعدة البيانات' : 'Base de données'}</span>
               <div className={cn("flex items-baseline space-x-2", i18n.language === 'ar' && "space-x-reverse justify-end")}>
                 <span className="text-4xl font-black text-primary tech-mono">550,000+</span>
@@ -75,7 +75,7 @@ const Home = () => {
                 {i18n.language === 'ar' ? 'المكونات والمعدات الصناعية المرجعية' : 'Composants et équipements industriels référencés'}
               </p>
             </div>
-            <div className={cn("p-8 hover:bg-neutral-bg transition-colors group", i18n.language === 'ar' && "text-right")}>
+            <div className={cn("p-8 hover:bg-neutral-bg transition-colors group", i18n.language === 'ar' && "text-end")}>
               <span className="tech-label">{i18n.language === 'ar' ? 'حركة الشبكة' : 'Trafic Réseau'}</span>
               <div className={cn("flex items-baseline space-x-2", i18n.language === 'ar' && "space-x-reverse justify-end")}>
                 <span className="text-4xl font-black text-primary tech-mono">2.7M</span>
@@ -85,7 +85,7 @@ const Home = () => {
                 {i18n.language === 'ar' ? 'صناع القرار والمهندسين المتصلين شهرياً' : 'Décideurs et ingénieurs connectés mensuellement'}
               </p>
             </div>
-            <div className={cn("p-8 hover:bg-neutral-bg transition-colors group", i18n.language === 'ar' && "text-right")}>
+            <div className={cn("p-8 hover:bg-neutral-bg transition-colors group", i18n.language === 'ar' && "text-end")}>
               <span className="tech-label">{i18n.language === 'ar' ? 'الشهادات' : 'Certification'}</span>
               <div className={cn("flex items-baseline space-x-2", i18n.language === 'ar' && "space-x-reverse justify-end")}>
                 <span className="text-4xl font-black text-primary tech-mono">5,000+</span>
@@ -123,7 +123,7 @@ const Home = () => {
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className={cn("flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6", i18n.language === 'ar' && "md:flex-row-reverse")}>
-            <div className={cn("max-w-2xl", i18n.language === 'ar' && "text-right")}>
+            <div className={cn("max-w-2xl", i18n.language === 'ar' && "text-end")}>
               <div className={cn("flex items-center space-x-2 text-secondary mb-4", i18n.language === 'ar' && "space-x-reverse justify-end")}>
                 <div className="w-8 h-[2px] bg-secondary" />
                 <span className="text-xs font-black uppercase tracking-[0.3em]">{i18n.language === 'ar' ? 'المواصفات الفنية' : 'Spécifications Techniques'}</span>
@@ -147,10 +147,10 @@ const Home = () => {
                   <div className="aspect-[4/3] mb-6 bg-neutral-bg border border-border-tech p-4 flex items-center justify-center">
                     <Skeleton className="w-2/3 h-2/3 opacity-20" />
                   </div>
-                  <div className={cn("space-y-4", i18n.language === 'ar' && "text-right flex flex-col items-end")}>
+                  <div className={cn("space-y-4", i18n.language === 'ar' && "text-end flex flex-col items-end")}>
                     <div className="space-y-2 w-full">
-                      <Skeleton className={cn("h-3 w-1/3", i18n.language === 'ar' && "ml-auto")} />
-                      <Skeleton className={cn("h-5 w-3/4", i18n.language === 'ar' && "ml-auto")} />
+                      <Skeleton className={cn("h-3 w-1/3", i18n.language === 'ar' && "ms-auto")} />
+                      <Skeleton className={cn("h-5 w-3/4", i18n.language === 'ar' && "ms-auto")} />
                     </div>
                     <div className={cn("flex justify-between items-center w-full pt-4 border-t border-border-tech", i18n.language === 'ar' && "flex-row-reverse")}>
                       <div className={cn("space-y-1 mt-2 flex flex-col", i18n.language === 'ar' && "items-end")}>
@@ -182,7 +182,7 @@ const Home = () => {
                     referrerPolicy="no-referrer"
                   />
                 </Link>
-                <div className={cn("space-y-4", i18n.language === 'ar' && "text-right")}>
+                <div className={cn("space-y-4", i18n.language === 'ar' && "text-end")}>
                   <div>
                     <span className="tech-label">{product.company || 'Entreprise ID: ' + (product.owner_id ? product.owner_id.substring(0, 8) : 'Inconnu')}</span>
                     <Link to={`/products/${generateSlugUrl(product.name, product.id)}`}>
@@ -193,7 +193,7 @@ const Home = () => {
                   </div>
                   
                   <div className={cn("flex items-center justify-between pt-4 border-t border-border-tech", i18n.language === 'ar' && "flex-row-reverse")}>
-                    <div className={cn("flex flex-col", i18n.language === 'ar' && "text-right")}>
+                    <div className={cn("flex flex-col", i18n.language === 'ar' && "text-end")}>
                       <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">{i18n.language === 'ar' ? 'السعر' : 'Cotation'}</span>
                       <span className="text-sm font-mono font-bold text-primary">{formatPrice(product.price || 'Sur Devis')}</span>
                     </div>
@@ -243,12 +243,12 @@ const Home = () => {
 
       {/* Besoin d'aide Section */}
       <section className="py-24 bg-primary text-white relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-1/3 h-full bg-secondary/10 -skew-x-12 translate-x-1/2" />
-        <div className="absolute top-0 left-0 w-full h-[1px] bg-white/10" />
+        <div className="absolute top-0 end-0 w-1/3 h-full bg-secondary/10 -skew-x-12 translate-x-1/2" />
+        <div className="absolute top-0 start-0 w-full h-[1px] bg-white/10" />
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className={cn("grid grid-cols-1 lg:grid-cols-2 gap-16 items-center", i18n.language === 'ar' && "lg:flex lg:flex-row-reverse lg:justify-between")}>
-            <div className={i18n.language === 'ar' ? "text-right" : ""}>
+            <div className={i18n.language === 'ar' ? "text-end" : ""}>
               <div className={cn("flex items-center space-x-2 text-secondary mb-6", i18n.language === 'ar' && "space-x-reverse justify-end")}>
                 <div className="w-8 h-[2px] bg-secondary" />
                 <span className="text-xs font-black uppercase tracking-[0.3em]">{t('footer.support')}</span>
@@ -266,7 +266,7 @@ const Home = () => {
                   <div className="bg-white/10 p-3 rounded-lg">
                     <Users className="h-6 w-6 text-secondary" />
                   </div>
-                  <div className={i18n.language === 'ar' ? "text-right" : ""}>
+                  <div className={i18n.language === 'ar' ? "text-end" : ""}>
                     <h4 className="font-bold uppercase tracking-tight text-sm">{i18n.language === 'ar' ? 'مساعدة مباشرة' : 'Assistance Live'}</h4>
                     <p className="text-xs text-gray-400 font-medium">{i18n.language === 'ar' ? 'استجابة فورية حسب التوافر' : 'Réponse immédiate selon disponibilité'}</p>
                   </div>
@@ -275,7 +275,7 @@ const Home = () => {
                   <div className="bg-white/10 p-3 rounded-lg">
                     <FileText className="h-6 w-6 text-secondary" />
                   </div>
-                  <div className={i18n.language === 'ar' ? "text-right" : ""}>
+                  <div className={i18n.language === 'ar' ? "text-end" : ""}>
                     <h4 className="font-bold uppercase tracking-tight text-sm">{i18n.language === 'ar' ? 'قاعدة المعرفة' : 'Base de connaissances'}</h4>
                     <p className="text-xs text-gray-400 font-medium">{i18n.language === 'ar' ? 'الوصول إلى الأدلة والدروس التعليمية' : 'Accédez aux guides et tutoriels'}</p>
                   </div>
@@ -296,14 +296,14 @@ const Home = () => {
             <div className="relative group lg:block hidden">
               <div className="absolute -inset-4 border border-secondary/30 rounded-[40px] translate-x-4 translate-y-4 -z-10 group-hover:translate-x-2 group-hover:translate-y-2 transition-transform duration-500" />
               <div className="bg-white/5 backdrop-blur-md border border-white/10 p-10 rounded-[40px] relative overflow-hidden">
-                <div className={cn("absolute top-0 p-8", i18n.language === 'ar' ? "left-0" : "right-0")}>
+                <div className={cn("absolute top-0 p-8", i18n.language === 'ar' ? "start-0" : "end-0")}>
                   <div className={cn("flex items-center space-x-2", i18n.language === 'ar' && "flex-row-reverse space-x-reverse")}>
                     <span className="w-2 h-2 bg-success rounded-full animate-ping" />
                     <span className="text-[10px] font-black text-success uppercase tracking-widest">{i18n.language === 'ar' ? 'الدعم عبر الإنترنت' : 'Support en ligne'}</span>
                   </div>
                 </div>
                 
-                <h3 className={cn("text-2xl font-black uppercase tracking-tight mb-8", i18n.language === 'ar' && "text-right")}>
+                <h3 className={cn("text-2xl font-black uppercase tracking-tight mb-8", i18n.language === 'ar' && "text-end")}>
                   {i18n.language === 'ar' ? 'إحصائيات الدعم' : 'Statistiques de support'}
                 </h3>
                 <div className="space-y-6">
@@ -334,7 +334,7 @@ const Home = () => {
                     <div className="w-10 h-10 rounded-full bg-secondary/20 flex items-center justify-center text-secondary">
                       <Building2 className="h-5 w-5" />
                     </div>
-                    <div className={i18n.language === 'ar' ? "text-right" : ""}>
+                    <div className={i18n.language === 'ar' ? "text-end" : ""}>
                       <p className="text-xs font-black uppercase tracking-widest text-white">{i18n.language === 'ar' ? 'هل أنت مستعد للبدء؟' : 'Prêt à démarrer ?'}</p>
                       <p className="text-[10px] text-gray-500 font-bold">{i18n.language === 'ar' ? 'سجل شركتك في دقيقتين' : 'Inscrivez votre entreprise en 2 minutes'}</p>
                     </div>

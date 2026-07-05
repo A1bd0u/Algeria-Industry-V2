@@ -21,6 +21,7 @@ import uploadRoutes from './server/routes/upload';
 import statsRoutes from './server/routes/stats';
 import aiRoutes from './server/routes/ai';
 import adminRoutes from './server/routes/admin';
+import searchRoutes from './server/routes/search';
 
 async function startServer() {
   const app = express();
@@ -59,6 +60,7 @@ async function startServer() {
   app.use('/api/stats', statsRoutes);
   app.use('/api/ai', aiRoutes);
   app.use('/api/admin', adminRoutes);
+  app.use('/api/search', searchRoutes);
 
   // Serve uploaded files statically
 

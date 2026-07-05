@@ -47,7 +47,7 @@ export default function GovSecurity({ state }: { state: any }) {
                       </div>
                    </div>
                 </div>
-                <ShieldCheck className="absolute -right-20 -bottom-20 h-80 w-80 text-white/5 -rotate-12" />
+                <ShieldCheck className="absolute -end-20 -bottom-20 h-80 w-80 text-white/5 -rotate-12" />
              </div>
 
              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

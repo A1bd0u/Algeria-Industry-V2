@@ -42,13 +42,13 @@ export default function SiteSettings({ state }: { state: any }) {
                            <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Suspendre l'accès public au portail</p>
                         </div>
                         <div className="w-12 h-6 bg-gray-200 rounded-full relative cursor-pointer">
-                           <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full shadow-sm" />
+                           <div className="absolute start-1 top-1 w-4 h-4 bg-white rounded-full shadow-sm" />
                         </div>
                      </div>
 
                      <div className="space-y-4">
                         <label className="text-[10px] font-black text-primary uppercase tracking-widest italic flex items-center">
-                           <ShieldCheck className="h-4 w-4 mr-2 text-secondary" />
+                           <ShieldCheck className="h-4 w-4 me-2 text-secondary" />
                            Niveau de sécurité API
                         </label>
                         <select className="w-full bg-gray-50 border border-gray-100 px-6 py-4 text-[10px] font-black uppercase tracking-widest rounded-2xl outline-none focus:border-secondary transition-all">

@@ -16,15 +16,15 @@ const StickySearchBar = () => {
             <div className="flex-1 relative group">
               <div className={cn(
                 "absolute inset-y-0 flex items-center pointer-events-none text-gray-400 group-focus-within:text-secondary transition-colors",
-                i18n.language === 'ar' ? "right-0 pr-6" : "left-0 pl-6"
+                i18n.language === 'ar' ? "end-0 pe-6" : "start-0 ps-6"
               )}>
                 <Search className="h-5 w-5" />
               </div>
               <button
                 onClick={() => setIsSearchOpen(true)}
                 className={cn(
-                  "w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 text-sm font-medium text-gray-400 hover:bg-white hover:border-secondary/30 hover:shadow-lg transition-all text-left",
-                  i18n.language === 'ar' ? "pr-14 pl-32 text-right" : "pl-14 pr-32 text-left"
+                  "w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 text-sm font-medium text-gray-400 hover:bg-white hover:border-secondary/30 hover:shadow-lg transition-all text-start",
+                  i18n.language === 'ar' ? "pe-14 ps-32 text-end" : "ps-14 pe-32 text-start"
                 )}
               >
                 <span className="hidden sm:inline">{t('hero.search_placeholder')}</span>
@@ -33,7 +33,7 @@ const StickySearchBar = () => {
               
               <div className={cn(
                 "absolute inset-y-0 flex items-center space-x-2",
-                i18n.language === 'ar' ? "left-0 pl-2 space-x-reverse" : "right-0 pr-2"
+                i18n.language === 'ar' ? "start-0 ps-2 space-x-reverse" : "end-0 pe-2"
               )}>
                  <button className="p-2 text-gray-300 hover:text-secondary transition-colors" title="Recherche par image" onClick={(e) => { e.preventDefault(); const file = document.createElement('input'); file.type = 'file'; file.accept = 'image/*'; file.click(); }}>
                     <Camera className="h-5 w-5" />
@@ -48,7 +48,7 @@ const StickySearchBar = () => {
             </div>
             
             <div className="hidden lg:flex items-center space-x-6">
-               <div className={cn("flex items-center space-x-2 border-gray-200", i18n.language === 'ar' ? "border-r pr-6" : "border-l pl-6")}>
+               <div className={cn("flex items-center space-x-2 border-gray-200", i18n.language === 'ar' ? "border-r pe-6" : "border-l ps-6")}>
                  <div className="w-1.5 h-1.5 bg-success rounded-full animate-pulse" />
                  <span className="text-[10px] font-black text-primary uppercase tracking-widest leading-none">
                     {i18n.language === 'ar' ? '١٢.٥ ألف منتج عبر الإنترنت' : '12.5k Produits en ligne'}

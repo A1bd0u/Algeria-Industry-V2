@@ -101,7 +101,7 @@ const SearchModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void
                       <button 
                         key={term}
                         onClick={() => setQuery(term)}
-                        className="flex items-center space-x-3 p-3 rounded-2xl hover:bg-gray-50 transition-colors text-left group"
+                        className="flex items-center space-x-3 p-3 rounded-2xl hover:bg-gray-50 transition-colors text-start group"
                       >
                         <TrendingUp className="h-4 w-4 text-secondary" />
                         <span className="text-sm font-bold text-primary group-hover:text-secondary">{term}</span>
@@ -118,7 +118,7 @@ const SearchModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void
                        <button 
                          key={result.id}
                          onClick={() => handleSelect(result)}
-                         className="w-full flex items-center space-x-4 p-4 rounded-2xl hover:bg-primary/5 transition-all text-left group"
+                         className="w-full flex items-center space-x-4 p-4 rounded-2xl hover:bg-primary/5 transition-all text-start group"
                        >
                          <div className="bg-gray-100 p-3 rounded-xl group-hover:bg-white transition-colors">
                             <Icon className="h-5 w-5 text-primary" />

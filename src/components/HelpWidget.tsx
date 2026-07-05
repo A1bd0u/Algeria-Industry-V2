@@ -43,14 +43,14 @@ const HelpWidget = () => {
   ];
 
   return (
-    <div className="fixed bottom-8 right-8 z-[9999]">
+    <div className="fixed bottom-8 end-8 z-[9999]">
       <AnimatePresence>
         {isOpen && (
           <motion.div
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="absolute bottom-20 right-0 w-[380px] bg-white rounded-[32px] shadow-2xl border border-gray-100 overflow-hidden"
+            className="absolute bottom-20 end-0 w-[380px] bg-white rounded-[32px] shadow-2xl border border-gray-100 overflow-hidden"
           >
             {/* Header */}
             <div className="bg-primary p-8 text-white relative overflow-hidden">
@@ -161,7 +161,7 @@ const HelpWidget = () => {
                         animate={{ opacity: 1, x: 0 }}
                         className={cn(
                           "p-4 rounded-2xl text-xs font-medium",
-                          msg.role === 'ai' ? "bg-primary/5 text-primary self-start rounded-tl-none" : "bg-secondary text-white self-end rounded-tr-none ml-12"
+                          msg.role === 'ai' ? "bg-primary/5 text-primary self-start rounded-tl-none" : "bg-secondary text-white self-end rounded-tr-none ms-12"
                         )}
                       >
                         {msg.text}
@@ -172,14 +172,14 @@ const HelpWidget = () => {
                     <input 
                       type="text" 
                       placeholder="Comment trouver un fournisseur d'acier ?"
-                      className="w-full pl-4 pr-12 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-[11px] font-bold outline-none focus:border-secondary transition-all"
+                      className="w-full ps-4 pe-12 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-[11px] font-bold outline-none focus:border-secondary transition-all"
                       value={aiMessage}
                       onChange={(e) => setAiMessage(e.target.value)}
                       onKeyPress={(e) => e.key === 'Enter' && handleAiSend()}
                     />
                     <button 
                       onClick={handleAiSend}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-secondary hover:scale-110 transition-all"
+                      className="absolute end-4 top-1/2 -translate-y-1/2 text-secondary hover:scale-110 transition-all"
                     >
                       <Send className="h-5 w-5" />
                     </button>
@@ -210,7 +210,7 @@ const HelpWidget = () => {
         ) : (
           <>
             <MessageSquare className="h-8 w-8" />
-            <span className="absolute -top-1 -right-1 w-5 h-5 bg-error text-white text-[10px] font-black flex items-center justify-center rounded-full border-2 border-neutral-bg animate-bounce">
+            <span className="absolute -top-1 -end-1 w-5 h-5 bg-error text-white text-[10px] font-black flex items-center justify-center rounded-full border-2 border-neutral-bg animate-bounce">
               1
             </span>
           </>
@@ -218,7 +218,7 @@ const HelpWidget = () => {
         
         {/* Tooltip */}
         {!isOpen && (
-          <div className="absolute right-20 bg-primary px-4 py-2 rounded-xl text-white text-[10px] font-black uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
+          <div className="absolute end-20 bg-primary px-4 py-2 rounded-xl text-white text-[10px] font-black uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
             Une question ? Chattez avec nous
           </div>
         )}

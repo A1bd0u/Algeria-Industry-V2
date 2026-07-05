@@ -59,7 +59,7 @@ export default function VerifyAccountModal() {
 
         <div className="p-8 space-y-6">
            <div className="bg-emerald-50 text-emerald-600 p-4 rounded-xl text-xs font-bold flex items-center border border-emerald-100 uppercase tracking-widest text-center justify-center">
-             <Mail className="h-4 w-4 mr-2" />
+             <Mail className="h-4 w-4 me-2" />
              Un code à 6 chiffres a été envoyé à {user.email}
            </div>
 
@@ -109,7 +109,7 @@ export default function VerifyAccountModal() {
                disabled={resendLoading}
                className="text-[10px] font-black text-secondary hover:text-primary uppercase tracking-widest flex items-center transition-colors disabled:opacity-50"
              >
-               <RefreshCw className={`h-3 w-3 mr-2 ${resendLoading ? 'animate-spin' : ''}`} />
+               <RefreshCw className={`h-3 w-3 me-2 ${resendLoading ? 'animate-spin' : ''}`} />
                {resendLoading ? 'Envoi...' : 'Renvoyer le code'}
              </button>
 

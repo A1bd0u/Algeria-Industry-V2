@@ -59,11 +59,11 @@ const Privacy = () => {
               </div>
               <h2 className="text-xl font-black text-primary uppercase tracking-tight">1. Collecte des Données Professionnelles</h2>
             </div>
-            <div className="pl-16 space-y-4 text-gray-600 leading-relaxed text-sm font-medium">
+            <div className="ps-16 space-y-4 text-gray-600 leading-relaxed text-sm font-medium">
               <p>
                 Nous collectons uniquement les données nécessaires à votre activité sur la plateforme :
               </p>
-              <ul className="list-disc pl-4 space-y-2">
+              <ul className="list-disc ps-4 space-y-2">
                 <li><strong>Informations d'Entreprise :</strong> Nom, NIF/RC, localisation, effectifs.</li>
                 <li><strong>Coordonnées Professionnelles :</strong> Nom des responsables, emails corporate, numéros de téléphone.</li>
                 <li><strong>Données Techniques :</strong> Spécifications produits, catalogues, appels d'offres émis.</li>
@@ -79,11 +79,11 @@ const Privacy = () => {
               </div>
               <h2 className="text-xl font-black text-primary uppercase tracking-tight">2. Finalités du Traitement</h2>
             </div>
-            <div className="pl-16 space-y-4 text-gray-600 leading-relaxed text-sm font-medium">
+            <div className="ps-16 space-y-4 text-gray-600 leading-relaxed text-sm font-medium">
               <p>
                 Vos informations sont traitées exclusivement pour :
               </p>
-              <ul className="list-disc pl-4 space-y-2">
+              <ul className="list-disc ps-4 space-y-2">
                 <li>La mise en relation acheteur/fournisseur.</li>
                 <li>La verification du statut certifiée ISO des entreprises.</li>
                 <li>L'envoi d'alertes personnalisées sur les nouveaux appels d'offres.</li>
@@ -100,7 +100,7 @@ const Privacy = () => {
               </div>
               <h2 className="text-xl font-black text-primary uppercase tracking-tight">3. Sécurité et Chiffrement</h2>
             </div>
-            <div className="pl-16 space-y-4 text-gray-600 leading-relaxed text-sm font-medium">
+            <div className="ps-16 space-y-4 text-gray-600 leading-relaxed text-sm font-medium">
               <p>
                 Nous appliquons des mesures de sécurité de grade industriel :
               </p>
@@ -121,11 +121,11 @@ const Privacy = () => {
               </div>
               <h2 className="text-xl font-black text-primary uppercase tracking-tight">4. Vos Droits</h2>
             </div>
-            <div className="pl-16 space-y-4 text-gray-600 leading-relaxed text-sm font-medium">
+            <div className="ps-16 space-y-4 text-gray-600 leading-relaxed text-sm font-medium">
               <p>
                 Conformément à la Loi 18-07 relative à la protection des personnes physiques dans le traitement des données à caractère personnel, vous disposez d'un droit :
               </p>
-              <ul className="list-disc pl-4 space-y-2">
+              <ul className="list-disc ps-4 space-y-2">
                 <li>D'accès à l'ensemble de vos données stockées.</li>
                 <li>De rectification des informations erronées.</li>
                 <li>D'opposition à la réception de communications marketing.</li>
@@ -142,7 +142,7 @@ const Privacy = () => {
               </div>
               <h2 className="text-xl font-black text-primary uppercase tracking-tight">5. Contact DPO</h2>
             </div>
-            <div className="pl-16 space-y-4 text-gray-600 leading-relaxed text-sm font-medium">
+            <div className="ps-16 space-y-4 text-gray-600 leading-relaxed text-sm font-medium">
               <p>
                 Pour toute question ou exercice de vos droits, contactez notre Délégué à la Protection des Données :
               </p>

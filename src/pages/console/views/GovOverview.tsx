@@ -45,7 +45,7 @@ export default function GovOverview({ state }: { state: any }) {
             onClick={handleExportPDF}
             className="flex items-center px-4 py-2 bg-secondary text-primary rounded-2xl hover:bg-secondary/90 transition-all font-bold text-xs uppercase tracking-wider"
           >
-            <Download className="w-4 h-4 mr-2" />
+            <Download className="w-4 h-4 me-2" />
             Exporter rapport
           </button>
         </div>
@@ -81,8 +81,8 @@ export default function GovOverview({ state }: { state: any }) {
                   </div>
                   <span className={cn("flex items-center text-[9px] font-black px-2.5 py-1 rounded-lg uppercase tracking-widest", 
                     isPositive ? "bg-green-100 text-green-700" : isNegative ? "bg-red-100 text-red-700" : "bg-gray-100 text-gray-700")}>
-                    {isPositive && <TrendingUp className="w-3 h-3 mr-1" />}
-                    {isNegative && <ArrowUpDown className="w-3 h-3 mr-1" />}
+                    {isPositive && <TrendingUp className="w-3 h-3 me-1" />}
+                    {isNegative && <ArrowUpDown className="w-3 h-3 me-1" />}
                     {stat.trend}
                   </span>
                 </div>
@@ -192,7 +192,7 @@ export default function GovOverview({ state }: { state: any }) {
         <div className="lg:col-span-4 space-y-8">
           <div className="bg-white/70 backdrop-blur-md p-8 rounded-[40px] border border-white shadow-sm text-primary">
             <h3 className="text-sm font-black uppercase mb-6 flex items-center italic">
-              <Activity className="h-4 w-4 mr-2 text-secondary" />
+              <Activity className="h-4 w-4 me-2 text-secondary" />
               Flux d'activité
             </h3>
             <div className="space-y-6">

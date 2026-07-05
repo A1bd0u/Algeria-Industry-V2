@@ -137,7 +137,7 @@ case 'gov-support': return <GovSupport state={state} />;
                       key={item.id}
                       onClick={() => setActiveTab(item.id)}
                       className={cn(
-                        "w-full flex items-center space-x-4 px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 text-left group relative overflow-hidden",
+                        "w-full flex items-center space-x-4 px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 text-start group relative overflow-hidden",
                         activeTab === item.id 
                           ? "bg-secondary text-white shadow-xl" 
                           : "text-white/40 hover:bg-white/[0.03] hover:text-white"
@@ -193,8 +193,8 @@ case 'gov-support': return <GovSupport state={state} />;
              </div>
              
              <div className="flex items-center space-x-3">
-                <div className="hidden xl:flex items-center space-x-4 pr-6 border-r border-primary/5">
-                    <div className="text-right">
+                <div className="hidden xl:flex items-center space-x-4 pe-6 border-r border-primary/5">
+                    <div className="text-end">
                        <p className="text-[8px] text-primary/30 font-black uppercase tracking-widest">Network Status</p>
                        <div className="flex items-center justify-end space-x-1.5">
                           <div className="w-1.5 h-1.5 bg-success rounded-full shadow-[0_0_8px_#10b981]" />
@@ -206,14 +206,14 @@ case 'gov-support': return <GovSupport state={state} />;
                 <div className="flex items-center space-x-2 bg-primary/[0.03] p-1.5 rounded-2xl border border-primary/5">
                    <button className="relative p-2.5 text-primary/40 hover:text-secondary hover:bg-white rounded-xl transition-all duration-300" onClick={(e) => { e.preventDefault(); alert("Fonctionnalité en cours de développement"); }}>
                       <Bell className="h-5 w-5" />
-                      <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-error rounded-full border-2 border-white" />
+                      <span className="absolute top-2.5 end-2.5 w-2 h-2 bg-error rounded-full border-2 border-white" />
                    </button>
                    <div className="h-8 w-px bg-primary/5 mx-1" />
-                   <div className="flex items-center space-x-3 pl-1 pr-3 py-1 group cursor-pointer hover:bg-white rounded-xl transition-all duration-300">
+                   <div className="flex items-center space-x-3 ps-1 pe-3 py-1 group cursor-pointer hover:bg-white rounded-xl transition-all duration-300">
                       <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-primary to-primary/80 text-white flex items-center justify-center font-black text-sm uppercase shadow-lg group-hover:scale-105 transition-transform">
                         AS
                       </div>
-                      <div className="hidden sm:block text-left leading-none">
+                      <div className="hidden sm:block text-start leading-none">
                         <p className="text-[10px] font-black text-primary uppercase">Abdallah S.</p>
                         <p className="text-[8px] text-primary/40 font-bold uppercase mt-1 tracking-widest">Verified Admin</p>
                       </div>
@@ -247,7 +247,7 @@ case 'gov-support': return <GovSupport state={state} />;
               exit={{ opacity: 0, scale: 0.95 }}
               className="bg-white p-8 rounded-[40px] max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl relative"
             >
-              <button onClick={() => setShowExhibitorForm(false)} className="absolute top-6 right-6 p-2 bg-gray-50 rounded-full hover:bg-gray-100 text-gray-500 transition-colors">
+              <button onClick={() => setShowExhibitorForm(false)} className="absolute top-6 end-6 p-2 bg-gray-50 rounded-full hover:bg-gray-100 text-gray-500 transition-colors">
                 <X className="h-5 w-5" />
               </button>
               
@@ -408,7 +408,7 @@ case 'gov-support': return <GovSupport state={state} />;
             animate={{ opacity: 1, y: 0, x: '-50%' }}
             exit={{ opacity: 0, y: 20, x: '-50%' }}
             className={cn(
-              "fixed bottom-10 left-1/2 -translate-x-1/2 px-8 py-4 rounded-2xl shadow-2xl z-[100] flex items-center space-x-4 border",
+              "fixed bottom-10 start-1/2 -translate-x-1/2 px-8 py-4 rounded-2xl shadow-2xl z-[100] flex items-center space-x-4 border",
               notification.type === 'success' ? "bg-emerald-500 text-white border-emerald-400" : "bg-red-500 text-white border-red-400"
             )}
           >

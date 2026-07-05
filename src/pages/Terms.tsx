@@ -52,11 +52,11 @@ const Terms = () => {
               </div>
               <h2 className="text-xl font-black text-primary uppercase tracking-tight">1. Éditeur de la Plateforme</h2>
             </div>
-            <div className="pl-16 space-y-4 text-gray-600 leading-relaxed text-sm font-medium">
+            <div className="ps-16 space-y-4 text-gray-600 leading-relaxed text-sm font-medium">
               <p>
                 La plateforme <strong>Algeria Industry</strong> est éditée par la société :
               </p>
-              <ul className="space-y-2 border-l-2 border-secondary pl-6 py-2">
+              <ul className="space-y-2 border-l-2 border-secondary ps-6 py-2">
                 <li><strong>Dénomination sociale :</strong> ALGERIA INDUSTRY SOLUTIONS SPA</li>
                 <li><strong>Capital social :</strong> 10.000.000 DZD</li>
                 <li><strong>Siège social :</strong> Zone Industrielle Rouiba, Alger, Algérie</li>
@@ -74,7 +74,7 @@ const Terms = () => {
               </div>
               <h2 className="text-xl font-black text-primary uppercase tracking-tight">2. Hébergement</h2>
             </div>
-            <div className="pl-16 space-y-4 text-gray-600 leading-relaxed text-sm font-medium">
+            <div className="ps-16 space-y-4 text-gray-600 leading-relaxed text-sm font-medium">
               <p>
                 Le site est hébergé sur des serveurs hautement sécurisés situés en Algérie (Secteur National) et conformes aux standards ISO 27001 :
               </p>
@@ -94,7 +94,7 @@ const Terms = () => {
               </div>
               <h2 className="text-xl font-black text-primary uppercase tracking-tight">3. Propriété Intellectuelle</h2>
             </div>
-            <div className="pl-16 space-y-4 text-gray-600 leading-relaxed text-sm font-medium">
+            <div className="ps-16 space-y-4 text-gray-600 leading-relaxed text-sm font-medium">
               <p>
                 L'ensemble de ce site (structure, design, logos, textes, bases de données, codes techniques) est la propriété exclusive de ALGERIA INDUSTRY SOLUTIONS.
               </p>
@@ -112,11 +112,11 @@ const Terms = () => {
               </div>
               <h2 className="text-xl font-black text-primary uppercase tracking-tight">4. Responsabilité</h2>
             </div>
-            <div className="pl-16 space-y-4 text-gray-600 leading-relaxed text-sm font-medium">
+            <div className="ps-16 space-y-4 text-gray-600 leading-relaxed text-sm font-medium">
               <p>
                 Algeria Industry agit en tant que tiers de confiance B2B. L'éditeur ne peut être tenu responsable :
               </p>
-              <ul className="list-disc space-y-2 pl-4">
+              <ul className="list-disc space-y-2 ps-4">
                 <li>De l'exactitude des informations fournies par les entreprises exposantes.</li>
                 <li>Des dommages directs ou indirects résultant de l'utilisation de la plateforme.</li>
                 <li>Des éventuels litiges commerciaux entre utilisateurs mis en relation via le portail.</li>
@@ -132,7 +132,7 @@ const Terms = () => {
               </div>
               <h2 className="text-xl font-black text-primary uppercase tracking-tight">5. Utilisation de Cookies</h2>
             </div>
-            <div className="pl-16 space-y-4 text-gray-600 leading-relaxed text-sm font-medium">
+            <div className="ps-16 space-y-4 text-gray-600 leading-relaxed text-sm font-medium">
               <p>
                 Notre plateforme utilise des cookies techniques nécessaires à son bon fonctionnement (maintien de session, préférences linguistiques, comparateur de produits).
               </p>

@@ -197,13 +197,13 @@ const Tarifs = () => {
                   <h4 className="text-xl font-black tracking-tighter uppercase mb-6">{plan.name}</h4>
                   <div className="mb-6">
                     <span className="text-4xl md:text-5xl font-black tracking-tighter leading-none">{plan.price}</span>
-                    {plan.period && <span className="text-[10px] font-bold opacity-60 ml-2 uppercase tracking-widest block mt-2">{plan.period}</span>}
+                    {plan.period && <span className="text-[10px] font-bold opacity-60 ms-2 uppercase tracking-widest block mt-2">{plan.period}</span>}
                   </div>
                   <p className="text-xs opacity-60 font-medium mb-8 border-b border-current/10 pb-8 min-h-[60px]">
                     {plan.description}
                   </p>
                   
-                  <ul className="space-y-4 mb-12 text-left min-h-[280px]">
+                  <ul className="space-y-4 mb-12 text-start min-h-[280px]">
                     {plan.features.map((feature, idx) => (
                       <li key={idx} className="flex items-start space-x-3 text-[11px] font-bold">
                         <Check className={cn("h-4 w-4 shrink-0 mt-0.5", plan.popular ? "text-secondary" : "text-secondary")} />
@@ -264,13 +264,13 @@ const Tarifs = () => {
                   <h4 className="text-xl font-black tracking-tighter uppercase mb-6">{plan.name}</h4>
                   <div className="mb-6">
                     <span className="text-4xl md:text-5xl font-black tracking-tighter leading-none">{plan.price}</span>
-                    {plan.period && <span className="text-[10px] font-bold opacity-60 ml-2 uppercase tracking-widest block mt-2">{plan.period}</span>}
+                    {plan.period && <span className="text-[10px] font-bold opacity-60 ms-2 uppercase tracking-widest block mt-2">{plan.period}</span>}
                   </div>
                   <p className="text-xs opacity-60 font-medium mb-8 border-b border-current/10 pb-8 min-h-[60px]">
                     {plan.description}
                   </p>
                   
-                  <ul className="space-y-4 mb-12 text-left min-h-[220px]">
+                  <ul className="space-y-4 mb-12 text-start min-h-[220px]">
                     {plan.features.map((feature, idx) => (
                       <li key={idx} className="flex items-start space-x-3 text-[11px] font-bold">
                         <Check className={cn("h-4 w-4 shrink-0 mt-0.5", plan.popular ? "text-secondary" : "text-secondary")} />

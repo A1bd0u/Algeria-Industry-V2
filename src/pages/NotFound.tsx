@@ -16,7 +16,7 @@ const NotFound = () => {
           className="bg-white p-12 rounded-[48px] border border-gray-100 shadow-2xl relative overflow-hidden"
         >
           {/* Glitch Effect Background */}
-          <div className="absolute top-0 right-0 w-32 h-32 bg-secondary/5 rounded-full -translate-y-16 translate-x-16" />
+          <div className="absolute top-0 end-0 w-32 h-32 bg-secondary/5 rounded-full -translate-y-16 translate-x-16" />
           
           <div className="relative z-10">
             <div className="w-24 h-24 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-10">
