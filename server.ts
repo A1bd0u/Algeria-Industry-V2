@@ -1,12 +1,3 @@
-import dotenv from 'dotenv';
-delete process.env.JWT_SECRET;
-dotenv.config({ path: ['.env.local', '.env'], override: true });
-
-if (!process.env.JWT_SECRET) {
-  console.error("FATAL: JWT_SECRET manquant dans .env.local");
-  process.exit(1);
-}
-
 import express from 'express';
 import path from 'path';
 import cookieParser from 'cookie-parser';

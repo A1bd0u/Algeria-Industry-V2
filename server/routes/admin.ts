@@ -8,7 +8,10 @@ const router = express.Router();
 const adminDashboardLimiter = rateLimit({
   windowMs: 60 * 1000,
   max: 60,
-  message: { error: 'Trop de requêtes, veuillez réessayer plus tard.' }
+  message: { error: 'Trop de requêtes, veuillez réessayer plus tard.' },
+  keyGenerator: (req) => {
+    return (req as any).user?.id || req.ip;
+  }
 });
 
 // Simple in-memory cache simulating Redis to avoid overloading DB
