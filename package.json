@@ -12,7 +12,8 @@
     "lint": "tsc --noEmit",
     "db:pull": "supabase db pull",
     "db:push": "supabase db push",
-    "db:migration": "supabase migration new"
+    "db:migration": "supabase migration new",
+    "db:seed": "tsx scripts/seed.ts"
   },
   "dependencies": {
     "@google/genai": "^1.29.0",

@@ -54,7 +54,7 @@ async function startServer() {
   app.use('/api/rfqs', rfqRoutes);
   app.use('/api/kyc', kycRoutes);
   app.use('/api/favorites', favoriteRoutes);
-  app.use('/api/ads', adRoutes);
+  app.use('/api/campaigns', adRoutes);
   app.use('/api/users', userRoutes);
   app.use('/api/upload', uploadRoutes);
   app.use('/api/stats', statsRoutes);

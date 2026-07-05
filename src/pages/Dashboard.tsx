@@ -243,7 +243,7 @@ const Dashboard = () => {
   const submitAd = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch('/api/ads', {
+      const res = await fetch('/api/campaigns', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(adFormData)

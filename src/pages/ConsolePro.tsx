@@ -86,7 +86,7 @@ const ConsolePro = () => {
       try {
         const [resProducts, resAds, resStats] = await Promise.all([
           fetch('/api/products'),
-          fetch('/api/ads'),
+          fetch('/api/campaigns'),
           fetch('/api/stats/admin')
 ]);
         
