@@ -73,7 +73,7 @@ router.get('/:id', async (req, res) => {
 
     const { data: company, error } = await supabase
       .from('companies')
-      .select('*, kyc_requests(status, notes, created_at)')
+      .select('*, kyc_requests(status, notes, created_at), products(*)')
       .eq('id', req.params.id)
       .maybeSingle();
 
@@ -213,6 +213,93 @@ router.delete('/:id', requireAuth, async (req, res) => {
   } catch (err: any) {
     console.error("Supabase Error DELETE /companies/:id:", err);
     return res.status(500).json({ error: "Erreur lors de la suppression de l'entreprise." });
+  }
+});
+
+// GET /api/companies/:id/reviews - Récupérer les avis d'une entreprise
+router.get('/:id/reviews', async (req, res) => {
+  try {
+    const supabase = getSupabase();
+    const companyId = req.params.id;
+
+    const { data: reviews, error } = await supabase
+      .from('reviews')
+      .select('*, users:user_id(id, name, email)')
+      .is('product_id', null)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    // Filter and format company reviews
+    const companyReviews = (reviews || []).map(r => {
+      try {
+        const parsed = JSON.parse(r.comment || '{}');
+        if (parsed.company_id === companyId) {
+          return {
+            id: r.id,
+            rating: r.rating,
+            comment: parsed.text || '',
+            created_at: r.created_at,
+            user: r.users || { name: 'Utilisateur anonyme', email: '' }
+          };
+        }
+      } catch (e) {
+        // Not JSON or other format - ignore
+      }
+      return null;
+    }).filter(Boolean);
+
+    return res.json(companyReviews);
+  } catch (err: any) {
+    console.error("Error GET /companies/:id/reviews:", err);
+    return res.status(500).json({ error: "Erreur lors de la récupération des avis." });
+  }
+});
+
+// POST /api/companies/:id/reviews - Ajouter un avis sur une entreprise
+router.post('/:id/reviews', requireAuth, async (req, res) => {
+  const user = (req as any).user;
+  const companyId = req.params.id;
+  const { rating, comment } = req.body;
+
+  if (!rating || rating < 1 || rating > 5) {
+    return res.status(400).json({ error: "La note doit être comprise entre 1 et 5." });
+  }
+
+  try {
+    const supabase = getSupabase();
+
+    // Store company_id and real comment as JSON in the comment field
+    const serializedComment = JSON.stringify({
+      company_id: companyId,
+      text: comment || ''
+    });
+
+    const { data, error } = await supabase
+      .from('reviews')
+      .insert([{
+        user_id: user.id,
+        rating,
+        comment: serializedComment,
+        product_id: null
+      }])
+      .select('*, users:user_id(id, name, email)')
+      .single();
+
+    if (error) throw error;
+
+    const formatted = {
+      id: data.id,
+      rating: data.rating,
+      comment: comment || '',
+      created_at: data.created_at,
+      user: data.users || { name: user.name, email: user.email }
+    };
+
+    return res.status(201).json(formatted);
+  } catch (err: any) {
+    console.error("Error POST /companies/:id/reviews:", err);
+    return res.status(500).json({ error: "Erreur lors de la publication de l'avis." });
   }
 });
 

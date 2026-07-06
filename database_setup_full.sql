@@ -137,6 +137,7 @@ INSERT INTO storage.buckets (id, name, public) VALUES ('kyc-documents', 'kyc-doc
 CREATE TABLE IF NOT EXISTS public.reviews (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     product_id UUID REFERENCES public.products(id) ON DELETE CASCADE,
+    company_id UUID REFERENCES public.companies(id) ON DELETE CASCADE,
     user_id UUID REFERENCES public.users(id) ON DELETE CASCADE,
     rating INTEGER NOT NULL,
     comment TEXT,

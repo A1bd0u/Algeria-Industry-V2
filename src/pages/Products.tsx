@@ -15,13 +15,14 @@ import { motion } from 'motion/react';
 import { productCategories } from '../data/productCategories';
 import React, { useEffect, useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { ProductSkeleton } from '../components/Skeleton';
 import { useAuth } from '../context/AuthContext';
 import { cn, generateSlugUrl } from '../lib/utils';
 import AddProduct from './AddProduct';
 
 const Products = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [activePage, setActivePage] = React.useState(1);
   const [showAddModal, setShowAddModal] = React.useState(false);
   const { t, i18n } = useTranslation();
@@ -161,7 +162,11 @@ const Products = () => {
     }
   };
 
+  const companyIdParam = searchParams.get('company_id') || searchParams.get('companyId');
+  const companyNameParam = searchParams.get('companyName');
+
   const filteredProducts = products.filter(product => {
+     if (companyIdParam && product.owner_id !== companyIdParam && product.company_id !== companyIdParam) return false;
      if (activeCategory !== 'Tous' && product.category !== activeCategory) return false;
      if (selectedRegion !== 'Toutes les wilayas' && product.region !== selectedRegion) return false;
      if (searchQuery) {
@@ -198,8 +203,26 @@ const Products = () => {
               <Package className="h-4 w-4" />
               <span className="text-[10px] font-black uppercase tracking-[0.4em]">{t('products.sourcing')}</span>
             </motion.div>
+            {companyNameParam && (
+              <button 
+                onClick={() => {
+                  setSearchParams({});
+                }} 
+                className="text-xs font-black text-secondary hover:underline uppercase tracking-wider block mb-4"
+              >
+                ← Voir tout le catalogue de Algiers Industry
+              </button>
+            )}
             <h1 className="text-4xl md:text-5xl font-black text-primary uppercase tracking-tighter leading-none mb-6">
-              {t('products.equipment_catalog').split(' ')[0]} <span className="text-secondary">{t('products.equipment_catalog').split(' ').slice(1).join(' ')}</span>
+              {companyNameParam ? (
+                <>
+                  Tous les produits <span className="text-secondary">{companyNameParam}</span>
+                </>
+              ) : (
+                <>
+                  {t('products.equipment_catalog').split(' ')[0]} <span className="text-secondary">{t('products.equipment_catalog').split(' ').slice(1).join(' ')}</span>
+                </>
+              )}
             </h1>
             <p className="text-gray-500 font-medium max-w-lg">
               Explorez les meilleures technologies industrielles disponibles en Algérie. Comparez, demandez des devis et connectez-vous aux fournisseurs.
