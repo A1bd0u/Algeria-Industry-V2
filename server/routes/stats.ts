@@ -10,57 +10,88 @@ router.get('/dashboard', requireAuth, async (req, res) => {
 
   try {
     const supabase = getSupabase();
-
-    // Dynamically calculate RFQs (devis)
-    const { count: rfqsCount, error: rfqError } = await supabase
-        .from('rfqs')
-        .select('*', { count: 'exact', head: true })
-        .eq(user.role === 'fournisseur' || user.role === 'exposant' ? 'receiver_id' : 'sender_id', user.id);
-
-    // Dynamically calculate Products/Tenders count
-    const { count: itemsCount } = await supabase
-        .from(user.role === 'acheteur' ? 'tenders' : 'products')
-        .select('*', { count: 'exact', head: true })
-        .eq('owner_id', user.id);
-
-    // Dynamically calculate Messages
+    
+    // Instead of rfqs/tenders, we will count favorites/ads based on role
+    // For 'fournisseur', count messages where they are receiver or sender
     const { count: messagesCount } = await supabase
         .from('messages')
         .select('*', { count: 'exact', head: true })
         .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`);
 
-
-    // Dynamically calculate Ad count
+    // Count Ads
     const { count: adsCount } = await supabase
         .from('ads')
-        .select('*', { count: 'exact', head: true })
-        .eq('owner_id', user.id);
+        .select('*', { count: 'exact', head: true }); // Assuming global count for now as ads don't have owner_id
 
+    // Check if user is associated with a company
+    const { data: userCompany } = await supabase.from('companies').select('id').eq('owner_id', user.id).single();
+    const companyId = userCompany ? userCompany.id : null;
+    
+    let productsCount = 0;
+    if (companyId) {
+        const { count } = await supabase
+            .from('products')
+            .select('*', { count: 'exact', head: true })
+            .eq('company_id', companyId);
+        productsCount = count || 0;
+    }
 
-    // Create some pseudo-dynamic time series data for the charts since we don't have a time-series DB table for clicks/visits.
+    // Fetch messages group by month for the chart
+    const daysLimit = timeframe === '1y' ? 365 : 180;
+    const dateLimit = new Date();
+    dateLimit.setDate(dateLimit.getDate() - daysLimit);
+    
+    const { data: messagesData } = await supabase
+        .from('messages')
+        .select('created_at')
+        .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
+        .gte('created_at', dateLimit.toISOString());
+
+    const { data: productsData } = companyId ? await supabase
+        .from('products')
+        .select('created_at')
+        .eq('company_id', companyId)
+        .gte('created_at', dateLimit.toISOString()) : { data: [] };
+
+    // Aggregate by month
     const months6 = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin'];
     const months12 = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'];
-    
-    // We base the randomness slightly on their real counts to make it "dynamic-ish"
-    const baseMult = (itemsCount || 1) * 5;
-    
     const timeLabels = timeframe === '1y' ? months12 : months6;
     
-    const chartData = timeLabels.map((month, index) => {
-      // simulating data progression
-      const progression = index * 0.1;
+    // We group by month index 
+    const groupedMessages = new Array(timeLabels.length).fill(0);
+    const groupedProducts = new Array(timeLabels.length).fill(0);
+    
+    const currentMonth = new Date().getMonth();
+    
+    if (messagesData) {
+        messagesData.forEach((m: any) => {
+            const mMonth = new Date(m.created_at).getMonth();
+            const idx = (mMonth - currentMonth + timeLabels.length - 1) % timeLabels.length;
+            if (idx >= 0 && idx < timeLabels.length) groupedMessages[idx]++;
+        });
+    }
 
+    if (productsData) {
+        productsData.forEach((p: any) => {
+            const mMonth = new Date(p.created_at).getMonth();
+            const idx = (mMonth - currentMonth + timeLabels.length - 1) % timeLabels.length;
+            if (idx >= 0 && idx < timeLabels.length) groupedProducts[idx]++;
+        });
+    }
+
+    const chartData = timeLabels.map((month, index) => {
       if (user.role === 'acheteur' || user.role === 'admin') {
          return {
            name: month,
-           devis: Math.floor(Math.random() * baseMult * (1 + progression)) + (rfqsCount || 0),
-           reponses: Math.floor(Math.random() * baseMult * (1 + progression)) + 5
+           messages: groupedMessages[index],
+           favoris: 0
          }
       } else {
          return {
            name: month,
-           visites: Math.floor(Math.random() * baseMult * 10 * (1 + progression)) + 50,
-           contacts: Math.floor(Math.random() * baseMult * (1 + progression)) + (messagesCount || 0)
+           visites: groupedProducts[index] * 5, // Just slightly simulate view correlation
+           contacts: groupedMessages[index]
          }
       }
     });
@@ -68,8 +99,7 @@ router.get('/dashboard', requireAuth, async (req, res) => {
     return res.json({
         chartData,
         metrics: {
-            rfqs: rfqsCount || 0,
-            items: itemsCount || 0,
+            items: productsCount,
             messages: messagesCount || 0,
             ads: adsCount || 0
         }
@@ -79,7 +109,6 @@ router.get('/dashboard', requireAuth, async (req, res) => {
     return res.status(500).json({ error: "Erreur lors du calcul des statistiques" });
   }
 });
-
 
 router.get('/admin', requireAuth, async (req, res) => {
   try {
@@ -121,19 +150,18 @@ router.get('/admin', requireAuth, async (req, res) => {
     const users = await getStats('users');
     const companies = await getStats('companies', { status: 'approved' });
     const products = await getStats('products');
-    const tenders = await getStats('tenders');
+    const ads = await getStats('ads'); // Replaced tenders with ads
 
     return res.json({
         users,
         companies,
         products,
-        tenders
+        tenders: ads // keeping key as tenders so UI doesn't break
     });
   } catch (err: any) {
     console.error("Stats Admin Error:", err);
     return res.status(500).json({ error: "Erreur lors du calcul des statistiques admin" });
   }
 });
-
 
 export default router;

@@ -98,7 +98,7 @@ const ConsolePro = () => {
              name: p.name,
              company: p.brand || p.owner_id || 'Entreprise x',
              status: p.status || 'En attente',
-             score: p.score || Math.floor(Math.random() * 20 + 80),
+             score: p.score || 0,
              ref: `#PRD-${new Date(p.created_at || Date.now()).getFullYear()}-${p.id.substring ? p.id.substring(0, 4) : p.id}`,
              region: p.region || 'Alger',
              dateAdded: p.created_at ? new Date(p.created_at).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]

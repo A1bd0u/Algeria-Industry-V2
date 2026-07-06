@@ -21,43 +21,66 @@ const BlogDetail = () => {
   const { i18n } = useTranslation();
   const [isLoading, setIsLoading] = useState(true);
 
+  const [recentPosts, setRecentPosts] = useState<any[]>([]);
+
   useEffect(() => {
-    // Simulate data loading
-    setIsLoading(true);
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1500);
-    return () => clearTimeout(timer);
+    const fetchRecent = async () => {
+      try {
+        const res = await fetch('/api/articles');
+        if (res.ok) {
+           const data = await res.json();
+           setRecentPosts(data.slice(0, 3));
+        }
+      } catch (err) {}
+    };
+    fetchRecent();
+  }, []);
+  const [error, setError] = useState("");
+  const [post, setPost] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchArticle = async () => {
+      try {
+        setIsLoading(true);
+        const res = await fetch(`/api/articles/${id}`);
+        if (!res.ok) throw new Error("Article non trouvé");
+        const data = await res.json();
+        
+        // Use real data, apply safe fallbacks for missing frontend expectations
+        setPost({
+           ...data,
+           readTime: data.read_time || "5 min",
+           author: data.author || "Rédaction AIS",
+           role: data.author_role || "Éditeur",
+           date: new Date(data.created_at).toLocaleDateString('fr-FR'),
+           tags: data.tags || ["Industrie", "Algérie", "B2B"],
+           excerpt: data.excerpt || (data.content ? data.content.substring(0, 150) + "..." : ""),
+           image: data.image_url || "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=2000&auto=format&fit=crop"
+        });
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    if (id) fetchArticle();
   }, [id]);
 
-  // Mock post data
-  const post = {
-    id: 1,
-    title: "L'Algérie accélère sa transition vers l'Industrie 4.0",
-    excerpt: "Comment les PME algériennes adoptent les nouvelles technologies de fabrication numérique.",
-    content: `
-      L'industrie algérienne connaît une transformation sans précédent. Portée par des initiatives gouvernementales et une volonté de diversification économique, la transition numérique devient une priorité pour les entreprises du secteur manufacturier.
-
-      ### L'impact de l'automatisation
-      L'automatisation ne se limite plus aux grands groupes pétroliers. Aujourd'hui, des unités de production dans la plasturgie et l'agroalimentaire intègrent des solutions robotisées pour gagner en productivité.
-
-      ### Les défis du Capital Humain
-      Le principal frein reste la formation des équipes. Former les ingénieurs d'aujourd'hui aux outils de demain (Maintenance prédictive, IoT, IA) est le défi majeur de 2026.
-
-      ### Conclusion
-      Le chemin est encore long, mais les premiers résultats montrent une amélioration de 15% de l'efficacité opérationnelle pour les entreprises ayant franchi le pas.
-    `,
-    category: "Technologie",
-    author: "Karim Benali",
-    role: "Expert en Stratégie Industrielle",
-    date: "24 Avril 2026",
-    readTime: "8 min",
-    image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=2000&auto=format&fit=crop",
-    tags: ["Digitalisation", "Algérie", "Performance", "PME"]
-  };
-
   if (isLoading) {
-    return <ArticleSkeleton />;
+    return (
+      <div className="min-h-screen pt-32 pb-20 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (error || !post) {
+    return (
+      <div className="min-h-screen pt-32 pb-20 flex items-center justify-center flex-col">
+         <p className="text-red-500 mb-4">{error || "Article introuvable"}</p>
+         <Link to="/blog" className="text-secondary hover:underline">Retour au blog</Link>
+      </div>
+    );
   }
 
   return (
@@ -194,14 +217,14 @@ const BlogDetail = () => {
                 Derniers Articles
              </h3>
              <div className="space-y-8">
-                {[1, 2, 3].map(i => (
-                  <Link key={i} to="/blog/2" className="group block">
+                {recentPosts.map((p: any, i: number) => (
+                  <Link key={i} to={`/blog/${generateSlugUrl(p.title, p.id)}`} className="group block">
                     <div className="aspect-video bg-gray-100 rounded-2xl overflow-hidden mb-4">
-                       <img src={`https://picsum.photos/seed/blog${i}/600/400`} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt="Post" />
+                       <img src={p.image_url || `https://picsum.photos/seed/${p.id}/600/400`} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt="Post" />
                     </div>
-                    <span className="text-[9px] font-black text-secondary tracking-widest uppercase mb-2 block">Secteur Énergie</span>
+                    <span className="text-[9px] font-black text-secondary tracking-widest uppercase mb-2 block">{p.tags?.[0] || 'Industrie'}</span>
                     <h4 className="text-xs font-black text-primary uppercase tracking-tight group-hover:text-secondary transition-colors mb-2 line-clamp-2 italic leading-tight">
-                      Le solaire thermique s'impose dans l'industrie laitière
+                      {p.title}
                     </h4>
                     <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">2h00 • 5 min de lecture</p>
                   </Link>

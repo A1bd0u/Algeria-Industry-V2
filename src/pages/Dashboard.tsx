@@ -47,45 +47,6 @@ import { useAuth } from '../context/AuthContext';
 import { cn, generateSlugUrl } from '../lib/utils';
 
 
-// Mock data for charts
-const dataAcheteur = [
-  { name: 'Jan', bids: 4, messages: 12, views: 0, clics: 0 },
-  { name: 'Fév', bids: 6, messages: 15, views: 0, clics: 0 },
-  { name: 'Mar', bids: 8, messages: 24, views: 0, clics: 0 },
-  { name: 'Avr', bids: 12, messages: 32, views: 0, clics: 0 },
-  { name: 'Mai', bids: 15, messages: 45, views: 0, clics: 0 },
-  { name: 'Juin', bids: 20, messages: 56, views: 0, clics: 0 },
-];
-
-const dataFournisseur = [
-  { name: 'Jan', views: 400, clics: 24, bids: 0, messages: 0 },
-  { name: 'Fév', views: 300, clics: 13, bids: 0, messages: 0 },
-  { name: 'Mar', views: 600, clics: 38, bids: 0, messages: 0 },
-  { name: 'Avr', views: 800, clics: 42, bids: 0, messages: 0 },
-  { name: 'Mai', views: 500, clics: 25, bids: 0, messages: 0 },
-  { name: 'Juin', views: 900, clics: 56, bids: 0, messages: 0 },
-];
-
-const dataAcheteur1y = [
-  ...dataAcheteur,
-  { name: 'Juil', bids: 22, messages: 60, views: 0, clics: 0 },
-  { name: 'Août', bids: 18, messages: 50, views: 0, clics: 0 },
-  { name: 'Sep', bids: 25, messages: 70, views: 0, clics: 0 },
-  { name: 'Oct', bids: 30, messages: 85, views: 0, clics: 0 },
-  { name: 'Nov', bids: 35, messages: 95, views: 0, clics: 0 },
-  { name: 'Déc', bids: 42, messages: 110, views: 0, clics: 0 },
-];
-
-const dataFournisseur1y = [
-  ...dataFournisseur,
-  { name: 'Juil', views: 850, clics: 50, bids: 0, messages: 0 },
-  { name: 'Août', views: 700, clics: 40, bids: 0, messages: 0 },
-  { name: 'Sep', views: 1100, clics: 65, bids: 0, messages: 0 },
-  { name: 'Oct', views: 1300, clics: 80, bids: 0, messages: 0 },
-  { name: 'Nov', views: 1500, clics: 95, bids: 0, messages: 0 },
-  { name: 'Déc', views: 1800, clics: 120, bids: 0, messages: 0 },
-];
-
 const productCategories = [
   {
     id: 1,
@@ -377,7 +338,7 @@ const Dashboard = () => {
                 </div>
                 <div className="h-[300px] w-full">
                   <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={apiStats?.chartData || (user.role === 'fournisseur' ? (chartTimeframe === '1y' ? dataFournisseur1y : dataFournisseur) : (chartTimeframe === '1y' ? dataAcheteur1y : dataAcheteur))}>
+                    <AreaChart data={apiStats?.chartData || []}>
                       <defs>
                         <linearGradient id="colorMain" x1="0" y1="0" x2="0" y2="1">
                           <stop offset="5%" stopColor={user.role === 'fournisseur' ? "#1B4D2E" : "#d97706"} stopOpacity={0.1}/>

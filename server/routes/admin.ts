@@ -61,17 +61,17 @@ router.get('/dashboard', verifyRole(['admin']), adminDashboardLimiter, async (re
       supabase.from('users').select('*', { count: 'exact', head: true }),
       supabase.from('companies').select('*', { count: 'exact', head: true }).eq('status', 'approved'),
       supabase.from('products').select('*', { count: 'exact', head: true }), // Assuming all are active for now since status doesn't exist on products
-      supabase.from('tenders').select('*', { count: 'exact', head: true }).eq('status', 'open'),
+      supabase.from('ads').select('*', { count: 'exact', head: true }).eq('status', 'published'),
       // Current month
       supabase.from('users').select('*', { count: 'exact', head: true }).gte('created_at', startOfCurrentMonth),
       supabase.from('companies').select('*', { count: 'exact', head: true }).eq('status', 'approved').gte('created_at', startOfCurrentMonth),
       supabase.from('products').select('*', { count: 'exact', head: true }).gte('created_at', startOfCurrentMonth),
-      supabase.from('tenders').select('*', { count: 'exact', head: true }).eq('status', 'open').gte('created_at', startOfCurrentMonth),
+      supabase.from('ads').select('*', { count: 'exact', head: true }).eq('status', 'published').gte('created_at', startOfCurrentMonth),
       // Previous month
       supabase.from('users').select('*', { count: 'exact', head: true }).gte('created_at', startOfPreviousMonth).lt('created_at', startOfCurrentMonth),
       supabase.from('companies').select('*', { count: 'exact', head: true }).eq('status', 'approved').gte('created_at', startOfPreviousMonth).lt('created_at', startOfCurrentMonth),
       supabase.from('products').select('*', { count: 'exact', head: true }).gte('created_at', startOfPreviousMonth).lt('created_at', startOfCurrentMonth),
-      supabase.from('tenders').select('*', { count: 'exact', head: true }).eq('status', 'open').gte('created_at', startOfPreviousMonth).lt('created_at', startOfCurrentMonth),
+      supabase.from('ads').select('*', { count: 'exact', head: true }).eq('status', 'published').gte('created_at', startOfPreviousMonth).lt('created_at', startOfCurrentMonth),
     ]);
 
     const calculateTrend = (cm: number | null, pm: number | null) => {
@@ -119,17 +119,34 @@ router.get('/dashboard', verifyRole(['admin']), adminDashboardLimiter, async (re
       .map(([date, count]) => ({ date, count }))
       .sort((a, b) => a.date.localeCompare(b.date));
 
-    // Mock revenue data for now as there is no transactions table
+    // Fetch transactions
+    const { data: txData } = await supabase
+      .from('transactions')
+      .select('amount, created_at')
+      .eq('status', 'completed')
+      .gte('created_at', dateLimit.toISOString());
+
     let total_revenue = 0;
-    const revenue_chart = [];
+    const revenueMap = new Map<string, number>();
     for (let i = days - 1; i >= 0; i--) {
       const d = new Date();
       d.setDate(d.getDate() - i);
-      const dateStr = d.toISOString().split('T')[0];
-      const dailyRevenue = Math.floor(Math.random() * 50000) + 10000;
-      total_revenue += dailyRevenue;
-      revenue_chart.push({ date: dateStr, revenue: dailyRevenue });
+      revenueMap.set(d.toISOString().split('T')[0], 0);
     }
+
+    if (txData) {
+      txData.forEach(tx => {
+        total_revenue += Number(tx.amount);
+        const dateStr = new Date(tx.created_at).toISOString().split('T')[0];
+        if (revenueMap.has(dateStr)) {
+          revenueMap.set(dateStr, revenueMap.get(dateStr)! + Number(tx.amount));
+        }
+      });
+    }
+
+    const revenue_chart = Array.from(revenueMap.entries())
+      .map(([date, revenue]) => ({ date, revenue }))
+      .sort((a, b) => a.date.localeCompare(b.date));
 
     const data = {
       kpis: {

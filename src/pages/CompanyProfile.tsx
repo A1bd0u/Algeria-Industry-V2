@@ -98,36 +98,21 @@ const CompanyProfile = () => {
     const fetchCompany = async () => {
       try {
         setIsLoading(true);
-        const res = await fetch(`/api/companies/${id}`).catch(() => null);
-        let data: any = { id: id, name: "Entreprise ID " + id, activity_sector: "Industrie" }; // Mock fallback base
-        
-        if (res && res.ok) {
-           data = await res.json();
+        const res = await fetch(`/api/companies/${id}`);
+        if (!res.ok) {
+           throw new Error("Entreprise introuvable");
         }
         
-        // Mock some dynamic data for the view
-        data = {
-          ...data,
-          fullName: data.name + " Algérie",
-          sector: data.activity_sector || "Énergie / Hydrocarbures",
-          region: "Alger",
-          address: "123 Rue de l'Industrie, Alger",
-          website: `www.${data.name?.toLowerCase().replace(/\s+/g,'')}.com`,
-          email: `contact@${data.name?.toLowerCase().replace(/\s+/g,'')}.dz`,
-          phone: "+213 21 00 00 00",
-          description: data.description || "Leader de la construction mécanique. Aucune description fournie.",
-          certified: Math.random() > 0.5,
-          certifications: ["ISO 9001", "ISO 14001"],
-          employees: "1,000+",
-          founded: "2010",
-          rating: 4.8,
-          reviews: 120,
-          logo: `https://picsum.photos/seed/${data.id}/200/200`,
-          banner: `https://picsum.photos/seed/${data.id}-banner/1200/400`,
-          products: [
-             { id: 101, name: "Produit A", category: "Équipement" },
-             { id: 102, name: "Produit B", category: "Outillage" }
-          ]
+        const companyData = await res.json();
+        
+        // Use real data, provide safe fallback for images
+        const data = {
+          ...companyData,
+          logo: `https://picsum.photos/seed/${companyData.id}/200/200`,
+          banner: `https://picsum.photos/seed/${companyData.id}-banner/1200/400`,
+          // ensure arrays and properties exist to avoid UI crash
+          certifications: companyData.certifications || [],
+          products: companyData.products || []
         };
 
         setCompany(data);
