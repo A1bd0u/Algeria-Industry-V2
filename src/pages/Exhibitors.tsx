@@ -10,15 +10,19 @@ import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { cn, generateSlugUrl } from '../lib/utils';
+import { CompanySkeleton } from '../components/Skeleton';
 
 const Exhibitors = () => {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [searchTerm, setSearchTerm] = useState('');
   const [activeSector, setActiveSector] = useState('Tous');
   const [isSectorOpen, setIsSectorOpen] = useState(false);
   const [activeRegion, setActiveRegion] = useState('Toutes');
   const [isRegionOpen, setIsRegionOpen] = useState(false);
   const [showVerifiedOnly, setShowVerifiedOnly] = useState(false);
+  const [exhibitors, setExhibitors] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
 
   const sectorRef = useRef<HTMLDivElement>(null);
   const regionRef = useRef<HTMLDivElement>(null);
@@ -56,52 +60,58 @@ const Exhibitors = () => {
     };
   }, []);
 
-  const sectors = ['Tous', 'Agroalimentaire', 'BTPH', 'Chimie & Pétrochimie', 'Énergie & Mines', 'Industrie Pharmaceutique', 'Métallurgie & Mécanique', 'Plasturgie & Caoutchouc', 'Textile & Cuir', 'Électronique & Électroménager', 'Automobile & Transport', 'Énergies Renouvelables'];
-  const regions = ['Toutes', 'Alger', 'Oran', 'Sétif', 'Annaba', 'Constantine', 'Blida'];
+  // Récupération des entreprises depuis l'API
+  useEffect(() => {
+    const fetchExhibitors = async () => {
+      try {
+        setIsLoading(true);
+        const res = await fetch('/api/companies');
+        if (!res.ok) throw new Error('Erreur lors du chargement des exposants');
+        const data = await res.json();
+        
+        // Formatage des données pour correspondre à l'affichage attendu
+        const formatted = data.map((c: any) => ({
+          id: c.id,
+          name: c.name,
+          sector: c.activity_sector || 'Non spécifié',
+          location: c.wilaya || c.region || 'Algérie',
+          description: c.description || 'Aucune description',
+          logo: c.logo_url || `https://picsum.photos/seed/${c.id}/200/200`,
+          stats: {
+            products: 0, // À remplacer par un vrai compteur si disponible
+            views: '0',
+            employees: 'N/A'
+          },
+          verified: c.certified || c.is_verified || false,
+          status: c.status
+        }));
+        
+        setExhibitors(formatted);
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchExhibitors();
+  }, []);
 
-  const exhibitors = [
-    {
-      id: 1,
-      name: 'Algerian Industrial Solutions (AIS)',
-      sector: 'Automobile & Transport',
-      location: 'Alger, Zone Industrielle Rouiba',
-      description: 'Leader dans la fabrication de composants mécaniques de précision.',
-      logo: 'https://images.unsplash.com/photo-1542744094-24638eff58bb?q=80&w=200&auto=format&fit=crop',
-      stats: { products: 145, views: '12K', employees: '250+' },
-      verified: true
-    },
-    {
-      id: 2,
-      name: 'EcoEnergy Algeria',
-      sector: 'Énergies Renouvelables',
-      location: 'Oran, Es Sénia',
-      description: 'Solutions photovoltaïques industrielles et stockage d\'énergie.',
-      logo: 'https://images.unsplash.com/photo-1557804506-669a67965ba0?q=80&w=200&auto=format&fit=crop',
-      stats: { products: 42, views: '8K', employees: '85' },
-      verified: true
-    },
-    {
-      id: 3,
-      name: 'Métal Nord Spa',
-      sector: 'Métallurgie & Mécanique',
-      location: 'Sétif, Zone Industrielle',
-      description: 'Transformation d\'acier et structures métalliques lourdes.',
-      logo: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=200&auto=format&fit=crop',
-      stats: { products: 88, views: '5K', employees: '180' },
-      verified: false
-    }
-  ];
-
-  const filteredExhibitors = exhibitors.filter(ex => {
-    if (showVerifiedOnly && !ex.verified) return false;
-    if (activeSector !== 'Tous' && ex.sector !== activeSector) return false;
-    if (activeRegion !== 'Toutes' && !ex.location.includes(activeRegion)) return false;
-    if (searchTerm) {
-      const q = searchTerm.toLowerCase();
-      return ex.name.toLowerCase().includes(q) || ex.description.toLowerCase().includes(q);
-    }
-    return true;
+  // Filtrage des exposants
+  const filteredExhibitors = exhibitors.filter((exhibitor: any) => {
+    const matchesSearch = exhibitor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          exhibitor.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSector = activeSector === 'Tous' || exhibitor.sector === activeSector;
+    const matchesRegion = activeRegion === 'Toutes' || exhibitor.location.includes(activeRegion);
+    const matchesVerified = !showVerifiedOnly || exhibitor.verified;
+    return matchesSearch && matchesSector && matchesRegion && matchesVerified;
   });
+
+  const sectors = ['Tous', 'Agroalimentaire', 'BTPH', 'Chimie & Pétrochimie', 'Énergie & Mines', 
+                   'Industrie Pharmaceutique', 'Métallurgie & Mécanique', 'Plasturgie & Caoutchouc', 
+                   'Textile & Cuir', 'Électronique & Électroménager', 'Automobile & Transport', 
+                   'Énergies Renouvelables'];
+  const regions = ['Toutes', 'Alger', 'Oran', 'Sétif', 'Annaba', 'Constantine', 'Blida'];
 
   return (
     <div className={cn("min-h-screen bg-neutral-bg pt-32 pb-20", i18n.language === 'ar' && "font-arabic")}>
@@ -245,75 +255,89 @@ const Exhibitors = () => {
 
         {/* Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredExhibitors.map((exhibitor, idx) => (
-            <motion.div 
-              key={exhibitor.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: idx * 0.1 }}
-              className="bg-white rounded-[40px] p-8 border border-gray-100 hover:shadow-2xl hover:border-secondary/20 transition-all group"
-            >
-              <div className="flex items-start justify-between mb-8">
-                <div className="w-20 h-20 rounded-2xl bg-gray-50 border border-gray-100 p-3 overflow-hidden group-hover:scale-105 transition-transform">
-                  <img src={exhibitor.logo} alt={exhibitor.name} className="w-full h-full object-contain" />
-                </div>
-                <div className="flex flex-col items-end">
-                  {exhibitor.verified && (
-                    <div className="flex items-center space-x-1.5 bg-secondary/5 px-3 py-1 rounded-full text-secondary mb-2">
-                      <ShieldCheck className="h-3.5 w-3.5" />
-                      <span className="text-[9px] font-black uppercase">Vérifié</span>
+          {isLoading ? (
+            Array.from({ length: 6 }).map((_, i) => (
+              <CompanySkeleton key={i} />
+            ))
+          ) : error ? (
+            <div className="col-span-full text-center py-12">
+              <p className="text-red-500 font-bold">{error}</p>
+            </div>
+          ) : filteredExhibitors.length === 0 ? (
+            <div className="col-span-full text-center py-12 bg-white rounded-[40px] p-8 border border-gray-100">
+              <p className="text-gray-400 font-bold">Aucun exposant trouvé</p>
+            </div>
+          ) : (
+            filteredExhibitors.map((exhibitor: any, idx) => (
+              <motion.div 
+                key={exhibitor.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: idx * 0.1 }}
+                className="bg-white rounded-[40px] p-8 border border-gray-100 hover:shadow-2xl hover:border-secondary/20 transition-all group"
+              >
+                <div className="flex items-start justify-between mb-8">
+                  <div className="w-20 h-20 rounded-2xl bg-gray-50 border border-gray-100 p-3 overflow-hidden group-hover:scale-105 transition-transform">
+                    <img src={exhibitor.logo} alt={exhibitor.name} className="w-full h-full object-contain" />
+                  </div>
+                  <div className="flex flex-col items-end">
+                    {exhibitor.verified && (
+                      <div className="flex items-center space-x-1.5 bg-secondary/5 px-3 py-1 rounded-full text-secondary mb-2">
+                        <ShieldCheck className="h-3.5 w-3.5" />
+                        <span className="text-[9px] font-black uppercase">Vérifié</span>
+                      </div>
+                    )}
+                    <div className="flex items-center space-x-1 text-orange-400">
+                      <Star className="h-3 w-3 fill-current" />
+                      <Star className="h-3 w-3 fill-current" />
+                      <Star className="h-3 w-3 fill-current" />
+                      <Star className="h-3 w-3 fill-current" />
+                      <Star className="h-3 w-3" />
                     </div>
-                  )}
-                  <div className="flex items-center space-x-1 text-orange-400">
-                    <Star className="h-3 w-3 fill-current" />
-                    <Star className="h-3 w-3 fill-current" />
-                    <Star className="h-3 w-3 fill-current" />
-                    <Star className="h-3 w-3 fill-current" />
-                    <Star className="h-3 w-3" />
                   </div>
                 </div>
-              </div>
 
-              <div className="mb-8">
-                <p className="text-[10px] font-black text-secondary uppercase tracking-[0.2em] mb-2">{exhibitor.sector}</p>
-                <h3 className="text-xl font-black text-primary uppercase tracking-tight group-hover:text-secondary transition-colors mb-4 line-clamp-1">
-                  {exhibitor.name}
-                </h3>
-                <div className="flex items-center text-gray-400 mb-6">
-                  <MapPin className="h-3.5 w-3.5 me-2 shrink-0 text-secondary" />
-                  <span className="text-[10px] font-bold uppercase tracking-widest truncate">{exhibitor.location}</span>
+                <div className="mb-8">
+                  <p className="text-[10px] font-black text-secondary uppercase tracking-[0.2em] mb-2">{exhibitor.sector}</p>
+                  <h3 className="text-xl font-black text-primary uppercase tracking-tight group-hover:text-secondary transition-colors mb-4 line-clamp-1">
+                    {exhibitor.name}
+                  </h3>
+                  <div className="flex items-center text-gray-400 mb-6">
+                    <MapPin className="h-3.5 w-3.5 me-2 shrink-0 text-secondary" />
+                    <span className="text-[10px] font-bold uppercase tracking-widest truncate">{exhibitor.location}</span>
+                  </div>
+                  <p className="text-xs text-gray-500 font-medium leading-relaxed italic border-l-2 border-gray-100 ps-4">
+                    "{exhibitor.description}"
+                  </p>
                 </div>
-                <p className="text-xs text-gray-500 font-medium leading-relaxed italic border-l-2 border-gray-100 ps-4">
-                  "{exhibitor.description}"
-                </p>
-              </div>
 
-              <div className="grid grid-cols-3 gap-4 mb-8 py-6 border-y border-gray-50">
-                <div>
-                  <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Produits</p>
-                  <p className="text-sm font-black text-primary">{exhibitor.stats.products}</p>
+                <div className="grid grid-cols-3 gap-4 mb-8 py-6 border-y border-gray-50">
+                  <div>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Produits</p>
+                    <p className="text-sm font-black text-primary">{exhibitor.stats?.products ?? 0}</p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Visites</p>
+                    <p className="text-sm font-black text-primary">{exhibitor.stats?.views ?? '0'}</p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Taille</p>
+                    <p className="text-sm font-black text-primary">{exhibitor.stats?.employees ?? 'N/A'}</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Visites</p>
-                  <p className="text-sm font-black text-primary">{exhibitor.stats.views}</p>
-                </div>
-                <div>
-                  <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Taille</p>
-                  <p className="text-sm font-black text-primary">{exhibitor.stats.employees}</p>
-                </div>
-              </div>
 
-              <div className="flex gap-3">
-                <Link to={`/directory/${generateSlugUrl(exhibitor.name, String(exhibitor.id))}`} className="flex-1 py-4 bg-primary text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-secondary transition-all flex items-center justify-center space-x-2 shadow-lg group">
-                  <span>Visiter</span>
-                  <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                </Link>
-                <Link to="/contact" className="w-14 h-14 bg-gray-50 text-gray-400 rounded-2xl flex items-center justify-center hover:text-secondary hover:bg-secondary/5 transition-all">
-                  <MessageSquare className="h-5 w-5" />
-                </Link>
-              </div>
-            </motion.div>
-          ))}
+                <div className="flex gap-3">
+                  <Link to={`/directory/${generateSlugUrl(exhibitor.name, String(exhibitor.id))}`} className="flex-1 py-4 bg-primary text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-secondary transition-all flex items-center justify-center space-x-2 shadow-lg group">
+                    <span>Visiter</span>
+                    <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                  </Link>
+                  <Link to="/contact" className="w-14 h-14 bg-gray-50 text-gray-400 rounded-2xl flex items-center justify-center hover:text-secondary hover:bg-secondary/5 transition-all">
+                    <MessageSquare className="h-5 w-5" />
+                  </Link>
+                </div>
+              </motion.div>
+            ))
+          )}
         </div>
 
         {/* CTA Section */}

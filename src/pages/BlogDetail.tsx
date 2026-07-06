@@ -13,7 +13,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ArticleSkeleton } from '../components/Skeleton';
-import { cn, extractIdFromSlug } from '../lib/utils';
+import { cn, extractIdFromSlug, generateSlugUrl } from '../lib/utils';
 
 const BlogDetail = () => {
   const { id: slugId } = useParams();

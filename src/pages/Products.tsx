@@ -105,18 +105,18 @@ const Products = () => {
         let data = await res.json();
         
         // Formatter les données pour le catalogue complet
-        data = data.map((p: any) => ({
-           id: p.id,
-           reference_id: p.reference_id,
-           name: p.name,
-           brand: p.brand || 'Marque Standard',
-           price: p.price,
-           category: p.cat || p.category || 'Non catégorisé',
-           region: p.region || 'Alger',
-           image: p.image || p.file_url || `https://picsum.photos/seed/${p.id}/600/400`,
-           features: p.features || ['Précision', 'Haute Performance'],
-           verified: p.verified !== undefined ? p.verified : true,
-           owner_id: p.owner_id
+        data = data.map((p: any) => ({ 
+           id: p.id, 
+           reference_id: p.reference_id, 
+           name: p.name, 
+           brand: p.company_name || 'Marque Standard',  // Si tu as une jointure
+           price: p.price, 
+           category: p.category || 'Non catégorisé', 
+           region: p.region || 'Alger',  // À ajouter dans ta table si besoin
+           image: p.file_url || p.image_url || `https://picsum.photos/seed/${p.id}/600/400`, 
+           features: p.features || ['Produit de qualité'], 
+           verified: p.verified || false, 
+           owner_id: p.owner_id || p.company_id
         }));
 
         setProducts(data);

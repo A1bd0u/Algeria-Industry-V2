@@ -102,6 +102,12 @@ CREATE TABLE IF NOT EXISTS public.products (
     category TEXT,
     company_id UUID REFERENCES public.companies(id),
     status TEXT DEFAULT 'active',
+    brand TEXT,
+    region TEXT,
+    file_url TEXT,
+    features TEXT[],
+    verified BOOLEAN DEFAULT false,
+    owner_id UUID REFERENCES public.users(id),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
