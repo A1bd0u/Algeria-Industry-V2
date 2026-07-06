@@ -249,7 +249,7 @@ const Products = () => {
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Sidebar Filters */}
           <aside className="w-full lg:w-72 space-y-8">
-            <div className="bg-white p-6 rounded-[32px] border border-gray-100 shadow-sm">
+            <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-sm font-black text-primary uppercase tracking-widest">{t('products.filters')}</h3>
                 <SlidersHorizontal className="h-4 w-4 text-gray-400" />
@@ -353,7 +353,7 @@ const Products = () => {
               </div>
             </div>
 
-            <div className="bg-primary rounded-[32px] p-8 text-white relative overflow-hidden">
+            <div className="bg-primary rounded-2xl p-8 text-white relative overflow-hidden">
               <Zap className="absolute -end-4 -bottom-4 w-24 h-24 text-white/10" />
               <h4 className="text-xl font-black mb-4 leading-tight uppercase">{t('products.sell_machines')}</h4>
               <p className="text-white/60 text-[10px] font-medium mb-6 uppercase tracking-widest">Rejoignez 500+ fournisseurs en Algérie</p>
@@ -405,7 +405,7 @@ const Products = () => {
                   layout
                   key={product.id}
                   className={cn(
-                    "bg-white rounded-[32px] border border-gray-100 overflow-hidden hover:shadow-2xl transition-all group",
+                    "bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-2xl transition-all group",
                     view === 'list' && "flex md:flex-row"
                   )}
                 >

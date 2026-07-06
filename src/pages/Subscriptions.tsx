@@ -133,7 +133,7 @@ const Subscriptions = () => {
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="lg:col-span-2 bg-primary rounded-[32px] p-8 md:p-12 text-white relative overflow-hidden shadow-2xl"
+            className="lg:col-span-2 bg-primary rounded-2xl p-8 md:p-12 text-white relative overflow-hidden shadow-2xl"
           >
             <div className="absolute top-0 end-0 p-12 opacity-10">
               <ShieldCheck className="w-64 h-64 -me-20 -mt-20" />
@@ -181,7 +181,7 @@ const Subscriptions = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="bg-white rounded-[32px] p-8 border border-gray-100 shadow-xl flex flex-col justify-between"
+            className="bg-white rounded-2xl p-8 border border-gray-100 shadow-xl flex flex-col justify-between"
           >
             <div>
               <h3 className="text-sm font-black text-primary uppercase tracking-widest mb-6 border-b border-gray-50 pb-4">Mode de Règlement</h3>
@@ -217,7 +217,7 @@ const Subscriptions = () => {
               <div 
                 key={i} 
                 className={cn(
-                  "relative p-8 rounded-[40px] border flex flex-col items-center justify-between transition-all",
+                  "relative p-8 rounded-2xl border flex flex-col items-center justify-between transition-all",
                   plan.color,
                   plan.current && "ring-4"
                 )}
@@ -270,7 +270,7 @@ const Subscriptions = () => {
         </div>
 
         {/* Billing History */}
-        <div className="bg-white rounded-[40px] border border-gray-100 shadow-xl overflow-hidden">
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-xl overflow-hidden">
           <div className="p-8 md:p-12 border-b border-gray-50 flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <div className="w-12 h-12 bg-primary/5 rounded-2xl flex items-center justify-center text-primary">

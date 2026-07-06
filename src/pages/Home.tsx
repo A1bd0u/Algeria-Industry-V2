@@ -294,8 +294,8 @@ const Home = () => {
             </div>
 
             <div className="relative group lg:block hidden">
-              <div className="absolute -inset-4 border border-secondary/30 rounded-[40px] translate-x-4 translate-y-4 -z-10 group-hover:translate-x-2 group-hover:translate-y-2 transition-transform duration-500" />
-              <div className="bg-white/5 backdrop-blur-md border border-white/10 p-10 rounded-[40px] relative overflow-hidden">
+              <div className="absolute -inset-4 border border-secondary/30 rounded-2xl translate-x-4 translate-y-4 -z-10 group-hover:translate-x-2 group-hover:translate-y-2 transition-transform duration-500" />
+              <div className="bg-white/5 backdrop-blur-md border border-white/10 p-10 rounded-2xl relative overflow-hidden">
                 <div className={cn("absolute top-0 p-8", i18n.language === 'ar' ? "start-0" : "end-0")}>
                   <div className={cn("flex items-center space-x-2", i18n.language === 'ar' && "flex-row-reverse space-x-reverse")}>
                     <span className="w-2 h-2 bg-success rounded-full animate-ping" />

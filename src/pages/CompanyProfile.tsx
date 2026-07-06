@@ -22,7 +22,7 @@ import { Upload, XCircle, CheckCircle, Clock,
 import { motion } from 'motion/react';
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { ProfileSkeleton } from '../components/Skeleton';
 import { cn, generateSlugUrl, extractIdFromSlug } from '../lib/utils';
 
@@ -30,6 +30,7 @@ const CompanyProfile = () => {
   const { id: slugId } = useParams();
   const id = extractIdFromSlug(slugId);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [isFavorite, setIsFavorite] = useState(false);
   
   const [company, setCompany] = useState<any>(null);
@@ -49,6 +50,13 @@ const CompanyProfile = () => {
   const [newComment, setNewComment] = useState('');
   const [submittingReview, setSubmittingReview] = useState(false);
   const [reviewError, setReviewError] = useState('');
+  const [showReviewForm, setShowReviewForm] = useState(false);
+
+  useEffect(() => {
+    if (searchParams.get('writeReview') === 'true') {
+      setShowReviewForm(true);
+    }
+  }, [searchParams]);
 
   // Sub-pages (sections) states
   const [activeTab, setActiveTab] = useState<'about' | 'products' | 'catalogues' | 'news_events'>('about');
@@ -158,6 +166,7 @@ const CompanyProfile = () => {
       setReviews(prev => [publishedReview, ...prev]);
       setNewComment('');
       setNewRating(5);
+      setShowReviewForm(false);
     } catch (err: any) {
       setReviewError(err.message);
     } finally {
@@ -283,17 +292,17 @@ const CompanyProfile = () => {
     : (company?.rating || '4.5');
 
   return (
-    <div className="bg-neutral-bg min-h-screen pb-20 pt-8">
+    <div className="bg-neutral-bg min-h-screen pb-20 pt-2 md:pt-3">
       <div className="w-full max-w-none px-4 sm:px-8 md:px-12 lg:px-16 relative z-10">
         
         {/* Navigation par Onglets (Sous-pages) */}
-        <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-4 md:p-6 mb-8 overflow-x-auto scrollbar-none">
-          <div className="flex items-center space-x-2 md:space-x-4 min-w-max">
+        <div className="bg-white rounded-xl md:rounded-2xl shadow-sm border border-gray-100 p-2 md:p-2.5 mb-1 overflow-x-auto scrollbar-none">
+          <div className="flex items-center space-x-2 md:space-x-3 min-w-max">
             {[
               { id: 'about', label: 'Présentation', icon: Building2 },
-              { id: 'products', label: `Produits (${company.products?.length || 0})`, icon: Package },
-              { id: 'catalogues', label: `Catalogues (${catalogues.length})`, icon: BookOpen },
-              { id: 'news_events', label: `Actualités & Salons (${articles.length + events.length})`, icon: FileText },
+              { id: 'products', label: 'Produits', icon: Package },
+              { id: 'catalogues', label: 'Catalogues', icon: BookOpen },
+              { id: 'news_events', label: 'Actualités & Salons', icon: FileText },
             ].map((tab) => {
               const Icon = tab.icon;
               const active = activeTab === tab.id;
@@ -302,10 +311,10 @@ const CompanyProfile = () => {
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as any)}
                   className={cn(
-                    "flex items-center space-x-2 py-3 px-5 rounded-2xl font-bold text-xs uppercase tracking-wider transition-all duration-300 cursor-pointer",
+                    "flex items-center space-x-2 py-2 px-3.5 md:px-5 rounded-lg md:rounded-xl font-bold text-xs uppercase tracking-wider transition-all duration-300 cursor-pointer",
                     active 
-                      ? "bg-secondary text-white shadow-md shadow-secondary/20 scale-[1.02]" 
-                      : "text-gray-400 hover:text-gray-700 hover:bg-gray-50"
+                      ? "bg-secondary text-white shadow-md shadow-secondary/20 scale-[1.01]" 
+                      : "text-black hover:text-black hover:bg-gray-50"
                   )}
                 >
                   <Icon className="h-4 w-4" />
@@ -316,21 +325,21 @@ const CompanyProfile = () => {
           </div>
         </div>
 
-        <div className="w-full space-y-8">
+        <div className="w-full space-y-6">
           
           {/* Main Content */}
-          <div className="w-full space-y-8">
+          <div className="w-full space-y-6">
 
             {/* Onglet 1 : Présentation */}
             {activeTab === 'about' && (
-              <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden p-8 md:p-12 space-y-10">
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden pt-2 pb-6 md:pt-3 md:pb-10 px-4 md:px-8 space-y-6">
                 
                 {/* Fiche d'identité de l'entreprise */}
-                <div className="bg-neutral-bg rounded-3xl p-6 md:p-8 border border-gray-100 grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div className="bg-neutral-bg rounded-xl p-5 md:p-6 border border-gray-100 grid grid-cols-1 lg:grid-cols-3 gap-6">
                   {/* Left block: Logo & Basic identity */}
                   <div className="lg:col-span-1 flex flex-col items-center lg:items-start text-center lg:text-left justify-between border-b lg:border-b-0 lg:border-e border-gray-200/60 lg:pe-8 pb-6 lg:pb-0">
                     <div className="space-y-4 w-full flex flex-col items-center lg:items-start">
-                      <div className="w-28 h-28 bg-white rounded-2xl shadow-md border-4 border-white overflow-hidden">
+                      <div className="w-28 h-28 bg-white rounded-xl shadow-md border-4 border-white overflow-hidden">
                         <img src={company.logo} alt={company.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                       </div>
                       <div>
@@ -355,7 +364,7 @@ const CompanyProfile = () => {
                       <button 
                         onClick={() => setIsFavorite(!isFavorite)}
                         className={cn(
-                          "flex items-center justify-center space-x-2 py-3 rounded-xl border transition-all font-bold text-sm cursor-pointer",
+                          "flex items-center justify-center space-x-2 py-3 rounded-lg border transition-all font-bold text-sm cursor-pointer",
                           isFavorite ? "bg-red-50 border-red-100 text-red-500" : "bg-white border-gray-200 text-gray-600 hover:bg-gray-50"
                         )}
                       >
@@ -373,7 +382,7 @@ const CompanyProfile = () => {
                           navigator.clipboard.writeText(window.location.href);
                           alert("Lien copié dans le presse-papier !");
                         }
-                      }} className="flex items-center justify-center space-x-2 py-3 rounded-xl bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 transition-all font-bold text-sm cursor-pointer">
+                      }} className="flex items-center justify-center space-x-2 py-3 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 transition-all font-bold text-sm cursor-pointer">
                         <Share2 className="h-4 w-4" />
                         <span>Partager</span>
                       </button>
@@ -432,7 +441,7 @@ const CompanyProfile = () => {
                       <button onClick={(e) => {
                         e.preventDefault();
                         window.location.href = `mailto:${company.email}?subject=Demande de contact`;
-                      }} className="w-full sm:w-auto btn-primary py-3.5 px-6 rounded-xl flex items-center justify-center space-x-2 shadow-lg text-sm font-black uppercase tracking-wider cursor-pointer">
+                      }} className="w-full sm:w-auto btn-primary py-3.5 px-6 rounded-lg flex items-center justify-center space-x-2 shadow-lg text-sm font-black uppercase tracking-wider cursor-pointer">
                         <MessageSquare className="h-5 w-5" />
                         <span>Contacter l'entreprise</span>
                       </button>
@@ -453,7 +462,7 @@ const CompanyProfile = () => {
 
                 {/* Stats / Effectif & Fondation */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <div className="bg-neutral-bg p-6 rounded-2xl border border-gray-100">
+                  <div className="bg-neutral-bg p-6 rounded-xl border border-gray-100">
                     <div className="flex items-center space-x-3 mb-4 text-primary">
                       <Users className="h-6 w-6" />
                       <h4 className="font-bold">Effectif</h4>
@@ -461,7 +470,7 @@ const CompanyProfile = () => {
                     <p className="text-2xl font-black text-primary">{company.employees || "Non spécifié"}</p>
                     <p className="text-xs text-gray-400 mt-1 uppercase font-bold">Collaborateurs en Algérie</p>
                   </div>
-                  <div className="bg-neutral-bg p-6 rounded-2xl border border-gray-100">
+                  <div className="bg-neutral-bg p-6 rounded-xl border border-gray-100">
                     <div className="flex items-center space-x-3 mb-4 text-primary">
                       <Calendar className="h-6 w-6" />
                       <h4 className="font-bold">Fondation</h4>
@@ -474,7 +483,7 @@ const CompanyProfile = () => {
                 {/* Informations Légales */}
                 <section>
                   <h2 className="text-2xl font-bold text-primary mb-6">Informations Légales</h2>
-                  <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden">
+                  <div className="bg-white border border-gray-100 rounded-xl overflow-hidden">
                     <table className="w-full text-sm">
                       <tbody>
                         <tr className="border-b border-gray-50">
@@ -498,7 +507,7 @@ const CompanyProfile = () => {
 
             {/* Onglet 2 : Produits */}
             {activeTab === 'products' && (
-              <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden p-8 md:p-12 space-y-6">
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden pt-4 pb-8 md:pt-6 md:pb-12 px-6 md:px-10 space-y-6">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                   <div>
                     <h2 className="text-2xl font-bold text-primary flex items-center gap-2">
@@ -508,18 +517,18 @@ const CompanyProfile = () => {
                     <p className="text-gray-500 text-sm mt-1">Découvrez la gamme de produits proposée par {company.name}.</p>
                   </div>
                 </div>
-
+ 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {!company.products || company.products.length === 0 ? (
-                    <div className="py-12 text-center text-gray-400 border border-dashed border-gray-200 rounded-3xl bg-gray-50/20 col-span-full">
+                    <div className="py-12 text-center text-gray-400 border border-dashed border-gray-200 rounded-xl bg-gray-50/20 col-span-full">
                       <Package className="h-8 w-8 mx-auto text-gray-300 mb-3" />
                       <p className="text-sm font-bold uppercase tracking-widest">Aucun produit disponible</p>
                       <p className="text-xs text-gray-500 mt-1">Cette entreprise n'a pas encore ajouté de produits.</p>
                     </div>
                   ) : (
                     company.products.map((product: any) => (
-                      <Link to={`/products/${generateSlugUrl(product.name, product.id)}`} key={product.id} className="flex items-center p-5 rounded-2xl border border-gray-100 hover:border-secondary/20 hover:shadow-md transition-all group bg-white relative">
-                        <div className="w-20 h-20 bg-gray-50 rounded-xl flex-shrink-0 flex items-center justify-center text-gray-400 border border-gray-100 group-hover:scale-105 transition-transform overflow-hidden">
+                      <Link to={`/products/${generateSlugUrl(product.name, product.id)}`} key={product.id} className="flex items-center p-5 rounded-xl border border-gray-100 hover:border-secondary/20 hover:shadow-md transition-all group bg-white relative">
+                        <div className="w-20 h-20 bg-gray-50 rounded-lg flex-shrink-0 flex items-center justify-center text-gray-400 border border-gray-100 group-hover:scale-105 transition-transform overflow-hidden">
                           {product.file_url ? (
                             <img src={product.file_url} alt={product.name} className="w-full h-full object-cover" />
                           ) : (
@@ -542,10 +551,9 @@ const CompanyProfile = () => {
                 </div>
               </div>
             )}
-
-            {/* Onglet 3 : Catalogue (Documents) */}
+                   {/* Onglet 3 : Catalogue (Documents) */}
             {activeTab === 'catalogues' && (
-              <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden p-8 md:p-12 space-y-6">
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden pt-4 pb-8 md:pt-6 md:pb-12 px-6 md:px-10 space-y-6">
                 <div>
                   <h2 className="text-2xl font-bold text-primary flex items-center gap-2">
                     <BookOpen className="h-6 w-6 text-secondary" />
@@ -553,11 +561,11 @@ const CompanyProfile = () => {
                   </h2>
                   <p className="text-gray-500 text-sm mt-1">Téléchargez ou visualisez les catalogues officiels de {company.name}.</p>
                 </div>
-
+ 
                 {cataloguesLoading ? (
                   <div className="py-12 text-center text-gray-400 font-bold uppercase tracking-widest text-xs">Chargement des catalogues...</div>
                 ) : catalogues.length === 0 ? (
-                  <div className="py-12 text-center text-gray-400 border border-dashed border-gray-200 rounded-3xl bg-gray-50/20">
+                  <div className="py-12 text-center text-gray-400 border border-dashed border-gray-200 rounded-xl bg-gray-50/20">
                     <BookOpen className="h-8 w-8 mx-auto text-gray-300 mb-3" />
                     <p className="text-sm font-bold uppercase tracking-widest">Aucun catalogue disponible</p>
                     <p className="text-xs text-gray-500 mt-1">Aucun document n'a été publié par cette entreprise.</p>
@@ -565,9 +573,9 @@ const CompanyProfile = () => {
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {catalogues.map((catalogue: any) => (
-                      <div key={catalogue.id} className="bg-white rounded-2xl border border-gray-100 p-5 hover:border-secondary/20 hover:shadow-md transition-all flex flex-col justify-between">
+                      <div key={catalogue.id} className="bg-white rounded-xl border border-gray-100 p-5 hover:border-secondary/20 hover:shadow-md transition-all flex flex-col justify-between">
                         <div>
-                          <div className="w-12 h-12 rounded-xl bg-red-50 text-red-500 flex items-center justify-center mb-4 border border-red-100">
+                          <div className="w-12 h-12 rounded-lg bg-red-50 text-red-500 flex items-center justify-center mb-4 border border-red-100">
                             <FileText className="h-6 w-6" />
                           </div>
                           <h4 className="font-bold text-primary text-base mb-1">{catalogue.title}</h4>
@@ -577,7 +585,7 @@ const CompanyProfile = () => {
                           href={catalogue.pdf_url} 
                           target="_blank" 
                           rel="noopener noreferrer" 
-                          className="flex items-center justify-center space-x-2 py-3 px-4 bg-gray-50 border border-gray-100 text-primary font-bold text-xs uppercase tracking-wider rounded-xl hover:bg-secondary hover:text-white hover:border-secondary transition-all"
+                          className="flex items-center justify-center space-x-2 py-3 px-4 bg-gray-50 border border-gray-100 text-primary font-bold text-xs uppercase tracking-wider rounded-lg hover:bg-secondary hover:text-white hover:border-secondary transition-all"
                         >
                           <Download className="h-4 w-4" />
                           <span>Télécharger le PDF</span>
@@ -588,12 +596,11 @@ const CompanyProfile = () => {
                 )}
               </div>
             )}
-
             {/* Onglet 4 : Actualités & Salons */}
             {activeTab === 'news_events' && (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Section Actualités */}
-                <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 md:p-10 space-y-6">
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 md:p-10 space-y-6">
                   <div>
                     <h2 className="text-2xl font-bold text-primary flex items-center gap-2">
                       <FileText className="h-6 w-6 text-secondary" />
@@ -601,11 +608,11 @@ const CompanyProfile = () => {
                     </h2>
                     <p className="text-gray-500 text-sm mt-1">Suivez les dernières nouvelles de {company.name}.</p>
                   </div>
-
+ 
                   {articlesLoading ? (
                     <div className="py-12 text-center text-gray-400 font-bold uppercase tracking-widest text-xs">Chargement...</div>
                   ) : articles.length === 0 ? (
-                    <div className="py-12 text-center text-gray-400 border border-dashed border-gray-200 rounded-3xl bg-gray-50/20">
+                    <div className="py-12 text-center text-gray-400 border border-dashed border-gray-200 rounded-xl bg-gray-50/20">
                       <FileText className="h-8 w-8 mx-auto text-gray-300 mb-3" />
                       <p className="text-sm font-bold uppercase tracking-widest">Aucune actualité disponible</p>
                     </div>
@@ -615,7 +622,7 @@ const CompanyProfile = () => {
                         <Link 
                           to={`/blog/${article.id}`} 
                           key={article.id} 
-                          className="bg-white rounded-2xl border border-gray-100 overflow-hidden hover:border-secondary/20 hover:shadow-md transition-all flex flex-col group"
+                          className="bg-white rounded-xl border border-gray-100 overflow-hidden hover:border-secondary/20 hover:shadow-md transition-all flex flex-col group"
                         >
                           <div className="h-36 bg-gray-100 relative overflow-hidden">
                             {article.image_url ? (
@@ -646,7 +653,7 @@ const CompanyProfile = () => {
                 </div>
 
                 {/* Section Salons & Événements */}
-                <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 md:p-10 space-y-6">
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 md:p-10 space-y-6">
                   <div>
                     <h2 className="text-2xl font-bold text-primary flex items-center gap-2">
                       <Calendar className="h-6 w-6 text-secondary" />
@@ -658,16 +665,16 @@ const CompanyProfile = () => {
                   {eventsLoading ? (
                     <div className="py-12 text-center text-gray-400 font-bold uppercase tracking-widest text-xs">Chargement...</div>
                   ) : events.length === 0 ? (
-                    <div className="py-12 text-center text-gray-400 border border-dashed border-gray-200 rounded-3xl bg-gray-50/20">
+                    <div className="py-12 text-center text-gray-400 border border-dashed border-gray-200 rounded-xl bg-gray-50/20">
                       <Calendar className="h-8 w-8 mx-auto text-gray-300 mb-3" />
                       <p className="text-sm font-bold uppercase tracking-widest">Aucun salon disponible</p>
                     </div>
                   ) : (
                     <div className="space-y-4">
                       {events.map((evt: any) => (
-                        <div key={evt.id} className="bg-white border border-gray-100 p-5 rounded-2xl hover:border-secondary/20 hover:shadow-md transition-all flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+                        <div key={evt.id} className="bg-white border border-gray-100 p-5 rounded-xl hover:border-secondary/20 hover:shadow-md transition-all flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
                           <div className="flex gap-3 items-start">
-                            <div className="w-12 h-12 rounded-xl bg-secondary/10 text-secondary border border-secondary/20 flex flex-col items-center justify-center font-black flex-shrink-0">
+                            <div className="w-12 h-12 rounded-lg bg-secondary/10 text-secondary border border-secondary/20 flex flex-col items-center justify-center font-black flex-shrink-0">
                               <span className="text-base leading-none">{new Date(evt.date).getDate()}</span>
                               <span className="text-[9px] uppercase leading-none tracking-wider mt-0.5">
                                 {new Date(evt.date).toLocaleDateString('fr-FR', { month: 'short' })}
@@ -691,7 +698,7 @@ const CompanyProfile = () => {
             )}
 
             {/* Système d'avis / Commentaires et étoiles */}
-            <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden p-8 md:p-12 space-y-8">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden p-8 md:p-12 space-y-8">
               <div className="border-b border-gray-100 pb-6">
                 <h2 className="text-2xl font-bold text-primary flex items-center gap-2">
                   <Star className="h-6 w-6 text-yellow-500 fill-current" />
@@ -701,7 +708,7 @@ const CompanyProfile = () => {
               </div>
 
               {/* Note globale et répartition */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center bg-gray-50/50 p-6 rounded-3xl border border-gray-100">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center bg-gray-50/50 p-6 rounded-xl border border-gray-100">
                 <div className="text-center md:border-e border-gray-200/60 md:pe-8">
                   <p className="text-5xl font-black text-primary leading-none mb-2">{avgRating}</p>
                   <div className="flex justify-center text-yellow-500 mb-2">
@@ -735,77 +742,121 @@ const CompanyProfile = () => {
                 </div>
               </div>
 
-              {/* Formulaire d'ajout d'avis */}
-              <div className="bg-gray-50/30 p-6 md:p-8 rounded-3xl border border-gray-100/80">
-                <h3 className="font-bold text-primary mb-4 text-lg">Laisser un avis</h3>
-                {user ? (
-                  <form onSubmit={handleSubmitReview} className="space-y-4">
-                    <div>
-                      <label className="block text-xs font-black uppercase tracking-wider text-gray-400 mb-2">Votre note</label>
-                      <div className="flex space-x-2">
-                        {[1, 2, 3, 4, 5].map((star) => {
-                          const active = hoveredRating !== null ? star <= hoveredRating : star <= newRating;
-                          return (
-                            <button
-                              type="button"
-                              key={star}
-                              onClick={() => setNewRating(star)}
-                              onMouseEnter={() => setHoveredRating(star)}
-                              onMouseLeave={() => setHoveredRating(null)}
-                              className="focus:outline-none p-1 transition-all hover:scale-110"
-                            >
-                              <Star
-                                className={cn(
-                                  "h-8 w-8 transition-colors",
-                                  active ? "text-yellow-500 fill-current" : "text-gray-300"
-                                )}
-                              />
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
+              {/* Liste des avis & Formulaire fusionnés */}
+              <div className="space-y-6 mt-8 border-t border-gray-100 pt-8">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <h3 className="font-bold text-primary text-lg flex items-center gap-2">
+                    <span>Avis des utilisateurs ({totalReviews})</span>
+                  </h3>
+                  {!showReviewForm && (
+                    user ? (
+                      <button
+                        onClick={() => setShowReviewForm(true)}
+                        className="btn-secondary px-5 py-2.5 text-xs font-black uppercase tracking-widest rounded-xl shadow-sm hover:scale-105 transition-all text-white flex items-center gap-1.5 self-start sm:self-auto animate-in fade-in duration-200"
+                      >
+                        <Star className="h-3.5 w-3.5 fill-current" />
+                        Laisser mon avis
+                      </button>
+                    ) : (
+                      <Link
+                        to={`/login?redirect=${encodeURIComponent(window.location.pathname + '?writeReview=true')}`}
+                        className="btn-secondary px-5 py-2.5 text-xs font-black uppercase tracking-widest rounded-xl shadow-sm hover:scale-105 transition-all text-white flex items-center gap-1.5 self-start sm:self-auto animate-in fade-in duration-200"
+                      >
+                        <Star className="h-3.5 w-3.5 fill-current" />
+                        Laisser mon avis
+                      </Link>
+                    )
+                  )}
+                </div>
 
-                    <div>
-                      <label htmlFor="review-comment" className="block text-xs font-black uppercase tracking-wider text-gray-400 mb-2">Votre commentaire</label>
-                      <textarea
-                        id="review-comment"
-                        rows={4}
-                        value={newComment}
-                        onChange={(e) => setNewComment(e.target.value)}
-                        placeholder="Qu'avez-vous pensé des services de cette entreprise ? Partagez votre expérience..."
-                        className="w-full px-4 py-3 rounded-2xl border border-gray-200 focus:border-secondary focus:ring-1 focus:ring-secondary/20 outline-none text-sm transition-all"
-                        required
-                      ></textarea>
-                    </div>
-
-                    {reviewError && (
-                      <p className="text-red-500 text-xs font-bold uppercase tracking-wider">{reviewError}</p>
-                    )}
-
-                    <button
-                      type="submit"
-                      disabled={submittingReview}
-                      className="btn-primary py-3.5 px-6 rounded-2xl flex items-center space-x-2 disabled:opacity-50 text-xs font-black uppercase tracking-widest shadow-lg hover:shadow-xl transition-all"
+                {/* Formulaire d'ajout d'avis (conditionnel / fusionné) */}
+                {showReviewForm && (
+                  <div className="bg-gray-50/30 p-6 md:p-8 rounded-xl border border-gray-100/80 relative animate-in fade-in slide-in-from-top-4 duration-300">
+                    <button 
+                      onClick={() => setShowReviewForm(false)}
+                      className="absolute top-4 end-4 text-gray-400 hover:text-gray-600 transition-colors"
+                      title="Fermer"
                     >
-                      <span>{submittingReview ? "Publication..." : "Publier l'avis"}</span>
+                      <XCircle className="h-5 w-5" />
                     </button>
-                  </form>
-                ) : (
-                  <div className="text-center py-6">
-                    <p className="text-sm text-gray-500 font-medium mb-4">Vous devez être connecté pour donner votre avis sur cette entreprise.</p>
-                    <Link to="/login" className="btn-secondary inline-block px-6 py-3 text-xs font-black uppercase tracking-widest rounded-xl shadow">Se connecter</Link>
+                    
+                    {user ? (
+                      <form onSubmit={handleSubmitReview} className="space-y-4">
+                        <h4 className="font-bold text-primary text-sm uppercase tracking-wider mb-2">Laisser mon avis</h4>
+                        <div>
+                          <label className="block text-xs font-black uppercase tracking-wider text-gray-400 mb-2">Votre note</label>
+                          <div className="flex space-x-2">
+                            {[1, 2, 3, 4, 5].map((star) => {
+                              const active = hoveredRating !== null ? star <= hoveredRating : star <= newRating;
+                              return (
+                                <button
+                                  type="button"
+                                  key={star}
+                                  onClick={() => setNewRating(star)}
+                                  onMouseEnter={() => setHoveredRating(star)}
+                                  onMouseLeave={() => setHoveredRating(null)}
+                                  className="focus:outline-none p-1 transition-all hover:scale-110"
+                                >
+                                  <Star
+                                    className={cn(
+                                      "h-8 w-8 transition-colors",
+                                      active ? "text-yellow-500 fill-current" : "text-gray-300"
+                                    )}
+                                  />
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+
+                        <div>
+                          <label htmlFor="review-comment" className="block text-xs font-black uppercase tracking-wider text-gray-400 mb-2">Votre commentaire</label>
+                          <textarea
+                            id="review-comment"
+                            rows={4}
+                            value={newComment}
+                            onChange={(e) => setNewComment(e.target.value)}
+                            placeholder="Qu'avez-vous pensé des services de cette entreprise ? Partagez votre expérience..."
+                            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-secondary focus:ring-1 focus:ring-secondary/20 outline-none text-sm transition-all"
+                            required
+                          ></textarea>
+                        </div>
+
+                        {reviewError && (
+                          <p className="text-red-500 text-xs font-bold uppercase tracking-wider">{reviewError}</p>
+                        )}
+
+                        <div className="flex items-center gap-3 pt-2">
+                          <button
+                            type="submit"
+                            disabled={submittingReview}
+                            className="btn-primary py-3 px-6 rounded-lg flex items-center space-x-2 disabled:opacity-50 text-xs font-black uppercase tracking-widest shadow-md hover:shadow-lg transition-all"
+                          >
+                            <span>{submittingReview ? "Publication..." : "Publier l'avis"}</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setShowReviewForm(false)}
+                            className="px-5 py-3 border border-gray-200 text-gray-500 hover:text-gray-700 hover:bg-gray-50 rounded-lg text-xs font-black uppercase tracking-widest transition-all"
+                          >
+                            Annuler
+                          </button>
+                        </div>
+                      </form>
+                    ) : (
+                      <div className="text-center py-6">
+                        <p className="text-sm text-gray-500 font-medium mb-4">Vous devez être connecté pour donner votre avis sur cette entreprise.</p>
+                        <Link to={`/login?redirect=${encodeURIComponent(window.location.pathname + '?writeReview=true')}`} className="btn-secondary inline-block px-6 py-3 text-xs font-black uppercase tracking-widest rounded-xl shadow">Laisser mon avis</Link>
+                      </div>
+                    )}
                   </div>
                 )}
-              </div>
 
-              {/* Liste des avis */}
-              <div className="space-y-6 mt-8">
-                <h3 className="font-bold text-primary text-lg">Avis des utilisateurs ({totalReviews})</h3>
+                {/* Liste des avis */}
                 {reviewsLoading ? (
                   <div className="py-8 text-center text-gray-400 font-bold uppercase tracking-widest text-xs">Chargement des avis...</div>
                 ) : reviews.length === 0 ? (
-                  <div className="py-12 text-center text-gray-400 border border-dashed border-gray-200 rounded-3xl bg-gray-50/20">
+                  <div className="py-12 text-center text-gray-400 border border-dashed border-gray-200 rounded-xl bg-gray-50/20">
                     <Star className="h-8 w-8 mx-auto text-gray-300 mb-3" />
                     <p className="text-sm font-bold uppercase tracking-widest">Aucun avis pour le moment</p>
                     <p className="text-xs text-gray-500 mt-1">Soyez le premier à partager votre expérience !</p>
@@ -815,7 +866,7 @@ const CompanyProfile = () => {
                     {reviews.map((review) => (
                       <div key={review.id} className="py-6 first:pt-0 last:pb-0 flex flex-col md:flex-row gap-4 items-start">
                         {/* Avatar */}
-                        <div className="w-12 h-12 rounded-2xl bg-secondary/10 border border-secondary/20 text-secondary flex items-center justify-center font-black text-lg uppercase flex-shrink-0 shadow-sm">
+                        <div className="w-12 h-12 rounded-xl bg-secondary/10 border border-secondary/20 text-secondary flex items-center justify-center font-black text-lg uppercase flex-shrink-0 shadow-sm">
                           {review.user?.name ? review.user.name.charAt(0) : '?'}
                         </div>
                         {/* Content */}
@@ -851,7 +902,7 @@ const CompanyProfile = () => {
             </div>
 
             {/* Download Brochure CTA */}
-            <div className="bg-primary p-10 rounded-[40px] text-white flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden shadow-2xl">
+            <div className="bg-primary p-10 rounded-2xl text-white flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden shadow-2xl">
               <div className="absolute top-0 end-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2"></div>
               <div className="relative z-10">
                 <h3 className="text-2xl font-bold mb-2">Brochure Corporate</h3>
@@ -863,7 +914,7 @@ const CompanyProfile = () => {
       a.href = URL.createObjectURL(new Blob(['Brochure'], {type: 'application/pdf'}));
       a.download = `brochure_${company.name.toLowerCase().replace(/ /g, '_')}.pdf`;
       a.click();
-    }} className="bg-secondary text-white px-8 py-4 rounded-2xl font-bold flex items-center space-x-2 hover:scale-105 transition-all shadow-xl relative z-10 inline-flex">
+    }} className="bg-secondary text-white px-8 py-4 rounded-xl font-bold flex items-center space-x-2 hover:scale-105 transition-all shadow-xl relative z-10 inline-flex">
                 <Download className="h-5 w-5" />
                 <span>Télécharger (PDF)</span>
               </button>

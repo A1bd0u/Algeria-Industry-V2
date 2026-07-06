@@ -3,7 +3,8 @@ import {
   Layout,
   MapPin,
   MessageSquare,
-  Search, ShieldCheck, Star, ChevronDown, Check, ArrowRight
+  Search, ShieldCheck, Star, ChevronDown, Check, ArrowRight,
+  ChevronLeft, ChevronRight
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useState, useRef, useEffect } from 'react';
@@ -23,6 +24,13 @@ const Exhibitors = () => {
   const [exhibitors, setExhibitors] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 12;
+
+  // Reset page when search or filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, activeSector, activeRegion, showVerifiedOnly]);
 
   const sectorRef = useRef<HTMLDivElement>(null);
   const regionRef = useRef<HTMLDivElement>(null);
@@ -35,6 +43,11 @@ const Exhibitors = () => {
       if (regionRef.current && !regionRef.current.contains(event.target as Node)) {
         setIsRegionOpen(false);
       }
+    };
+
+    const handleScroll = () => {
+      setIsSectorOpen(false);
+      setIsRegionOpen(false);
     };
 
     const observer = new IntersectionObserver((entries) => {
@@ -53,9 +66,11 @@ const Exhibitors = () => {
     if (currentRegionRef) observer.observe(currentRegionRef);
 
     document.addEventListener('mousedown', handleClickOutside);
+    window.addEventListener('scroll', handleScroll, { passive: true });
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
+      window.removeEventListener('scroll', handleScroll);
       observer.disconnect();
     };
   }, []);
@@ -74,7 +89,7 @@ const Exhibitors = () => {
           id: c.id,
           name: c.name,
           sector: c.activity_sector || 'Non spécifié',
-          location: c.wilaya || c.region || 'Algérie',
+          location: c.wilaya || c.region || 'Alger',
           description: c.description || 'Aucune description',
           logo: c.logo_url || `https://picsum.photos/seed/${c.id}/200/200`,
           stats: {
@@ -107,6 +122,12 @@ const Exhibitors = () => {
     return matchesSearch && matchesSector && matchesRegion && matchesVerified;
   });
 
+  const totalItems = filteredExhibitors.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedExhibitors = filteredExhibitors.slice(startIndex, endIndex);
+
   const sectors = ['Tous', 'Agroalimentaire', 'BTPH', 'Chimie & Pétrochimie', 'Énergie & Mines', 
                    'Industrie Pharmaceutique', 'Métallurgie & Mécanique', 'Plasturgie & Caoutchouc', 
                    'Textile & Cuir', 'Électronique & Électroménager', 'Automobile & Transport', 
@@ -114,9 +135,9 @@ const Exhibitors = () => {
   const regions = ['Toutes', 'Alger', 'Oran', 'Sétif', 'Annaba', 'Constantine', 'Blida'];
 
   return (
-    <div className={cn("min-h-screen bg-neutral-bg pt-32 pb-20", i18n.language === 'ar' && "font-arabic")}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-16">
+    <div className={cn("min-h-screen bg-neutral-bg pt-8 pb-20", i18n.language === 'ar' && "font-arabic")}>
+      <div className="max-w-full mx-auto px-4 sm:px-8 lg:px-12">
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-2">
           <div className="max-w-3xl">
             <motion.div 
               initial={{ opacity: 0, x: -20 }}
@@ -148,7 +169,7 @@ const Exhibitors = () => {
         </div>
 
         {/* Search & Filters */}
-        <div className="mb-12">
+        <div className="sticky top-[96px] z-30 bg-transparent py-4 -mt-4 mb-12">
           <div className="flex flex-col lg:flex-row gap-4">
             <div className="flex-1 flex items-center bg-white p-2 rounded-2xl border border-gray-100 shadow-sm focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary transition-all">
               <Search className="h-5 w-5 text-gray-400 ms-3" />
@@ -239,24 +260,15 @@ const Exhibitors = () => {
                 )}
               </div>
 
-              <button 
-                onClick={() => setShowVerifiedOnly(!showVerifiedOnly)}
-                className={cn(
-                  "flex items-center justify-center px-6 py-4 rounded-xl border shadow-sm text-[10px] font-black uppercase tracking-widest transition-all cursor-pointer space-x-2 shrink-0",
-                  showVerifiedOnly ? "bg-secondary border-secondary text-white" : "bg-white border-gray-100 text-gray-500 hover:border-gray-300"
-                )}
-              >
-                <ShieldCheck className={cn("h-4 w-4", showVerifiedOnly ? "text-white" : "text-gray-400")} />
-                <span>Vérifiés</span>
-              </button>
+
             </div>
           </div>
         </div>
 
         {/* Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
           {isLoading ? (
-            Array.from({ length: 6 }).map((_, i) => (
+            Array.from({ length: 8 }).map((_, i) => (
               <CompanySkeleton key={i} />
             ))
           ) : error ? (
@@ -264,87 +276,140 @@ const Exhibitors = () => {
               <p className="text-red-500 font-bold">{error}</p>
             </div>
           ) : filteredExhibitors.length === 0 ? (
-            <div className="col-span-full text-center py-12 bg-white rounded-[40px] p-8 border border-gray-100">
+            <div className="col-span-full text-center py-12 bg-white rounded-2xl p-8 border border-gray-100">
               <p className="text-gray-400 font-bold">Aucun exposant trouvé</p>
             </div>
           ) : (
-            filteredExhibitors.map((exhibitor: any, idx) => (
+            paginatedExhibitors.map((exhibitor: any, idx) => (
               <motion.div 
                 key={exhibitor.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.1 }}
-                className="bg-white rounded-[40px] p-8 border border-gray-100 hover:shadow-2xl hover:border-secondary/20 transition-all group"
+                className="bg-white rounded-2xl p-6 border border-gray-100 hover:shadow-2xl hover:border-secondary/20 transition-all group flex flex-col justify-between"
               >
-                <div className="flex items-start justify-between mb-8">
-                  <div className="w-20 h-20 rounded-2xl bg-gray-50 border border-gray-100 p-3 overflow-hidden group-hover:scale-105 transition-transform">
-                    <img src={exhibitor.logo} alt={exhibitor.name} className="w-full h-full object-contain" />
+                <div>
+                  <div className="flex items-start justify-between mb-5">
+                    <div className="w-16 h-16 rounded-xl bg-gray-50 border border-gray-100 p-2 overflow-hidden group-hover:scale-105 transition-transform">
+                      <img src={exhibitor.logo} alt={exhibitor.name} className="w-full h-full object-contain" />
+                    </div>
+                    <div className="flex flex-col items-end">
+                    </div>
                   </div>
-                  <div className="flex flex-col items-end">
-                    {exhibitor.verified && (
-                      <div className="flex items-center space-x-1.5 bg-secondary/5 px-3 py-1 rounded-full text-secondary mb-2">
-                        <ShieldCheck className="h-3.5 w-3.5" />
-                        <span className="text-[9px] font-black uppercase">Vérifié</span>
-                      </div>
-                    )}
-                    <div className="flex items-center space-x-1 text-orange-400">
-                      <Star className="h-3 w-3 fill-current" />
-                      <Star className="h-3 w-3 fill-current" />
-                      <Star className="h-3 w-3 fill-current" />
-                      <Star className="h-3 w-3 fill-current" />
-                      <Star className="h-3 w-3" />
+
+                  <div className="mb-5">
+                    <p className="text-[10px] font-black text-secondary uppercase tracking-[0.2em] mb-1">{exhibitor.sector}</p>
+                    <h3 className="text-lg font-black text-primary uppercase tracking-tight group-hover:text-secondary transition-colors mb-2 line-clamp-1">
+                      {exhibitor.name}
+                    </h3>
+                    <div className="flex items-center text-gray-400 mb-1">
+                      <MapPin className="h-3.5 w-3.5 me-2 shrink-0 text-secondary" />
+                      <span className="text-[10px] font-bold uppercase tracking-widest truncate">{exhibitor.location}</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="mb-8">
-                  <p className="text-[10px] font-black text-secondary uppercase tracking-[0.2em] mb-2">{exhibitor.sector}</p>
-                  <h3 className="text-xl font-black text-primary uppercase tracking-tight group-hover:text-secondary transition-colors mb-4 line-clamp-1">
-                    {exhibitor.name}
-                  </h3>
-                  <div className="flex items-center text-gray-400 mb-6">
-                    <MapPin className="h-3.5 w-3.5 me-2 shrink-0 text-secondary" />
-                    <span className="text-[10px] font-bold uppercase tracking-widest truncate">{exhibitor.location}</span>
+                <div>
+                  <div className="mb-5 py-4 border-y border-gray-50">
+                    <div>
+                      <p className="text-[10px] font-bold text-gray-400 uppercase mb-0.5">Produits</p>
+                      <p className="text-sm font-black text-primary">{exhibitor.stats?.products ?? 0}</p>
+                    </div>
                   </div>
-                  <p className="text-xs text-gray-500 font-medium leading-relaxed italic border-l-2 border-gray-100 ps-4">
-                    "{exhibitor.description}"
-                  </p>
-                </div>
 
-                <div className="grid grid-cols-3 gap-4 mb-8 py-6 border-y border-gray-50">
-                  <div>
-                    <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Produits</p>
-                    <p className="text-sm font-black text-primary">{exhibitor.stats?.products ?? 0}</p>
+                  <div className="flex gap-3">
+                    <Link to={`/directory/${generateSlugUrl(exhibitor.name, String(exhibitor.id))}`} className="flex-1 py-3 bg-primary text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-secondary transition-all flex items-center justify-center space-x-2 shadow-lg group">
+                      <span>Visiter</span>
+                      <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                    </Link>
+                    <Link to="/contact" className="w-12 h-12 bg-gray-50 text-gray-400 rounded-xl flex items-center justify-center hover:text-secondary hover:bg-secondary/5 transition-all shrink-0">
+                      <MessageSquare className="h-4 w-4" />
+                    </Link>
                   </div>
-                  <div>
-                    <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Visites</p>
-                    <p className="text-sm font-black text-primary">{exhibitor.stats?.views ?? '0'}</p>
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Taille</p>
-                    <p className="text-sm font-black text-primary">{exhibitor.stats?.employees ?? 'N/A'}</p>
-                  </div>
-                </div>
-
-                <div className="flex gap-3">
-                  <Link to={`/directory/${generateSlugUrl(exhibitor.name, String(exhibitor.id))}`} className="flex-1 py-4 bg-primary text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-secondary transition-all flex items-center justify-center space-x-2 shadow-lg group">
-                    <span>Visiter</span>
-                    <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                  </Link>
-                  <Link to="/contact" className="w-14 h-14 bg-gray-50 text-gray-400 rounded-2xl flex items-center justify-center hover:text-secondary hover:bg-secondary/5 transition-all">
-                    <MessageSquare className="h-5 w-5" />
-                  </Link>
                 </div>
               </motion.div>
             ))
           )}
         </div>
 
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="mt-12 flex justify-center items-center space-x-2">
+            <button
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className="p-3 bg-white text-primary border border-gray-100 rounded-xl hover:text-secondary hover:border-secondary/20 hover:shadow-md disabled:opacity-40 disabled:hover:text-primary disabled:hover:border-gray-100 disabled:hover:shadow-none transition-all cursor-pointer disabled:cursor-not-allowed"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+
+            {(() => {
+              const range = [];
+              const rangeWithDots = [];
+              let l;
+
+              for (let i = 1; i <= totalPages; i++) {
+                if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+                  range.push(i);
+                }
+              }
+
+              for (const i of range) {
+                if (l) {
+                  if (i - l === 2) {
+                    rangeWithDots.push(l + 1);
+                  } else if (i - l > 2) {
+                    rangeWithDots.push('...');
+                  }
+                }
+                rangeWithDots.push(i);
+                l = i;
+              }
+
+              return rangeWithDots.map((page, index) => {
+                if (page === '...') {
+                  return (
+                    <span key={`dots-${index}`} className="px-3 py-2 text-gray-400 font-bold select-none">
+                      .....
+                    </span>
+                  );
+                }
+
+                return (
+                  <button
+                    key={page}
+                    onClick={() => {
+                      setCurrentPage(page as number);
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                    className={cn(
+                      "px-4 py-2.5 rounded-xl text-xs font-black transition-all cursor-pointer",
+                      currentPage === page
+                        ? "bg-secondary text-white shadow-lg shadow-secondary/20"
+                        : "bg-white text-primary border border-gray-100 hover:text-secondary hover:border-secondary/20 hover:shadow-md"
+                    )}
+                  >
+                    {page}
+                  </button>
+                );
+              });
+            })()}
+
+            <button
+              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+              className="p-3 bg-white text-primary border border-gray-100 rounded-xl hover:text-secondary hover:border-secondary/20 hover:shadow-md disabled:opacity-40 disabled:hover:text-primary disabled:hover:border-gray-100 disabled:hover:shadow-none transition-all cursor-pointer disabled:cursor-not-allowed"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
+        )}
+
         {/* CTA Section */}
         <motion.div 
           initial={{ opacity: 0, scale: 0.95 }}
           whileInView={{ opacity: 1, scale: 1 }}
-          className="mt-20 bg-primary rounded-[48px] p-12 text-white relative overflow-hidden text-center"
+          className="mt-20 bg-primary rounded-2xl p-12 text-white relative overflow-hidden text-center"
         >
           <div className="absolute inset-0 opacity-5" 
                style={{ backgroundImage: 'radial-gradient(#fff 1.5px, transparent 1.5px)', backgroundSize: '32px 32px' }} />
@@ -354,13 +419,13 @@ const Exhibitors = () => {
               Vous aussi, <span className="text-secondary">Exposez ICI</span>
             </h2>
             <p className="text-white/60 font-medium mb-10 text-lg">
-              Ne manquez pas l'opportunité de présenter vos innovations au plus grand réseau industriel du pays.
+              Ne manquez pas l'opportunité de présenter vos innovations au plus grand réseau industriel en Algérie.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link to="/become-exhibitor" className="btn-secondary px-12 py-5 rounded-2xl text-sm font-black uppercase tracking-widest shadow-2xl">
                 Devenir Exposant
               </Link>
-              <Link to="/subscriptions" className="bg-white/10 border border-white/20 px-12 py-5 rounded-2xl text-sm font-black uppercase tracking-widest hover:bg-white/20 transition-all flex items-center justify-center">
+              <Link to="/tarifs" className="bg-white/10 border border-white/20 px-12 py-5 rounded-2xl text-sm font-black uppercase tracking-widest hover:bg-white/20 transition-all flex items-center justify-center">
                 Voir toutes les options
               </Link>
             </div>

@@ -82,7 +82,7 @@ const FAQ = () => {
             <input 
               type="text" 
               placeholder="Rechercher une solution..."
-              className="w-full ps-16 pe-8 py-5 bg-white rounded-[24px] border border-gray-100 shadow-xl focus:outline-none focus:border-secondary transition-all font-medium"
+              className="w-full ps-16 pe-8 py-5 bg-white rounded-xl border border-gray-100 shadow-xl focus:outline-none focus:border-secondary transition-all font-medium"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -102,7 +102,7 @@ const FAQ = () => {
                     <motion.div 
                       key={idx}
                       className={cn(
-                        "bg-white rounded-[24px] border transition-all overflow-hidden",
+                        "bg-white rounded-xl border transition-all overflow-hidden",
                         isOpen ? "border-secondary shadow-lg" : "border-gray-100"
                       )}
                     >
@@ -146,7 +146,7 @@ const FAQ = () => {
         </div>
 
         {/* Support CTA */}
-        <div className="mt-20 bg-primary rounded-[40px] p-10 text-white flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden">
+        <div className="mt-20 bg-primary rounded-2xl p-10 text-white flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden">
           <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'linear-gradient(45deg, #fff 25%, transparent 25%, transparent 50%, #fff 50%, #fff 75%, transparent 75%, transparent)', backgroundSize: '20px 20px' }} />
           <div className="relative z-10 text-center md:text-start">
             <h3 className="text-2xl font-black uppercase tracking-tighter mb-2">Besoin d'aide personnalisée ?</h3>

@@ -39,7 +39,7 @@ const HeroSlider: React.FC<HeroSliderProps> = ({ slides }) => {
           setDynamicSlides(formattedSlides);
         }
       } catch (err) {
-        console.error("Failed to fetch ads", err);
+        console.warn("Failed to fetch ads gracefully:", err);
       }
     };
     fetchAds();

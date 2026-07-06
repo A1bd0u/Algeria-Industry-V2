@@ -179,7 +179,7 @@ const Tarifs = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1 + 0.2 }}
                 className={cn(
-                  "relative p-10 rounded-[40px] flex flex-col items-center justify-between transition-all duration-500 hover:-translate-y-2 border",
+                  "relative p-10 rounded-2xl flex flex-col items-center justify-between transition-all duration-500 hover:-translate-y-2 border",
                   plan.color,
                   plan.popular 
                     ? "shadow-2xl scale-105 z-10 border-transparent" 
@@ -246,7 +246,7 @@ const Tarifs = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1 + 0.2 }}
                 className={cn(
-                  "relative p-10 rounded-[40px] flex flex-col items-center justify-between transition-all duration-500 hover:-translate-y-2 border",
+                  "relative p-10 rounded-2xl flex flex-col items-center justify-between transition-all duration-500 hover:-translate-y-2 border",
                   plan.color,
                   plan.popular 
                     ? "shadow-2xl scale-105 z-10 border-transparent" 
@@ -296,7 +296,7 @@ const Tarifs = () => {
           </div>
         </div>
 
-        <div className="mt-16 max-w-4xl mx-auto bg-white rounded-[40px] p-12 text-center shadow-xl shadow-gray-200/50 border border-gray-100 relative overflow-hidden group">
+        <div className="mt-16 max-w-4xl mx-auto bg-white rounded-2xl p-12 text-center shadow-xl shadow-gray-200/50 border border-gray-100 relative overflow-hidden group">
           <div className="absolute inset-0 bg-secondary/5 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-in-out"></div>
           <div className="relative z-10">
             <ShieldCheck className="h-16 w-16 text-secondary mx-auto mb-6 drop-shadow-md" />

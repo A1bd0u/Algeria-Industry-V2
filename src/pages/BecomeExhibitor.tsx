@@ -161,7 +161,7 @@ const BecomeExhibitor = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
-              className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl transition-all group"
+              className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl transition-all group"
             >
               <div className="w-14 h-14 bg-primary/5 rounded-2xl flex items-center justify-center text-primary mb-6 group-hover:bg-primary group-hover:text-white transition-all">
                 <benefit.icon className="h-7 w-7" />
@@ -187,7 +187,7 @@ const BecomeExhibitor = () => {
                 key={plan.id}
                 whileHover={{ y: -10 }}
                 className={cn(
-                  "relative p-10 rounded-[40px] border flex flex-col",
+                  "relative p-10 rounded-2xl border flex flex-col",
                   plan.color,
                   plan.textColor,
                   plan.popular ? "shadow-2xl scale-105 z-10 border-transparent" : "border-gray-200"
@@ -235,7 +235,7 @@ const BecomeExhibitor = () => {
 
       {/* Simple Steps */}
       <section className="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-white rounded-[60px] p-12 md:p-20 shadow-2xl border border-gray-100 overflow-hidden relative">
+        <div className="bg-white rounded-2xl p-12 md:p-20 shadow-2xl border border-gray-100 overflow-hidden relative">
           
           <div className="relative z-10">
             <h2 className="text-3xl font-black text-primary uppercase tracking-tight mb-12 text-center md:text-start">
@@ -276,18 +276,18 @@ const BecomeExhibitor = () => {
             Ne laissez pas vos concurrents prendre toute la place. L'industrie de demain se construit aujourd'hui, sur Algeria Industry.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="bg-white/5 p-6 rounded-3xl border border-white/10 text-start">
+            <div className="bg-white/5 p-6 rounded-2xl border border-white/10 text-start">
               <ShieldCheck className="h-8 w-8 text-secondary mb-4" />
               <h4 className="text-sm font-black text-white uppercase mb-2">Exposition Certifiée</h4>
               <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Membre vérifié de la plateforme</p>
             </div>
-            <div className="bg-white/5 p-6 rounded-3xl border border-white/10 text-start">
+            <div className="bg-white/5 p-6 rounded-2xl border border-white/10 text-start">
               <Zap className="h-8 w-8 text-secondary mb-4" />
               <h4 className="text-sm font-black text-white uppercase mb-2">Setup Express</h4>
               <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Mise en ligne en moins de 24h</p>
             </div>
           </div>
-          <button className="w-full mt-12 btn-secondary py-5 rounded-3xl font-black uppercase tracking-[0.2em] flex items-center justify-center space-x-4" onClick={(e) => { e.preventDefault(); alert("Fonctionnalité en cours de développement"); }}>
+          <button className="w-full mt-12 btn-secondary py-5 rounded-2xl font-black uppercase tracking-[0.2em] flex items-center justify-center space-x-4" onClick={(e) => { e.preventDefault(); alert("Fonctionnalité en cours de développement"); }}>
             <span>Démarrer mon inscription</span>
             <ArrowRight className="h-6 w-6" />
           </button>

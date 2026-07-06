@@ -178,7 +178,7 @@ const Events = () => {
           )}
 
           {/* Organizer CTA */}
-          <section className="mt-24 bg-neutral-bg border-2 border-dashed border-gray-200 p-12 rounded-[40px] text-center">
+          <section className="mt-24 bg-neutral-bg border-2 border-dashed border-gray-200 p-12 rounded-2xl text-center">
             <div className="bg-white w-16 h-16 rounded-2xl shadow-sm flex items-center justify-center text-primary mx-auto mb-6">
               <Ticket className="h-8 w-8" />
             </div>
@@ -193,7 +193,7 @@ const Events = () => {
           </section>
 
           {/* Reminder Section */}
-          <section className="mt-12 bg-white p-8 rounded-3xl border border-gray-100 flex flex-col md:flex-row items-center justify-between gap-6">
+          <section className="mt-12 bg-white p-8 rounded-2xl border border-gray-100 flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center space-x-4">
               <div className="bg-secondary/10 p-3 rounded-xl text-secondary">
                 <Bell className="h-6 w-6" />

@@ -1,7 +1,7 @@
 import { Eye, EyeOff, Building2, Lock, Mail, Globe, ArrowRight, Loader2 } from 'lucide-react';
 import { motion } from 'motion/react';
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -22,6 +22,8 @@ const Login = () => {
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const { login } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const redirectUrl = searchParams.get('redirect');
 
   const { register, handleSubmit, formState: { errors } } = useForm<LoginForm>({
     resolver: zodResolver(loginSchema)
@@ -73,7 +75,7 @@ const Login = () => {
       if (data.email.toLowerCase().includes('admin')) {
         navigate('/extranet');
       } else {
-        navigate('/dashboard');
+        navigate(redirectUrl || '/dashboard');
       }
     } catch (err: any) {
       setAuthError(err.message || 'Identifiants invalides. Veuillez réessayer.');
