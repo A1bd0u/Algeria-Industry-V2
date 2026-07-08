@@ -11,14 +11,16 @@ const Tarifs = () => {
     {
       name: 'Free',
       price: '0 DA',
+      originalPrice: '0 DA',
+      discount: null,
       period: '/à vie',
       description: 'L\'essentiel pour découvrir la plateforme et créer votre profil.',
       features: [
-        'Profil entreprise basique',
-        'Catalogue jusqu\'à 2 produits',
-        'Messagerie limitée',
-        'Accès visiteur prioritaire',
-        'Badge "Nouveau Membre"'
+        '5 produits inclus',
+        '2 images par produit',
+        'Support Standard',
+        'Messagerie Gratuite',
+        'Économie : -'
       ],
       popular: false,
       color: 'bg-white text-primary',
@@ -26,152 +28,72 @@ const Tarifs = () => {
       buttonAction: '/register'
     },
     {
-      name: 'Standard',
-      price: '15,000 DA',
-      period: '/événement',
-      description: 'Idéal pour les PME souhaitant une première présence virtuelle.',
+      name: 'Basic',
+      price: '18 000 DA',
+      originalPrice: '30 000 DA',
+      discount: '-40%',
+      period: '/an',
+      description: 'Idéal pour les entreprises souhaitant une visibilité accrue à moindre coût.',
       features: [
-        'Stand virtuel personnalisable (2D)',
-        'Catalogue jusqu\'à 20 produits',
-        'Messagerie et prise de rendez-vous',
-        'Accès aux appels d\'offres standard',
-        'Support email prioritaire'
+        '15 produits inclus',
+        '5 images par produit',
+        'Statistiques Basiques',
+        'Support sous 48h',
+        'Messagerie Gratuite',
+        'Économie : -40%'
       ],
       popular: false,
       color: 'bg-white text-primary',
-      buttonText: 'Choisir ce plan',
+      buttonText: 'Choisir Basic',
       buttonAction: '/contact'
     },
     {
-      name: 'Premium Industriel',
-      price: '45,000 DA',
-      period: '/événement',
-      description: 'La solution complète pour maximiser votre visibilité B2B.',
+      name: 'Pro',
+      price: '29 900 DA',
+      originalPrice: '55 000 DA',
+      discount: '-46%',
+      period: '/an',
+      description: 'La solution complète ultime avec mise en avant et outils avancés.',
       features: [
-        'Stand virtuel immersif (3D)',
-        'Catalogue de produits illimité',
-        'Visibilité sponsorisée dans les recherches',
-        'Organisation de 3 webinaires',
-        'Accès RFQ (Appels d\'offres exclusifs)',
-        'Badge "Vendeur Vérifié"',
-        'Account Manager dédié'
+        'Produits Illimités',
+        '10 images par produit',
+        '3 produits mis en avant',
+        'Statistiques Avancées',
+        'Support sous 24h',
+        'Messagerie Gratuite',
+        'Économie : -46%'
       ],
       popular: true,
       color: 'bg-primary text-white',
-      buttonText: 'Contacter les ventes',
-      buttonAction: '/contact'
-    },
-    {
-      name: 'Enterprise',
-      price: 'Sur Devis',
-      period: '',
-      description: 'Solutions sur-mesure pour les grandes entreprises et consortiums.',
-      features: [
-        'Pavillon complet multi-marques',
-        'Intégration ERP & CRM sur-mesure',
-        'Analytics avancés B2B',
-        'Publicité ciblée sur toute la plateforme',
-        'Modération prioritaire',
-        'Support 24/7'
-      ],
-      popular: false,
-      color: 'bg-white text-primary',
-      buttonText: 'Parler à un expert',
-      buttonAction: '/contact'
-    }
-  ];
-
-  const buyerPlans = [
-    {
-      name: 'Visiteur Gratuit',
-      price: '0 DA',
-      period: '/à vie',
-      description: 'Pour explorer le salon et consulter les catalogues.',
-      features: [
-        'Accès aux stands 2D et 3D',
-        'Consultation des catalogues',
-        'Favoris limités',
-        'Prise de rendez-vous simple'
-      ],
-      popular: false,
-      color: 'bg-white text-primary',
-      buttonText: 'Créer un compte',
-      buttonAction: '/register'
-    },
-    {
-      name: 'Acheteur Pro',
-      price: '10,000 DA',
-      period: '/an',
-      description: 'Pour les professionnels à la recherche de fournisseurs qualifiés.',
-      features: [
-        'Publication de RFQ limités (5/mois)',
-        'Accès aux fiches fournisseurs',
-        'Messagerie avancée',
-        'Comparateur de produits B2B'
-      ],
-      popular: true,
-      color: 'bg-primary text-white',
-      buttonText: 'Devenir Acheteur Pro',
-      buttonAction: '/register'
-    },
-    {
-      name: 'Acheteur Premium',
-      price: '25,000 DA',
-      period: '/an',
-      description: 'La meilleure solution pour les grandes équipes achats.',
-      features: [
-        'Publication de RFQ illimités',
-        'Matching IA de fournisseurs',
-        'Statistiques du marché',
-        'Support dédié pour les achats',
-        'Multi-comptes utilisateurs'
-      ],
-      popular: false,
-      color: 'bg-white text-primary',
-      buttonText: 'Accès Premium',
+      buttonText: 'Choisir Pro',
       buttonAction: '/contact'
     }
   ];
 
   return (
-    <div className="pt-16 pb-20 bg-gray-50/50 min-h-screen relative overflow-hidden">
+    <div className="pt-12 pb-20 bg-gray-50/50 min-h-screen relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 relative z-10">
-        <div className="text-center mb-24">
+        <div className="text-center mb-6">
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="inline-flex items-center space-x-2 bg-white px-4 py-2 rounded-full mb-8 border border-gray-100 shadow-sm"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex items-center justify-center space-x-2 text-secondary"
           >
-            <Award className="h-4 w-4 text-secondary" />
-            <span className="text-[10px] font-black uppercase tracking-widest text-primary">Tarification Transparente</span>
+            <Award className="h-4 w-4" />
+            <span className="text-[10px] font-black uppercase tracking-[0.4em]">Tarification Transparente</span>
           </motion.div>
-          <motion.h1 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-5xl md:text-7xl font-black text-primary tracking-tighter uppercase mb-6"
-          >
-            Nos Tarifs
-          </motion.h1>
-          <motion.p 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="text-gray-500 font-medium max-w-2xl mx-auto text-lg"
-          >
-            Choisissez le plan qui correspond le mieux à vos objectifs de croissance et de visibilité sur le marché industriel algérien.
-          </motion.p>
         </div>
 
-        <div className="mb-16">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-black text-primary tracking-tighter uppercase mb-4 flex items-center justify-center space-x-3">
+        <div className="mb-10">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl md:text-4xl font-black text-primary tracking-tighter uppercase mb-3 flex items-center justify-center space-x-3">
               <span>Tarifs Exposants</span>
               <span className="text-secondary opacity-50">/</span>
               <span className="text-gray-400">Fournisseurs</span>
             </h2>
-            <p className="text-gray-500 font-medium max-w-xl mx-auto">Solutions de visibilité premium pour présenter vos produits et services aux décideurs du secteur industriel.</p>
+            <p className="text-gray-500 font-medium max-w-xl mx-auto">Des solutions de visibilité stratégiques pour toucher et cibler directement les décideurs du secteur industriel.</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {exhibitorPlans.map((plan, i) => (
               <motion.div 
                 key={i} 
@@ -195,76 +117,21 @@ const Tarifs = () => {
                 
                 <div className="w-full text-center">
                   <h4 className="text-xl font-black tracking-tighter uppercase mb-6">{plan.name}</h4>
-                  <div className="mb-6">
-                    <span className="text-4xl md:text-5xl font-black tracking-tighter leading-none">{plan.price}</span>
-                    {plan.period && <span className="text-[10px] font-bold opacity-60 ms-2 uppercase tracking-widest block mt-2">{plan.period}</span>}
-                  </div>
-                  <p className="text-xs opacity-60 font-medium mb-8 border-b border-current/10 pb-8 min-h-[60px]">
-                    {plan.description}
-                  </p>
-                  
-                  <ul className="space-y-4 mb-12 text-start min-h-[280px]">
-                    {plan.features.map((feature, idx) => (
-                      <li key={idx} className="flex items-start space-x-3 text-[11px] font-bold">
-                        <Check className={cn("h-4 w-4 shrink-0 mt-0.5", plan.popular ? "text-secondary" : "text-secondary")} />
-                        <span className="leading-tight opacity-70 italic">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                
-                <Link 
-                  to={plan.buttonAction} 
-                  className={cn(
-                    "w-full py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all text-center border-2",
-                    plan.popular 
-                      ? "bg-secondary border-secondary text-white hover:bg-white hover:text-secondary hover:border-white shadow-lg" 
-                      : "bg-transparent border-gray-200 text-primary hover:bg-primary hover:text-white hover:border-primary"
-                  )}
-                >
-                  {plan.buttonText}
-                </Link>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-
-        <div className="mb-20">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-black text-primary tracking-tighter uppercase mb-4 flex items-center justify-center space-x-3">
-              <span>Tarifs Acheteurs</span>
-              <span className="text-secondary opacity-50">/</span>
-              <span className="text-gray-400">Décideurs</span>
-            </h2>
-            <p className="text-gray-500 font-medium max-w-xl mx-auto">Des outils puissants pour explorer le marché, sourcer des fournisseurs qualifiés et lancer des appels d'offres.</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {buyerPlans.map((plan, i) => (
-              <motion.div 
-                key={i} 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1 + 0.2 }}
-                className={cn(
-                  "relative p-10 rounded-2xl flex flex-col items-center justify-between transition-all duration-500 hover:-translate-y-2 border",
-                  plan.color,
-                  plan.popular 
-                    ? "shadow-2xl scale-105 z-10 border-transparent" 
-                    : "border-gray-100 shadow-xl shadow-gray-200/50 hover:shadow-2xl hover:shadow-gray-200/80 hover:border-gray-200"
-                )}
-              >
-                {plan.popular && (
-                  <div className="absolute -top-4 bg-secondary text-white px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest shadow-xl flex items-center space-x-2">
-                    <Zap className="h-3 w-3" />
-                    <span>Le plus populaire</span>
-                  </div>
-                )}
-                
-                <div className="w-full text-center">
-                  <h4 className="text-xl font-black tracking-tighter uppercase mb-6">{plan.name}</h4>
-                  <div className="mb-6">
-                    <span className="text-4xl md:text-5xl font-black tracking-tighter leading-none">{plan.price}</span>
-                    {plan.period && <span className="text-[10px] font-bold opacity-60 ms-2 uppercase tracking-widest block mt-2">{plan.period}</span>}
+                  <div className="mb-6 flex flex-col items-center justify-center">
+                    {plan.discount && (
+                      <span className="inline-block bg-secondary/10 text-secondary text-[10px] font-black uppercase tracking-wider px-3 py-1.5 rounded-lg mb-3">
+                        Économie {plan.discount}
+                      </span>
+                    )}
+                    <div className="flex items-baseline justify-center">
+                      <span className="text-4xl md:text-5xl font-black tracking-tighter leading-none">{plan.price}</span>
+                      {plan.period && <span className="text-[10px] font-bold opacity-60 ms-1 uppercase tracking-widest block">{plan.period}</span>}
+                    </div>
+                    {plan.originalPrice && plan.originalPrice !== plan.price && (
+                      <span className="text-xs text-gray-400 line-through mt-2 block">
+                        Prix normal : {plan.originalPrice}/an
+                      </span>
+                    )}
                   </div>
                   <p className="text-xs opacity-60 font-medium mb-8 border-b border-current/10 pb-8 min-h-[60px]">
                     {plan.description}
@@ -295,6 +162,86 @@ const Tarifs = () => {
             ))}
           </div>
         </div>
+
+        {/* Tableau Comparatif */}
+        <div className="mb-24 mt-8">
+          <div className="text-center mb-12">
+            <h3 className="text-2xl font-black text-primary tracking-tighter uppercase mb-4">Tableau Comparatif détaillé</h3>
+            <p className="text-gray-500 font-medium max-w-xl mx-auto">Comparez les fonctionnalités et choisissez l'offre la plus adaptée à vos besoins.</p>
+          </div>
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-xl overflow-hidden max-w-5xl mx-auto">
+            <div className="overflow-x-auto">
+              <table className="w-full text-start border-collapse">
+                <thead>
+                  <tr className="bg-gray-50/50">
+                    <th className="px-6 py-4 text-start text-xs font-black text-gray-400 uppercase tracking-widest">Caractéristique</th>
+                    <th className="px-6 py-4 text-center text-xs font-black text-primary uppercase tracking-widest bg-gray-100/30">Free</th>
+                    <th className="px-6 py-4 text-center text-xs font-black text-primary uppercase tracking-widest bg-gray-100/10">Basic</th>
+                    <th className="px-6 py-4 text-center text-xs font-black text-secondary uppercase tracking-widest bg-secondary/5">Pro</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  <tr className="hover:bg-neutral-bg transition-colors">
+                    <td className="px-6 py-4 text-xs font-bold text-gray-600">Prix normal</td>
+                    <td className="px-6 py-4 text-center text-xs font-black text-primary bg-gray-100/30">0 DA</td>
+                    <td className="px-6 py-4 text-center text-xs font-black text-primary bg-gray-100/10">30 000 DA/an</td>
+                    <td className="px-6 py-4 text-center text-xs font-black text-primary bg-secondary/5">55 000 DA/an</td>
+                  </tr>
+                  <tr className="hover:bg-neutral-bg transition-colors">
+                    <td className="px-6 py-4 text-xs font-bold text-gray-600">Prix de lancement</td>
+                    <td className="px-6 py-4 text-center text-xs font-black text-primary bg-gray-100/30">0 DA</td>
+                    <td className="px-6 py-4 text-center text-xs font-black text-secondary bg-gray-100/10">18 000 DA/an</td>
+                    <td className="px-6 py-4 text-center text-xs font-black text-secondary bg-secondary/5 font-black">29 900 DA/an</td>
+                  </tr>
+                  <tr className="hover:bg-neutral-bg transition-colors">
+                    <td className="px-6 py-4 text-xs font-bold text-gray-600">Économie</td>
+                    <td className="px-6 py-4 text-center text-xs font-bold text-gray-400 bg-gray-100/30">-</td>
+                    <td className="px-6 py-4 text-center text-xs font-black text-success bg-gray-100/10">-40%</td>
+                    <td className="px-6 py-4 text-center text-xs font-black text-success bg-secondary/5">-46%</td>
+                  </tr>
+                  <tr className="hover:bg-neutral-bg transition-colors">
+                    <td className="px-6 py-4 text-xs font-bold text-gray-600">Produits</td>
+                    <td className="px-6 py-4 text-center text-xs font-bold text-gray-600 bg-gray-100/30">5 produits</td>
+                    <td className="px-6 py-4 text-center text-xs font-bold text-gray-600 bg-gray-100/10">15 produits</td>
+                    <td className="px-6 py-4 text-center text-xs font-black text-secondary bg-secondary/5">Illimité</td>
+                  </tr>
+                  <tr className="hover:bg-neutral-bg transition-colors">
+                    <td className="px-6 py-4 text-xs font-bold text-gray-600">Images/produit</td>
+                    <td className="px-6 py-4 text-center text-xs font-bold text-gray-600 bg-gray-100/30">2 images</td>
+                    <td className="px-6 py-4 text-center text-xs font-bold text-gray-600 bg-gray-100/10">5 images</td>
+                    <td className="px-6 py-4 text-center text-xs font-bold text-gray-600 bg-secondary/5">10 images</td>
+                  </tr>
+                  <tr className="hover:bg-neutral-bg transition-colors">
+                    <td className="px-6 py-4 text-xs font-bold text-gray-600">Mise en avant</td>
+                    <td className="px-6 py-4 text-center text-xs text-red-500 bg-gray-100/30">❌</td>
+                    <td className="px-6 py-4 text-center text-xs text-red-500 bg-gray-100/10">❌</td>
+                    <td className="px-6 py-4 text-center text-xs font-black text-primary bg-secondary/5">3 produits</td>
+                  </tr>
+                  <tr className="hover:bg-neutral-bg transition-colors">
+                    <td className="px-6 py-4 text-xs font-bold text-gray-600">Statistiques</td>
+                    <td className="px-6 py-4 text-center text-xs text-red-500 bg-gray-100/30">❌</td>
+                    <td className="px-6 py-4 text-center text-xs text-success bg-gray-100/10">✅ Basiques</td>
+                    <td className="px-6 py-4 text-center text-xs text-success bg-secondary/5 font-bold">✅ Avancées</td>
+                  </tr>
+                  <tr className="hover:bg-neutral-bg transition-colors">
+                    <td className="px-6 py-4 text-xs font-bold text-gray-600">Support</td>
+                    <td className="px-6 py-4 text-center text-xs text-gray-500 bg-gray-100/30">Standard</td>
+                    <td className="px-6 py-4 text-center text-xs font-bold text-gray-600 bg-gray-100/10">48h</td>
+                    <td className="px-6 py-4 text-center text-xs font-bold text-gray-600 bg-secondary/5">24h</td>
+                  </tr>
+                  <tr className="hover:bg-neutral-bg transition-colors">
+                    <td className="px-6 py-4 text-xs font-bold text-gray-600">Messagerie</td>
+                    <td className="px-6 py-4 text-center text-xs text-success bg-gray-100/30 font-bold">✅ Gratuite</td>
+                    <td className="px-6 py-4 text-center text-xs text-success bg-gray-100/10 font-bold">✅ Gratuite</td>
+                    <td className="px-6 py-4 text-center text-xs text-success bg-secondary/5 font-bold">✅ Gratuite</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+
 
         <div className="mt-16 max-w-4xl mx-auto bg-white rounded-2xl p-12 text-center shadow-xl shadow-gray-200/50 border border-gray-100 relative overflow-hidden group">
           <div className="absolute inset-0 bg-secondary/5 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-in-out"></div>

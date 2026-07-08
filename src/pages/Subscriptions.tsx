@@ -27,60 +27,47 @@ const Subscriptions = () => {
       period: '/à vie',
       description: 'L\'essentiel pour découvrir la plateforme et créer votre profil.',
       features: [
-        'Profil entreprise basique',
-        'Catalogue jusqu\'à 2 produits',
-        'Messagerie limitée',
-        'Accès visiteur prioritaire',
-        'Badge "Nouveau Membre"'
+        '5 produits inclus',
+        '2 images par produit',
+        'Support Standard',
+        'Messagerie Gratuite',
+        'Économie : -'
       ],
       current: false,
       color: 'bg-white text-primary border-gray-100'
     },
     {
-      name: 'Standard',
-      price: '15,000 DA',
-      period: '/événement',
-      description: 'Idéal pour les PME souhaitant une première présence virtuelle.',
+      name: 'Basic',
+      price: '18 000 DA',
+      period: '/an',
+      description: 'Idéal pour les entreprises souhaitant une visibilité accrue à moindre coût.',
       features: [
-        'Stand virtuel personnalisable (2D)',
-        'Catalogue jusqu\'à 10 produits',
-        'Chat texte en direct',
-        'Statistiques de base',
-        '1 webinaire technique'
+        '15 produits inclus',
+        '5 images par produit',
+        'Statistiques Basiques',
+        'Support sous 48h',
+        'Messagerie Gratuite',
+        'Économie : -40%'
       ],
       current: false,
       color: 'bg-white text-primary border-gray-100'
     },
     {
-      name: 'Premium',
-      price: '45,000 DA',
-      period: '/événement',
-      description: 'Le choix le plus populaire pour maximiser votre impact.',
+      name: 'Pro',
+      price: '29 900 DA',
+      period: '/an',
+      description: 'La solution complète ultime avec mise en avant et outils avancés.',
       features: [
-        'Stand interactif 3D immersif',
-        'Catalogue produits illimité',
-        'Vidéo-conférence en direct',
-        'Analyses comportementales avancées',
-        '3 webinaires & Promotion réseaux sociaux',
-        'Badge "Exposant Certifié"'
+        'Produits Illimités',
+        '10 images par produit',
+        '3 produits mis en avant',
+        'Statistiques Avancées',
+        'Support sous 24h',
+        'Messagerie Gratuite',
+        'Économie : -46%'
       ],
       current: true,
       color: 'bg-primary text-white border-primary shadow-2xl'
-    },
-    {
-      name: 'Enterprise',
-      price: 'Sur Devis',
-      period: '',
-      description: 'Solution sur mesure pour les grands groupes industriels.',
-      features: [
-        'Halle d\'exposition dédiée',
-        'Intégration d\'outils CRM',
-        'Support technique prioritaire 24/7',
-        'Ateliers privés exclusifs',
-        'Accès aux données Big Data sectorielles'
-      ],
-      current: false,
-      color: 'bg-secondary text-white border-secondary'
     }
   ];
 
@@ -212,7 +199,7 @@ const Subscriptions = () => {
             <h3 className="text-3xl font-black text-primary uppercase tracking-tighter">Plans Disponibles</h3>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             {plans.map((plan, i) => (
               <div 
                 key={i} 
@@ -223,7 +210,7 @@ const Subscriptions = () => {
                 )}
               >
                 {plan.current && (
-                  <div className="absolute -top-4 bg-secondary text-white px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest shadow-xl">
+                  <div className="absolute -top-4 bg-secondary text-white px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest shadow-xl font-sans">
                     Plan Actuel
                   </div>
                 )}
@@ -249,7 +236,7 @@ const Subscriptions = () => {
                 </div>
                 
                 <button 
-                  onClick={(e) => { e.preventDefault(); alert(plan.name === 'Enterprise' ? "Ouverture du formulaire de contact commercial..." : "Redirection vers le paiement..."); }}
+                  onClick={(e) => { e.preventDefault(); alert("Redirection vers le paiement..."); }}
                   disabled={plan.current}
                   className={cn(
                     "w-full py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all text-center block",
@@ -257,12 +244,10 @@ const Subscriptions = () => {
                       ? "bg-white/10 text-white/40 border border-white/10 cursor-not-allowed" 
                       : i === 0 
                         ? "bg-primary text-white" 
-                        : i === 2 
-                          ? "bg-white text-primary"
-                          : "bg-secondary text-white"
+                        : "bg-secondary text-white"
                   )}
                 >
-                  {plan.current ? 'Déjà Actif' : plan.name === 'Enterprise' ? 'Contacter Commercial' : 'Sélectionner'}
+                  {plan.current ? 'Déjà Actif' : 'Sélectionner'}
                 </button>
               </div>
             ))}
