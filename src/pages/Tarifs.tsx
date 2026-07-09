@@ -1,4 +1,4 @@
-import { Check, ShieldCheck, Zap, Award } from 'lucide-react';
+import { Check, ShieldCheck, Zap, Award, X } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
@@ -9,64 +9,67 @@ const Tarifs = () => {
 
   const exhibitorPlans = [
     {
+      id: 'free',
       name: 'Free',
       price: '0 DA',
-      originalPrice: '0 DA',
+      originalPrice: null,
       discount: null,
-      period: '/à vie',
-      description: 'L\'essentiel pour découvrir la plateforme et créer votre profil.',
+      period: '/ an',
+      description: 'Pour découvrir la plateforme',
       features: [
-        '5 produits inclus',
-        '2 images par produit',
-        'Support Standard',
-        'Messagerie Gratuite',
-        'Économie : -'
+        { text: '5 produits' },
+        { text: '2 images/produit' },
+        { text: 'Messagerie' },
+        { text: 'Support standard' }
       ],
-      popular: false,
-      color: 'bg-white text-primary',
-      buttonText: 'Commencer Gratuitement',
-      buttonAction: '/register'
+      badge: null,
+      bgClass: 'bg-[#F8F9FA] text-primary border-[#E0E0E0]',
+      buttonText: 'Commencer',
+      buttonAction: '/register',
+      buttonClass: 'bg-neutral-200 text-neutral-800 border-transparent hover:bg-neutral-300'
     },
     {
+      id: 'basic',
       name: 'Basic',
       price: '18 000 DA',
       originalPrice: '30 000 DA',
       discount: '-40%',
-      period: '/an',
-      description: 'Idéal pour les entreprises souhaitant une visibilité accrue à moindre coût.',
+      period: '/ an',
+      description: 'Le meilleur rapport qualité-prix',
       features: [
-        '15 produits inclus',
-        '5 images par produit',
-        'Statistiques Basiques',
-        'Support sous 48h',
-        'Messagerie Gratuite',
-        'Économie : -40%'
+        { text: '15 produits' },
+        { text: '5 images/produit' },
+        { text: 'Messagerie' },
+        { text: 'Statistiques de base' },
+        { text: 'Support 48h' }
       ],
-      popular: false,
-      color: 'bg-white text-primary',
+      badge: 'POPULAIRE',
+      bgClass: 'bg-[#F8F9FA] text-primary border-[#E86A17] shadow-lg',
       buttonText: 'Choisir Basic',
-      buttonAction: '/contact'
+      buttonAction: '/contact',
+      buttonClass: 'bg-[#E86A17] text-white border-transparent hover:bg-[#d05c12]'
     },
     {
+      id: 'pro',
       name: 'Pro',
       price: '29 900 DA',
       originalPrice: '55 000 DA',
       discount: '-46%',
-      period: '/an',
-      description: 'La solution complète ultime avec mise en avant et outils avancés.',
+      period: '/ an',
+      description: 'Pour les entreprises ambitieuses',
       features: [
-        'Produits Illimités',
-        '10 images par produit',
-        '3 produits mis en avant',
-        'Statistiques Avancées',
-        'Support sous 24h',
-        'Messagerie Gratuite',
-        'Économie : -46%'
+        { text: 'Produits ILLIMITÉS', isBold: true },
+        { text: '10 images/produit' },
+        { text: '3 mises en avant' },
+        { text: 'Statistiques avancées' },
+        { text: 'Support 24h' },
+        { text: 'Messagerie' }
       ],
-      popular: true,
-      color: 'bg-primary text-white',
+      badge: 'RECOMMANDÉ',
+      bgClass: 'bg-[#1A1A1A] text-white border-[#E86A17] shadow-xl',
       buttonText: 'Choisir Pro',
-      buttonAction: '/contact'
+      buttonAction: '/contact',
+      buttonClass: 'bg-[#E86A17] text-white border-[#E86A17] hover:bg-transparent hover:text-[#E86A17]'
     }
   ];
 
@@ -86,14 +89,12 @@ const Tarifs = () => {
 
         <div className="mb-10">
           <div className="text-center mb-10">
-            <h2 className="text-3xl md:text-4xl font-black text-primary tracking-tighter uppercase mb-3 flex items-center justify-center space-x-3">
+            <h2 className="text-4xl md:text-6xl font-black text-primary tracking-tighter uppercase mb-4 flex items-center justify-center">
               <span>Tarifs Exposants</span>
-              <span className="text-secondary opacity-50">/</span>
-              <span className="text-gray-400">Fournisseurs</span>
             </h2>
-            <p className="text-gray-500 font-medium max-w-xl mx-auto">Des solutions de visibilité stratégiques pour toucher et cibler directement les décideurs du secteur industriel.</p>
+            <p className="text-gray-700 font-bold max-w-xl mx-auto text-base md:text-lg">Pour présenter vos produits et services</p>
           </div>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto items-stretch">
             {exhibitorPlans.map((plan, i) => (
               <motion.div 
                 key={i} 
@@ -101,47 +102,73 @@ const Tarifs = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1 + 0.2 }}
                 className={cn(
-                  "relative p-10 rounded-2xl flex flex-col items-center justify-between transition-all duration-500 hover:-translate-y-2 border",
-                  plan.color,
-                  plan.popular 
-                    ? "shadow-2xl scale-105 z-10 border-transparent" 
-                    : "border-gray-100 shadow-xl shadow-gray-200/50 hover:shadow-2xl hover:shadow-gray-200/80 hover:border-gray-200"
+                  "relative p-6 md:p-8 rounded-2xl flex flex-col items-stretch justify-between transition-all duration-300 hover:-translate-y-2 border",
+                  plan.bgClass,
+                  plan.id === 'basic' && "hover:shadow-2xl hover:shadow-[#E86A17]/10",
+                  plan.id === 'pro' && "hover:shadow-2xl hover:shadow-[#E86A17]/20"
                 )}
               >
-                {plan.popular && (
-                  <div className="absolute -top-4 bg-secondary text-white px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest shadow-xl flex items-center space-x-2">
-                    <Zap className="h-3 w-3" />
-                    <span>Le plus populaire</span>
+                {plan.badge && (
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#E86A17] text-white px-5 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg z-20">
+                    <span>{plan.badge}</span>
                   </div>
                 )}
                 
-                <div className="w-full text-center">
-                  <h4 className="text-xl font-black tracking-tighter uppercase mb-6">{plan.name}</h4>
-                  <div className="mb-6 flex flex-col items-center justify-center">
-                    {plan.discount && (
-                      <span className="inline-block bg-secondary/10 text-secondary text-[10px] font-black uppercase tracking-wider px-3 py-1.5 rounded-lg mb-3">
-                        Économie {plan.discount}
-                      </span>
-                    )}
-                    <div className="flex items-baseline justify-center">
-                      <span className="text-4xl md:text-5xl font-black tracking-tighter leading-none">{plan.price}</span>
-                      {plan.period && <span className="text-[10px] font-bold opacity-60 ms-1 uppercase tracking-widest block">{plan.period}</span>}
+                <div className="w-full">
+                  <div className="text-center mb-6">
+                    <h4 className={cn(
+                      "text-2xl font-black tracking-tighter uppercase mb-2",
+                      plan.id === 'pro' ? "text-white" : "text-neutral-900"
+                    )}>{plan.name}</h4>
+                    
+                    <p className={cn(
+                      "text-xs font-medium mb-4",
+                      plan.id === 'pro' ? "text-neutral-400" : "text-neutral-500"
+                    )}>
+                      {plan.description}
+                    </p>
+
+                    <div className="mb-4 flex flex-col items-center justify-center">
+                      <div className="flex items-baseline justify-center">
+                        <span className={cn(
+                          "text-4xl md:text-5xl font-black tracking-tighter leading-none",
+                          plan.id === 'pro' ? "text-white" : "text-neutral-900"
+                        )}>{plan.price}</span>
+                        <span className={cn(
+                          "text-3xl md:text-4xl font-black ms-2 uppercase tracking-tighter",
+                          plan.id === 'pro' ? "text-white" : "text-neutral-900"
+                        )}>{plan.period}</span>
+                      </div>
+                      
+                      {plan.originalPrice && (
+                        <div className="flex items-center gap-2 mt-2">
+                          <span className={cn(
+                            "text-sm line-through decoration-red-500 decoration-2 font-bold",
+                            plan.id === 'pro' ? "text-neutral-400" : "text-neutral-500"
+                          )}>
+                            {plan.originalPrice} / an
+                          </span>
+                          {plan.discount && (
+                            <span className="bg-[#E86A17] text-white text-[11px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-md">
+                              {plan.discount}
+                            </span>
+                          )}
+                        </div>
+                      )}
                     </div>
-                    {plan.originalPrice && plan.originalPrice !== plan.price && (
-                      <span className="text-xs text-gray-400 line-through mt-2 block">
-                        Prix normal : {plan.originalPrice}/an
-                      </span>
-                    )}
                   </div>
-                  <p className="text-xs opacity-60 font-medium mb-8 border-b border-current/10 pb-8 min-h-[60px]">
-                    {plan.description}
-                  </p>
                   
-                  <ul className="space-y-4 mb-12 text-start min-h-[220px]">
+                  <ul className="space-y-3 mb-8 border-t border-current/10 pt-6">
                     {plan.features.map((feature, idx) => (
-                      <li key={idx} className="flex items-start space-x-3 text-[11px] font-bold">
-                        <Check className={cn("h-4 w-4 shrink-0 mt-0.5", plan.popular ? "text-secondary" : "text-secondary")} />
-                        <span className="leading-tight opacity-70 italic">{feature}</span>
+                      <li key={idx} className="flex items-center space-x-3 text-xs font-semibold">
+                        <Check className="h-4 w-4 shrink-0 text-[#E86A17]" />
+                        <span className={cn(
+                          "leading-tight",
+                          plan.id === 'pro' ? "text-neutral-200" : "text-neutral-700",
+                          feature.isBold && "font-black text-[#E86A17]"
+                        )}>
+                          {feature.text}
+                        </span>
                       </li>
                     ))}
                   </ul>
@@ -150,10 +177,8 @@ const Tarifs = () => {
                 <Link 
                   to={plan.buttonAction} 
                   className={cn(
-                    "w-full py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all text-center border-2",
-                    plan.popular 
-                      ? "bg-secondary border-secondary text-white hover:bg-white hover:text-secondary hover:border-white shadow-lg" 
-                      : "bg-transparent border-gray-200 text-primary hover:bg-primary hover:text-white hover:border-primary"
+                    "w-full py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all text-center border-2 block font-sans",
+                    plan.buttonClass
                   )}
                 >
                   {plan.buttonText}
@@ -166,74 +191,98 @@ const Tarifs = () => {
         {/* Tableau Comparatif */}
         <div className="mb-24 mt-8">
           <div className="text-center mb-12">
-            <h3 className="text-2xl font-black text-primary tracking-tighter uppercase mb-4">Tableau Comparatif détaillé</h3>
-            <p className="text-gray-500 font-medium max-w-xl mx-auto">Comparez les fonctionnalités et choisissez l'offre la plus adaptée à vos besoins.</p>
+            <h3 className="text-3xl md:text-5xl font-black text-primary tracking-tighter uppercase mb-4">Tableau Comparatif détaillé</h3>
+            <p className="text-gray-700 font-bold max-w-xl mx-auto text-base">Comparez les fonctionnalités et choisissez l'offre la plus adaptée à vos besoins.</p>
           </div>
           <div className="bg-white rounded-2xl border border-gray-100 shadow-xl overflow-hidden max-w-5xl mx-auto">
             <div className="overflow-x-auto">
               <table className="w-full text-start border-collapse">
                 <thead>
                   <tr className="bg-gray-50/50">
-                    <th className="px-6 py-4 text-start text-xs font-black text-gray-400 uppercase tracking-widest">Caractéristique</th>
-                    <th className="px-6 py-4 text-center text-xs font-black text-primary uppercase tracking-widest bg-gray-100/30">Free</th>
-                    <th className="px-6 py-4 text-center text-xs font-black text-primary uppercase tracking-widest bg-gray-100/10">Basic</th>
-                    <th className="px-6 py-4 text-center text-xs font-black text-secondary uppercase tracking-widest bg-secondary/5">Pro</th>
+                    <th className="px-6 py-4 text-start text-sm font-black text-gray-700 uppercase tracking-widest">Caractéristique</th>
+                    <th className="px-6 py-4 text-center text-sm font-black text-primary uppercase tracking-widest bg-gray-100/30">Free</th>
+                    <th className="px-6 py-4 text-center text-sm font-black text-primary uppercase tracking-widest bg-gray-100/10">Basic</th>
+                    <th className="px-6 py-4 text-center text-sm font-black text-secondary uppercase tracking-widest bg-secondary/5">Pro</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   <tr className="hover:bg-neutral-bg transition-colors">
-                    <td className="px-6 py-4 text-xs font-bold text-gray-600">Prix normal</td>
-                    <td className="px-6 py-4 text-center text-xs font-black text-primary bg-gray-100/30">0 DA</td>
-                    <td className="px-6 py-4 text-center text-xs font-black text-primary bg-gray-100/10">30 000 DA/an</td>
-                    <td className="px-6 py-4 text-center text-xs font-black text-primary bg-secondary/5">55 000 DA/an</td>
+                    <td className="px-6 py-4 text-sm font-extrabold text-gray-800">Prix normal</td>
+                    <td className="px-6 py-4 text-center text-sm font-black text-primary bg-gray-100/30">0 DA</td>
+                    <td className="px-6 py-4 text-center text-sm font-black text-primary bg-gray-100/10">30 000 DA/an</td>
+                    <td className="px-6 py-4 text-center text-sm font-black text-primary bg-secondary/5">55 000 DA/an</td>
                   </tr>
                   <tr className="hover:bg-neutral-bg transition-colors">
-                    <td className="px-6 py-4 text-xs font-bold text-gray-600">Prix de lancement</td>
-                    <td className="px-6 py-4 text-center text-xs font-black text-primary bg-gray-100/30">0 DA</td>
-                    <td className="px-6 py-4 text-center text-xs font-black text-secondary bg-gray-100/10">18 000 DA/an</td>
-                    <td className="px-6 py-4 text-center text-xs font-black text-secondary bg-secondary/5 font-black">29 900 DA/an</td>
+                    <td className="px-6 py-4 text-sm font-extrabold text-gray-800">Prix de lancement</td>
+                    <td className="px-6 py-4 text-center text-sm font-black text-primary bg-gray-100/30">0 DA</td>
+                    <td className="px-6 py-4 text-center text-sm font-black text-secondary bg-gray-100/10">18 000 DA/an</td>
+                    <td className="px-6 py-4 text-center text-sm font-black text-secondary bg-secondary/5">29 900 DA/an</td>
                   </tr>
                   <tr className="hover:bg-neutral-bg transition-colors">
-                    <td className="px-6 py-4 text-xs font-bold text-gray-600">Économie</td>
-                    <td className="px-6 py-4 text-center text-xs font-bold text-gray-400 bg-gray-100/30">-</td>
-                    <td className="px-6 py-4 text-center text-xs font-black text-success bg-gray-100/10">-40%</td>
-                    <td className="px-6 py-4 text-center text-xs font-black text-success bg-secondary/5">-46%</td>
+                    <td className="px-6 py-4 text-sm font-extrabold text-gray-800">Économie</td>
+                    <td className="px-6 py-4 text-center text-sm font-extrabold text-gray-500 bg-gray-100/30">-</td>
+                    <td className="px-6 py-4 text-center text-sm font-black text-success bg-gray-100/10">-40%</td>
+                    <td className="px-6 py-4 text-center text-sm font-black text-success bg-secondary/5">-46%</td>
                   </tr>
                   <tr className="hover:bg-neutral-bg transition-colors">
-                    <td className="px-6 py-4 text-xs font-bold text-gray-600">Produits</td>
-                    <td className="px-6 py-4 text-center text-xs font-bold text-gray-600 bg-gray-100/30">5 produits</td>
-                    <td className="px-6 py-4 text-center text-xs font-bold text-gray-600 bg-gray-100/10">15 produits</td>
-                    <td className="px-6 py-4 text-center text-xs font-black text-secondary bg-secondary/5">Illimité</td>
+                    <td className="px-6 py-4 text-sm font-extrabold text-gray-800">Produits</td>
+                    <td className="px-6 py-4 text-center text-sm font-extrabold text-gray-800 bg-gray-100/30">5</td>
+                    <td className="px-6 py-4 text-center text-sm font-extrabold text-gray-800 bg-gray-100/10">15</td>
+                    <td className="px-6 py-4 text-center text-sm font-black text-secondary bg-secondary/5">Illimité</td>
                   </tr>
                   <tr className="hover:bg-neutral-bg transition-colors">
-                    <td className="px-6 py-4 text-xs font-bold text-gray-600">Images/produit</td>
-                    <td className="px-6 py-4 text-center text-xs font-bold text-gray-600 bg-gray-100/30">2 images</td>
-                    <td className="px-6 py-4 text-center text-xs font-bold text-gray-600 bg-gray-100/10">5 images</td>
-                    <td className="px-6 py-4 text-center text-xs font-bold text-gray-600 bg-secondary/5">10 images</td>
+                    <td className="px-6 py-4 text-sm font-extrabold text-gray-800">Images / produit</td>
+                    <td className="px-6 py-4 text-center text-sm font-extrabold text-gray-800 bg-gray-100/30">2</td>
+                    <td className="px-6 py-4 text-center text-sm font-extrabold text-gray-800 bg-gray-100/10">5</td>
+                    <td className="px-6 py-4 text-center text-sm font-extrabold text-gray-800 bg-secondary/5">10</td>
                   </tr>
                   <tr className="hover:bg-neutral-bg transition-colors">
-                    <td className="px-6 py-4 text-xs font-bold text-gray-600">Mise en avant</td>
-                    <td className="px-6 py-4 text-center text-xs text-red-500 bg-gray-100/30">❌</td>
-                    <td className="px-6 py-4 text-center text-xs text-red-500 bg-gray-100/10">❌</td>
-                    <td className="px-6 py-4 text-center text-xs font-black text-primary bg-secondary/5">3 produits</td>
+                    <td className="px-6 py-4 text-sm font-extrabold text-gray-800">Mise en avant</td>
+                    <td className="px-6 py-4 text-center text-sm bg-gray-100/30">
+                      <X className="h-5 w-5 text-red-500 mx-auto stroke-[3]" />
+                    </td>
+                    <td className="px-6 py-4 text-center text-sm bg-gray-100/10">
+                      <X className="h-5 w-5 text-red-500 mx-auto stroke-[3]" />
+                    </td>
+                    <td className="px-6 py-4 text-center text-sm font-extrabold text-primary bg-secondary/5">3 produits (page d'accueil)</td>
                   </tr>
                   <tr className="hover:bg-neutral-bg transition-colors">
-                    <td className="px-6 py-4 text-xs font-bold text-gray-600">Statistiques</td>
-                    <td className="px-6 py-4 text-center text-xs text-red-500 bg-gray-100/30">❌</td>
-                    <td className="px-6 py-4 text-center text-xs text-success bg-gray-100/10">✅ Basiques</td>
-                    <td className="px-6 py-4 text-center text-xs text-success bg-secondary/5 font-bold">✅ Avancées</td>
+                    <td className="px-6 py-4 text-sm font-extrabold text-gray-800">Statistiques</td>
+                    <td className="px-6 py-4 text-center text-sm bg-gray-100/30">
+                      <X className="h-5 w-5 text-red-500 mx-auto stroke-[3]" />
+                    </td>
+                    <td className="px-6 py-4 text-center text-sm font-extrabold text-neutral-800 bg-gray-100/10">Basiques (vues)</td>
+                    <td className="px-6 py-4 text-center text-sm font-black text-neutral-900 bg-secondary/5">Avancées (vues, clics, leads)</td>
                   </tr>
                   <tr className="hover:bg-neutral-bg transition-colors">
-                    <td className="px-6 py-4 text-xs font-bold text-gray-600">Support</td>
-                    <td className="px-6 py-4 text-center text-xs text-gray-500 bg-gray-100/30">Standard</td>
-                    <td className="px-6 py-4 text-center text-xs font-bold text-gray-600 bg-gray-100/10">48h</td>
-                    <td className="px-6 py-4 text-center text-xs font-bold text-gray-600 bg-secondary/5">24h</td>
+                    <td className="px-6 py-4 text-sm font-extrabold text-gray-800">Support</td>
+                    <td className="px-6 py-4 text-center text-sm font-extrabold text-gray-700 bg-gray-100/30">Standard</td>
+                    <td className="px-6 py-4 text-center text-sm font-extrabold text-gray-700 bg-gray-100/10">48h</td>
+                    <td className="px-6 py-4 text-center text-sm font-extrabold text-gray-700 bg-secondary/5">24h / Prioritaire</td>
                   </tr>
                   <tr className="hover:bg-neutral-bg transition-colors">
-                    <td className="px-6 py-4 text-xs font-bold text-gray-600">Messagerie</td>
-                    <td className="px-6 py-4 text-center text-xs text-success bg-gray-100/30 font-bold">✅ Gratuite</td>
-                    <td className="px-6 py-4 text-center text-xs text-success bg-gray-100/10 font-bold">✅ Gratuite</td>
-                    <td className="px-6 py-4 text-center text-xs text-success bg-secondary/5 font-bold">✅ Gratuite</td>
+                    <td className="px-6 py-4 text-sm font-extrabold text-gray-800">Messagerie</td>
+                    <td className="px-6 py-4 text-center text-sm bg-gray-100/30">
+                      <Check className="h-5 w-5 text-green-500 mx-auto stroke-[3]" />
+                    </td>
+                    <td className="px-6 py-4 text-center text-sm bg-gray-100/10">
+                      <Check className="h-5 w-5 text-green-500 mx-auto stroke-[3]" />
+                    </td>
+                    <td className="px-6 py-4 text-center text-sm bg-secondary/5">
+                      <Check className="h-5 w-5 text-green-500 mx-auto stroke-[3]" />
+                    </td>
+                  </tr>
+                  <tr className="hover:bg-neutral-bg transition-colors">
+                    <td className="px-6 py-4 text-sm font-extrabold text-gray-800">Catalogues PDF</td>
+                    <td className="px-6 py-4 text-center text-sm text-neutral-800 bg-gray-100/30">1</td>
+                    <td className="px-6 py-4 text-center text-sm text-neutral-800 bg-gray-100/10">5</td>
+                    <td className="px-6 py-4 text-center text-sm font-black text-secondary bg-secondary/5">Illimité</td>
+                  </tr>
+                  <tr className="hover:bg-neutral-bg transition-colors">
+                    <td className="px-6 py-4 text-sm font-extrabold text-gray-800">Visibilité</td>
+                    <td className="px-6 py-4 text-center text-sm text-neutral-700 bg-gray-100/30">Standard</td>
+                    <td className="px-6 py-4 text-center text-sm text-neutral-800 bg-gray-100/10">Mise en avant secteur</td>
+                    <td className="px-6 py-4 text-center text-sm font-extrabold text-neutral-900 bg-secondary/5">Mise en avant secteur</td>
                   </tr>
                 </tbody>
               </table>
