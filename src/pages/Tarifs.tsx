@@ -129,13 +129,13 @@ const Tarifs = () => {
                     </p>
 
                     <div className="mb-4 flex flex-col items-center justify-center">
-                      <div className="flex items-baseline justify-center">
+                      <div className="flex items-baseline justify-center whitespace-nowrap">
                         <span className={cn(
-                          "text-4xl md:text-5xl font-black tracking-tighter leading-none",
+                          "text-3xl sm:text-4xl md:text-5xl font-black tracking-tighter leading-none",
                           plan.id === 'pro' ? "text-white" : "text-neutral-900"
                         )}>{plan.price}</span>
                         <span className={cn(
-                          "text-3xl md:text-4xl font-black ms-2 uppercase tracking-tighter",
+                          "text-xl sm:text-2xl md:text-3xl font-black ms-1 uppercase tracking-tighter",
                           plan.id === 'pro' ? "text-white" : "text-neutral-900"
                         )}>{plan.period}</span>
                       </div>
