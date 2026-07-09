@@ -47,7 +47,7 @@ const Tarifs = () => {
       bgClass: 'bg-[#F8F9FA] text-primary border-[#E86A17] shadow-lg',
       buttonText: 'Choisir Basic',
       buttonAction: '/contact',
-      buttonClass: 'bg-[#E86A17] text-white border-transparent hover:bg-[#d05c12]'
+      buttonClass: 'bg-[#E86A17] text-white border-transparent hover:bg-[#c8530b]'
     },
     {
       id: 'pro',
@@ -69,7 +69,7 @@ const Tarifs = () => {
       bgClass: 'bg-[#1A1A1A] text-white border-[#E86A17] shadow-xl',
       buttonText: 'Choisir Pro',
       buttonAction: '/contact',
-      buttonClass: 'bg-[#E86A17] text-white border-[#E86A17] hover:bg-transparent hover:text-[#E86A17]'
+      buttonClass: 'bg-[#E86A17] text-white border-transparent hover:bg-[#c8530b]'
     }
   ];
 
@@ -189,7 +189,7 @@ const Tarifs = () => {
         </div>
 
         {/* Tableau Comparatif */}
-        <div className="mb-24 mt-8">
+        <div className="mb-8 mt-8">
           <div className="text-center mb-12">
             <h3 className="text-3xl md:text-5xl font-black text-primary tracking-tighter uppercase mb-4">Tableau Comparatif détaillé</h3>
             <p className="text-gray-700 font-bold max-w-xl mx-auto text-base">Comparez les fonctionnalités et choisissez l'offre la plus adaptée à vos besoins.</p>
@@ -201,88 +201,88 @@ const Tarifs = () => {
                   <tr className="bg-gray-50/50">
                     <th className="px-6 py-4 text-start text-sm font-black text-gray-700 uppercase tracking-widest">Caractéristique</th>
                     <th className="px-6 py-4 text-center text-sm font-black text-primary uppercase tracking-widest bg-gray-100/30">Free</th>
-                    <th className="px-6 py-4 text-center text-sm font-black text-primary uppercase tracking-widest bg-gray-100/10">Basic</th>
-                    <th className="px-6 py-4 text-center text-sm font-black text-secondary uppercase tracking-widest bg-secondary/5">Pro</th>
+                    <th className="px-6 py-4 text-center text-sm font-black text-white uppercase tracking-widest bg-[#E86A17]">Basic</th>
+                    <th className="px-6 py-4 text-center text-sm font-black text-white uppercase tracking-widest bg-neutral-950">Pro</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  <tr className="hover:bg-neutral-bg transition-colors">
+                  <tr>
                     <td className="px-6 py-4 text-sm font-extrabold text-gray-800">Prix normal</td>
                     <td className="px-6 py-4 text-center text-sm font-black text-primary bg-gray-100/30">0 DA</td>
-                    <td className="px-6 py-4 text-center text-sm font-black text-primary bg-gray-100/10">30 000 DA/an</td>
-                    <td className="px-6 py-4 text-center text-sm font-black text-primary bg-secondary/5">55 000 DA/an</td>
+                    <td className="px-6 py-4 text-center text-sm font-black text-neutral-900 bg-[#E86A17]/15">30 000 DA/an</td>
+                    <td className="px-6 py-4 text-center text-sm font-black text-neutral-950 bg-neutral-950/10">55 000 DA/an</td>
                   </tr>
-                  <tr className="hover:bg-neutral-bg transition-colors">
+                  <tr>
                     <td className="px-6 py-4 text-sm font-extrabold text-gray-800">Prix de lancement</td>
                     <td className="px-6 py-4 text-center text-sm font-black text-primary bg-gray-100/30">0 DA</td>
-                    <td className="px-6 py-4 text-center text-sm font-black text-secondary bg-gray-100/10">18 000 DA/an</td>
-                    <td className="px-6 py-4 text-center text-sm font-black text-secondary bg-secondary/5">29 900 DA/an</td>
+                    <td className="px-6 py-4 text-center text-sm font-black text-[#E86A17] bg-[#E86A17]/15">18 000 DA/an</td>
+                    <td className="px-6 py-4 text-center text-sm font-black text-[#E86A17] bg-neutral-950/10">29 900 DA/an</td>
                   </tr>
-                  <tr className="hover:bg-neutral-bg transition-colors">
+                  <tr>
                     <td className="px-6 py-4 text-sm font-extrabold text-gray-800">Économie</td>
                     <td className="px-6 py-4 text-center text-sm font-extrabold text-gray-500 bg-gray-100/30">-</td>
-                    <td className="px-6 py-4 text-center text-sm font-black text-success bg-gray-100/10">-40%</td>
-                    <td className="px-6 py-4 text-center text-sm font-black text-success bg-secondary/5">-46%</td>
+                    <td className="px-6 py-4 text-center text-sm font-black text-green-700 bg-[#E86A17]/15">-40%</td>
+                    <td className="px-6 py-4 text-center text-sm font-black text-green-700 bg-neutral-950/10">-46%</td>
                   </tr>
-                  <tr className="hover:bg-neutral-bg transition-colors">
+                  <tr>
                     <td className="px-6 py-4 text-sm font-extrabold text-gray-800">Produits</td>
                     <td className="px-6 py-4 text-center text-sm font-extrabold text-gray-800 bg-gray-100/30">5</td>
-                    <td className="px-6 py-4 text-center text-sm font-extrabold text-gray-800 bg-gray-100/10">15</td>
-                    <td className="px-6 py-4 text-center text-sm font-black text-secondary bg-secondary/5">Illimité</td>
+                    <td className="px-6 py-4 text-center text-sm font-extrabold text-neutral-900 bg-[#E86A17]/15">15</td>
+                    <td className="px-6 py-4 text-center text-sm font-black text-neutral-950 bg-neutral-950/10">Illimité</td>
                   </tr>
-                  <tr className="hover:bg-neutral-bg transition-colors">
+                  <tr>
                     <td className="px-6 py-4 text-sm font-extrabold text-gray-800">Images / produit</td>
                     <td className="px-6 py-4 text-center text-sm font-extrabold text-gray-800 bg-gray-100/30">2</td>
-                    <td className="px-6 py-4 text-center text-sm font-extrabold text-gray-800 bg-gray-100/10">5</td>
-                    <td className="px-6 py-4 text-center text-sm font-extrabold text-gray-800 bg-secondary/5">10</td>
+                    <td className="px-6 py-4 text-center text-sm font-extrabold text-neutral-900 bg-[#E86A17]/15">5</td>
+                    <td className="px-6 py-4 text-center text-sm font-extrabold text-neutral-950 bg-neutral-950/10">10</td>
                   </tr>
-                  <tr className="hover:bg-neutral-bg transition-colors">
+                  <tr>
                     <td className="px-6 py-4 text-sm font-extrabold text-gray-800">Mise en avant</td>
                     <td className="px-6 py-4 text-center text-sm bg-gray-100/30">
                       <X className="h-5 w-5 text-red-500 mx-auto stroke-[3]" />
                     </td>
-                    <td className="px-6 py-4 text-center text-sm bg-gray-100/10">
+                    <td className="px-6 py-4 text-center text-sm bg-[#E86A17]/15">
                       <X className="h-5 w-5 text-red-500 mx-auto stroke-[3]" />
                     </td>
-                    <td className="px-6 py-4 text-center text-sm font-extrabold text-primary bg-secondary/5">3 produits (page d'accueil)</td>
+                    <td className="px-6 py-4 text-center text-sm font-extrabold text-neutral-950 bg-neutral-950/10">3 produits (page d'accueil)</td>
                   </tr>
-                  <tr className="hover:bg-neutral-bg transition-colors">
+                  <tr>
                     <td className="px-6 py-4 text-sm font-extrabold text-gray-800">Statistiques</td>
                     <td className="px-6 py-4 text-center text-sm bg-gray-100/30">
                       <X className="h-5 w-5 text-red-500 mx-auto stroke-[3]" />
                     </td>
-                    <td className="px-6 py-4 text-center text-sm font-extrabold text-neutral-800 bg-gray-100/10">Basiques (vues)</td>
-                    <td className="px-6 py-4 text-center text-sm font-black text-neutral-900 bg-secondary/5">Avancées (vues, clics, leads)</td>
+                    <td className="px-6 py-4 text-center text-sm font-extrabold text-neutral-800 bg-[#E86A17]/15">Basiques (vues)</td>
+                    <td className="px-6 py-4 text-center text-sm font-black text-neutral-950 bg-neutral-950/10">Avancées (vues, clics, leads)</td>
                   </tr>
-                  <tr className="hover:bg-neutral-bg transition-colors">
+                  <tr>
                     <td className="px-6 py-4 text-sm font-extrabold text-gray-800">Support</td>
                     <td className="px-6 py-4 text-center text-sm font-extrabold text-gray-700 bg-gray-100/30">Standard</td>
-                    <td className="px-6 py-4 text-center text-sm font-extrabold text-gray-700 bg-gray-100/10">48h</td>
-                    <td className="px-6 py-4 text-center text-sm font-extrabold text-gray-700 bg-secondary/5">24h / Prioritaire</td>
+                    <td className="px-6 py-4 text-center text-sm font-extrabold text-neutral-800 bg-[#E86A17]/15">48h</td>
+                    <td className="px-6 py-4 text-center text-sm font-extrabold text-neutral-950 bg-neutral-950/10">24h / Prioritaire</td>
                   </tr>
-                  <tr className="hover:bg-neutral-bg transition-colors">
+                  <tr>
                     <td className="px-6 py-4 text-sm font-extrabold text-gray-800">Messagerie</td>
                     <td className="px-6 py-4 text-center text-sm bg-gray-100/30">
                       <Check className="h-5 w-5 text-green-500 mx-auto stroke-[3]" />
                     </td>
-                    <td className="px-6 py-4 text-center text-sm bg-gray-100/10">
+                    <td className="px-6 py-4 text-center text-sm bg-[#E86A17]/15">
                       <Check className="h-5 w-5 text-green-500 mx-auto stroke-[3]" />
                     </td>
-                    <td className="px-6 py-4 text-center text-sm bg-secondary/5">
-                      <Check className="h-5 w-5 text-green-500 mx-auto stroke-[3]" />
+                    <td className="px-6 py-4 text-center text-sm bg-neutral-950/10">
+                      <Check className="h-5 w-5 text-green-600 mx-auto stroke-[3]" />
                     </td>
                   </tr>
-                  <tr className="hover:bg-neutral-bg transition-colors">
+                  <tr>
                     <td className="px-6 py-4 text-sm font-extrabold text-gray-800">Catalogues PDF</td>
                     <td className="px-6 py-4 text-center text-sm text-neutral-800 bg-gray-100/30">1</td>
-                    <td className="px-6 py-4 text-center text-sm text-neutral-800 bg-gray-100/10">5</td>
-                    <td className="px-6 py-4 text-center text-sm font-black text-secondary bg-secondary/5">Illimité</td>
+                    <td className="px-6 py-4 text-center text-sm text-neutral-900 bg-[#E86A17]/15 font-extrabold">5</td>
+                    <td className="px-6 py-4 text-center text-sm font-black text-neutral-950 bg-neutral-950/10">Illimité</td>
                   </tr>
-                  <tr className="hover:bg-neutral-bg transition-colors">
+                  <tr>
                     <td className="px-6 py-4 text-sm font-extrabold text-gray-800">Visibilité</td>
                     <td className="px-6 py-4 text-center text-sm text-neutral-700 bg-gray-100/30">Standard</td>
-                    <td className="px-6 py-4 text-center text-sm text-neutral-800 bg-gray-100/10">Mise en avant secteur</td>
-                    <td className="px-6 py-4 text-center text-sm font-extrabold text-neutral-900 bg-secondary/5">Mise en avant secteur</td>
+                    <td className="px-6 py-4 text-center text-sm text-neutral-900 bg-[#E86A17]/15 font-extrabold">Mise en avant secteur</td>
+                    <td className="px-6 py-4 text-center text-sm font-extrabold text-neutral-950 bg-neutral-950/10">Mise en avant secteur</td>
                   </tr>
                 </tbody>
               </table>
@@ -292,14 +292,36 @@ const Tarifs = () => {
 
 
 
-        <div className="mt-16 max-w-4xl mx-auto bg-white rounded-2xl p-12 text-center shadow-xl shadow-gray-200/50 border border-gray-100 relative overflow-hidden group">
-          <div className="absolute inset-0 bg-secondary/5 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-in-out"></div>
-          <div className="relative z-10">
+        <div className="mt-6 max-w-4xl mx-auto bg-white rounded-2xl p-10 text-center shadow-lg shadow-gray-200/50 border border-gray-100 relative">
+          <div>
             <ShieldCheck className="h-16 w-16 text-secondary mx-auto mb-6 drop-shadow-md" />
             <h3 className="text-2xl font-black text-primary tracking-tighter uppercase mb-4">Paiement Sécurisé</h3>
-            <p className="text-sm text-gray-500 max-w-lg mx-auto leading-relaxed font-medium">
+            <p className="text-sm text-gray-500 max-w-lg mx-auto leading-relaxed font-medium mb-8">
               Tous nos abonnements sont facturés en Dinar Algérien (DZD). Nous acceptons les paiements par virement bancaire, chèque certifié et paiement électronique via CIB / Dahabia.
             </p>
+
+            {/* Cartes CIB et Edahabia */}
+            <div className="flex items-center justify-center gap-6 mt-6">
+              {/* Carte CIB - Taille Moyenne */}
+              <div className="relative w-28 h-16 rounded-lg shadow-lg overflow-hidden bg-gradient-to-br from-[#0F2027] to-[#2C5364] border border-white/10 flex items-center justify-center hover:scale-105 transition-transform duration-200 cursor-pointer" title="Carte CIB">
+                {/* REMPLACEMENT FACILE PAR UNE IMAGE : 
+                    <img src="/images/cib.png" alt="CIB" className="w-full h-full object-cover absolute inset-0 rounded-lg" /> 
+                */}
+                <span className="text-xs font-black tracking-widest text-white relative z-10">CIB</span>
+                <div className="absolute top-2 left-2 w-5 h-3.5 rounded-[1px] bg-gradient-to-r from-amber-200 to-amber-400 opacity-85"></div>
+                <div className="absolute right-2 bottom-2 w-3 h-3 rounded-full bg-cyan-400 opacity-50"></div>
+              </div>
+
+              {/* Carte Edahabia - Taille Moyenne */}
+              <div className="relative w-28 h-16 rounded-lg shadow-lg overflow-hidden bg-gradient-to-br from-[#1C160E] to-[#3E2D1A] border border-[#D4AF37]/30 flex items-center justify-center hover:scale-105 transition-transform duration-200 cursor-pointer" title="Carte Edahabia">
+                {/* REMPLACEMENT FACILE PAR UNE IMAGE : 
+                    <img src="/images/edahabia.png" alt="Edahabia" className="w-full h-full object-cover absolute inset-0 rounded-lg" /> 
+                */}
+                <span className="text-[10px] font-black tracking-widest text-[#D4AF37] uppercase relative z-10">Gold</span>
+                <div className="absolute top-2 left-2 w-5 h-3.5 rounded-[1px] bg-gradient-to-r from-amber-200 to-amber-400 opacity-85"></div>
+                <div className="absolute right-2 bottom-2 w-3 h-3 rounded-full bg-amber-500 opacity-50"></div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
