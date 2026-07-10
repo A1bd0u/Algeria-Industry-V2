@@ -30,9 +30,30 @@ async function startServer() {
   // Trust proxy for rate limiting behind reverse proxies (like Cloud Run)
   app.set('trust proxy', 1);
 
+  const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || '';
+  let supabaseDomain = '';
+  try {
+    if (supabaseUrl) {
+      supabaseDomain = new URL(supabaseUrl).origin;
+    }
+  } catch (e) {
+    console.error('Invalid Supabase URL for CSP config');
+  }
+
   // Security HTTP Headers
+  // TODO: Passer cette politique en mode bloquant (retirer reportOnly: true) après une 
+  // période de test en staging, une fois qu'on aura vérifié dans les logs qu'aucune 
+  // ressource légitime n'est bloquée par erreur.
   app.use(helmet({
-    contentSecurityPolicy: false, // Disabled for development/vite
+    contentSecurityPolicy: {
+      reportOnly: true,
+      directives: {
+        defaultSrc: ["'self'"],
+        connectSrc: ["'self'", supabaseDomain].filter(Boolean),
+        imgSrc: ["'self'", 'data:', 'blob:', supabaseDomain].filter(Boolean),
+        // Les autres directives hériteront de default-src ou des valeurs par défaut strictes de helmet
+      }
+    },
     crossOriginEmbedderPolicy: false
   }));
 
@@ -79,6 +100,26 @@ async function startServer() {
     app.get('*', (req, res) => {
       res.sendFile(path.join(distPath, 'index.html'));
     });
+  }
+
+  // Validation des variables d'environnement obligatoires
+  const requiredEnvVars = [
+    'JWT_SECRET',
+    'SUPABASE_URL',
+    'SUPABASE_SERVICE_ROLE_KEY',
+    'GEMINI_API_KEY'
+  ];
+
+  const missingEnvVars = requiredEnvVars.filter(
+    (varName) => !process.env[varName] || process.env[varName].trim() === ''
+  );
+
+  if (missingEnvVars.length > 0) {
+    console.error(
+      `\x1b[31m[ERREUR CONFIGURATION] Variables d'environnement requises manquantes ou vides : ${missingEnvVars.join(', ')}\x1b[0m`
+    );
+    console.error("Le serveur ne peut pas démarrer sans ces configurations. Arrêt du processus.");
+    process.exit(1);
   }
 
   app.listen(PORT, '0.0.0.0', () => {

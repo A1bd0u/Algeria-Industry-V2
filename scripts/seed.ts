@@ -22,8 +22,152 @@ const PDF_URLS = [
   'https://pdfobject.com/pdf/sample-3pp.pdf'
 ];
 
+function cleanValue(val: string): any {
+  val = val.trim();
+  if (val.startsWith("'") && val.endsWith("'")) {
+    return val.slice(1, -1);
+  }
+  // Unquoted values
+  if (val.toLowerCase() === 'true') return true;
+  if (val.toLowerCase() === 'false') return false;
+  if (val.toLowerCase() === 'null') return null;
+  if (!isNaN(Number(val)) && val !== '') return Number(val);
+  return val;
+}
+
+function parseSqlFile(filePath: string): { table: string; rows: any[] }[] {
+  const content = fs.readFileSync(filePath, 'utf8');
+  const blocks = content.split(/INSERT\s+INTO\s+public\./gi);
+  const results: { table: string; rows: any[] }[] = [];
+
+  for (const block of blocks) {
+    if (!block.trim()) continue;
+    
+    // Extract table name and columns
+    const headerMatch = block.match(/^(\w+)\s*\(([^)]+)\)/i);
+    if (!headerMatch) continue;
+    
+    const table = headerMatch[1].trim();
+    const columns = headerMatch[2].split(',').map(c => c.trim().replace(/['"`]/g, ''));
+    
+    // Extract everything after VALUES
+    const valuesIndex = block.toUpperCase().indexOf('VALUES');
+    if (valuesIndex === -1) continue;
+    
+    const valuesPart = block.substring(valuesIndex + 6).trim();
+    
+    // Parse individual lines
+    const valueLines = valuesPart
+      .split('\n')
+      .map(line => line.trim())
+      .filter(line => line.startsWith('('));
+    
+    const rows: any[] = [];
+    for (const line of valueLines) {
+      // Remove leading '(' and trailing '),', ');', ')'
+      let cleanLine = line;
+      if (cleanLine.startsWith('(')) {
+        cleanLine = cleanLine.substring(1);
+      }
+      if (cleanLine.endsWith(';')) {
+        cleanLine = cleanLine.slice(0, -1);
+      }
+      if (cleanLine.endsWith(',')) {
+        cleanLine = cleanLine.slice(0, -1);
+      }
+      if (cleanLine.endsWith(')')) {
+        cleanLine = cleanLine.slice(0, -1);
+      }
+      
+      // Parse columns respecting single quotes and commas
+      const values: any[] = [];
+      let currentVal = '';
+      let inQuotes = false;
+      
+      for (let i = 0; i < cleanLine.length; i++) {
+        const char = cleanLine[i];
+        if (char === "'") {
+          // Check for escaped single quote in SQL: ''
+          if (cleanLine[i + 1] === "'") {
+            currentVal += "'";
+            i++; // Skip the next quote
+          } else {
+            inQuotes = !inQuotes;
+            currentVal += char;
+          }
+        } else if (char === ',' && !inQuotes) {
+          values.push(cleanValue(currentVal));
+          currentVal = '';
+        } else {
+          currentVal += char;
+        }
+      }
+      values.push(cleanValue(currentVal));
+      
+      const rowObj: any = {};
+      columns.forEach((col, idx) => {
+        rowObj[col] = values[idx];
+      });
+      rows.push(rowObj);
+    }
+    
+    results.push({ table, rows });
+  }
+  
+  return results;
+}
+
+async function runSqlSeeds() {
+  console.log("Démarrage de l'importation des fichiers SQL de seed...");
+  
+  const seedFiles = [
+    'supabase/seeds/20260705000002_seed_test_users.sql',
+    'supabase/seeds/20260705000003_seed_data.sql'
+  ];
+
+  for (const file of seedFiles) {
+    const filePath = path.join(process.cwd(), file);
+    if (!fs.existsSync(filePath)) {
+      console.warn(`[WARNING] Fichier de seed introuvable : ${filePath}`);
+      continue;
+    }
+    
+    console.log(`Lecture et traitement de ${file}...`);
+    const blocks = parseSqlFile(filePath);
+    
+    for (const block of blocks) {
+      console.log(`Upserting ${block.rows.length} lignes dans la table "${block.table}"...`);
+      
+      const chunkSize = 100;
+      for (let i = 0; i < block.rows.length; i += chunkSize) {
+        const chunk = block.rows.slice(i, i + chunkSize);
+        
+        let error;
+        if (block.table === 'users') {
+          const { error: upsertError } = await supabase
+            .from(block.table)
+            .upsert(chunk, { onConflict: 'email' });
+          error = upsertError;
+        } else {
+          const { error: upsertError } = await supabase
+            .from(block.table)
+            .upsert(chunk);
+          error = upsertError;
+        }
+        
+        if (error) {
+          console.error(`Erreur d'upsert pour la table ${block.table}:`, error.message);
+          process.exit(1);
+        }
+      }
+      console.log(`Table "${block.table}" upsertée avec succès.`);
+    }
+  }
+  console.log("Importation des fichiers SQL de seed terminée avec succès !");
+}
+
 async function seed() {
-  console.log("Démarrage du script de seed...");
+  console.log("Démarrage du script de seed (programmé, sans données démo de test)...");
 
   // 1. Seed Companies (60)
   console.log("Insertion des entreprises...");
@@ -60,14 +204,11 @@ async function seed() {
   // 2. Upload PDFs & Seed Catalogues
   console.log("Génération des catalogues et upload (simulation ou réel)...");
   
-  // Note: To upload real PDFs, we'll fetch a dummy PDF and upload it to Supabase Storage 'catalogues' bucket
-  // Ensure the bucket 'catalogues' exists and is public!
-  let uploadedPdfUrls = [];
+  let uploadedPdfUrls: string[] = [];
   try {
     const pdfResponse = await fetch(PDF_URLS[0]);
     const pdfBuffer = await pdfResponse.arrayBuffer();
     
-    // We upload one PDF and reuse its URL for all catalogues to save time/bandwidth
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from('catalogues')
       .upload(`seed/sample_catalogue_${Date.now()}.pdf`, pdfBuffer, {
@@ -83,7 +224,7 @@ async function seed() {
       uploadedPdfUrls = [publicUrl];
       console.log("PDF uploadé avec succès :", publicUrl);
     }
-  } catch(e) {
+  } catch(e: any) {
       console.warn("Erreur fetch/upload, fallback sur URL externe.", e.message);
       uploadedPdfUrls = PDF_URLS;
   }
@@ -129,4 +270,13 @@ async function seed() {
   console.log("Seed terminé avec succès !");
 }
 
-seed().catch(console.error);
+async function main() {
+  const isDemo = process.argv.includes('--demo') || process.argv.includes('--with-demo');
+  if (isDemo) {
+    await runSqlSeeds();
+  } else {
+    await seed();
+  }
+}
+
+main().catch(console.error);

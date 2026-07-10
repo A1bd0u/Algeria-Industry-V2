@@ -7,10 +7,7 @@ const router = express.Router();
 let genAI: GoogleGenAI | null = null;
 
 const getAI = () => {
-  let apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey || apiKey === "MY_GEMINI_API_KEY") {
-    apiKey = "AQ.Ab8RN6JBb6903v3j2xaSS1rAVmSLyARdBWTS6k1N7oMujs7VwA";
-  }
+  const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) return null;
   if (!genAI) genAI = new GoogleGenAI({ apiKey });
   return genAI;

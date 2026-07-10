@@ -1,6 +1,7 @@
 import express from 'express';
 import { getSupabase } from '../db/supabaseClient';
 import { verifyRole } from '../middlewares/authMiddleware';
+import { logAdminAction } from '../utils/auditLogger';
 
 const router = express.Router();
 
@@ -51,12 +52,26 @@ router.put('/:id/role', verifyRole(['admin']), async (req, res) => {
 
     const supabase = getSupabase();
     
+    // Fetch current user email for the audit log
+    const { data: targetUser } = await supabase
+      .from('users')
+      .select('email, role')
+      .eq('id', id)
+      .single();
+
     const { error } = await supabase
       .from('users')
       .update({ role })
       .eq('id', id);
 
     if (error) throw error;
+    
+    await logAdminAction(req, 'role_change', {
+      targetUserId: id,
+      targetUserEmail: targetUser?.email || 'unknown',
+      previousRole: targetUser?.role || 'unknown',
+      newRole: role
+    });
     
     return res.json({ success: true, message: 'Rôle mis à jour' });
   } catch (err: any) {
@@ -99,6 +114,13 @@ router.put('/:id/status', verifyRole(['admin']), async (req, res) => {
        }
     }
 
+    // Fetch user email for the audit log
+    const { data: targetUser } = await supabase
+      .from('users')
+      .select('email')
+      .eq('id', id)
+      .single();
+
     if (newRole !== currentRole) {
        const { error: updateError } = await supabase
          .from('users')
@@ -106,6 +128,13 @@ router.put('/:id/status', verifyRole(['admin']), async (req, res) => {
          .eq('id', id);
        if (updateError) throw updateError;
     }
+    
+    await logAdminAction(req, action === 'suspend' ? 'suspension' : 'reactivation', {
+      targetUserId: id,
+      targetUserEmail: targetUser?.email || 'unknown',
+      previousRole: currentRole,
+      newRole: newRole
+    });
     
     return res.json({ success: true, message: action === 'suspend' ? 'Compte suspendu' : 'Compte réactivé' });
   } catch (err: any) {
@@ -147,6 +176,13 @@ router.delete('/:id', verifyRole(['admin']), async (req, res) => {
     const { id } = req.params;
     const supabase = getSupabase();
     
+    // Fetch target user details before deleting
+    const { data: targetUser } = await supabase
+      .from('users')
+      .select('email, name, role')
+      .eq('id', id)
+      .single();
+
     await supabase.from('messages').delete().or(`sender_id.eq.${id},receiver_id.eq.${id}`);
     await supabase.from('favorites').delete().eq('user_id', id);
     await supabase.from('kyc_requests').delete().eq('user_id', id);
@@ -169,6 +205,13 @@ router.delete('/:id', verifyRole(['admin']), async (req, res) => {
     if (authError) {
       console.error("Auth user delete error:", authError);
     }
+
+    await logAdminAction(req, 'user_delete', {
+      targetUserId: id,
+      targetUserEmail: targetUser?.email || 'unknown',
+      targetUserName: targetUser?.name || 'unknown',
+      targetUserRole: targetUser?.role || 'unknown'
+    });
 
     return res.json({ success: true, message: 'Utilisateur supprimé avec succès' });
   } catch (err: any) {

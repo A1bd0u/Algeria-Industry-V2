@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; color: #1a1a1a; padding: 20px; }
+    .container { max-width: 600px; margin: 0 auto; background: #ffffff; padding: 30px; border-radius: 8px; border-top: 4px solid #ff6b00; }
+    .logo { font-size: 24px; font-weight: bold; color: #1a1a1a; margin-bottom: 20px; }
+    .code { font-size: 32px; font-weight: bold; letter-spacing: 4px; color: #004a99; text-align: center; margin: 30px 0; padding: 15px; background: #f8f9fa; border-radius: 4px; }
+    .footer { margin-top: 40px; font-size: 12px; color: #6b7280; text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">Algeria Industry</div>
+    <h2>Vérification de votre adresse e-mail</h2>
+    <p>Bonjour {{ name }},</p>
+    <p>Merci de vous être inscrit sur Algeria Industry. Veuillez utiliser le code de vérification suivant pour valider votre compte :</p>
+    <div class="code">{{ code }}</div>
+    <p>Ce code est valable pendant 15 minutes. Si vous n'avez pas demandé ce code, vous pouvez ignorer cet e-mail.</p>
+    <p>Cordialement,<br>L'équipe Algeria Industry</p>
+    <div class="footer">© 2026 Algeria Industry. Tous droits réservés.</div>
+  </div>
+</body>
+</html>

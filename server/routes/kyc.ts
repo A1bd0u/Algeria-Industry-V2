@@ -2,6 +2,7 @@ import express from 'express';
 import { getSupabase } from '../db/supabaseClient';
 import { z } from 'zod';
 import { validate } from '../middlewares/validateMiddleware';
+import { logAdminAction } from '../utils/auditLogger';
 
 import { requireAuth, verifyRole } from '../middlewares/authMiddleware';
 
@@ -179,6 +180,19 @@ router.post('/:id/approve', verifyRole(['admin']), async (req, res) => {
        
        // Simulate Email Notification
        console.log(`[EMAIL SIMULATION] To: ${userData?.email} | Subject: Votre entreprise est validée ! | Body: Félicitations ${kycData.name}, votre compte a été approuvé.`);
+       
+       await logAdminAction(req, 'kyc_approve', {
+         kycRequestId: id,
+         targetUserId: kycData.user_id,
+         targetUserEmail: userData?.email,
+         targetCompanyName: kycData.name,
+         targetCompanyId: userData?.company_id
+       });
+    } else {
+       await logAdminAction(req, 'kyc_approve', {
+         kycRequestId: id,
+         targetCompanyName: kycData?.name
+       });
     }
 
     return res.json({ success: true, message: "Entreprise approuvée et notifiée par email." });
@@ -220,6 +234,21 @@ router.post('/:id/reject', verifyRole(['admin']), validate(kycRejectSchema), asy
        
        // Simulate Email Notification
        console.log(`[EMAIL SIMULATION] To: ${userData?.email} | Subject: Refus de validation de votre entreprise | Body: Bonjour ${kycData.name}, votre demande a été refusée pour le motif suivant: ${reason}`);
+       
+       await logAdminAction(req, 'kyc_reject', {
+         kycRequestId: id,
+         targetUserId: kycData.user_id,
+         targetUserEmail: userData?.email,
+         targetCompanyName: kycData.name,
+         targetCompanyId: userData?.company_id,
+         reason
+       });
+    } else {
+       await logAdminAction(req, 'kyc_reject', {
+         kycRequestId: id,
+         targetCompanyName: kycData?.name,
+         reason
+       });
     }
 
     return res.json({ success: true, message: "Entreprise rejetée et notifiée par email." });

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; color: #1a1a1a; padding: 20px; }
+    .container { max-width: 600px; margin: 0 auto; background: #ffffff; padding: 30px; border-radius: 8px; border-top: 4px solid #10b981; }
+    .logo { font-size: 24px; font-weight: bold; color: #1a1a1a; margin-bottom: 20px; }
+    .success-icon { font-size: 40px; text-align: center; margin: 20px 0; }
+    .btn { display: inline-block; background-color: #10b981; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 4px; font-weight: bold; margin: 20px 0; }
+    .footer { margin-top: 40px; font-size: 12px; color: #6b7280; text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">Algeria Industry</div>
+    <div class="success-icon">✅</div>
+    <h2 style="text-align: center; color: #10b981;">Dossier KYC Approuvé</h2>
+    <p>Bonjour {{ name }},</p>
+    <p>Nous avons le plaisir de vous informer que votre dossier d'authentification d'entreprise (KYC) a été examiné et <strong>approuvé</strong> avec succès.</p>
+    <p>Votre entreprise bénéficie désormais du badge "Vérifié", renforçant ainsi la confiance auprès de vos partenaires commerciaux sur notre plateforme.</p>
+    <div style="text-align: center;">
+      <a href="{{ dashboardUrl }}" class="btn" style="color: #ffffff;">Accéder à mon tableau de bord</a>
+    </div>
+    <p>Merci pour votre collaboration.</p>
+    <p>Cordialement,<br>L'équipe Algeria Industry</p>
+    <div class="footer">© 2026 Algeria Industry. Tous droits réservés.</div>
+  </div>
+</body>
+</html>

@@ -8,13 +8,17 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Turnstile } from '@marsidev/react-turnstile';
+import { PasswordStrengthIndicator } from '../components/PasswordStrengthIndicator';
 
 const registerSchema = z.object({
   firstName: z.string().min(2, 'Prénom trop court'),
   lastName: z.string().min(2, 'Nom trop court'),
   companyName: z.string().min(2, "Nom de l'entreprise requis"),
   email: z.string().email('Adresse email invalide'),
-  password: z.string().min(6, 'Mot de passe trop court (6 min)'),
+  password: z.string()
+    .min(8, 'Le mot de passe doit contenir au moins 8 caractères')
+    .regex(/[a-zA-Z]/, 'Le mot de passe doit contenir au moins une lettre')
+    .regex(/[0-9]/, 'Le mot de passe doit contenir au moins un chiffre'),
 });
 
 type RegisterForm = z.infer<typeof registerSchema>;
@@ -28,9 +32,11 @@ const Register = () => {
   const { register: registerAuth } = useAuth();
   const navigate = useNavigate();
 
-  const { register, handleSubmit, formState: { errors } } = useForm<RegisterForm>({
+  const { register, handleSubmit, watch, formState: { errors } } = useForm<RegisterForm>({
     resolver: zodResolver(registerSchema)
   });
+  
+  const passwordValue = watch('password');
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
@@ -68,7 +74,10 @@ const Register = () => {
   };
 
   const onSubmit = async (data: RegisterForm) => {
-    const tokenToUse = captchaToken || 'dummy-token';
+    if (!captchaToken) {
+      setAuthError('Veuillez valider le captcha pour continuer.');
+      return;
+    }
     setIsLoading(true);
     setAuthError('');
     
@@ -79,7 +88,7 @@ const Register = () => {
         company: data.companyName,
         role: role as any,
         password: data.password,
-        captchaToken: tokenToUse
+        captchaToken: captchaToken
       });
       navigate('/register-success');
     } catch (err: any) {
@@ -306,6 +315,7 @@ const Register = () => {
                       />
                     </div>
                     {errors.password && <p className="text-red-500 text-[10px] mt-1 font-medium">{errors.password.message}</p>}
+                    <PasswordStrengthIndicator password={passwordValue} />
                   </div>
 
                   <div className="flex justify-center py-2">

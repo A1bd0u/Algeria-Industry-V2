@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Lock, ArrowRight, Loader2, Key, Eye, EyeOff, CheckCircle2 } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router-dom';
+import { PasswordStrengthIndicator } from '../components/PasswordStrengthIndicator';
 
 const ResetPassword = () => {
   const [searchParams] = useSearchParams();
@@ -23,8 +24,18 @@ const ResetPassword = () => {
       return;
     }
     
-    if (password.length < 6) {
-      setError("Le mot de passe doit faire au moins 6 caractères.");
+    if (password.length < 8) {
+      setError("Le mot de passe doit faire au moins 8 caractères.");
+      return;
+    }
+    
+    if (!/[a-zA-Z]/.test(password)) {
+      setError("Le mot de passe doit contenir au moins une lettre.");
+      return;
+    }
+
+    if (!/[0-9]/.test(password)) {
+      setError("Le mot de passe doit contenir au moins un chiffre.");
       return;
     }
 
@@ -124,6 +135,7 @@ const ResetPassword = () => {
                     {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                   </button>
                 </div>
+                <PasswordStrengthIndicator password={password} />
               </div>
 
               <div>

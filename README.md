@@ -35,4 +35,18 @@ Avant de commencer, assurez-vous de disposer des éléments suivants :
    L'application sera accessible localement sur le port configuré (par défaut : 3000).
 
 4. **Base de données** :
-   Vous pouvez initialiser la base de données en exécutant les fichiers SQL disponibles dans le dossier `supabase/migrations/` depuis le SQL Editor de votre tableau de bord Supabase. Le fichier `20260705000002_seed_test_users.sql` contient les utilisateurs de test (mot de passe par défaut : `admin123`).
+   - **Migrations (Schéma)** : Initialisez le schéma de la base de données en appliquant séquentiellement les fichiers SQL du dossier `supabase/migrations/` depuis le SQL Editor de Supabase.
+   - **Seeding de Production (Sans utilisateurs démo)** :
+     ```bash
+     npm run db:seed
+     ```
+     Ce script peuple la base avec des entreprises et des offres fictives générées à la volée, sans ajouter de comptes utilisateurs prédéfinis.
+   - **Seeding de Démo/Développement (Avec utilisateurs de test)** :
+     ```bash
+     npm run db:seed:demo
+     ```
+     Ce script charge les données de démonstration figées ainsi que les comptes de test (rôles admin, acheteur, fournisseur, exposant) définis dans `supabase/seeds/`.
+
+> [!WARNING]
+> **SÉCURITÉ IMPORTANTE : Le dossier `supabase/seeds/` ne doit JAMAIS être exécuté en production.**
+> Il contient des utilisateurs de démonstration et d'administration dotés de mots de passe communs de test publiquement documentés (`admin123`). Son exécution en production présenterait un risque critique de sécurité.

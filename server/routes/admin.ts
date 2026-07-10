@@ -2,6 +2,7 @@ import express from 'express';
 import { verifyRole } from '../middlewares/authMiddleware';
 import { getSupabase } from '../db/supabaseClient';
 import rateLimit from 'express-rate-limit';
+import { logAdminAction } from '../utils/auditLogger';
 
 const router = express.Router();
 
@@ -36,7 +37,7 @@ const redisCache = new SimpleCache();
 router.get('/dashboard', verifyRole(['admin']), adminDashboardLimiter, async (req, res) => {
   try {
     const user = (req as any).user;
-    console.log(`[DASHBOARD_CONSULTATION] User: ${user.id} (${user.email || 'N/A'}), Time: ${new Date().toISOString()}, IP: ${req.ip}`);
+    await logAdminAction(req, 'dashboard_consultation', { scope: 'dashboard' });
 
     const days = parseInt(req.query.days as string, 10) || 30;
     const cacheKey = `admin:dashboard:${days}`;
@@ -230,6 +231,28 @@ router.get('/analytics', verifyRole(['admin']), async (req, res) => {
     registrations: registrationsData,
     totalIntents: days <= 30 ? 12700 : 21800
   });
+});
+
+// GET /api/admin/audit-logs - Get admin audit logs
+router.get('/audit-logs', verifyRole(['admin']), async (req, res) => {
+  try {
+    const supabase = getSupabase();
+    const { data, error } = await supabase
+      .from('audit_logs')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(100);
+
+    if (error) {
+      console.warn("Could not fetch audit logs from DB (it might not be provisioned yet):", error.message);
+      return res.json({ success: true, data: [] });
+    }
+
+    return res.json({ success: true, data });
+  } catch (err: any) {
+    console.error("Error GET /api/admin/audit-logs:", err);
+    return res.status(500).json({ error: err.message });
+  }
 });
 
 export default router;

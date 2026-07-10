@@ -65,13 +65,15 @@ const Login = () => {
   };
 
   const onSubmit = async (data: LoginForm) => {
-    // Bypass captcha check if token is empty
-    const tokenToUse = captchaToken || 'dummy-token';
+    if (!captchaToken) {
+      setAuthError('Veuillez valider le captcha pour continuer.');
+      return;
+    }
     setIsLoading(true);
     setAuthError('');
     
     try {
-      await login(data.email, data.password, tokenToUse);
+      await login(data.email, data.password, captchaToken);
       if (data.email.toLowerCase().includes('admin')) {
         navigate('/extranet');
       } else {

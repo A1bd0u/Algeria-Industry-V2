@@ -548,3 +548,21 @@ VALUES
 ('0dbd837c-3be4-491f-a7c2-ca2753a10217', 'Catalogue Électronique 2026', 'Découvrez nos derniers produits et services pour l''industrie Électronique.', 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf', '4ca3e6b6-f311-4d20-b404-125d875df22b'),
 ('e3cae6ee-433a-4302-a505-8812d494b69c', 'Catalogue Plasturgie 2026', 'Découvrez nos derniers produits et services pour l''industrie Plasturgie.', 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf', '7f63e1f5-1799-4f0d-a3e3-c8ee6f82aef7');
 
+
+-- Create audit_logs table for administrative logging
+CREATE TABLE IF NOT EXISTS public.audit_logs (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    admin_id UUID REFERENCES public.users(id) ON DELETE SET NULL,
+    admin_email TEXT,
+    action TEXT NOT NULL,
+    ip_address TEXT,
+    details JSONB NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Enable RLS and create policy
+ALTER TABLE public.audit_logs ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Full access to backend" ON public.audit_logs;
+CREATE POLICY "Full access to backend" ON public.audit_logs FOR ALL USING (true);
+
+
