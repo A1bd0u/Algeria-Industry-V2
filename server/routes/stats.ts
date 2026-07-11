@@ -1,3 +1,4 @@
+import { logger } from '../utils/logger';
 import express from 'express';
 import { getSupabase } from '../db/supabaseClient';
 import { requireAuth } from '../middlewares/authMiddleware';
@@ -105,7 +106,7 @@ router.get('/dashboard', requireAuth, async (req, res) => {
         }
     });
   } catch (err: any) {
-    console.error("Stats Error:", err);
+    logger.error("Stats Error:", err);
     return res.status(500).json({ error: "Erreur lors du calcul des statistiques" });
   }
 });
@@ -159,7 +160,7 @@ router.get('/admin', requireAuth, async (req, res) => {
         tenders: ads // keeping key as tenders so UI doesn't break
     });
   } catch (err: any) {
-    console.error("Stats Admin Error:", err);
+    logger.error("Stats Admin Error:", err);
     return res.status(500).json({ error: "Erreur lors du calcul des statistiques admin" });
   }
 });

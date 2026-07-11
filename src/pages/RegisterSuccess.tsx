@@ -94,7 +94,7 @@ const RegisterSuccess = () => {
                           {step.desc}
                         </p>
                       </div>
-                      <ArrowRight className="h-4 w-4 text-gray-300 group-hover:text-secondary group-hover:translate-x-1 transition-all" />
+                      <ArrowRight className="h-4 w-4 text-gray-300 group-hover:text-secondary group-hover:translate-x-1 transition-all rtl:rotate-180" />
                     </div>
                   </Link>
                 ))}
@@ -105,7 +105,7 @@ const RegisterSuccess = () => {
                   <span className="text-xs font-black uppercase tracking-widest">
                     {i18n.language === 'ar' ? 'الانتقال إلى لوحة التحكم' : 'Aller au Tableau de Bord'}
                   </span>
-                  <ArrowRight className="h-4 w-4" />
+                  <ArrowRight className="h-4 w-4 rtl:rotate-180" />
                 </Link>
                 
                 <Link to="/" className="text-center text-[10px] font-black text-gray-400 uppercase tracking-widest hover:text-primary transition-colors">

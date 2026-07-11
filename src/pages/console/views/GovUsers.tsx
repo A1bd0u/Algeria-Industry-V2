@@ -1,5 +1,6 @@
 /* eslint-disable */
 import React, { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '../../../lib/utils';
 import { 
@@ -389,14 +390,14 @@ export default function GovUsers({ state }: { state: any }) {
                 disabled={page === 1}
                 className="p-2 rounded-xl bg-white border border-gray-100 text-gray-400 disabled:opacity-50 hover:text-primary hover:border-gray-200 transition-all"
               >
-                <ChevronLeft className="h-4 w-4" />
+                <ChevronLeft className="h-4 w-4 rtl:rotate-180" />
               </button>
               <button
                 onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                 disabled={page === totalPages}
                 className="p-2 rounded-xl bg-white border border-gray-100 text-gray-400 disabled:opacity-50 hover:text-primary hover:border-gray-200 transition-all"
               >
-                <ChevronRight className="h-4 w-4" />
+                <ChevronRight className="h-4 w-4 rtl:rotate-180" />
               </button>
             </div>
           </div>

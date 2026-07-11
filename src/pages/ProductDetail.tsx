@@ -15,14 +15,17 @@ import {
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ProductDetailSkeleton } from '../components/Skeleton';
 import { Product as IProduct, useComparison } from '../context/ComparisonContext';
 import { useCurrency } from '../context/CurrencyContext';
 import { useAuth } from '../context/AuthContext';
 import { cn, extractIdFromSlug } from '../lib/utils';
+import axios from 'axios';
 
 const ProductDetail = () => {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = React.useState('description');
   const { id: slugId } = useParams();
   const id = extractIdFromSlug(slugId);
@@ -33,9 +36,10 @@ const ProductDetail = () => {
   const [isLoading, setIsLoading] = useState(true);
   const { isAuthenticated } = useAuth();
   const [product, setProduct] = useState<any>(null);
+  const [similarProducts, setSimilarProducts] = useState<any[]>([]);
   const [favoriteId, setFavoriteId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  
   const [showReport, setShowReport] = useState(false);
   const [reportReason, setReportReason] = useState("");
 
@@ -49,12 +53,8 @@ const ProductDetail = () => {
        return;
     }
     try {
-      const res = await fetch(`/api/products/${id}/report`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reason: reportReason })
-      });
-      if (res.ok) {
+      const res = await axios.post(`/api/products/${id}/report`, { reason: reportReason });
+      if (res.status === 200) {
         alert("Le produit a été signalé avec succès. Merci.");
         setShowReport(false);
         setReportReason("");
@@ -70,10 +70,9 @@ const ProductDetail = () => {
     const fetchFavoriteStatus = async () => {
       if (!isAuthenticated || !id) return;
       try {
-        const res = await fetch('/api/favorites');
-        if (res.ok) {
-          const data = await res.json();
-          const fav = data.find((f: any) => f.item_id === id);
+        const res = await axios.get('/api/favorites');
+        if (res.status === 200) {
+          const fav = res.data.find((f: any) => f.item_id === id);
           if (fav) setFavoriteId(fav.id);
         }
       } catch (err) {
@@ -84,35 +83,17 @@ const ProductDetail = () => {
     const fetchProduct = async () => {
       try {
         setIsLoading(true);
-        // We'll mock the rest since there's no /api/products/:id explicitly defined
-        const res = await fetch('/api/products');
-        if (res.ok) {
-           const data = await res.json();
-           const p = data.find((p: any) => p.id === id);
-           if (p) {
-             setProduct({
-               id: p.id,
-               name: p.name,
-               category: p.category || p.cat || 'Équipement',
-               brand: p.brand || p.owner_id || 'Entreprise',
-               company: p.brand || p.owner_id || "Algeria Systems",
-               price: typeof p.price === 'string' ? parseFloat(p.price.replace(/[^0-9.]/g, '') || '0') : (p.price || 850000),
-               rating: 4.8,
-               reviews: 24,
-               stock: 'En Stock',
-               image: p.file_url || p.image || `https://picsum.photos/seed/${p.id}/800/800`,
-               images: [p.file_url || p.image || `https://picsum.photos/seed/${p.id}/800/800`, `https://picsum.photos/seed/${p.id}-2/800/800`, `https://picsum.photos/seed/${p.id}-3/800/800`],
-               description: p.description || "Un équipement de haute performance...",
-               features: p.features || ['Précision', 'Fiabilité', 'Facile à intégrer'],
-               specs: {
-                 'Catégorie': p.category || p.cat || 'Standard',
-                 'Région': p.region || 'Alger'
-               }
-             });
-           }
-        }
-      } catch (err) {
+        setError(null);
+        const res = await axios.get(`/api/products/${id}`);
+        setProduct(res.data.product);
+        setSimilarProducts(res.data.similar || []);
+      } catch (err: any) {
         console.error(err);
+        if (err.response && err.response.status === 404) {
+          setError("Produit introuvable");
+        } else {
+          setError("Erreur lors du chargement du produit");
+        }
       } finally {
         setIsLoading(false);
       }
@@ -130,21 +111,20 @@ const ProductDetail = () => {
     
     try {
       if (favoriteId) {
-        await fetch(`/api/favorites/${favoriteId}`, { method: 'DELETE' });
+        await axios.delete(`/api/favorites/${favoriteId}`);
         setFavoriteId(null);
       } else {
-        const res = await fetch('/api/favorites', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ item_type: 'product', item_id: id })
+        const res = await axios.post('/api/favorites', {
+          item_type: 'product',
+          item_id: id
         });
-        if (res.ok) {
-          const data = await res.json();
-          setFavoriteId(data.id);
+        if (res.status === 200 || res.status === 201) {
+          setFavoriteId(res.data.id);
         }
       }
     } catch (e) {
       console.error(e);
+      alert("Erreur lors de l'ajout aux favoris");
     }
   };
 
@@ -159,8 +139,19 @@ const ProductDetail = () => {
     }
   };
 
-  if (isLoading || !product) {
+  if (isLoading) {
     return <ProductDetailSkeleton />;
+  }
+
+  if (error || !product) {
+    return (
+      <div className="min-h-[50vh] flex flex-col items-center justify-center">
+        <h2 className="text-2xl font-bold text-gray-800 mb-4">{error || "Produit introuvable"}</h2>
+        <button onClick={() => navigate('/products')} className="text-primary hover:underline font-medium">
+          Retour aux produits
+        </button>
+      </div>
+    );
   }
 
   return (
@@ -171,7 +162,7 @@ const ProductDetail = () => {
           onClick={() => navigate(-1)}
           className="flex items-center space-x-2 text-gray-500 hover:text-primary transition-colors mb-8 group"
         >
-          <ArrowLeft className="h-5 w-5 group-hover:-translate-x-1 transition-transform" />
+          <ArrowLeft className="h-5 w-5 group-hover:-translate-x-1 transition-transform rtl:rotate-180" />
           <span className="text-xs font-black uppercase tracking-widest">Retour au catalogue</span>
         </button>
 
@@ -276,7 +267,7 @@ const ProductDetail = () => {
                 >
                   <FileText className="h-6 w-6" />
                   <span>DEMANDER UN DEVIS PROFESSIONNEL</span>
-                  <ArrowRight className="h-5 w-5 opacity-0 group-hover:opacity-100 group-hover:translate-x-2 transition-all" />
+                  <ArrowRight className="h-5 w-5 opacity-0 group-hover:opacity-100 group-hover:translate-x-2 transition-all rtl:rotate-180" />
                 </button>
                 <div className="grid grid-cols-2 gap-4">
                   <button 
@@ -380,13 +371,33 @@ const ProductDetail = () => {
           </div>
         </div>
       </div>
-    
-      {/* Report Modal */}
+        {/* Similar Products */}
+        {similarProducts && similarProducts.length > 0 && (
+          <div className="mt-20">
+            <h2 className="text-2xl font-black text-primary mb-8 uppercase tracking-tight">{t('products.similar')}</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {similarProducts.map((p, idx) => (
+                <div key={idx} className="bg-white rounded-3xl p-4 border border-gray-100 shadow-sm hover:shadow-lg transition-all flex flex-col group cursor-pointer" onClick={() => {
+                  navigate(`/product/${p.id}`);
+                  window.scrollTo(0, 0);
+                }}>
+                  <div className="aspect-square bg-gray-50 rounded-2xl mb-4 overflow-hidden relative">
+                    <img src={p.file_url} alt={p.name} className="w-full h-full object-cover transition-transform group-hover:scale-105" />
+                  </div>
+                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{p.companyName}</p>
+                  <h3 className="text-lg font-bold text-primary leading-tight mb-2 flex-1">{p.name}</h3>
+                  <p className="text-xl font-black text-secondary">{formatPrice(typeof p.price === 'string' ? parseFloat(p.price.replace(/[^0-9.]/g, '') || '0') : (p.price || 850000))}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+          {/* Report Modal */}
       {showReport && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <div className="bg-white rounded-3xl w-full max-w-md p-8 shadow-2xl relative">
-            <h3 className="text-xl font-bold text-primary mb-2 flex items-center"><AlertTriangle className="h-5 w-5 text-red-500 me-2" /> Signaler un contenu inapproprié</h3>
-            <p className="text-sm text-gray-500 mb-6">Aidez-nous à garder Algiers Industry sûr. Pourquoi signalez-vous ce produit ?</p>
+            <h3 className="text-xl font-bold text-primary mb-2 flex items-center"><AlertTriangle className="h-5 w-5 text-red-500 me-2" />{t('products.report')}</h3>
+            <p className="text-sm text-gray-500 mb-6">{t('products.report_desc')}</p>
             <textarea
               value={reportReason}
               onChange={(e) => setReportReason(e.target.value)}
@@ -394,8 +405,8 @@ const ProductDetail = () => {
               className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-red-500 focus:ring-2 focus:ring-red-500/20 text-sm outline-none transition-all resize-none h-32 mb-6"
             ></textarea>
             <div className="flex space-x-3">
-              <button onClick={() => setShowReport(false)} className="flex-1 bg-gray-100 text-gray-700 py-3 rounded-xl font-bold hover:bg-gray-200 transition-colors">Annuler</button>
-              <button onClick={handleReport} className="flex-1 bg-red-600 text-white py-3 rounded-xl font-bold hover:bg-red-700 transition-colors">Envoyer le signalement</button>
+              <button onClick={() => setShowReport(false)} className="flex-1 bg-gray-100 text-gray-700 py-3 rounded-xl font-bold hover:bg-gray-200 transition-colors">{t('products.cancel')}</button>
+              <button onClick={handleReport} className="flex-1 bg-red-600 text-white py-3 rounded-xl font-bold hover:bg-red-700 transition-colors">{t('products.send_report')}</button>
             </div>
           </div>
         </div>

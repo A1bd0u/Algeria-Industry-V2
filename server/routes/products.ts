@@ -1,6 +1,7 @@
+import { logger } from '../utils/logger';
 import express from 'express';
 import { getSupabase } from '../db/supabaseClient';
-import { requireAuth, verifyRole } from '../middlewares/authMiddleware';
+import { requireAuth, verifyRole, requireVerified } from '../middlewares/authMiddleware';
 import { generateReferenceId } from '../utils/reference';
 import { z } from 'zod';
 import { validate } from '../middlewares/validateMiddleware';
@@ -29,23 +30,40 @@ const reportSchema = z.object({
 // GET /api/products - Liste des produits
 router.get('/', async (req, res) => {
   try {
+    const page = parseInt(req.query.page as string) || 1;
+    let limit = parseInt(req.query.limit as string) || 12;
+    if (limit > 50) limit = 50;
+    const from = (page - 1) * limit;
+    const to = from + limit - 1;
+
     const supabase = getSupabase();
-    const { data: products, error } = await supabase
-      .from('products')
-      .select('*');
+    let query = supabase.from('products').select('*', { count: 'exact' });
+
+    if (req.query.category && req.query.category !== 'Tous') {
+      query = query.eq('category', req.query.category);
+    }
+    if (req.query.search) {
+      query = query.ilike('name', `%${req.query.search}%`);
+    }
+
+    const { data: products, count, error } = await query.range(from, to).order('created_at', { ascending: false });
 
     if (error) throw error;
     
-    // Add default image if no file_url exists and format data for frontend consistency
     const formattedProducts = products?.map(p => ({
       ...p,
       file_url: p.file_url || `https://picsum.photos/seed/${p.id}/600/400`,
       color: p.status === 'Actif' ? 'text-success' : 'text-gray-400'
     }));
 
-    return res.json(formattedProducts || []);
+    return res.json({
+      data: formattedProducts || [],
+      total: count || 0,
+      page,
+      totalPages: Math.ceil((count || 0) / limit)
+    });
   } catch (err: any) {
-    console.error("Supabase Error GET /products:", err);
+    logger.error("Supabase Error GET /products:", err);
     return res.status(500).json({ error: err.message });
   }
 });
@@ -70,13 +88,95 @@ router.get('/my', requireAuth, async (req, res) => {
 
     return res.json(formattedProducts || []);
   } catch (err: any) {
-    console.error("Supabase Error GET /products/my:", err);
+    logger.error("Supabase Error GET /products/my:", err);
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// GET /api/products/:id - Récupérer un produit
+router.get('/:id', async (req, res) => {
+  try {
+    const supabase = getSupabase();
+    
+    // Check if the id is a valid UUID, otherwise it might fail depending on Supabase version
+    const { data: product, error } = await supabase
+      .from('products')
+      .select(`
+        *,
+        owner:users!owner_id(name, company, company_id, companies:company_id(name, status))
+      `)
+      .eq('id', req.params.id)
+      .maybeSingle();
+
+    if (error || !product) {
+      // Fallback simple fetch just in case the join fails
+      const { data: simpleProduct, error: simpleErr } = await supabase
+        .from('products')
+        .select('*')
+        .eq('id', req.params.id)
+        .maybeSingle();
+
+      if (simpleErr || !simpleProduct) {
+        return res.status(404).json({ error: "Produit non trouvé" });
+      }
+      Object.assign(product || {}, simpleProduct);
+    }
+
+    // Format data for frontend consistency
+    const file_url = product.file_url || `https://picsum.photos/seed/${product.id}/600/400`;
+    
+    let companyName = "Entreprise non spécifiée";
+    if (product.owner?.companies?.name) companyName = product.owner.companies.name;
+    else if (product.owner?.company) companyName = product.owner.company;
+    else if (product.owner?.name) companyName = product.owner.name;
+
+    const formattedProduct = {
+      ...product,
+      file_url,
+      images: [
+        file_url,
+        `https://picsum.photos/seed/${product.id}-2/800/800`,
+        `https://picsum.photos/seed/${product.id}-3/800/800`
+      ],
+      companyName,
+      color: product.status === 'Actif' ? 'text-success' : 'text-gray-400',
+      priceValue: typeof product.price === 'string' ? parseFloat(product.price.replace(/[^0-9.]/g, '') || '0') : (product.price || 850000),
+      features: product.features || ['Précision', 'Fiabilité', 'Facile à intégrer'],
+      specs: {
+        'Catégorie': product.category || 'Standard',
+        'Région': 'Alger',
+        'Référence': product.reference_id || 'N/A'
+      }
+    };
+
+    // Obtenir les produits similaires
+    const { data: similarProducts } = await supabase
+      .from('products')
+      .select('*')
+      .eq('category', product.category || "Non catégorisé")
+      .neq('id', product.id)
+      .limit(4);
+
+    const formattedSimilar = similarProducts?.map(p => {
+      const pUrl = p.file_url || `https://picsum.photos/seed/${p.id}/600/400`;
+      return {
+        ...p,
+        file_url: pUrl,
+        image: pUrl,
+        companyName: "Autre entreprise", // Mock fallback
+        color: p.status === 'Actif' ? 'text-success' : 'text-gray-400'
+      };
+    }) || [];
+
+    return res.json({ product: formattedProduct, similar: formattedSimilar });
+  } catch (err: any) {
+    logger.error("Supabase Error GET /products/:id:", err);
     return res.status(500).json({ error: err.message });
   }
 });
 
 // POST /api/products - Créer un produit
-router.post('/', verifyRole(['fournisseur', 'admin']), validate(productSchema), async (req, res) => {
+router.post('/', verifyRole(['fournisseur', 'admin']), requireVerified, validate(productSchema), async (req, res) => {
   const { name, category, price, description, file_url, status } = req.body;
   const user = (req as any).user;
 
@@ -101,7 +201,7 @@ router.post('/', verifyRole(['fournisseur', 'admin']), validate(productSchema), 
     };
     return res.status(201).json(responseData);
   } catch (err: any) {
-    console.error("Supabase Error POST /products:", err);
+    logger.error("Supabase Error POST /products:", err);
     return res.status(500).json({ error: err.message });
   }
 });
@@ -146,7 +246,7 @@ router.put('/:id', verifyRole(['fournisseur', 'admin']), validate(productSchema)
     };
     return res.json(responseData);
   } catch (err: any) {
-    console.error("Supabase Error PUT /products/:id:", err);
+    logger.error("Supabase Error PUT /products/:id:", err);
     return res.status(500).json({ error: err.message });
   }
 });
@@ -180,7 +280,7 @@ router.delete('/:id', verifyRole(['fournisseur', 'admin']), async (req, res) => 
     
     return res.json({ success: true, message: "Product deleted" });
   } catch (err: any) {
-    console.error("Supabase Error DELETE /products/:id:", err);
+    logger.error("Supabase Error DELETE /products/:id:", err);
     return res.status(500).json({ error: err.message });
   }
 });
@@ -200,7 +300,7 @@ router.put('/:id/status', verifyRole(['admin']), validate(statusSchema), async (
     if (error) throw error;
     return res.json(data);
   } catch (err: any) {
-    console.error("Error PUT /products/:id/status:", err);
+    logger.error("Error PUT /products/:id/status:", err);
     return res.status(500).json({ error: err.message });
   }
 });
@@ -234,7 +334,7 @@ router.post('/:id/report', requireAuth, validate(reportSchema), async (req, res)
     if (error) throw error;
     return res.json({ success: true, message: 'Produit signalé' });
   } catch (err: any) {
-    console.error("Error POST /products/:id/report:", err);
+    logger.error("Error POST /products/:id/report:", err);
     return res.status(500).json({ error: err.message });
   }
 });

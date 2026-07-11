@@ -42,7 +42,7 @@ const Compare = () => {
               onClick={() => navigate(-1)}
               className="flex items-center space-x-2 text-gray-400 hover:text-primary mb-4 transition-colors"
             >
-              <ArrowLeft className="h-4 w-4" />
+              <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
               <span className="text-[10px] font-black uppercase tracking-widest">Continuer le sourcing</span>
             </button>
             <h1 className="text-4xl font-black text-primary uppercase tracking-tighter italic">

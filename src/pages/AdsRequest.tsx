@@ -73,7 +73,7 @@ const AdsRequest = () => {
         >
           <div className="inline-flex items-center space-x-2 bg-secondary/10 text-secondary px-4 py-2 rounded-full mb-6">
             <Megaphone className="h-5 w-5" />
-            <span className="font-bold text-sm uppercase tracking-widest">Espace Publicitaire</span>
+            <span className="font-bold text-sm uppercase tracking-widest">{t('ads.title')}</span>
           </div>
           <h1 className="text-4xl md:text-5xl font-black text-primary uppercase tracking-tighter mb-6">
             Boostez Votre Visibilité
@@ -94,7 +94,7 @@ const AdsRequest = () => {
               <div className="w-20 h-20 bg-success/10 rounded-full flex items-center justify-center mx-auto mb-6">
                 <CheckCircle2 className="h-10 w-10 text-success" />
               </div>
-              <h3 className="text-2xl font-black text-primary mb-4">Demande Envoyée !</h3>
+              <h3 className="text-2xl font-black text-primary mb-4">{t('ads.success')}</h3>
               <p className="text-gray-600 mb-8 max-w-md mx-auto">
                 Notre équipe commerciale a bien reçu votre demande d'espace publicitaire. Nous vous contacterons dans les plus brefs délais.
               </p>
@@ -109,7 +109,7 @@ const AdsRequest = () => {
             <form onSubmit={handleSubmit} className="space-y-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-gray-500 uppercase">Nom de l'entreprise *</label>
+                  <label className="text-xs font-bold text-gray-500 uppercase">{t('ads.company_name')}</label>
                   <div className="relative">
                     <Building className="absolute start-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                     <input 
@@ -125,7 +125,7 @@ const AdsRequest = () => {
                 </div>
                 
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-gray-500 uppercase">Contact *</label>
+                  <label className="text-xs font-bold text-gray-500 uppercase">{t('ads.contact')}</label>
                   <div className="relative">
                     <User className="absolute start-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                     <input 
@@ -141,7 +141,7 @@ const AdsRequest = () => {
                 </div>
                 
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-gray-500 uppercase">Email Pro *</label>
+                  <label className="text-xs font-bold text-gray-500 uppercase">{t('ads.email')}</label>
                   <div className="relative">
                     <Mail className="absolute start-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                     <input 
@@ -157,7 +157,7 @@ const AdsRequest = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-gray-500 uppercase">Téléphone *</label>
+                  <label className="text-xs font-bold text-gray-500 uppercase">{t('ads.phone')}</label>
                   <div className="relative">
                     <Phone className="absolute start-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                     <input 
@@ -174,7 +174,7 @@ const AdsRequest = () => {
               </div>
 
               <div className="space-y-4">
-                <label className="text-xs font-bold text-gray-500 uppercase">Emplacement Souhaité *</label>
+                <label className="text-xs font-bold text-gray-500 uppercase">{t('ads.placement')}</label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {adPlacements.map((placement) => (
                     <label 
@@ -208,7 +208,7 @@ const AdsRequest = () => {
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-bold text-gray-500 uppercase">Détails de la campagne (Optionnel)</label>
+                <label className="text-xs font-bold text-gray-500 uppercase">{t('ads.details')}</label>
                 <textarea 
                   name="message"
                   value={formData.message}
@@ -220,7 +220,7 @@ const AdsRequest = () => {
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-bold text-gray-500 uppercase">Uploader votre design (Image)</label>
+                <label className="text-xs font-bold text-gray-500 uppercase">{t('ads.upload_design')}</label>
                 {!formData.designFile ? (
                   <div className="relative group">
                     <input 
@@ -233,8 +233,8 @@ const AdsRequest = () => {
                       <div className="h-12 w-12 bg-white rounded-full flex items-center justify-center shadow-sm mb-3 group-hover:scale-110 transition-transform">
                         <Upload className="h-6 w-6 text-primary" />
                       </div>
-                      <p className="font-bold text-gray-900 mb-1">Cliquez ou glissez votre image ici</p>
-                      <p className="text-xs text-gray-500">Formats acceptés: JPG, PNG, WEBP (Max 5MB)</p>
+                      <p className="font-bold text-gray-900 mb-1">{t('ads.click_drop')}</p>
+                      <p className="text-xs text-gray-500">{t('ads.formats')}</p>
                     </div>
                   </div>
                 ) : (
@@ -262,7 +262,7 @@ const AdsRequest = () => {
               {status === 'error' && (
                 <div className="bg-red-50 text-red-600 p-4 rounded-xl flex items-start space-x-3 text-sm">
                   <AlertCircle className="h-5 w-5 shrink-0 mt-0.5" />
-                  <p>Une erreur est survenue lors de l'envoi. Veuillez réessayer plus tard.</p>
+                  <p>{t('ads.error_send')}</p>
                 </div>
               )}
 
@@ -276,7 +276,7 @@ const AdsRequest = () => {
                 ) : (
                   <>
                     <Megaphone className="h-5 w-5" />
-                    <span>Envoyer la Demande</span>
+                    <span>{t('ads.send_request')}</span>
                   </>
                 )}
               </button>
@@ -288,7 +288,7 @@ const AdsRequest = () => {
         <div className="mt-12 bg-white/50 border border-gray-200/50 p-6 rounded-2xl flex items-start space-x-4">
            <Info className="h-6 w-6 text-primary shrink-0 mt-1" />
            <div>
-             <h4 className="font-bold text-primary mb-2">Pourquoi annoncer sur Algeria Industry ?</h4>
+             <h4 className="font-bold text-primary mb-2">{t('ads.why_advertise')}</h4>
              <p className="text-sm text-gray-600 leading-relaxed">
                Notre plateforme regroupe la plus grande communauté de professionnels de l'industrie en Algérie. En diffusant vos bannières sur nos espaces, vous touchez directement les décideurs (acheteurs, fournisseurs, investisseurs).
              </p>

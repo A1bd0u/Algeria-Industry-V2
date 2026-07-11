@@ -104,7 +104,7 @@ const ResetPassword = () => {
               
               <Link to="/login" className="w-full btn-primary py-4 rounded-xl flex items-center justify-center space-x-2 shadow-lg">
                 <span>Aller à la connexion</span>
-                <ArrowRight className="h-5 w-5" />
+                <ArrowRight className="h-5 w-5 rtl:rotate-180" />
               </Link>
             </motion.div>
           ) : (
@@ -166,7 +166,7 @@ const ResetPassword = () => {
                 ) : (
                   <>
                     <span>Mettre à jour</span>
-                    <ArrowRight className="h-5 w-5" />
+                    <ArrowRight className="h-5 w-5 rtl:rotate-180" />
                   </>
                 )}
               </button>

@@ -1,3 +1,4 @@
+import { logger } from '../utils/logger';
 import express from 'express';
 import { getSupabase } from '../db/supabaseClient';
 import { verifyRole } from '../middlewares/authMiddleware';
@@ -35,7 +36,7 @@ router.get('/', verifyRole(['admin']), async (req, res) => {
 
     return res.json(formattedUsers);
   } catch (err: any) {
-    console.error("Error GET /api/users:", err);
+    logger.error("Error GET /api/users:", err);
     return res.status(500).json({ error: err.message });
   }
 });
@@ -75,7 +76,7 @@ router.put('/:id/role', verifyRole(['admin']), async (req, res) => {
     
     return res.json({ success: true, message: 'Rôle mis à jour' });
   } catch (err: any) {
-    console.error("Error PUT /api/users/:id/role:", err);
+    logger.error("Error PUT /api/users/:id/role:", err);
     return res.status(500).json({ error: err.message });
   }
 });
@@ -138,7 +139,7 @@ router.put('/:id/status', verifyRole(['admin']), async (req, res) => {
     
     return res.json({ success: true, message: action === 'suspend' ? 'Compte suspendu' : 'Compte réactivé' });
   } catch (err: any) {
-    console.error("Error PUT /api/users/:id/status:", err);
+    logger.error("Error PUT /api/users/:id/status:", err);
     return res.status(500).json({ error: err.message });
   }
 });
@@ -165,7 +166,7 @@ router.get('/:id/details', verifyRole(['admin']), async (req, res) => {
       messages: messagesRes.data || [],
     });
   } catch (err: any) {
-    console.error("Error GET /api/users/:id/details:", err);
+    logger.error("Error GET /api/users/:id/details:", err);
     return res.status(500).json({ error: err.message });
   }
 });
@@ -203,7 +204,7 @@ router.delete('/:id', verifyRole(['admin']), async (req, res) => {
 
     const { error: authError } = await supabase.auth.admin.deleteUser(id);
     if (authError) {
-      console.error("Auth user delete error:", authError);
+      logger.error("Auth user delete error:", authError);
     }
 
     await logAdminAction(req, 'user_delete', {
@@ -215,7 +216,7 @@ router.delete('/:id', verifyRole(['admin']), async (req, res) => {
 
     return res.json({ success: true, message: 'Utilisateur supprimé avec succès' });
   } catch (err: any) {
-    console.error("Error DELETE /api/users/:id:", err);
+    logger.error("Error DELETE /api/users/:id:", err);
     return res.status(500).json({ error: err.message });
   }
 });

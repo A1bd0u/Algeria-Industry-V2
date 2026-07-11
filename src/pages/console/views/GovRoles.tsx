@@ -10,12 +10,22 @@ import {
   PackagePlus, Plus, Search, SlidersHorizontal, ArrowUpDown, Settings, 
   ShieldCheck, Trash, Trash2, TrendingUp, Users, X, Zap, Store
 } from 'lucide-react';
-import { 
-  LineChart, Line, AreaChart, Area, BarChart, CartesianGrid, 
-  ResponsiveContainer, Tooltip, XAxis, YAxis 
-} from 'recharts';
+import { useQuery } from '@tanstack/react-query';
 
 export default function GovRoles({ state }: { state: any }) {
+  
+  const { data: rolesData = [], isLoading } = useQuery({
+    queryKey: ['admin-roles'],
+    queryFn: async () => {
+      const res = await fetch('/api/admin/roles', {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      });
+      if (!res.ok) throw new Error('Failed to fetch');
+      const json = await res.json();
+      return json.data || [];
+    }
+  });
+
   const {
     activeTab, setActiveTab, chartTimeframe, setChartTimeframe, showArticleForm, setShowArticleForm,
     exhibitors, setExhibitors, showExhibitorForm, setShowExhibitorForm, pendingKYC, setPendingKYC,
@@ -44,12 +54,9 @@ export default function GovRoles({ state }: { state: any }) {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-               {[
-                 { role: 'Super Admin', users: 2, access: 'Total', color: 'bg-primary' },
-                 { role: 'Modérateur Content', users: 5, access: 'Catalogue & Articles', color: 'bg-emerald-500' },
-                 { role: 'Agent Support', users: 3, access: 'Tickets & Messages', color: 'bg-blue-500' },
-                 { role: 'Analyste Data', users: 1, access: 'Indicateurs & Stats', color: 'bg-orange-500' },
-               ].map((role, i) => (
+               
+               {isLoading ? <p>Chargement...</p> : rolesData.map((role: any, i: number) => (
+
                  <div key={i} className="bg-white p-8 rounded-[40px] border border-gray-100 shadow-sm group hover:border-secondary transition-all">
                     <div className="flex items-center justify-between mb-6">
                        <div className={cn("px-4 py-2 rounded-xl text-[9px] font-black text-white uppercase tracking-widest", role.color)}>{role.role}</div>

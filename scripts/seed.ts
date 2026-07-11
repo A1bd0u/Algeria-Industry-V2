@@ -1,4 +1,10 @@
 import { createClient } from '@supabase/supabase-js';
+if (process.env.NODE_ENV === 'production') {
+  console.error("❌ ERREUR CRITIQUE : L'exécution des seeds (données de test) est strictement interdite en production.");
+  console.error("Ces scripts injectent des comptes administrateurs par défaut (ex: admin123) et des données factices qui compromettent la sécurité du système.");
+  process.exit(1);
+}
+
 import dotenv from 'dotenv';
 import fs from 'fs';
 import path from 'path';

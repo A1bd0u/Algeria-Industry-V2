@@ -1,3 +1,4 @@
+import { logger } from '../utils/logger';
 import express from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
@@ -33,7 +34,8 @@ const registerSchema = z.object({
 });
 
 const forgotPasswordSchema = z.object({
-  email: z.string().email('Email invalide')
+  email: z.string().email('Email invalide'),
+  captchaToken: z.string().min(1, 'Captcha requis')
 });
 
 const resetPasswordSchema = z.object({
@@ -47,7 +49,8 @@ const verifyCodeSchema = z.object({
 });
 
 const resendCodeSchema = z.object({
-  email: z.string().email('Email invalide')
+  email: z.string().email('Email invalide'),
+  captchaToken: z.string().min(1, 'Captcha requis')
 });
 
 const JWT_SECRET = process.env.JWT_SECRET || '';
@@ -113,7 +116,13 @@ router.get('/me', async (req, res) => {
 // Verify Captcha helper
 const verifyCaptcha = async (token: string) => {
   const secret = process.env.TURNSTILE_SECRET_KEY;
-  if (!secret) return true; // Skip verification if no secret is set in env
+  if (!secret) {
+    if (process.env.NODE_ENV === 'production') {
+      logger.error('Configuration error: TURNSTILE_SECRET_KEY is missing');
+      return false; // Force verification failure in production if no secret
+    }
+    return true; // Skip verification in dev
+  }
   try {
     const formData = new URLSearchParams();
     formData.append('secret', secret);
@@ -125,7 +134,7 @@ const verifyCaptcha = async (token: string) => {
     const outcome = await result.json();
     return outcome.success;
   } catch (err) {
-    console.error('Captcha verification error:', err);
+    logger.error('Captcha verification error:', err);
     return false;
   }
 };
@@ -144,6 +153,19 @@ router.post('/login', authLimiter, validate(loginSchema), async (req, res) => {
 
   try {
     const supabase = getSupabase();
+    const ipAddress = req.ip || req.socket?.remoteAddress || 'unknown';
+
+    // 1. Verrouillage anti-brute-force avec la table login_attempts
+    const fifteenMinsAgo = new Date(Date.now() - 15 * 60 * 1000).toISOString();
+    const { count } = await supabase
+      .from('login_attempts')
+      .select('*', { count: 'exact', head: true })
+      .eq('email', email)
+      .gte('attempt_time', fifteenMinsAgo);
+
+    if (count !== null && count >= 5) {
+      return res.status(401).json({ error: 'Email ou mot de passe incorrect' });
+    }
     
     // Check if exists
     const { data: dbUser, error } = await supabase
@@ -152,16 +174,31 @@ router.post('/login', authLimiter, validate(loginSchema), async (req, res) => {
       .ilike('email', email)
       .maybeSingle();
 
-    if (!dbUser || error) {
+    const isValid = dbUser ? await bcrypt.compare(password, dbUser.passwordHash || '') : false;
+
+    if (!dbUser || !isValid) {
+      // 2. Enregistrement de la tentative échouée
+      await supabase.from('login_attempts').insert({
+        email,
+        ip_address: ipAddress,
+        attempt_time: new Date().toISOString()
+      });
+
+      // Vérifier si on vient d'atteindre la limite pour alerter
+      const { count: newCount } = await supabase
+        .from('login_attempts')
+        .select('*', { count: 'exact', head: true })
+        .eq('email', email)
+        .gte('attempt_time', fifteenMinsAgo);
+
+      if (newCount === 5) {
+        await sendTransactionalEmail(email, 'securityAlert', { ip: ipAddress });
+      }
+
       return res.status(401).json({ error: 'Email ou mot de passe incorrect' });
     }
 
     const user = normalizeUser(dbUser);
-
-    // Check if account is locked due to brute force
-    if (user.account_locked_until && new Date(user.account_locked_until) > new Date()) {
-      return res.status(401).json({ error: 'Email ou mot de passe incorrect' });
-    }
 
     const { companies, ...userData } = user;
     if (companies && !Array.isArray(companies)) {
@@ -169,35 +206,15 @@ router.post('/login', authLimiter, validate(loginSchema), async (req, res) => {
     } else if (Array.isArray(companies) && companies.length > 0) {
        (userData as any).companyStatus = companies[0].status;
     }
-
     
     if (user.role && user.role.endsWith('_suspended')) {
       return res.status(403).json({ error: 'Ce compte a été suspendu par l\'administrateur.' });
     }
-    const isValid = await bcrypt.compare(password, user.passwordHash || '');
-    if (!isValid) {
-      let attempts = (user.failed_login_attempts || 0) + 1;
-      
-      // Reset attempts if the last failed login was more than 15 minutes ago
-      if (user.last_failed_login_at && (Date.now() - new Date(user.last_failed_login_at).getTime() > 15 * 60 * 1000)) {
-        attempts = 1;
-      }
-      
-      const updates: any = { 
-        failed_login_attempts: attempts,
-        last_failed_login_at: new Date().toISOString()
-      };
-      
-      if (attempts >= 10) {
-        updates.account_locked_until = new Date(Date.now() + 15 * 60 * 1000).toISOString();
-      }
-      
-      await supabase.from('users').update(updates).eq('id', user.id);
-      
-      return res.status(401).json({ error: 'Email ou mot de passe incorrect' });
-    }
 
-    // Reset attempts on successful login
+    // 3. Réinitialisation du compteur après succès
+    await supabase.from('login_attempts').delete().eq('email', email);
+
+    // Legacy fields cleanup (optional but good for consistency)
     if ((user.failed_login_attempts && user.failed_login_attempts > 0) || user.account_locked_until || user.last_failed_login_at) {
       await supabase.from('users').update({ 
         failed_login_attempts: 0, 
@@ -213,22 +230,23 @@ router.post('/login', authLimiter, validate(loginSchema), async (req, res) => {
       company: user.company,
       role: user.role,
       isVerified: Boolean(user.isVerified),
-      emailVerified: Boolean(user.isVerified)
+      emailVerified: Boolean(user.isVerified),
+      token_version: user.token_version || 0
     };
 
-    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '72h' });
+    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
 
     res.cookie('token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      sameSite: 'strict',
       path: '/',
-      maxAge: 72 * 60 * 60 * 1000
+      maxAge: 7 * 24 * 60 * 60 * 1000
     });
 
     return res.json({ user: { ...payload, companyStatus: (userData as any).companyStatus } });
   } catch (err: any) {
-    console.error("Login Error:", err);
+    logger.error("Login Error:", err);
     return res.status(500).json({ error: 'Internal Server Error' });
   }
 });
@@ -284,7 +302,7 @@ router.post('/register', authLimiter, validate(registerSchema), async (req, res)
       .single();
       
     if (insertError || !newUserRow) {
-      console.error(insertError);
+      logger.error(insertError);
       return res.status(500).json({ error: "Erreur lors de l'inscription dans la base de données: " + (insertError?.message || JSON.stringify(insertError)) });
     }
 
@@ -310,10 +328,10 @@ router.post('/register', authLimiter, validate(registerSchema), async (req, res)
           // Link user to the new company 
           await supabase.from('users').update({ company_id: companyRow.id }).eq('id', newUserRow.id);
         } else {
-          console.error("Erreur création company: ", companyError);
+          logger.error("Erreur création company: ", companyError);
         }
       } catch (err) {
-        console.error("KYC Generation Error: ", err);
+        logger.error("KYC Generation Error: ", err);
       }
     }
 
@@ -341,33 +359,39 @@ router.post('/register', authLimiter, validate(registerSchema), async (req, res)
         company: newUserRow.company,
         role: newUserRow.role,
         isVerified: false,
-        emailVerified: false
+        emailVerified: false,
+        token_version: newUserRow.token_version || 0
     };
 
     const token = jwt.sign(
       payload,
       JWT_SECRET,
-      { expiresIn: '72h' }
+      { expiresIn: '7d' }
     );
 
     res.cookie('token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      sameSite: 'strict',
       path: '/',
-      maxAge: 72 * 60 * 60 * 1000
+      maxAge: 7 * 24 * 60 * 60 * 1000
     });
 
     return res.json({ success: true, user: payload, message: "Inscription réussie avec Supabase" });
   } catch (err: any) {
-    console.error("Register Error:", err);
+    logger.error("Register Error:", err);
     return res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
 // API - Auth - Forgot Password
 router.post('/forgot-password', validate(forgotPasswordSchema), async (req, res) => {
-  const { email } = req.body;
+  const { email, captchaToken } = req.body;
+
+  const isCaptchaValid = await verifyCaptcha(captchaToken);
+  if (!isCaptchaValid) {
+    return res.status(400).json({ error: 'Validation captcha échouée' });
+  }
 
   if (!email) {
     return res.status(400).json({ error: 'Veuillez fournir une adresse email' });
@@ -401,7 +425,7 @@ router.post('/forgot-password', validate(forgotPasswordSchema), async (req, res)
       });
 
     if (insertError) {
-      console.error("Error inserting reset token:", insertError);
+      logger.error("Error inserting reset token:", insertError);
       return res.status(500).json({ error: 'Erreur lors de la génération du lien de réinitialisation' });
     }
 
@@ -415,7 +439,7 @@ router.post('/forgot-password', validate(forgotPasswordSchema), async (req, res)
 
     return res.json({ success: true, message: 'Si cette adresse existe, un email a été envoyé.' });
   } catch (err: any) {
-    console.error("Forgot Password Error:", err);
+    logger.error("Forgot Password Error:", err);
     return res.status(500).json({ error: 'Erreur interne du serveur' });
   }
 });
@@ -452,14 +476,18 @@ router.post('/reset-password', validate(resetPasswordSchema), async (req, res) =
     const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(newPassword, salt);
 
-    // Update user password
+    // Fetch current token_version
+    const { data: userRecord } = await supabase.from('users').select('token_version').eq('id', resetRecord.user_id).maybeSingle();
+    const nextVersion = (userRecord?.token_version || 0) + 1;
+
+    // Update user password and token_version
     const { error: updateError } = await supabase
       .from('users')
-      .update({ passwordHash: passwordHash })
+      .update({ passwordHash: passwordHash, token_version: nextVersion })
       .eq('id', resetRecord.user_id);
 
     if (updateError) {
-      console.error("Error updating user password:", updateError);
+      logger.error("Error updating user password:", updateError);
       return res.status(500).json({ error: 'Erreur lors de la mise à jour du mot de passe.' });
     }
 
@@ -473,17 +501,33 @@ router.post('/reset-password', validate(resetPasswordSchema), async (req, res) =
 
     return res.json({ success: true, message: 'Votre mot de passe a été réinitialisé avec succès.' });
   } catch (err: any) {
-    console.error("Reset Password Error:", err);
+    logger.error("Reset Password Error:", err);
     return res.status(500).json({ error: 'Erreur interne du serveur' });
   }
 });
 
 // API - Auth - Logout
-router.post('/logout', (req, res) => {
+router.post('/logout', async (req, res) => {
+  const token = req.cookies?.token;
+  if (token) {
+    try {
+      const decoded = jwt.verify(token, JWT_SECRET, { ignoreExpiration: true }) as any;
+      if (decoded?.id) {
+        const supabase = getSupabase();
+        const { data: user } = await supabase.from('users').select('token_version').eq('id', decoded.id).maybeSingle();
+        if (user) {
+          await supabase.from('users').update({ token_version: (user.token_version || 0) + 1 }).eq('id', decoded.id);
+        }
+      }
+    } catch(err) {
+      logger.error("Logout token invalidation error", err);
+    }
+  }
+
   res.clearCookie('token', {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
+    sameSite: 'strict',
     path: '/'
   });
   return res.json({ success: true, message: 'Déconnexion réussie' });
@@ -552,17 +596,18 @@ router.get(['/oauth/callback/:provider', '/oauth/callback/:provider/'], async (r
         email: `user@${provider}.com`,
         company: 'N/A',
         role: 'acheteur',
-        isVerified: true
+        isVerified: true,
+        token_version: 0
     };
 
-    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '72h' });
+    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
 
     res.cookie('token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      sameSite: 'strict',
       path: '/',
-      maxAge: 72 * 60 * 60 * 1000
+      maxAge: 7 * 24 * 60 * 60 * 1000
     });
 
     res.send(`
@@ -635,16 +680,16 @@ router.post('/verify-code', validate(verifyCodeSchema), async (req, res) => {
       delete decoded.exp;
       decoded.emailVerified = true;
       decoded.isVerified = true;
-      const newToken = jwt.sign(decoded, JWT_SECRET, { expiresIn: '72h' });
+      const newToken = jwt.sign(decoded, JWT_SECRET, { expiresIn: '7d' });
       res.cookie('token', newToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
+        sameSite: 'strict',
         path: '/',
-        maxAge: 72 * 60 * 60 * 1000
+        maxAge: 7 * 24 * 60 * 60 * 1000
       });
     } catch (e) {
-      console.error("Erreur mise à jour token:", e);
+      logger.error("Erreur mise à jour token:", e);
     }
   }
 
@@ -653,7 +698,13 @@ router.post('/verify-code', validate(verifyCodeSchema), async (req, res) => {
 
 // API - Auth - Resend Code
 router.post('/resend-code', validate(resendCodeSchema), async (req, res) => {
-  const { email } = req.body;
+  const { email, captchaToken } = req.body;
+
+  const isCaptchaValid = await verifyCaptcha(captchaToken);
+  if (!isCaptchaValid) {
+    return res.status(400).json({ error: 'Validation captcha échouée' });
+  }
+
   if (!email) {
     return res.status(400).json({ error: 'Email requis' });
   }

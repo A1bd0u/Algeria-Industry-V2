@@ -131,7 +131,7 @@ const HelpWidget = () => {
                           </p>
                           <p className="text-xs font-bold text-primary font-mono">{option.value}</p>
                         </div>
-                        <ArrowRight className="h-4 w-4 text-gray-300" />
+                        <ArrowRight className="h-4 w-4 text-gray-300 rtl:rotate-180" />
                       </a>
                     ))}
                   </div>

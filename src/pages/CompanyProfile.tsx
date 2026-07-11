@@ -25,6 +25,7 @@ import { useAuth } from '../context/AuthContext';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { ProfileSkeleton } from '../components/Skeleton';
 import { cn, generateSlugUrl, extractIdFromSlug } from '../lib/utils';
+import SEO from '../components/SEO';
 
 const CompanyProfile = () => {
   const { id: slugId } = useParams();
@@ -292,6 +293,28 @@ const CompanyProfile = () => {
     : (company?.rating || '4.5');
 
   return (
+    <>
+      {company && (
+        <SEO 
+          title={company.name} 
+          description={company.description}
+          url={`https://votre-domaine.dz/directory/${generateSlugUrl(company.name, company.id)}`}
+          image={company.logo}
+          structuredData={{
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            "name": company.name,
+            "description": company.description,
+            "logo": company.logo,
+            "url": `https://votre-domaine.dz/directory/${generateSlugUrl(company.name, company.id)}`,
+            "address": {
+              "@type": "PostalAddress",
+              "addressLocality": company.region || company.address?.split(',')[1] || "Algérie",
+              "addressCountry": "DZ"
+            }
+          }}
+        />
+      )}
     <div className="bg-neutral-bg min-h-screen pb-20 pt-2 md:pt-3">
       <div className="w-full max-w-none px-4 sm:px-8 md:px-12 lg:px-16 relative z-10">
         
@@ -544,7 +567,7 @@ const CompanyProfile = () => {
                             <p className="text-xs text-gray-400 font-bold mt-2">Sur devis</p>
                           )}
                         </div>
-                        <ChevronRight className="h-5 w-5 text-gray-200 group-hover:text-primary transition-colors absolute end-4 top-1/2 -translate-y-1/2" />
+                        <ChevronRight className="h-5 w-5 text-gray-200 group-hover:text-primary transition-colors absolute end-4 top-1/2 -translate-y-1/2 rtl:rotate-180" />
                       </Link>
                     ))
                   )}
@@ -643,7 +666,7 @@ const CompanyProfile = () => {
                             </div>
                             <span className="text-[11px] font-bold text-primary group-hover:text-secondary transition-colors inline-flex items-center gap-1">
                               <span>Lire la suite</span>
-                              <ChevronRight className="h-3.5 w-3.5" />
+                              <ChevronRight className="h-3.5 w-3.5 rtl:rotate-180" />
                             </span>
                           </div>
                         </Link>
@@ -923,6 +946,7 @@ const CompanyProfile = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

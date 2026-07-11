@@ -1,9 +1,13 @@
 import { Award, Building2, ChevronRight, ExternalLink, Filter, List, Map as MapIcon, MapPin, Search } from 'lucide-react';
 import { motion } from 'motion/react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { AlertTriangle, RefreshCw } from 'lucide-react';
+
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { cn } from '../lib/utils';
+import SEO from '../components/SEO';
 
 // No mock data needed anymore, using API
 
@@ -14,59 +18,41 @@ import { CompanySkeleton } from '../components/Skeleton';
 const Directory = () => {
   const { t, i18n } = useTranslation();
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
-  const [isLoading, setIsLoading] = useState(true);
   const [isCertifiedOnly, setIsCertifiedOnly] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSectors, setSelectedSectors] = useState<string[]>([]);
   const [selectedRegion, setSelectedRegion] = useState<string>(t('common.all'));
 
-  const [companies, setCompanies] = useState<any[]>([]);
-  const [error, setError] = useState('');
 
-  useEffect(() => {
-    const fetchCompanies = async () => {
-      try {
-        setIsLoading(true);
-        const params = new URLSearchParams();
-        if (isCertifiedOnly) params.append('certified', 'true');
-        if (selectedRegion !== t('common.all') && selectedRegion) params.append('region', selectedRegion);
-        if (selectedSectors.length > 0) params.append('sectors', selectedSectors.join(','));
-        
-        const res = await fetch(`/api/companies?${params.toString()}`).catch(() => null);
-        let data = [];
-        
-        if (res && res.ok) {
-           data = await res.json();
-        }
-        
-        const formattedData = data.map((c: any) => ({
-          ...c,
-          id: c.id,
-          name: c.name,
-          sector: c.activity_sector || "Non spécifié",
-          region: c.region || "Alger",
-          coordinates: { x: Math.floor(Math.random() * 40) + 30, y: Math.floor(Math.random() * 40) + 10 },
-          description: c.description || "Aucune description",
-          certified: c.certified || false,
-          logo: `https://picsum.photos/seed/${c.id}/100/100`,
-          employees: "50-100",
-          founded: "2020"
-        }));
-        
-        setCompanies(formattedData);
-      } catch (err: any) {
-        setError(err.message);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    const timeoutId = setTimeout(() => {
-      fetchCompanies();
-    }, 300);
-    
-    return () => clearTimeout(timeoutId);
-  }, [searchQuery, isCertifiedOnly, selectedRegion, selectedSectors, t]);
+
+  const { data: companies = [], isLoading, isError, refetch } = useQuery({
+    queryKey: ['companies', isCertifiedOnly, selectedRegion, selectedSectors],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      if (isCertifiedOnly) params.append('certified', 'true');
+      if (selectedRegion !== t('common.all') && selectedRegion) params.append('region', selectedRegion);
+      if (selectedSectors.length > 0) params.append('sectors', selectedSectors.join(','));
+      
+      const res = await fetch(`/api/companies?${params.toString()}`);
+      if (!res.ok) throw new Error('Failed to fetch companies');
+      const result = await res.json();
+      const data = result.data || result;
+      
+      return data.map((c: any) => ({
+        ...c,
+        id: c.id,
+        name: c.name,
+        sector: c.activity_sector || "Non spécifié",
+        region: c.region || "Alger",
+        coordinates: { x: Math.floor(Math.random() * 40) + 30, y: Math.floor(Math.random() * 40) + 10 },
+        description: c.description || "Aucune description",
+        certified: c.certified || false,
+        logo: `https://picsum.photos/seed/${c.id}/100/100`,
+        employees: "50-100",
+        founded: "2020"
+      }));
+    }
+  });
 
   const sectors = [t('categories.agrifood'), t('categories.btph'), t('categories.chemistry'), t('categories.energy'), t('categories.pharma'), t('categories.metallurgy'), t('categories.plastics'), t('categories.textile'), t('categories.electronics'), t('categories.auto'), t('categories.renewable')];
   const regions = ["Alger", "Oran", "Constantine", "Béjaïa", "Sétif", "Bordj Bou Arreridj"];
@@ -103,6 +89,12 @@ const Directory = () => {
   });
 
   return (
+    <>
+      <SEO 
+        title={t('directory.title')} 
+        description={t('directory.subtitle')}
+        url="https://votre-domaine.dz/directory"
+      />
     <div className={cn("bg-neutral-bg min-h-screen pb-20", i18n.language === 'ar' && "font-arabic")}>
       {/* Header Section */}
       <div className="bg-white border-b border-border-tech py-12">
@@ -272,9 +264,12 @@ const Directory = () => {
               <div className="grid grid-cols-1 gap-6">
                 {[...Array(5)].map((_, i) => <CompanySkeleton key={i} />)}
               </div>
-            ) : error ? (
-              <div className="bg-red-50 text-red-500 p-8 border border-red-100 font-bold max-w-md float-left">
-                {error}
+            ) : isError ? (
+              <div className="bg-red-50 p-8 border border-red-100 max-w-md float-left text-center flex flex-col items-center justify-center">
+                <AlertTriangle className="w-8 h-8 text-red-500 mb-4" />
+                <h3 className="text-red-700 font-bold mb-2">{t('common.error')}</h3>
+                <p className="text-red-500 mb-4 text-sm">{t('common.error_desc')}</p>
+                <button onClick={() => refetch()} className="btn-primary py-2 px-4 flex items-center justify-center space-x-2"><RefreshCw className="w-4 h-4" /><span>{t('common.retry')}</span></button>
               </div>
             ) : filteredCompanies.length > 0 ? (
               viewMode === 'list' ? (
@@ -414,11 +409,23 @@ const Directory = () => {
                   </div>
                 </div>
               )
-            ) : null}
+            ) : (
+              <div className="bg-gray-50 border border-gray-100 p-12 text-center rounded-2xl flex flex-col items-center">
+                <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mb-4">
+                  <Search className="w-8 h-8 text-gray-400" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">{t("common.no_results", "Aucun résultat trouvé")}</h3>
+                <p className="text-gray-500 mb-6">{t("common.no_results_desc", "Veuillez modifier vos critères de recherche.")}</p>
+                <button onClick={() => { setSearchQuery(""); setSelectedSectors([]); setSelectedRegion(t("common.all")); setIsCertifiedOnly(false); }} className="btn-primary py-2 px-6">
+                  {t("common.clear_filters", "Effacer les filtres")}
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
     </div>
+    </>
   );
 };
 

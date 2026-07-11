@@ -1,10 +1,11 @@
+import { logger } from '../utils/logger';
 import express from 'express';
 import { getSupabase } from '../db/supabaseClient';
 import { z } from 'zod';
 import { validate } from '../middlewares/validateMiddleware';
 
 import { generateReferenceId } from '../utils/reference';
-import { requireAuth } from '../middlewares/authMiddleware';
+import { requireAuth, requireVerified } from '../middlewares/authMiddleware';
 
 const router = express.Router();
 
@@ -21,9 +22,15 @@ const companySchema = z.object({
 // GET /api/companies - Liste toutes les entreprises (pour l'annuaire)
 router.get('/', async (req, res) => {
   try {
+    const page = parseInt(req.query.page as string) || 1;
+    let limit = parseInt(req.query.limit as string) || 12;
+    if (limit > 50) limit = 50;
+    const from = (page - 1) * limit;
+    const to = from + limit - 1;
+
     const supabase = getSupabase();
     
-    let query = supabase.from('companies').select('*');
+    let query = supabase.from('companies').select('*', { count: 'exact' });
     const { search, region, sectors, certified } = req.query;
 
     if (search && typeof search === 'string') {
@@ -39,23 +46,43 @@ router.get('/', async (req, res) => {
       query = query.eq('status', 'approved');
     }
 
-    const { data: companies, error } = await query;
+    const { data: companies, count, error } = await query.range(from, to).order('created_at', { ascending: false });
 
     if (error) {
       throw error;
     }
     
     let result = companies || [];
+    let totalCount = count || 0;
     
     // Fallback in-memory filter for region if the column doesn't exist on schema
     // assuming it might be stored in address or doesn't exist
+    // Note: If in-memory filter is applied, total count might be inaccurate for pagination.
     if (region && typeof region === 'string') {
-       result = result.filter(c => (c.region === region) || (c.address && c.address.includes(region)));
+       const { data: allCompanies } = await supabase.from('companies').select('*');
+       if (allCompanies) {
+         let allFiltered = allCompanies;
+         if (search && typeof search === 'string') allFiltered = allFiltered.filter(c => c.name?.toLowerCase().includes(search.toLowerCase()));
+         if (sectors && typeof sectors === 'string') {
+           const sList = sectors.split(',');
+           allFiltered = allFiltered.filter(c => sList.includes(c.activity_sector));
+         }
+         if (certified === 'true') allFiltered = allFiltered.filter(c => c.status === 'approved');
+         
+         result = allFiltered.filter(c => (c.region === region) || (c.address && c.address.includes(region)));
+         totalCount = result.length;
+         result = result.slice(from, to + 1);
+       }
     }
 
-    return res.json(result);
+    return res.json({
+      data: result,
+      total: totalCount,
+      page,
+      totalPages: Math.ceil(totalCount / limit)
+    });
   } catch (err: any) {
-    console.error("Supabase Error GET /companies:", err);
+    logger.error("Supabase Error GET /companies:", err);
     return res.status(500).json({ error: err.message });
   }
 });
@@ -97,17 +124,18 @@ router.get('/:id', async (req, res) => {
        // Invalid UUID
        return res.status(404).json({ error: "Invalid ID format" });
     }
-    console.error("Supabase Error GET /companies/:id:", err);
+    logger.error("Supabase Error GET /companies/:id:", err);
     return res.status(500).json({ error: err.message });
   }
 });
 
 // POST /api/companies - Créer ou mettre à jour le profil entreprise
-router.post('/', validate(companySchema), async (req, res) => {
-  const { name, nif, rc, description, activity_sector, owner_id } = req.body;
+router.post('/', requireAuth, validate(companySchema), async (req, res) => {
+  const { name, nif, rc, description, activity_sector } = req.body;
+  const owner_id = (req as any).user.id;
 
-  if (!name || !owner_id) {
-    return res.status(400).json({ error: "Le nom et l'ID du propriétaire sont obligatoires." });
+  if (!name) {
+    return res.status(400).json({ error: "Le nom de l'entreprise est obligatoire." });
   }
 
   try {
@@ -121,16 +149,8 @@ router.post('/', validate(companySchema), async (req, res) => {
       .maybeSingle();
 
     if (existing) {
-      // Update
-      const { data, error } = await supabase
-        .from('companies')
-        .update({ name, nif, rc, description, activity_sector })
-        .eq('id', existing.id)
-        .select()
-        .single();
-        
-      if (error) throw error;
-      return res.json(data);
+      // Return 409 Conflict if the user already has a company
+      return res.status(409).json({ error: "Vous possédez déjà une entreprise." });
     } else {
       // Insert
       const reference_id = generateReferenceId('CMP');
@@ -179,7 +199,7 @@ router.put('/:id', requireAuth, validate(companySchema), async (req, res) => {
     if (error) throw error;
     return res.json(data);
   } catch (err: any) {
-    console.error("Supabase Error PUT /companies/:id:", err);
+    logger.error("Supabase Error PUT /companies/:id:", err);
     return res.status(500).json({ error: "Erreur lors de la modification de l'entreprise." });
   }
 });
@@ -211,7 +231,7 @@ router.delete('/:id', requireAuth, async (req, res) => {
     if (error) throw error;
     return res.json({ success: true, message: "Entreprise supprimée" });
   } catch (err: any) {
-    console.error("Supabase Error DELETE /companies/:id:", err);
+    logger.error("Supabase Error DELETE /companies/:id:", err);
     return res.status(500).json({ error: "Erreur lors de la suppression de l'entreprise." });
   }
 });
@@ -251,13 +271,13 @@ router.get('/:id/reviews', async (req, res) => {
 
     return res.json(companyReviews);
   } catch (err: any) {
-    console.error("Error GET /companies/:id/reviews:", err);
+    logger.error("Error GET /companies/:id/reviews:", err);
     return res.status(500).json({ error: "Erreur lors de la récupération des avis." });
   }
 });
 
 // POST /api/companies/:id/reviews - Ajouter un avis sur une entreprise
-router.post('/:id/reviews', requireAuth, async (req, res) => {
+router.post('/:id/reviews', requireAuth, requireVerified, async (req, res) => {
   const user = (req as any).user;
   const companyId = req.params.id;
   const { rating, comment } = req.body;
@@ -298,7 +318,7 @@ router.post('/:id/reviews', requireAuth, async (req, res) => {
 
     return res.status(201).json(formatted);
   } catch (err: any) {
-    console.error("Error POST /companies/:id/reviews:", err);
+    logger.error("Error POST /companies/:id/reviews:", err);
     return res.status(500).json({ error: "Erreur lors de la publication de l'avis." });
   }
 });

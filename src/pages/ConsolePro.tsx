@@ -91,7 +91,8 @@ const ConsolePro = () => {
 ]);
         
         if (resProducts.ok) {
-          const data = await resProducts.json();
+          let data = await resProducts.json();
+          if (data && data.data) data = data.data;
           // Map backend data to match ConsolePro expectations
           const mapped = data.map((p: any) => ({
              id: p.id,

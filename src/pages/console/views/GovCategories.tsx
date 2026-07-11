@@ -1,5 +1,6 @@
 /* eslint-disable */
 import React from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '../../../lib/utils';
 import { 
@@ -16,6 +17,14 @@ import {
 } from 'recharts';
 
 export default function GovCategories({ state }: { state: any }) {
+  const { data: viewData = [], isLoading } = useQuery({
+          queryKey: ['admin-GovCategories'],
+          queryFn: async () => {
+            const res = await fetch('/api/admin/categories', { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }});
+            const json = await res.json();
+            return json.data || [];
+          }
+        });
   const {
     activeTab, setActiveTab, chartTimeframe, setChartTimeframe, showArticleForm, setShowArticleForm,
     exhibitors, setExhibitors, showExhibitorForm, setShowExhibitorForm, pendingKYC, setPendingKYC,
@@ -39,7 +48,7 @@ export default function GovCategories({ state }: { state: any }) {
                     <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Gérer le nom et les sous-catégories</p>
                  </div>
                  <button onClick={() => setSelectedCategory(null)} className="text-gray-400 hover:text-primary transition-all px-4 py-2 font-bold text-[10px] uppercase flex items-center space-x-2">
-                    <ArrowRight className="h-4 w-4 rotate-180" />
+                    <ArrowRight className="h-4 w-4 rotate-180 rtl:rotate-180" />
                     <span>Retour aux catégories</span>
                  </button>
                </div>

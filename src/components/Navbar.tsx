@@ -274,7 +274,7 @@ const Navbar = () => {
                               <item.icon className="h-4 w-4 text-white/20 group-hover:text-secondary transition-colors" />
                               <span className={cn(i18n.language === 'ar' && "me-3 ms-0")}>{item.label}</span>
                             </div>
-                            <ChevronRight className="h-3 w-3 text-white/5 group-hover:text-secondary transition-all group-hover:translate-x-1" />
+                            <ChevronRight className="h-3 w-3 text-white/5 group-hover:text-secondary transition-all group-hover:translate-x-1 rtl:rotate-180" />
                           </Link>
                         ))}
                       </div>
@@ -316,7 +316,9 @@ const Navbar = () => {
           <div className="md:hidden flex items-center space-x-4">
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="text-white hover:text-secondary focus:outline-none p-2 bg-white/5 rounded-lg"
+              aria-expanded={isOpen}
+              aria-label={isOpen ? "Fermer le menu" : "Ouvrir le menu"}
+              className="text-white hover:text-secondary focus:outline-none p-3 bg-white/5 rounded-lg min-h-[44px] min-w-[44px] flex items-center justify-center"
             >
               {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>

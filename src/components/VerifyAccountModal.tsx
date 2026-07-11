@@ -2,14 +2,18 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Mail, ArrowRight, RefreshCw, Smartphone } from 'lucide-react';
 import { motion } from 'motion/react';
+import { Turnstile } from '@marsidev/react-turnstile';
 
 export default function VerifyAccountModal() {
   const { user, verifyCode, resendCode, logout } = useAuth();
   const [code, setCode] = useState('');
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
   const [resendMessage, setResendMessage] = useState('');
+
+  const turnstileSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY;
 
   if (!user || user.emailVerified) return null;
 
@@ -27,11 +31,15 @@ export default function VerifyAccountModal() {
   };
 
   const handleResend = async () => {
+    if (!captchaToken) {
+      setError('Veuillez valider le captcha pour renvoyer le code.');
+      return;
+    }
     setResendMessage('');
     setError('');
     setResendLoading(true);
     try {
-      await resendCode(user.email);
+      await resendCode(user.email, captchaToken);
       setResendMessage('Un nouveau code a été envoyé ! (Vérifiez la console ou simulez la réception)');
     } catch (err: any) {
       setError(err.message || "Erreur lors de l'envoi.");
@@ -41,7 +49,10 @@ export default function VerifyAccountModal() {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-primary/90 backdrop-blur-sm p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-primary/90 backdrop-blur-sm p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Vérification de compte">
       <motion.div 
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -77,8 +88,9 @@ export default function VerifyAccountModal() {
 
            <form onSubmit={handleSubmit} className="space-y-6">
              <div className="space-y-2">
-                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Code de vérification</label>
+                <label htmlFor="code_input" className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Code de vérification</label>
                 <input 
+                  id="code_input"
                   type="text" 
                   maxLength={6}
                   value={code}
@@ -98,27 +110,42 @@ export default function VerifyAccountModal() {
                   <span className="text-xs font-black uppercase tracking-widest flex items-center">
                     {loading ? 'Vérification...' : 'Confirmer mon compte'}
                   </span>
-                  {!loading && <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />}
+                  {!loading && <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform rtl:rotate-180" />}
                 </button>
              </div>
            </form>
 
-           <div className="flex items-center justify-between pt-6 border-t border-gray-100">
-             <button 
-               onClick={handleResend} 
-               disabled={resendLoading}
-               className="text-[10px] font-black text-secondary hover:text-primary uppercase tracking-widest flex items-center transition-colors disabled:opacity-50"
-             >
-               <RefreshCw className={`h-3 w-3 me-2 ${resendLoading ? 'animate-spin' : ''}`} />
-               {resendLoading ? 'Envoi...' : 'Renvoyer le code'}
-             </button>
+           <div className="flex flex-col space-y-4 pt-6 border-t border-gray-100">
+             <div className="flex justify-center">
+                {turnstileSiteKey ? (
+                  <Turnstile
+                    siteKey={turnstileSiteKey}
+                    onSuccess={(token) => setCaptchaToken(token)}
+                    onError={() => setCaptchaToken(null)}
+                    onExpire={() => setCaptchaToken(null)}
+                  />
+                ) : (
+                  <p className="text-red-500 text-[10px] font-bold">Erreur de configuration : VITE_TURNSTILE_SITE_KEY manquant</p>
+                )}
+             </div>
 
-             <button 
-               onClick={logout} 
-               className="text-[10px] font-black text-gray-400 hover:text-primary uppercase tracking-widest transition-colors"
-             >
-               Se déconnecter
-             </button>
+             <div className="flex items-center justify-between">
+               <button 
+                 onClick={handleResend} 
+                 disabled={resendLoading}
+                 className="text-[10px] font-black text-secondary hover:text-primary uppercase tracking-widest flex items-center transition-colors disabled:opacity-50"
+               >
+                 <RefreshCw className={`h-3 w-3 me-2 ${resendLoading ? 'animate-spin' : ''}`} />
+                 {resendLoading ? 'Envoi...' : 'Renvoyer le code'}
+               </button>
+
+               <button 
+                 onClick={logout} 
+                 className="text-[10px] font-black text-gray-400 hover:text-primary uppercase tracking-widest transition-colors"
+               >
+                 Se déconnecter
+               </button>
+             </div>
            </div>
         </div>
       </motion.div>

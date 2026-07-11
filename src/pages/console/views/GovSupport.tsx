@@ -1,5 +1,6 @@
 /* eslint-disable */
 import React from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '../../../lib/utils';
 import { 
@@ -16,6 +17,14 @@ import {
 } from 'recharts';
 
 export default function GovSupport({ state }: { state: any }) {
+  const { data: viewData = [], isLoading } = useQuery({
+          queryKey: ['admin-GovSupport'],
+          queryFn: async () => {
+            const res = await fetch('/api/admin/support/tickets', { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }});
+            const json = await res.json();
+            return json.data || [];
+          }
+        });
   const {
     activeTab, setActiveTab, chartTimeframe, setChartTimeframe, showArticleForm, setShowArticleForm,
     exhibitors, setExhibitors, showExhibitorForm, setShowExhibitorForm, pendingKYC, setPendingKYC,
@@ -62,7 +71,7 @@ export default function GovSupport({ state }: { state: any }) {
                             "px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest",
                             ticket.status === 'Nouveau' ? "bg-secondary text-white shadow-lg" : "bg-primary text-white"
                           )}>{ticket.status}</span>
-                          <button className="p-3 bg-white text-gray-400 rounded-xl hover:text-primary transition-all shadow-sm" onClick={(e) => { e.preventDefault(); alert("Fonctionnalité en cours de développement"); }}><ChevronRight className="h-4 w-4" /></button>
+                          <button className="p-3 bg-white text-gray-400 rounded-xl hover:text-primary transition-all shadow-sm" onClick={(e) => { e.preventDefault(); alert("Fonctionnalité en cours de développement"); }}><ChevronRight className="h-4 w-4 rtl:rotate-180" /></button>
                        </div>
                     </div>
                   ))}

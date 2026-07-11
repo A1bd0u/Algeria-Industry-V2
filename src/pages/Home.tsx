@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { Skeleton } from '../components/Skeleton';
 import { useCurrency } from '../context/CurrencyContext';
 import { cn, generateSlugUrl } from '../lib/utils';
+import SEO from '../components/SEO';
 
 const PARTNERS = [
   { name: "Sonatrach", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Sonatrach_Logo.svg/1200px-Sonatrach_Logo.svg.png" },
@@ -39,7 +40,7 @@ const Home = () => {
         ];
 
         if (prodRes && prodRes.ok) {
-          try { pData = await prodRes.json(); } catch(e){}
+          try { const res = await prodRes.json(); pData = res.data || res; } catch(e){}
         }
 
         setProducts(pData.slice(0, 8));
@@ -57,6 +58,23 @@ const Home = () => {
   };
   
   return (
+    <>
+      <SEO 
+        title={t('nav.home', 'Accueil')} 
+        description="Le 1er portail B2B de l'industrie en Algérie. Découvrez les entreprises, les produits, et les appels d'offres."
+        url="https://votre-domaine.dz/"
+        structuredData={{
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          "name": "Algiers Industry",
+          "url": "https://votre-domaine.dz/",
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://votre-domaine.dz/search?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
+        }}
+      />
     <div className={cn("flex flex-col min-h-screen", i18n.language === 'ar' && "font-arabic")}>
       {/* Stats Section (Technical Dashboard Style) */}
       <section className="py-12 bg-white border-b border-border-tech">
@@ -349,6 +367,7 @@ const Home = () => {
         </div>
       </section>
     </div>
+    </>
   );
 };
 

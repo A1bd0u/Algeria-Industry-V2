@@ -1,9 +1,9 @@
 import {
   AlertCircle,
   ArrowRight,
-  ChevronDown,
+  ChevronDown, ChevronLeft, ChevronRight,
   Grid, List as ListIcon,
-  Package,
+  Package, Box,
   Search,
   ShieldCheck,
   SlidersHorizontal,
@@ -14,22 +14,40 @@ import {
 import { motion } from 'motion/react';
 import { productCategories } from '../data/productCategories';
 import React, { useEffect, useState, useRef } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { RefreshCw } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { ProductSkeleton } from '../components/Skeleton';
 import { useAuth } from '../context/AuthContext';
 import { cn, generateSlugUrl } from '../lib/utils';
 import AddProduct from './AddProduct';
+import SEO from '../components/SEO';
 
 const Products = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [activePage, setActivePage] = React.useState(1);
+  const activePage = parseInt(searchParams.get('page') || '1');
   const [showAddModal, setShowAddModal] = React.useState(false);
   const { t, i18n } = useTranslation();
   const [view, setView] = useState<'grid' | 'list'>('grid');
-  const [activeCategory, setActiveCategory] = useState('Tous');
+  const activeCategory = searchParams.get('category') || 'Tous';
+  const setActiveCategory = (c: string) => {
+    const p = new URLSearchParams(searchParams);
+    if (c === 'Tous') p.delete('category');
+    else p.set('category', c);
+    p.delete('page');
+    setSearchParams(p);
+  };
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchInput, setSearchInput] = useState(searchParams.get('search') || '');
+  const searchQuery = searchParams.get('search') || '';
+  const setSearchQuery = (s: string) => {
+    const p = new URLSearchParams(searchParams);
+    if (!s) p.delete('search');
+    else p.set('search', s);
+    p.delete('page');
+    setSearchParams(p);
+  };
   const [selectedRegion, setSelectedRegion] = useState('Toutes les wilayas');
   const [isRegionOpen, setIsRegionOpen] = useState(false);
 
@@ -72,13 +90,9 @@ const Products = () => {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
-  const [products, setProducts] = useState<any[]>([]);
   const [favorites, setFavorites] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState('');
 
   const categories = ['Tous'];
-  const regionsList = ["Toutes les wilayas", ...Array.from(new Set(products.map(p => p.region).filter(Boolean)))];
 
   const fetchFavorites = async () => {
     if (!isAuthenticated) return;
@@ -93,42 +107,51 @@ const Products = () => {
     }
   };
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        setIsLoading(true);
-        const res = await fetch('/api/products');
-        
-        if (!res.ok) {
-           throw new Error('Erreur lors du chargement des produits');
-        }
-        
-        let data = await res.json();
-        
-        // Formatter les données pour le catalogue complet
-        data = data.map((p: any) => ({ 
-           id: p.id, 
-           reference_id: p.reference_id, 
-           name: p.name, 
-           brand: p.company_name || 'Marque Standard',  // Si tu as une jointure
-           price: p.price, 
-           category: p.category || 'Non catégorisé', 
-           region: p.region || 'Alger',  // À ajouter dans ta table si besoin
-           image: p.file_url || p.image_url || `https://picsum.photos/seed/${p.id}/600/400`, 
-           features: p.features || ['Produit de qualité'], 
-           verified: p.verified || false, 
-           owner_id: p.owner_id || p.company_id
-        }));
 
-        setProducts(data);
-      } catch (err: any) {
-        setError(err.message);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    fetchProducts();
+
+  const { data: productsData = { data: [], totalItems: 0, totalPages: 1 }, isLoading, isError, refetch } = useQuery({
+    queryKey: ['products', searchParams.toString()],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      const page = searchParams.get('page') || '1';
+      params.append('page', page);
+      params.append('limit', '12');
+      if (searchParams.get('search')) params.append('search', searchParams.get('search')!);
+      if (searchParams.get('category')) params.append('category', searchParams.get('category')!);
+      if (searchParams.get('companyId')) params.append('company_id', searchParams.get('companyId')!);
+      
+      const res = await fetch(`/api/products?${params.toString()}`);
+      if (!res.ok) throw new Error('Erreur lors du chargement des produits');
+      
+      let result = await res.json();
+      const formattedData = (result.data || []).map((p: any) => ({
+          id: p.id,
+          reference_id: p.reference_id,
+          name: p.name,
+          brand: p.company_name || 'Marque Standard',
+          price: p.price,
+          category: p.category || 'Non catégorisé',
+          region: p.region || 'Alger',
+          image: p.file_url || p.image_url || `https://picsum.photos/seed/${p.id}/600/400`,
+          features: p.features || ['Produit de qualité'],
+          verified: p.verified || false,
+          owner_id: p.owner_id || p.company_id
+      }));
+      return {
+        data: formattedData,
+        totalItems: result.total || 0,
+        totalPages: result.totalPages || 1
+      };
+    }
+  });
+  
+  const products = productsData.data;
+  const regionsList = ["Toutes les wilayas", ...Array.from(new Set(products.map((p: any) => p.region).filter(Boolean)))];
+  const totalPages = productsData.totalPages;
+  const totalItems = productsData.totalItems;
+
+
+  useEffect(() => {
     fetchFavorites();
   }, [isAuthenticated]);
 
@@ -182,11 +205,16 @@ const Products = () => {
 
   return (
     <React.Fragment>
+      <SEO 
+        title={companyNameParam ? `Produits de ${companyNameParam}` : t('products.equipment_catalog')} 
+        description={t('products.hero_desc')}
+        url="https://votre-domaine.dz/products"
+      />
             <AddProduct 
          isOpen={showAddModal} 
          onClose={() => setShowAddModal(false)} 
          onSuccess={(prod) => {
-            setProducts([prod, ...products]);
+            refetch();
          }}
       />
       
@@ -200,7 +228,7 @@ const Products = () => {
               animate={{ opacity: 1, x: 0 }}
               className="flex items-center space-x-2 text-secondary mb-4"
             >
-              <Package className="h-4 w-4" />
+              <Box className="h-4 w-4" />
               <span className="text-[10px] font-black uppercase tracking-[0.4em]">{t('products.sourcing')}</span>
             </motion.div>
             {companyNameParam && (
@@ -225,7 +253,7 @@ const Products = () => {
               )}
             </h1>
             <p className="text-gray-500 font-medium max-w-lg">
-              Explorez les meilleures technologies industrielles disponibles en Algérie. Comparez, demandez des devis et connectez-vous aux fournisseurs.
+              {t('products.hero_desc')}
             </p>
           </div>
 
@@ -356,7 +384,7 @@ const Products = () => {
             <div className="bg-primary rounded-2xl p-8 text-white relative overflow-hidden">
               <Zap className="absolute -end-4 -bottom-4 w-24 h-24 text-white/10" />
               <h4 className="text-xl font-black mb-4 leading-tight uppercase">{t('products.sell_machines')}</h4>
-              <p className="text-white/60 text-[10px] font-medium mb-6 uppercase tracking-widest">Rejoignez 500+ fournisseurs en Algérie</p>
+              <p className="text-white/60 text-[10px] font-medium mb-6 uppercase tracking-widest">{t('products.join_suppliers')}</p>
               <button onClick={() => setShowAddModal(true)} className="w-full py-4 bg-secondary rounded-xl text-xs font-black uppercase tracking-widest shadow-xl hover:scale-105 transition-all text-center block text-white">{t('products.add_product')}</button>
             </div>
           </aside>
@@ -368,11 +396,16 @@ const Products = () => {
               <input 
                 type="text"
                 placeholder="Rechercher une machine, une marque..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    setSearchQuery(searchInput);
+                  }
+                }}
                 className="flex-1 bg-transparent px-4 py-3 text-sm font-medium focus:outline-none"
               />
-              <button className="px-6 py-3 bg-primary rounded-xl text-[10px] font-black uppercase tracking-widest text-white hover:bg-secondary transition-all" onClick={(e) => { e.preventDefault(); alert("Fonctionnalité en cours de développement"); }}>
+              <button className="px-6 py-3 bg-primary rounded-xl text-[10px] font-black uppercase tracking-widest text-white hover:bg-secondary transition-all" onClick={(e) => { e.preventDefault(); setSearchQuery(searchInput); }}>
                 Rechercher
               </button>
             </div>
@@ -386,14 +419,14 @@ const Products = () => {
                   <ProductSkeleton key={i} view={view} />
                 ))}
               </div>
-            ) : error ? (
+            ) : isError ? (
               <div className="bg-red-50 text-red-500 p-8 border border-red-100 font-bold flex items-center mb-8">
                  <AlertCircle className="h-6 w-6 me-3" />
-                 {error}
+                 <div className="bg-red-50 p-8 border border-red-100 max-w-md mx-auto text-center flex flex-col items-center justify-center"><AlertCircle className="w-8 h-8 text-red-500 mb-4" /><h3 className="text-red-700 font-bold mb-2">{t('common.error')}</h3><p className="text-red-500 mb-4 text-sm">{t('common.error_desc')}</p><button onClick={() => refetch()} className="btn-primary py-2 px-4 flex items-center justify-center space-x-2"><RefreshCw className="w-4 h-4" /><span>{t('common.retry')}</span></button></div>
               </div>
             ) : filteredProducts.length === 0 ? (
                <div className="bg-white p-8 text-center border border-gray-200">
-                  <p className="text-gray-500 font-bold uppercase">Aucun produit trouvé.</p>
+                  <div className="flex flex-col items-center"><Box className="w-12 h-12 text-gray-300 mb-4" /><p className="text-gray-500 font-bold uppercase">{t("products.no_results", "Aucun produit trouvé.")}</p></div>
                </div>
             ) : (
             <div className={cn(
@@ -473,7 +506,7 @@ const Products = () => {
                         <p className="text-lg font-black text-primary uppercase tracking-tighter">{product.price}</p>
                       </div>
                       <Link to={`/products/${generateSlugUrl(product.name, product.id)}`} className="w-12 h-12 rounded-2xl bg-primary text-white flex items-center justify-center hover:bg-secondary transition-all shadow-lg">
-                        <ArrowRight className="h-5 w-5" />
+                        <ArrowRight className="h-5 w-5 rtl:rotate-180" />
                       </Link>
                     </div>
                   </div>
@@ -481,26 +514,61 @@ const Products = () => {
               ))}
             </div>
             )}
-
-            {/* Pagination Placeholder */}
-            <div className="mt-12 flex items-center justify-center space-x-2">
-              {[1, 2, 3].map(page => (
-                 <button 
-                   key={page}
-                   onClick={() => setActivePage(page)}
-                   className={`w-10 h-10 rounded-xl flex items-center justify-center text-xs font-bold transition-all ${activePage === page ? 'bg-primary text-white shadow-lg' : 'border border-gray-100 text-gray-400 hover:border-primary hover:text-primary'}`}
-                 >
-                   {page}
-                 </button>
-              ))}
-              <span className="px-2 text-gray-300">...</span>
-              <button 
-                onClick={() => setActivePage(prev => prev + 1)}
-                className="w-10 h-10 rounded-xl border border-gray-100 flex items-center justify-center text-xs font-bold text-gray-400 hover:border-primary hover:text-primary transition-all"
-              >
-                <ChevronDown className="h-4 w-4 -rotate-90" />
-              </button>
-            </div>
+            
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="mt-12 flex items-center justify-between border-t border-gray-100 pt-8">
+                <button 
+                  disabled={activePage === 1}
+                  onClick={() => {
+                    const p = new URLSearchParams(searchParams);
+                    p.set('page', String(activePage - 1));
+                    setSearchParams(p);
+                    window.scrollTo(0, 0);
+                  }}
+                  className="disabled:opacity-50 flex items-center space-x-2 text-sm font-bold text-gray-500 hover:text-primary transition-colors px-4 py-2 rounded-xl hover:bg-gray-50 border border-transparent hover:border-gray-100"
+                >
+                  <ChevronLeft className="h-4 w-4 rtl:rotate-180" />
+                  <span>{t('products.prev')}</span>
+                </button>
+                
+                <div className="flex space-x-2 overflow-x-auto max-w-[50vw]">
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                    <button 
+                      key={page}
+                      onClick={() => {
+                        const p = new URLSearchParams(searchParams);
+                        p.set('page', String(page));
+                        setSearchParams(p);
+                        window.scrollTo(0, 0);
+                      }}
+                      className={cn(
+                        "min-w-[40px] h-10 px-2 rounded-xl text-sm font-bold flex items-center justify-center transition-all",
+                        page === activePage 
+                          ? "bg-primary text-white shadow-md"
+                          : "text-gray-500 hover:bg-gray-50 hover:text-primary"
+                      )}
+                    >
+                      {page}
+                    </button>
+                  ))}
+                </div>
+                
+                <button 
+                  disabled={activePage === totalPages}
+                  onClick={() => {
+                    const p = new URLSearchParams(searchParams);
+                    p.set('page', String(activePage + 1));
+                    setSearchParams(p);
+                    window.scrollTo(0, 0);
+                  }}
+                  className="disabled:opacity-50 flex items-center space-x-2 text-sm font-bold text-gray-500 hover:text-primary transition-colors px-4 py-2 rounded-xl hover:bg-gray-50 border border-transparent hover:border-gray-100"
+                >
+                  <span>{t('products.next')}</span>
+                  <ChevronRight className="h-4 w-4 rtl:rotate-180" />
+                </button>
+              </div>
+            )}
           </main>
         </div>
       </div>

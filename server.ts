@@ -2,7 +2,32 @@ import express from 'express';
 import path from 'path';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
+import compression from 'compression';
+import * as Sentry from '@sentry/node';
+import { nodeProfilingIntegration } from '@sentry/profiling-node';
 import { apiLimiter } from './server/middlewares/rateLimiter';
+import { errorHandler } from './server/middlewares/errorMiddleware';
+import { logger } from './server/utils/logger';
+import { getSupabase } from './server/db/supabaseClient';
+
+// Initialisation de Sentry
+if (process.env.SENTRY_DSN && process.env.SENTRY_DSN.startsWith('http')) {
+  Sentry.init({
+    dsn: process.env.SENTRY_DSN,
+    integrations: [
+      nodeProfilingIntegration(),
+    ],
+    tracesSampleRate: 1.0,
+    profilesSampleRate: 1.0,
+    beforeSend(event) {
+      if (event.request && event.request.headers) {
+        delete event.request.headers['authorization'];
+        delete event.request.headers['cookie'];
+      }
+      return event;
+    }
+  });
+}
 
 import authRoutes from './server/routes/auth';
 import tenderRoutes from './server/routes/tenders';
@@ -23,11 +48,25 @@ import aiRoutes from './server/routes/ai';
 import adminRoutes from './server/routes/admin';
 import searchRoutes from './server/routes/search';
 
-async function startServer() {
+export async function createApp() {
   const app = express();
-  const PORT = Number(process.env.PORT || 3000);
+  
+  // The request handler must be the first middleware on the app
+  if (process.env.SENTRY_DSN && process.env.SENTRY_DSN.startsWith('http')) {
+    Sentry.setupExpressErrorHandler(app);
+  }
+  
+  // Compression (gzip)
+  app.use(compression());
 
-  // Trust proxy for rate limiting behind reverse proxies (like Cloud Run)
+  // Configuration du trust proxy
+  // 1 = Trust le premier proxy (ex: Cloud Run).
+  // Si vous placez Cloudflare devant :
+  // - Cloudflare offre un WAF (Web Application Firewall) et une protection anti-DDoS.
+  // - Il fait aussi office de CDN pour le cache.
+  // - Assurez-vous que l'application n'est accessible que via Cloudflare (règles de pare-feu)
+  //   auquel cas vous pouvez utiliser `app.set('trust proxy', true)` ou lister les IPs Cloudflare.
+  // - Turnstile s'intègre parfaitement avec Cloudflare (qui gère son backend).
   app.set('trust proxy', 1);
 
   const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || '';
@@ -37,13 +76,10 @@ async function startServer() {
       supabaseDomain = new URL(supabaseUrl).origin;
     }
   } catch (e) {
-    console.error('Invalid Supabase URL for CSP config');
+    logger.error('Invalid Supabase URL for CSP config', e);
   }
 
   // Security HTTP Headers
-  // TODO: Passer cette politique en mode bloquant (retirer reportOnly: true) après une 
-  // période de test en staging, une fois qu'on aura vérifié dans les logs qu'aucune 
-  // ressource légitime n'est bloquée par erreur.
   app.use(helmet({
     contentSecurityPolicy: {
       reportOnly: true,
@@ -51,7 +87,6 @@ async function startServer() {
         defaultSrc: ["'self'"],
         connectSrc: ["'self'", supabaseDomain].filter(Boolean),
         imgSrc: ["'self'", 'data:', 'blob:', supabaseDomain].filter(Boolean),
-        // Les autres directives hériteront de default-src ou des valeurs par défaut strictes de helmet
       }
     },
     crossOriginEmbedderPolicy: false
@@ -60,8 +95,27 @@ async function startServer() {
   // Global Rate Limiting
   app.use('/api', apiLimiter);
 
-  app.use(express.json());
+  // Limiter la taille du payload JSON pour prévenir les attaques d'épuisement de mémoire (ex: 2mb)
+  app.use(express.json({ limit: '2mb' }));
   app.use(cookieParser());
+
+  // Endpoints de supervision (Probes)
+  app.get('/health', (req, res) => {
+    res.json({ status: 'ok', timestamp: new Date().toISOString() });
+  });
+
+  app.get('/ready', async (req, res) => {
+    try {
+      const supabase = getSupabase();
+      // Vérification basique de la connexion à la base de données
+      const { error } = await supabase.from('users').select('id').limit(1);
+      if (error) throw error;
+      res.json({ status: 'ready', database: 'connected' });
+    } catch (err: any) {
+      logger.error('Readiness check failed:', err.message);
+      res.status(503).json({ status: 'not ready', error: 'Database unavailable' });
+    }
+  });
 
   // Mount API Routes
   app.use('/api/auth', authRoutes);
@@ -82,6 +136,17 @@ async function startServer() {
   app.use('/api/ai', aiRoutes);
   app.use('/api/admin', adminRoutes);
   app.use('/api/search', searchRoutes);
+
+  // Error handling middleware should be the last middleware
+  app.use(errorHandler);
+
+  return app;
+}
+
+async function startServer() {
+  const PORT = Number(process.env.PORT || 3000);
+  const app = await createApp();
+
 
   // Serve uploaded files statically
 
@@ -115,16 +180,21 @@ async function startServer() {
   );
 
   if (missingEnvVars.length > 0) {
-    console.error(
-      `\x1b[31m[ERREUR CONFIGURATION] Variables d'environnement requises manquantes ou vides : ${missingEnvVars.join(', ')}\x1b[0m`
-    );
-    console.error("Le serveur ne peut pas démarrer sans ces configurations. Arrêt du processus.");
+    logger.error(`[ERREUR CONFIGURATION] Variables d'environnement requises manquantes ou vides : ${missingEnvVars.join(', ')}`);
+    logger.error("Le serveur ne peut pas démarrer sans ces configurations. Arrêt du processus.");
     process.exit(1);
   }
 
-  app.listen(PORT, '0.0.0.0', () => {
-    console.log(`[SERVEUR PRINCIPAL] Serveur actif sur http://localhost:${PORT}`);
+  const server = app.listen(PORT, '0.0.0.0', () => {
+    logger.info(`[SERVEUR PRINCIPAL] Serveur actif sur http://localhost:${PORT}`);
   });
+
+  // Configuration des timeouts pour prévenir l'épuisement des connexions
+  // Légèrement supérieur au timeout d'un Load Balancer (ex: 60s pour AWS ALB, GCP Cloud Run)
+  server.keepAliveTimeout = 65000;
+  server.headersTimeout = 66000;
 }
 
-startServer();
+if (process.env.NODE_ENV !== 'test') {
+  startServer();
+}

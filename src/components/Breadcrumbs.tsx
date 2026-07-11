@@ -32,7 +32,7 @@ const Breadcrumbs = () => {
 
             return (
               <React.Fragment key={to}>
-                <ChevronRight className="h-3 w-3 text-gray-300 flex-shrink-0" />
+                <ChevronRight className="h-3 w-3 text-gray-300 flex-shrink-0 rtl:rotate-180" />
                 {last ? (
                   <span className="text-[10px] font-black uppercase tracking-widest text-primary px-1">
                     {label}

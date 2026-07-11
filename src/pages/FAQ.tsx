@@ -11,44 +11,23 @@ import { useTranslation } from 'react-i18next';
 import { cn } from '../lib/utils';
 
 const FAQ = () => {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [openIndex, setOpenIndex] = useState<number | null>(0);
   const [search, setSearch] = useState('');
 
   const faqs = [
     {
-      category: 'Général',
+      category: t('faq.cat_general'),
       questions: [
-        { 
-          q: "Comment fonctionne le salon virtuel ?", 
-          a: "Notre salon virtuel utilise une interface immersive 2.5D qui vous permet de naviguer entre différents halls thématiques. Vous pouvez cliquer sur un stand pour voir les machines en détail, télécharger des catalogues et discuter en direct avec les exposants." 
-        },
-        { 
-          q: "Le site est-il gratuit pour les visiteurs ?", 
-          a: "Oui, l'accès au catalogue et la visite du salon virtuel sont totalement gratuits pour tous les professionnels. Une inscription est toutefois nécessaire pour contacter les exposants ou sauvegarder des favoris." 
-        }
+        { q: t('faq.q1'), a: t('faq.a1') },
+        { q: t('faq.q2'), a: t('faq.a2') }
       ]
     },
     {
-      category: 'Exposants',
+      category: t('faq.cat_exhibitor'),
       questions: [
-        { 
-          q: "Comment ajouter mes produits au catalogue ?", 
-          a: "Une fois votre abonnement Premium ou Business activé, rendez-vous dans votre Dashboard section 'Mes Produits'. Vous pourrez y importer vos fiches techniques et photos." 
-        },
-        { 
-          q: "Quelles sont les options de paiement ?", 
-          a: "Nous acceptons les virements bancaires, chèques et bientôt le paiement électronique par CIB/Edahabia pour une activation instantanée des packs." 
-        }
-      ]
-    },
-    {
-      category: 'Sécurité',
-      questions: [
-        { 
-          q: "Comment sont protégées mes données de devis ?", 
-          a: "Toutes les communications entre acheteurs et vendeurs sont cryptées de bout en bout. Seul l'exposant concerné a accès aux détails de votre demande." 
-        }
+        { q: t('faq.q3'), a: t('faq.a3') },
+        { q: t('faq.q4'), a: t('faq.a4') }
       ]
     }
   ];
@@ -71,11 +50,9 @@ const FAQ = () => {
             className="flex items-center justify-center space-x-2 text-secondary mb-4"
           >
             <HelpCircle className="h-4 w-4" />
-            <span className="text-[10px] font-black uppercase tracking-[0.4em]">Support Industriel</span>
+            <span className="text-[10px] font-black uppercase tracking-[0.4em]">{t('faq.subtitle')}</span>
           </motion.div>
-          <h1 className="text-4xl md:text-5xl font-black text-primary uppercase tracking-tighter mb-8 leading-none">
-            Questions <span className="text-secondary">Fréquentes</span>
-          </h1>
+          <h1 className="text-4xl md:text-5xl font-black text-primary uppercase tracking-tighter mb-8 leading-none">{t('faq.title').split(' ')[0]} <span className="text-secondary">{t('faq.title').split(' ').slice(1).join(' ')}</span></h1>
           
           <div className="relative max-w-xl mx-auto">
             <Search className="absolute start-6 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
@@ -149,17 +126,17 @@ const FAQ = () => {
         <div className="mt-20 bg-primary rounded-2xl p-10 text-white flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden">
           <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'linear-gradient(45deg, #fff 25%, transparent 25%, transparent 50%, #fff 50%, #fff 75%, transparent 75%, transparent)', backgroundSize: '20px 20px' }} />
           <div className="relative z-10 text-center md:text-start">
-            <h3 className="text-2xl font-black uppercase tracking-tighter mb-2">Besoin d'aide personnalisée ?</h3>
-            <p className="text-white/60 font-medium text-sm">Nos experts industriels sont à votre disposition.</p>
+            <h3 className="text-2xl font-black uppercase tracking-tighter mb-2">{t('faq.need_help')}</h3>
+            <p className="text-white/60 font-medium text-sm">{t('faq.help_desc')}</p>
           </div>
           <div className="relative z-10 flex flex-wrap justify-center gap-4">
              <button className="flex items-center space-x-3 bg-secondary px-6 py-4 rounded-2xl text-xs font-black uppercase tracking-widest shadow-xl hover:scale-105 transition-all" onClick={(e) => { e.preventDefault(); alert("Fonctionnalité en cours de développement"); }}>
                 <Phone className="h-4 w-4" />
-                <span>Appel Expert</span>
+                <span>{t('faq.call_expert')}</span>
              </button>
              <button className="flex items-center space-x-3 bg-white/10 border border-white/20 px-6 py-4 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-white/20 transition-all" onClick={(e) => { e.preventDefault(); alert("Fonctionnalité en cours de développement"); }}>
                 <Mail className="h-4 w-4" />
-                <span>Envoyer Ticket</span>
+                <span>{t('faq.send_ticket')}</span>
              </button>
           </div>
         </div>

@@ -1,3 +1,4 @@
+import { logger } from '../utils/logger';
 import { Resend } from 'resend';
 import fs from 'fs';
 import path from 'path';
@@ -8,7 +9,7 @@ import path from 'path';
 const resend = new Resend(process.env.RESEND_API_KEY);
 const SENDER_EMAIL = process.env.SENDER_EMAIL || 'onboarding@resend.dev'; // Use resend default for testing if not provided
 
-export type TemplateType = 'verificationCode' | 'resetPassword' | 'kycApproved' | 'kycRejected';
+export type TemplateType = 'verificationCode' | 'resetPassword' | 'kycApproved' | 'kycRejected' | 'securityAlert';
 
 export async function sendTransactionalEmail(to: string, templateType: TemplateType, variables: Record<string, string>) {
   if (!process.env.RESEND_API_KEY) {
@@ -30,6 +31,9 @@ export async function sendTransactionalEmail(to: string, templateType: TemplateT
         break;
       case 'kycRejected':
         subject = 'Mise à jour concernant votre dossier KYC - Algeria Industry';
+        break;
+      case 'securityAlert':
+        subject = 'Alerte de sécurité - Algeria Industry';
         break;
       default:
         subject = 'Notification - Algeria Industry';
@@ -65,13 +69,13 @@ export async function sendTransactionalEmail(to: string, templateType: TemplateT
     });
 
     if (error) {
-      console.error('[Email Service] Error sending email:', error);
+      logger.error('[Email Service] Error sending email:', error);
       return { success: false, error };
     }
 
     return { success: true, data };
   } catch (error) {
-    console.error('[Email Service] Unexpected error:', error);
+    logger.error('[Email Service] Unexpected error:', error);
     return { success: false, error };
   }
 }

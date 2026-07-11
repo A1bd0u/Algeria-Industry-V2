@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '../../../lib/utils';
+import { useQuery } from '@tanstack/react-query';
 import { 
   Activity, AlertTriangle, ArrowRight, ArrowUpRight, BarChart3, Bell, 
   Building2, CheckCircle, ChevronRight, Clock, CreditCard, Edit2, Eye, 
@@ -29,6 +30,11 @@ export default function GovSecurity({ state }: { state: any }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedAction, setSelectedAction] = useState('all');
   const [selectedLog, setSelectedLog] = useState<AuditLog | null>(null);
+  
+  // Pagination
+  const [page, setPage] = useState(1);
+  const itemsPerPage = 20;
+  const totalPages = Math.ceil(filteredLogs.length / itemsPerPage) || 1;
 
   const fetchAuditLogs = async () => {
     setLoading(true);
@@ -118,11 +124,15 @@ export default function GovSecurity({ state }: { state: any }) {
           icon: AlertTriangle 
         };
       case 'dashboard_consultation':
-        return { 
-          label: 'Consultation Dashboard', 
-          color: 'text-gray-600 bg-gray-50 border-gray-100', 
-          icon: Eye 
-        };
+        return { label: 'Consultation Dashboard', color: 'text-gray-600 bg-gray-50 border-gray-100', icon: LayoutDashboard };
+      case 'product_delete':
+        return { label: 'Produit Supprimé', color: 'text-rose-600 bg-rose-50 border-rose-100', icon: Trash2 };
+      case 'company_delete':
+        return { label: 'Entreprise Supprimée', color: 'text-rose-600 bg-rose-50 border-rose-100', icon: Trash2 };
+      case 'content_approve':
+        return { label: 'Contenu Approuvé', color: 'text-teal-600 bg-teal-50 border-teal-100', icon: CheckCircle };
+      case 'content_reject':
+        return { label: 'Contenu Rejeté', color: 'text-red-600 bg-red-50 border-red-100', icon: AlertTriangle };
       default:
         return { 
           label: action, 
@@ -276,6 +286,27 @@ export default function GovSecurity({ state }: { state: any }) {
                 );
               })}
             </div>
+            
+            <div className="p-4 border-t border-gray-100 flex items-center justify-between bg-gray-50">
+                <p className="text-[10px] font-bold text-gray-500 uppercase">Page {page} sur {totalPages}</p>
+                <div className="flex gap-2">
+                    <button 
+                        disabled={page === 1} 
+                        onClick={() => setPage(p => Math.max(1, p - 1))}
+                        className="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-[10px] font-black uppercase disabled:opacity-50"
+                    >
+                        Précédent
+                    </button>
+                    <button 
+                        disabled={page >= totalPages} 
+                        onClick={() => setPage(p => p + 1)}
+                        className="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-[10px] font-black uppercase disabled:opacity-50"
+                    >
+                        Suivant
+                    </button>
+                </div>
+            </div>
+
           </div>
         )}
       </div>

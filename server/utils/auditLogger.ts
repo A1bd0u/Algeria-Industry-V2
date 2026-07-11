@@ -1,3 +1,4 @@
+import { logger } from './logger';
 import { Request } from 'express';
 import { getSupabase } from '../db/supabaseClient';
 
@@ -15,7 +16,7 @@ export interface AuditLogDetails {
  */
 export async function logAdminAction(
   req: Request,
-  action: 'suspension' | 'reactivation' | 'user_delete' | 'role_change' | 'kyc_approve' | 'kyc_reject' | 'dashboard_consultation',
+  action: 'suspension' | 'reactivation' | 'user_delete' | 'role_change' | 'kyc_approve' | 'kyc_reject' | 'dashboard_consultation' | 'product_delete' | 'company_delete' | 'content_approve' | 'content_reject',
   details: AuditLogDetails
 ): Promise<void> {
   const adminUser = (req as any).user;
@@ -44,6 +45,6 @@ export async function logAdminAction(
       console.warn(`[AUDIT_LOG_WARN] Failed to write to database audit_logs table (it might not be provisioned yet):`, error.message);
     }
   } catch (err: any) {
-    console.error(`[AUDIT_LOG_ERROR] Exception while recording administrative audit log:`, err.message || err);
+    logger.error(`[AUDIT_LOG_ERROR] Exception while recording administrative audit log:`, err.message || err);
   }
 }

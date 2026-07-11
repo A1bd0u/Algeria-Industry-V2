@@ -14,7 +14,7 @@ const getAI = () => {
 };
 
 // Applique le profil aiLimiter sur la route Gemini
-router.post('/translate', requireAuth, aiLimiter, async (req, res) => {
+router.post('/translate', requireAuth, aiLimiter, async (req, res, next) => {
   const { text, targetLang } = req.body;
   if (!text || !targetLang) {
     return res.status(400).json({ error: 'Texte et langue cible requis' });
@@ -34,8 +34,7 @@ router.post('/translate', requireAuth, aiLimiter, async (req, res) => {
     });
     return res.json({ result: response.text?.trim() || text });
   } catch (error: any) {
-    console.error("Translation error:", error);
-    return res.status(500).json({ error: 'Erreur lors de la traduction', details: error.message });
+    next(error);
   }
 });
 

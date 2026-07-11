@@ -1,6 +1,7 @@
+import { logger } from '../utils/logger';
 import express from 'express';
 import { getSupabase } from '../db/supabaseClient';
-import { requireAuth, verifyRole } from '../middlewares/authMiddleware';
+import { requireAuth, verifyRole, requireVerified } from '../middlewares/authMiddleware';
 import { generateReferenceId } from '../utils/reference';
 import { z } from 'zod';
 import { validate } from '../middlewares/validateMiddleware';
@@ -29,14 +30,40 @@ const reportSchema = z.object({
 // GET /api/tenders - Liste tous les appels d'offres
 router.get('/', async (req, res) => {
   try {
+    const page = parseInt(req.query.page as string) || 1;
+    let limit = parseInt(req.query.limit as string) || 12;
+    if (limit > 50) limit = 50;
+    const from = (page - 1) * limit;
+    const to = from + limit - 1;
+
     const supabase = getSupabase();
-    const { data: tenders, error } = await supabase
+    let query = supabase
       .from('tenders')
-      .select('*, author:users(name, company)');
+      .select('*, author:users(name, company)', { count: 'exact' });
+
+    if (req.query.search) {
+      query = query.ilike('title', `%${req.query.search}%`);
+    }
+
+    if (req.query.status && req.query.status !== 'Tous') {
+      query = query.eq('status', req.query.status);
+    }
+
+    if (req.query.category && req.query.category !== 'Toutes') {
+      query = query.eq('category', req.query.category);
+    }
+
+    const { data: tenders, count, error } = await query.range(from, to).order('created_at', { ascending: false });
+
     if (error) throw error;
-    return res.json(tenders);
+    return res.json({
+      data: tenders || [],
+      total: count || 0,
+      page,
+      totalPages: Math.ceil((count || 0) / limit)
+    });
   } catch (err: any) {
-    console.error("Supabase Error GET /tenders:", err);
+    logger.error("Supabase Error GET /tenders:", err);
     return res.status(500).json({ error: err.message });
   }
 });
@@ -53,13 +80,13 @@ router.get('/my', requireAuth, async (req, res) => {
     if (error) throw error;
     return res.json(tenders);
   } catch (err: any) {
-    console.error("Supabase Error GET /tenders/my:", err);
+    logger.error("Supabase Error GET /tenders/my:", err);
     return res.status(500).json({ error: err.message });
   }
 });
 
 // POST /api/tenders - Créer un appel d'offres
-router.post('/', verifyRole(['acheteur', 'admin']), validate(tenderSchema), async (req, res) => {
+router.post('/', verifyRole(['acheteur', 'admin']), requireVerified, validate(tenderSchema), async (req, res) => {
   const { title, description, budget, deadline, category, file_url } = req.body;
   const user = (req as any).user;
 
@@ -95,7 +122,7 @@ router.post('/', verifyRole(['acheteur', 'admin']), validate(tenderSchema), asyn
 
     return res.status(201).json(data);
   } catch (err: any) {
-    console.error("Supabase Error POST /tenders:", err);
+    logger.error("Supabase Error POST /tenders:", err);
     return res.status(500).json({ error: err.message });
   }
 });
@@ -123,7 +150,7 @@ router.get('/:id', async (req, res) => {
 
     return res.json(tender);
   } catch (err: any) {
-    console.error("Supabase Error GET /tenders/:id:", err);
+    logger.error("Supabase Error GET /tenders/:id:", err);
     return res.status(500).json({ error: err.message });
   }
 });
@@ -143,7 +170,7 @@ router.put('/:id/status', verifyRole(['admin']), validate(statusSchema), async (
     if (error) throw error;
     return res.json(data);
   } catch (err: any) {
-    console.error("Error PUT /tenders/:id/status:", err);
+    logger.error("Error PUT /tenders/:id/status:", err);
     return res.status(500).json({ error: err.message });
   }
 });
@@ -174,7 +201,7 @@ router.post('/:id/report', requireAuth, validate(reportSchema), async (req, res)
     if (error) throw error;
     return res.json({ success: true, message: "Appel d'offres signalé" });
   } catch (err: any) {
-    console.error("Error POST /tenders/:id/report:", err);
+    logger.error("Error POST /tenders/:id/report:", err);
     return res.status(500).json({ error: err.message });
   }
 });
@@ -190,7 +217,7 @@ router.delete('/:id', verifyRole(['admin']), async (req, res) => {
     if (error) throw error;
     return res.json({ success: true, message: "Appel d'offres supprimé" });
   } catch (err: any) {
-    console.error("Error DELETE /tenders/:id:", err);
+    logger.error("Error DELETE /tenders/:id:", err);
     return res.status(500).json({ error: err.message });
   }
 });

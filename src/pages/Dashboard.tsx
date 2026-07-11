@@ -526,7 +526,7 @@ const Dashboard = () => {
                     className="text-[10px] font-black text-secondary hover:underline uppercase tracking-widest flex items-center space-x-1"
                    >
                      <span>{fav.item_type === 'product' ? 'Voir produit' : 'Voir profil'}</span>
-                     <ChevronRight className="h-3 w-3" />
+                     <ChevronRight className="h-3 w-3 rtl:rotate-180" />
                    </Link>
                 </div>
               </div>

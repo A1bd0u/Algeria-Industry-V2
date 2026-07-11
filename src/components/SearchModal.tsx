@@ -71,6 +71,9 @@ const SearchModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void
             initial={{ opacity: 0, y: -20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -20, scale: 0.95 }}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Recherche"
             className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden relative z-10"
           >
             <form onSubmit={handleSearchSubmit} className="p-6 border-b border-gray-100 flex items-center space-x-4">
@@ -78,7 +81,8 @@ const SearchModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void
               <input 
                 autoFocus
                 type="text" 
-                placeholder="Rechercher un produit ou une entreprise..." 
+                placeholder="Rechercher un produit ou une entreprise..."
+                aria-label="Rechercher un produit ou une entreprise" 
                 className="flex-1 bg-transparent border-none outline-none text-lg text-primary font-medium"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
@@ -86,6 +90,7 @@ const SearchModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void
               <button 
                 type="button"
                 onClick={onClose}
+                aria-label="Fermer la recherche"
                 className="p-2 hover:bg-gray-100 rounded-full transition-colors"
               >
                 <X className="h-5 w-5 text-gray-400" />
@@ -118,6 +123,7 @@ const SearchModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void
                        <button 
                          key={result.id}
                          onClick={() => handleSelect(result)}
+                        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleSelect(result); } }}
                          className="w-full flex items-center space-x-4 p-4 rounded-2xl hover:bg-primary/5 transition-all text-start group"
                        >
                          <div className="bg-gray-100 p-3 rounded-xl group-hover:bg-white transition-colors">
@@ -132,7 +138,7 @@ const SearchModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void
                             <p className="text-sm font-bold text-primary group-hover:text-secondary transition-colors">{result.title}</p>
                             <p className="text-xs text-gray-500">{result.subtitle}</p>
                          </div>
-                         <ArrowRight className="h-4 w-4 text-gray-300 group-hover:translate-x-1 group-hover:text-secondary transition-all" />
+                         <ArrowRight className="h-4 w-4 text-gray-300 group-hover:translate-x-1 group-hover:text-secondary transition-all rtl:rotate-180" />
                        </button>
                      );
                    })}

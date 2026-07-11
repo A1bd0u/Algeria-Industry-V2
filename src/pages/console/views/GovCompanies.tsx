@@ -1,5 +1,6 @@
 /* eslint-disable */
 import React, { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '../../../lib/utils';
 import { 
@@ -7,9 +8,23 @@ import {
 } from 'lucide-react';
 
 export default function GovCompanies({ state }: { state: any }) {
-  const {
-    pendingKYC, approvedKYC, handleApproveKYC, handleRejectKYC, showNotify
-  } = state;
+  const { handleApproveKYC, handleRejectKYC, showNotify } = state;
+  
+  const { data: allCompanies = [], isLoading } = useQuery({
+    queryKey: ['admin-companies'],
+    queryFn: async () => {
+      const res = await fetch('/api/admin/companies', {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      });
+      if (!res.ok) throw new Error('Failed to fetch companies');
+      const json = await res.json();
+      return json.data || [];
+    }
+  });
+
+  const pendingKYC = allCompanies.filter((c: any) => c.status === 'pending' || c.status === 'En attente' || !c.status);
+  const approvedKYC = allCompanies.filter((c: any) => c.status === 'approved' || c.status === 'Actif' || c.status === 'Validé');
+
 
   // Modals state
   const [selectedDocUrl, setSelectedDocUrl] = useState<string | null>(null);
@@ -124,7 +139,7 @@ export default function GovCompanies({ state }: { state: any }) {
                           className="px-4 py-2 bg-secondary/10 text-secondary hover:bg-secondary hover:text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-colors flex items-center justify-center space-x-2 w-full max-w-[120px] ms-auto"
                         >
                           <span>Examiner</span>
-                          <ArrowRight className="h-3 w-3" />
+                          <ArrowRight className="h-3 w-3 rtl:rotate-180" />
                         </button>
                       </td>
                     </motion.tr>

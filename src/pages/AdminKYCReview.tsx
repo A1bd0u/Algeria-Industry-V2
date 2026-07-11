@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ShieldCheck, ArrowLeft, CheckCircle2, XCircle, AlertTriangle, FileText, Download, Building2, User } from 'lucide-react';
 import { motion } from 'motion/react';
@@ -10,6 +11,7 @@ import 'react-pdf/dist/Page/TextLayer.css';
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 export default function AdminKYCReview() {
+  const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const [kyc, setKyc] = useState<any>(null);
@@ -115,10 +117,10 @@ export default function AdminKYCReview() {
       <header className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between sticky top-0 z-20 shadow-sm">
         <div className="flex items-center space-x-4">
           <button onClick={() => navigate('/extranet')} className="p-2 hover:bg-gray-100 rounded-xl transition-colors">
-            <ArrowLeft className="h-5 w-5 text-gray-500" />
+            <ArrowLeft className="h-5 w-5 text-gray-500 rtl:rotate-180" />
           </button>
           <div>
-            <h1 className="text-xl font-black text-primary uppercase tracking-tight">Revue KYC : {kyc.name}</h1>
+            <h1 className="text-xl font-black text-primary uppercase tracking-tight">{t('kyc.admin_title')} {kyc.name}</h1>
             <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">{kyc.company_details?.activity_sector || 'Secteur non spécifié'}</p>
           </div>
         </div>
@@ -129,7 +131,7 @@ export default function AdminKYCReview() {
             disabled={isSubmitting}
           >
             <XCircle className="h-4 w-4" />
-            <span>Rejeter</span>
+            <span>{t('kyc.reject')}</span>
           </button>
           <button 
             onClick={handleApprove}
@@ -137,7 +139,7 @@ export default function AdminKYCReview() {
             disabled={isSubmitting}
           >
             <CheckCircle2 className="h-4 w-4" />
-            <span>Valider</span>
+            <span>{t('kyc.approve')}</span>
           </button>
         </div>
       </header>
@@ -155,12 +157,12 @@ export default function AdminKYCReview() {
               </h2>
               <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100 space-y-4">
                 <div>
-                  <p className="text-xs text-gray-500 font-bold uppercase">Raison sociale</p>
+                  <p className="text-xs text-gray-500 font-bold uppercase">{t('kyc.company_name')}</p>
                   <p className="text-lg font-black text-primary">{kyc.name}</p>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <p className="text-xs text-gray-500 font-bold uppercase">Secteur</p>
+                    <p className="text-xs text-gray-500 font-bold uppercase">{t('kyc.sector')}</p>
                     <p className="font-medium text-gray-800">{kyc.company_details?.activity_sector || 'N/A'}</p>
                   </div>
                   <div>
@@ -173,7 +175,7 @@ export default function AdminKYCReview() {
                   </div>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500 font-bold uppercase">Description</p>
+                  <p className="text-xs text-gray-500 font-bold uppercase">{t('kyc.description')}</p>
                   <p className="text-sm text-gray-600 mt-1">{kyc.company_details?.description || 'Aucune description'}</p>
                 </div>
               </div>
@@ -187,11 +189,11 @@ export default function AdminKYCReview() {
               </h2>
               <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100 grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-xs text-gray-500 font-bold uppercase">Nom</p>
+                  <p className="text-xs text-gray-500 font-bold uppercase">{t('kyc.name')}</p>
                   <p className="font-medium text-gray-800">{kyc.user_name}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500 font-bold uppercase">Email</p>
+                  <p className="text-xs text-gray-500 font-bold uppercase">{t('kyc.email')}</p>
                   <p className="font-medium text-gray-800">{kyc.user_email}</p>
                 </div>
               </div>
@@ -231,7 +233,7 @@ export default function AdminKYCReview() {
                     </button>
                   ))
                 ) : (
-                  <p className="text-sm text-gray-500">Aucun document attaché.</p>
+                  <p className="text-sm text-gray-500">{t('kyc.no_docs')}</p>
                 )}
               </div>
             </section>
@@ -246,7 +248,7 @@ export default function AdminKYCReview() {
                 <Document
                   file={activeDoc.file_url}
                   onLoadSuccess={onDocumentLoadSuccess}
-                  loading={<div className="p-8 text-center text-gray-500 font-bold uppercase tracking-widest">Chargement du document...</div>}
+                  loading={<div className="p-8 text-center text-gray-500 font-bold uppercase tracking-widest">Loading...</div>}
                 >
                   <Page 
                     pageNumber={pageNumber} 
@@ -285,7 +287,7 @@ export default function AdminKYCReview() {
           ) : (
             <div className="flex flex-col items-center justify-center h-full text-gray-400">
               <FileText className="h-16 w-16 mb-4 opacity-20" />
-              <p className="text-sm font-bold uppercase tracking-widest">Sélectionnez un document</p>
+              <p className="text-sm font-bold uppercase tracking-widest">{t('kyc.select_doc')}</p>
             </div>
           )}
         </div>
@@ -302,13 +304,13 @@ export default function AdminKYCReview() {
             <div className="w-12 h-12 bg-red-100 rounded-2xl flex items-center justify-center mb-6">
               <AlertTriangle className="h-6 w-6 text-red-600" />
             </div>
-            <h3 className="text-xl font-black text-primary uppercase tracking-tighter mb-2">Rejeter la demande</h3>
+            <h3 className="text-xl font-black text-primary uppercase tracking-tighter mb-2">{t('kyc.reject')}</h3>
             <p className="text-xs text-gray-500 mb-6 font-medium leading-relaxed">
               Veuillez indiquer le motif du refus pour <strong className="text-primary">{kyc.name}</strong>. Ce motif lui sera communiqué par email.
             </p>
             
             <div className="mb-8">
-              <label className="block text-[10px] font-black text-primary uppercase tracking-widest mb-2">Motif du rejet *</label>
+              <label className="block text-[10px] font-black text-primary uppercase tracking-widest mb-2">{t('kyc.reject_reason')}</label>
               <textarea 
                 value={rejectReason}
                 onChange={(e) => setRejectReason(e.target.value)}

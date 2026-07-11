@@ -165,7 +165,7 @@ const Events = () => {
                   <div className="mt-auto flex items-center justify-between pt-6 border-t border-gray-50">
                     <button className="text-primary font-bold text-sm flex items-center space-x-1 hover:translate-x-1 transition-transform" onClick={(e) => { e.preventDefault(); alert("Fonctionnalité en cours de développement"); }}>
                       <span>Détails</span>
-                      <ChevronRight className="h-4 w-4" />
+                      <ChevronRight className="h-4 w-4 rtl:rotate-180" />
                     </button>
                     <button className="btn-primary py-2 px-6 rounded-xl text-xs" onClick={(e) => { e.preventDefault(); alert("Inscription confirmée et ajoutée à votre calendrier !"); }}>
                       S'inscrire

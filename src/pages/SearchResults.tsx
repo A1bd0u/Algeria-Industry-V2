@@ -57,7 +57,7 @@ const SearchResults = () => {
         <div className="mb-12">
           <div className="flex items-center space-x-3 mb-4">
              <Search className="h-5 w-5 text-secondary" />
-             <h1 className="text-4xl font-black text-primary uppercase tracking-tighter">Résultats pour "{query || 'Toutes les données'}"</h1>
+             <h1 className="text-4xl font-black text-primary uppercase tracking-tighter">{t('search.results_for')} "{query || 'Toutes les données'}"</h1>
           </div>
           <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-2">
             Nous avons trouvé {isLoading ? '...' : totalResults} résultats correspondant à votre requête.
@@ -97,7 +97,7 @@ const SearchResults = () => {
               
               <div className="space-y-4">
                  <div>
-                   <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2 block">Secteur / Catégorie</label>
+                   <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2 block">{t('search.sector_cat')}</label>
                    <input 
                      type="text" 
                      placeholder="Ex: Énergie, IT..." 
@@ -107,7 +107,7 @@ const SearchResults = () => {
                    />
                  </div>
                  <div>
-                   <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2 block">Wilaya (Région)</label>
+                   <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2 block">{t('search.region')}</label>
                    <input 
                      type="text" 
                      placeholder="Ex: Alger, Oran..." 
@@ -123,7 +123,7 @@ const SearchResults = () => {
                <div className="absolute -end-8 -bottom-8 opacity-10">
                  <Zap className="h-32 w-32" />
                </div>
-               <h3 className="text-xl font-black uppercase tracking-tighter mb-4 relative z-10">Booster votre visibilité ?</h3>
+               <h3 className="text-xl font-black uppercase tracking-tighter mb-4 relative z-10">{t('search.boost_vis')}</h3>
                <p className="text-white/60 text-[9px] font-bold uppercase tracking-widest leading-relaxed mb-8 relative z-10">
                  Apparaissez en tête des résultats de recherche pour vos mots-clés stratégiques.
                </p>
@@ -205,7 +205,7 @@ const SearchResults = () => {
                               </div>
                               <button className="hidden sm:flex items-center space-x-2 px-6 py-3 bg-gray-50 text-[10px] font-black uppercase tracking-widest text-primary group-hover:bg-secondary group-hover:text-white transition-all">
                                 <span>{t('search.view_profile')}</span>
-                                <ChevronRight className="h-3.5 w-3.5" />
+                                <ChevronRight className="h-3.5 w-3.5 rtl:rotate-180" />
                               </button>
                             </Link>
                           ))}

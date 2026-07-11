@@ -93,7 +93,7 @@ const Resources = () => {
                 </h2>
                 <Link to="/blog" className="text-sm font-bold text-secondary hover:underline flex items-center space-x-1">
                   <span>Voir tout</span>
-                  <ChevronRight className="h-4 w-4" />
+                  <ChevronRight className="h-4 w-4 rtl:rotate-180" />
                 </Link>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -120,7 +120,7 @@ const Resources = () => {
                       </p>
                       <Link to="/blog/1" className="text-primary font-bold text-sm flex items-center space-x-1 hover:translate-x-1 transition-transform">
                         <span>Lire la suite</span>
-                        <ChevronRight className="h-4 w-4" />
+                        <ChevronRight className="h-4 w-4 rtl:rotate-180" />
                       </Link>
                     </div>
                   </div>

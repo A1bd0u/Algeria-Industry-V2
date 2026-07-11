@@ -1,3 +1,4 @@
+import { logger } from '../utils/logger';
 import express from 'express';
 import { getSupabase } from '../db/supabaseClient';
 
@@ -44,7 +45,7 @@ router.get('/', async (req, res) => {
       
       const { data, error } = await query;
       if (error) {
-         console.error('Company search error:', error);
+         logger.error('Company search error:', error);
          // Fallback if columns don't exist
          if (error.code === '42703') {
             const fallbackQuery = supabase.from('companies').select('*').order('created_at', { ascending: false }).limit(limit + 1);
@@ -77,7 +78,7 @@ router.get('/', async (req, res) => {
       
       const { data, error } = await query;
       if (error) {
-         console.error('Product search error:', error);
+         logger.error('Product search error:', error);
          if (error.code === '42703') {
             const fallbackQuery = supabase.from('products').select('*').order('created_at', { ascending: false }).limit(limit + 1);
             const { data: fbData } = await fallbackQuery;
@@ -107,7 +108,7 @@ router.get('/', async (req, res) => {
     });
 
   } catch (err: any) {
-    console.error("Error GET /search:", err);
+    logger.error("Error GET /search:", err);
     return res.status(500).json({ error: err.message });
   }
 });

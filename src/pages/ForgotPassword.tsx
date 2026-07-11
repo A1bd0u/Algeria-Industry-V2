@@ -2,15 +2,23 @@ import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { Mail, ArrowLeft, ArrowRight, Loader2, Key } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { Turnstile } from '@marsidev/react-turnstile';
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState('');
 
+  const turnstileSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!captchaToken) {
+      setError('Veuillez valider le captcha pour continuer.');
+      return;
+    }
     setIsLoading(true);
     setError('');
 
@@ -18,7 +26,7 @@ const ForgotPassword = () => {
       const response = await fetch('/api/auth/forgot-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, captchaToken }),
       });
 
       const data = await response.json();
@@ -44,7 +52,7 @@ const ForgotPassword = () => {
       >
         <div className="p-8">
           <Link to="/login" className="inline-flex items-center text-sm font-bold text-gray-400 hover:text-primary transition-colors mb-8">
-            <ArrowLeft className="h-4 w-4 me-2" />
+            <ArrowLeft className="h-4 w-4 me-2 rtl:rotate-180" />
             Retour à la connexion
           </Link>
 
@@ -93,6 +101,19 @@ const ForgotPassword = () => {
                 </div>
               </div>
 
+              <div className="flex justify-center my-4">
+                {turnstileSiteKey ? (
+                  <Turnstile
+                    siteKey={turnstileSiteKey}
+                    onSuccess={(token) => setCaptchaToken(token)}
+                    onError={() => setCaptchaToken(null)}
+                    onExpire={() => setCaptchaToken(null)}
+                  />
+                ) : (
+                  <p className="text-red-500 text-sm font-bold">Erreur de configuration : VITE_TURNSTILE_SITE_KEY manquant</p>
+                )}
+              </div>
+
               <button 
                 type="submit" 
                 disabled={isLoading}
@@ -106,7 +127,7 @@ const ForgotPassword = () => {
                 ) : (
                   <>
                     <span>Envoyer le lien</span>
-                    <ArrowRight className="h-5 w-5" />
+                    <ArrowRight className="h-5 w-5 rtl:rotate-180" />
                   </>
                 )}
               </button>

@@ -1,6 +1,7 @@
+import { logger } from '../utils/logger';
 import express from 'express';
 import { getSupabase } from '../db/supabaseClient';
-import { requireAuth } from '../middlewares/authMiddleware';
+import { requireAuth, requireVerified } from '../middlewares/authMiddleware';
 
 const router = express.Router();
 
@@ -42,7 +43,7 @@ router.get('/conversations', requireAuth, async (req, res) => {
 
     return res.json(Array.from(convos.values()));
   } catch (err: any) {
-    console.error("Error GET /conversations:", err);
+    logger.error("Error GET /conversations:", err);
     return res.status(500).json({ error: err.message });
   }
 });
@@ -73,13 +74,13 @@ router.get('/:conversationId', requireAuth, async (req, res) => {
 
     return res.json(mapped);
   } catch (err: any) {
-    console.error("Supabase Error GET /messages/:conversationId:", err);
+    logger.error("Supabase Error GET /messages/:conversationId:", err);
     return res.status(500).json({ error: err.message });
   }
 });
 
 // POST /api/messages - Envoyer un message
-router.post('/', requireAuth, async (req, res) => {
+router.post('/', requireAuth, requireVerified, async (req, res) => {
   const { text, receiver_id } = req.body;
   const user = (req as any).user;
 
@@ -106,7 +107,7 @@ router.post('/', requireAuth, async (req, res) => {
 
     return res.status(201).json(mapped);
   } catch (err: any) {
-    console.error("Supabase Error POST /messages:", err);
+    logger.error("Supabase Error POST /messages:", err);
     return res.status(500).json({ error: err.message });
   }
 });

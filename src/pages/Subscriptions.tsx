@@ -313,7 +313,7 @@ const Subscriptions = () => {
             <p className="text-xs font-bold text-gray-400 mb-4 italic">Vous avez une question sur votre facturation ?</p>
             <Link to="/contact" className="btn-secondary py-4 px-10 rounded-2xl flex items-center space-x-3">
               <span className="text-xs font-black uppercase tracking-widest">Contacter le Support PAIERIE</span>
-              <ArrowRight className="h-4 w-4" />
+              <ArrowRight className="h-4 w-4 rtl:rotate-180" />
             </Link>
           </div>
         </div>

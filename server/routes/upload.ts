@@ -73,8 +73,10 @@ router.post('/', requireAuth, upload.single('file'), async (req: any, res: any) 
     
     return res.json({ url: publicUrlData.publicUrl });
   } catch (e: any) {
-    console.error("Supabase Upload Error:", e);
-    return res.status(500).json({ error: "Erreur lors de l'upload vers Supabase Storage", details: e.message });
+    return res.status(500).json({ 
+      error: "Erreur lors de l'upload vers Supabase Storage", 
+      ...(process.env.NODE_ENV !== 'production' && { details: e.message })
+    });
   }
 });
 
@@ -85,8 +87,7 @@ router.use((err: any, req: any, res: any, next: any) => {
     }
     return res.status(400).json({ error: 'Erreur lors du téléchargement du fichier: ' + err.message });
   }
-  console.error("Upload Error Middleware:", err);
-  res.status(500).json({ error: 'Upload failed', details: err.message });
+  next(err);
 });
 
 export default router;

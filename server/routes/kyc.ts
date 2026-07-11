@@ -1,3 +1,4 @@
+import { logger } from '../utils/logger';
 import express from 'express';
 import { getSupabase } from '../db/supabaseClient';
 import { z } from 'zod';
@@ -62,7 +63,7 @@ router.get('/', verifyRole(['admin']), async (req, res) => {
     
     return res.json(kycsWithDocs);
   } catch(e: any) {
-    console.error("Supabase Error GET /kyc:", e);
+    logger.error("Supabase Error GET /kyc:", e);
     return res.status(500).json({ error: e.message });
   }
 });
@@ -86,7 +87,7 @@ router.post('/submit', requireAuth, validate(kycSubmitSchema), async (req, res) 
       .single();
 
     if (userError || !userData?.company_id) {
-      console.error('Kyc Submit Error: userError:', userError, 'userData:', userData, 'user.id:', user.id);
+      logger.error('Kyc Submit Error: userError:', userError, 'userData:', userData, 'user.id:', user.id);
       return res.status(404).json({ error: 'Entreprise non trouvée pour cet utilisateur' });
     }
 
@@ -109,7 +110,7 @@ router.post('/submit', requireAuth, validate(kycSubmitSchema), async (req, res) 
       .single();
 
     if (reqError) {
-      console.error("KYC Request Insert Error:", reqError);
+      logger.error("KYC Request Insert Error:", reqError);
       if (reqError.message?.includes('row-level security') || reqError.message?.includes('RLS')) {
          console.warn("RLS block detected on kyc_requests. Bypassing for prototype demonstration.");
       } else {
@@ -130,7 +131,7 @@ router.post('/submit', requireAuth, validate(kycSubmitSchema), async (req, res) 
       .insert(docInserts);
 
     if (docError) {
-      console.error("KYC Document Insert Error:", docError);
+      logger.error("KYC Document Insert Error:", docError);
       if (docError.message?.includes('row-level security') || docError.message?.includes('RLS')) {
           console.warn("RLS block detected on kyc_documents. Bypassing for prototype demonstration.");
       } else {
@@ -146,7 +147,7 @@ router.post('/submit', requireAuth, validate(kycSubmitSchema), async (req, res) 
 
     return res.json({ success: true, message: 'Votre demande KYC a bien été soumise.' });
   } catch (e: any) {
-    console.error("Supabase Error POST /kyc/submit:", e);
+    logger.error("Supabase Error POST /kyc/submit:", e);
     return res.status(500).json({ error: 'Une erreur interne s\'est produite', details: e.message });
   }
 });
@@ -197,7 +198,7 @@ router.post('/:id/approve', verifyRole(['admin']), async (req, res) => {
 
     return res.json({ success: true, message: "Entreprise approuvée et notifiée par email." });
   } catch (err: any) {
-    console.error("Supabase Error POST /kyc/:id/approve:", err);
+    logger.error("Supabase Error POST /kyc/:id/approve:", err);
     return res.status(500).json({ error: err.message });
   }
 });
@@ -253,7 +254,7 @@ router.post('/:id/reject', verifyRole(['admin']), validate(kycRejectSchema), asy
 
     return res.json({ success: true, message: "Entreprise rejetée et notifiée par email." });
   } catch (err: any) {
-    console.error("Supabase Error POST /kyc/:id/reject:", err);
+    logger.error("Supabase Error POST /kyc/:id/reject:", err);
     return res.status(500).json({ error: err.message });
   }
 });

@@ -14,6 +14,7 @@ import { Link } from 'react-router-dom';
 import PageTransition from '../components/PageTransition';
 import { BlogCardSkeleton } from '../components/Skeleton';
 import { cn, generateSlugUrl } from '../lib/utils';
+import SEO from '../components/SEO';
 
 const Blog = () => {
   const { t, i18n } = useTranslation();
@@ -54,6 +55,11 @@ const Blog = () => {
 
   return (
     <PageTransition>
+      <SEO 
+        title={t('nav.news', 'Actualités')} 
+        description="Les dernières actualités et tendances de l'industrie en Algérie."
+        url="https://votre-domaine.dz/blog"
+      />
       <div className={cn("bg-neutral-bg min-h-screen pb-20", i18n.language === 'ar' && "font-arabic")}>
         {/* Header */}
         <section className="bg-primary py-16 text-white relative overflow-hidden">
@@ -147,7 +153,7 @@ const Blog = () => {
                       </div>
                     </div>
                     <Link to={`/blog/${generateSlugUrl(featuredPost.title, featuredPost.id)}`} className={cn("btn-primary p-3 rounded-xl", i18n.language === 'ar' && "rotate-180")}>
-                      <ArrowRight className="h-5 w-5" />
+                      <ArrowRight className="h-5 w-5 rtl:rotate-180" />
                     </Link>
                   </div>
                 </div>

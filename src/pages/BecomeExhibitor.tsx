@@ -289,7 +289,7 @@ const BecomeExhibitor = () => {
           </div>
           <button className="w-full mt-12 btn-secondary py-5 rounded-2xl font-black uppercase tracking-[0.2em] flex items-center justify-center space-x-4" onClick={(e) => { e.preventDefault(); alert("Fonctionnalité en cours de développement"); }}>
             <span>Démarrer mon inscription</span>
-            <ArrowRight className="h-6 w-6" />
+            <ArrowRight className="h-6 w-6 rtl:rotate-180" />
           </button>
         </div>
       </section>

@@ -22,7 +22,8 @@ export default function AdminContentModeration() {
     queryFn: async () => {
       const res = await fetch('/api/products');
       if (!res.ok) throw new Error('Failed to fetch products');
-      return res.json();
+      const data = await res.json();
+      return data.data || data;
     }
   });
 
@@ -32,7 +33,8 @@ export default function AdminContentModeration() {
     queryFn: async () => {
       const res = await fetch('/api/tenders');
       if (!res.ok) throw new Error('Failed to fetch tenders');
-      return res.json();
+      const data = await res.json();
+      return data.data || data;
     }
   });
 
@@ -239,7 +241,7 @@ export default function AdminContentModeration() {
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <header className="bg-white border-b border-gray-200 px-6 py-4 flex items-center space-x-4 sticky top-0 z-20 shadow-sm">
         <button onClick={() => navigate('/extranet')} className="p-2 hover:bg-gray-100 rounded-xl transition-colors">
-          <ArrowLeft className="h-5 w-5 text-gray-500" />
+          <ArrowLeft className="h-5 w-5 text-gray-500 rtl:rotate-180" />
         </button>
         <div>
           <h1 className="text-xl font-black text-primary uppercase tracking-tight">Modération du contenu</h1>

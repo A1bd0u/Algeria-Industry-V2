@@ -1,3 +1,4 @@
+import { logger } from '../utils/logger';
 import express from 'express';
 import { getSupabase } from '../db/supabaseClient';
 
@@ -19,7 +20,7 @@ router.get('/', async (req, res) => {
 
     return res.json(events || []);
   } catch (err: any) {
-    console.error("Supabase Error GET /events:", err);
+    logger.error("Supabase Error GET /events:", err);
     return res.status(500).json({ error: err.message });
   }
 });

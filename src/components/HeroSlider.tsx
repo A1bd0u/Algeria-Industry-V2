@@ -196,13 +196,13 @@ const HeroSlider: React.FC<HeroSliderProps> = ({ slides }) => {
             onClick={prev}
             className={cn("absolute top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/10 text-white hover:bg-black/30 transition-all z-20", i18n.language === 'ar' ? "end-4" : "start-4")}
           >
-            {i18n.language === 'ar' ? <ChevronRight className="h-6 w-6" /> : <ChevronLeft className="h-6 w-6" />}
+            {i18n.language === 'ar' ? <ChevronRight className="h-6 w-6 rtl:rotate-180" /> : <ChevronLeft className="h-6 w-6 rtl:rotate-180" />}
           </button>
           <button 
             onClick={next}
             className={cn("absolute top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/10 text-white hover:bg-black/30 transition-all z-20", i18n.language === 'ar' ? "start-4" : "end-4")}
           >
-            {i18n.language === 'ar' ? <ChevronLeft className="h-6 w-6" /> : <ChevronRight className="h-6 w-6" />}
+            {i18n.language === 'ar' ? <ChevronLeft className="h-6 w-6 rtl:rotate-180" /> : <ChevronRight className="h-6 w-6 rtl:rotate-180" />}
           </button>
         </>
       )}

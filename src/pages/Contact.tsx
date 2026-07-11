@@ -184,8 +184,9 @@ const Contact = () => {
                   <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
-                        <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Nom complet</label>
+                        <label htmlFor="name" className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Nom complet</label>
                         <input 
+                          id="name"
                           type="text" 
                           required
                           className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all"
@@ -195,8 +196,9 @@ const Contact = () => {
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Email professionnel</label>
+                        <label htmlFor="email" className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Email professionnel</label>
                         <input 
+                          id="email"
                           type="email" 
                           required
                           className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all"
@@ -207,7 +209,7 @@ const Contact = () => {
                       </div>
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Sujet</label>
+                      <label htmlFor="subject" className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Sujet</label>
                       <select 
                         required
                         className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all"
@@ -222,7 +224,7 @@ const Contact = () => {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Message</label>
+                      <label htmlFor="message" className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Message</label>
                       <textarea 
                         required
                         rows={6}

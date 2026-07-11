@@ -1,16 +1,19 @@
-import { AlertCircle, Building2, FileText, Gavel, Scale, ShieldCheck } from 'lucide-react';
+import { Building2, Gavel, Scale } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useTranslation } from 'react-i18next';
 import { cn } from '../lib/utils';
+import { legalContent } from '../data/legal';
 
 const Terms = () => {
   const { i18n } = useTranslation();
+  const lang = (i18n.language === 'ar' || i18n.language === 'en') ? i18n.language : 'fr';
+  const content = legalContent[lang].terms;
 
   return (
     <div className={cn("bg-neutral-bg min-h-screen pb-20", i18n.language === 'ar' && "font-arabic")}>
       {/* Header section */}
       <section className="bg-primary pt-32 pb-20 text-white relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10" 
+        <div className="absolute inset-0 opacity-10"
              style={{ backgroundImage: 'radial-gradient(#fff 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
         
         <div className="max-w-4xl mx-auto px-4 relative z-10 text-center">
@@ -20,15 +23,15 @@ const Terms = () => {
             className="inline-flex items-center space-x-3 mb-6 bg-white/10 px-4 py-2 rounded-xl backdrop-blur-md border border-white/10"
           >
             <Gavel className="h-5 w-5 text-secondary" />
-            <span className="text-[10px] font-black uppercase tracking-[0.2em]">Cadre Juridique</span>
+            <span className="text-[10px] font-black uppercase tracking-[0.2em]">{lang === 'ar' ? 'الإطار القانوني' : lang === 'en' ? 'Legal Framework' : 'Cadre Juridique'}</span>
           </motion.div>
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-4xl md:text-6xl font-black mb-6 uppercase tracking-tighter leading-none"
+            className="text-3xl md:text-5xl font-black mb-6 uppercase tracking-tighter leading-tight"
           >
-            {i18n.language === 'ar' ? 'إشعارات قانونية' : 'Mentions Légales'}
+            {content.title}
           </motion.h1>
           <motion.p 
             initial={{ opacity: 0 }}
@@ -36,117 +39,59 @@ const Terms = () => {
             transition={{ delay: 0.2 }}
             className="text-white/60 text-sm font-bold uppercase tracking-widest"
           >
-            Dernière mise à jour : 28 Avril 2024
+            {content.lastUpdated}
           </motion.p>
         </div>
       </section>
 
       {/* Content Section */}
       <section className="max-w-4xl mx-auto px-4 -mt-10 relative z-20">
-        <div className="bg-white p-8 md:p-16 border border-gray-100 shadow-2xl space-y-12">
-          {/* Section 1: Publisher */}
+        <div className="bg-white p-8 md:p-12 border border-gray-100 shadow-2xl space-y-12" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
+          
+          <div className="p-4 bg-orange-50 border-l-4 border-orange-500 text-orange-800 text-sm font-medium rounded-r-md">
+            {content.validationWarning}
+          </div>
+
+          {/* Mentions Légales */}
           <div className="space-y-6">
             <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-primary/5 flex items-center justify-center text-primary">
+              <div className="w-12 h-12 bg-primary/5 flex items-center justify-center text-primary shrink-0">
                 <Building2 className="h-6 w-6" />
               </div>
-              <h2 className="text-xl font-black text-primary uppercase tracking-tight">1. Éditeur de la Plateforme</h2>
+              <h2 className="text-xl font-black text-primary uppercase tracking-tight">{content.mentions.title}</h2>
             </div>
-            <div className="ps-16 space-y-4 text-gray-600 leading-relaxed text-sm font-medium">
-              <p>
-                La plateforme <strong>Algeria Industry</strong> est éditée par la société :
-              </p>
-              <ul className="space-y-2 border-l-2 border-secondary ps-6 py-2">
-                <li><strong>Dénomination sociale :</strong> ALGERIA INDUSTRY SOLUTIONS SPA</li>
-                <li><strong>Capital social :</strong> 10.000.000 DZD</li>
-                <li><strong>Siège social :</strong> Zone Industrielle Rouiba, Alger, Algérie</li>
-                <li><strong>Registre du Commerce :</strong> 16/00-XXXXXXX B 21</li>
-                <li><strong>NIF :</strong> 0021XXXXXXXXXXX</li>
-              </ul>
+            <div className={cn("space-y-4 text-gray-600 leading-relaxed text-sm font-medium", lang === 'ar' ? 'pe-16' : 'ps-16')}>
+              <pre className="whitespace-pre-wrap font-sans bg-gray-50 p-6 rounded-lg border border-gray-100 text-xs md:text-sm">
+                {content.mentions.content}
+              </pre>
             </div>
           </div>
 
-          {/* Section 2: Hosting */}
+          {/* CGU */}
           <div className="space-y-6 pt-12 border-t border-gray-50">
             <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-primary/5 flex items-center justify-center text-primary">
-                <ShieldCheck className="h-6 w-6" />
-              </div>
-              <h2 className="text-xl font-black text-primary uppercase tracking-tight">2. Hébergement</h2>
-            </div>
-            <div className="ps-16 space-y-4 text-gray-600 leading-relaxed text-sm font-medium">
-              <p>
-                Le site est hébergé sur des serveurs hautement sécurisés situés en Algérie (Secteur National) et conformes aux standards ISO 27001 :
-              </p>
-              <p className="p-4 bg-neutral-bg border-l-4 border-primary italic">
-                Algeria Telecom Cloud Services<br/>
-                Direction des Services Entreprises<br/>
-                Alger, Algérie.
-              </p>
-            </div>
-          </div>
-
-          {/* Section 3: Intellectual Property */}
-          <div className="space-y-6 pt-12 border-t border-gray-50">
-            <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-primary/5 flex items-center justify-center text-primary">
+              <div className="w-12 h-12 bg-primary/5 flex items-center justify-center text-primary shrink-0">
                 <Scale className="h-6 w-6" />
               </div>
-              <h2 className="text-xl font-black text-primary uppercase tracking-tight">3. Propriété Intellectuelle</h2>
+              <h2 className="text-xl font-black text-primary uppercase tracking-tight">{content.cgu.title}</h2>
             </div>
-            <div className="ps-16 space-y-4 text-gray-600 leading-relaxed text-sm font-medium">
-              <p>
-                L'ensemble de ce site (structure, design, logos, textes, bases de données, codes techniques) est la propriété exclusive de ALGERIA INDUSTRY SOLUTIONS.
-              </p>
-              <p>
-                Toute reproduction, représentation, modification, publication, adaptation de tout ou partie des éléments du site, quel que soit le moyen ou le procédé utilisé, est interdite, sauf autorisation écrite préalable.
-              </p>
-            </div>
-          </div>
-
-          {/* Section 4: Responsibility */}
-          <div className="space-y-6 pt-12 border-t border-gray-50">
-            <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-primary/5 flex items-center justify-center text-primary">
-                <AlertCircle className="h-6 w-6" />
-              </div>
-              <h2 className="text-xl font-black text-primary uppercase tracking-tight">4. Responsabilité</h2>
-            </div>
-            <div className="ps-16 space-y-4 text-gray-600 leading-relaxed text-sm font-medium">
-              <p>
-                Algeria Industry agit en tant que tiers de confiance B2B. L'éditeur ne peut être tenu responsable :
-              </p>
-              <ul className="list-disc space-y-2 ps-4">
-                <li>De l'exactitude des informations fournies par les entreprises exposantes.</li>
-                <li>Des dommages directs ou indirects résultant de l'utilisation de la plateforme.</li>
-                <li>Des éventuels litiges commerciaux entre utilisateurs mis en relation via le portail.</li>
-              </ul>
+            
+            <div className={cn("space-y-8 text-gray-600 leading-relaxed text-sm font-medium", lang === 'ar' ? 'pe-16' : 'ps-16')}>
+              {content.cgu.sections.map((section: any, idx: number) => (
+                <div key={idx} className="space-y-2">
+                  <h3 className="font-bold text-gray-900">{section.subtitle}</h3>
+                  <p>{section.text}</p>
+                </div>
+              ))}
             </div>
           </div>
 
-          {/* Section 5: Cookies */}
-          <div className="space-y-6 pt-12 border-t border-gray-50">
-            <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-primary/5 flex items-center justify-center text-primary">
-                <FileText className="h-6 w-6" />
-              </div>
-              <h2 className="text-xl font-black text-primary uppercase tracking-tight">5. Utilisation de Cookies</h2>
-            </div>
-            <div className="ps-16 space-y-4 text-gray-600 leading-relaxed text-sm font-medium">
-              <p>
-                Notre plateforme utilise des cookies techniques nécessaires à son bon fonctionnement (maintien de session, préférences linguistiques, comparateur de produits).
-              </p>
-              <p>
-                En naviguant sur ce portail, vous acceptez l'utilisation de ces outils essentiels à l'expérience industrielle connectée.
-              </p>
-            </div>
-          </div>
         </div>
 
         {/* Footer info */}
-        <div className="mt-12 text-center">
+        <div className="mt-12 text-center pb-8">
           <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.4em]">
-            Certifié Conforme - Département Conformité Algérie Industrie
+            {lang === 'ar' ? 'متوافق مع القوانين' : lang === 'en' ? 'Compliant with Laws' : 'Certifié Conforme - Conformité Légale'}
           </p>
         </div>
       </section>

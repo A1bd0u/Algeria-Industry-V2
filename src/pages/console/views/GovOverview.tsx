@@ -1,5 +1,6 @@
 /* eslint-disable */
 import React from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '../../../lib/utils';
 import { 
@@ -17,6 +18,13 @@ import {
 } from 'recharts';
 
 export default function GovOverview({ state }: { state: any }) {
+  const { data: dashboardData, isLoading } = useQuery({
+      queryKey: ['admin-dashboard', state.chartTimeframe],
+      queryFn: async () => {
+        const res = await fetch('/api/admin/dashboard?days=' + state.chartTimeframe, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }});
+        return res.json();
+      }
+    });
   const {
     activeTab, setActiveTab, chartTimeframe, setChartTimeframe, showArticleForm, setShowArticleForm,
     exhibitors, setExhibitors, showExhibitorForm, setShowExhibitorForm, pendingKYC, setPendingKYC,

@@ -1,3 +1,4 @@
+import { logger } from '../utils/logger';
 import express from 'express';
 import { getSupabase } from '../db/supabaseClient';
 
@@ -22,7 +23,7 @@ router.get('/', async (req, res) => {
 
     return res.json(articles || []);
   } catch (err: any) {
-    console.error("Supabase Error GET /articles:", err);
+    logger.error("Supabase Error GET /articles:", err);
     return res.status(500).json({ error: err.message });
   }
 });
@@ -46,7 +47,7 @@ router.get('/:id', async (req, res) => {
 
     return res.json(article);
   } catch (err: any) {
-    console.error("Supabase Error GET /articles/:id:", err);
+    logger.error("Supabase Error GET /articles/:id:", err);
     return res.status(500).json({ error: err.message });
   }
 });
@@ -79,7 +80,7 @@ router.post('/', verifyRole(['admin']), async (req, res) => {
     
     return res.status(201).json(data);
   } catch (err: any) {
-    console.error("Supabase Error POST /articles:", err);
+    logger.error("Supabase Error POST /articles:", err);
     return res.status(500).json({ error: err.message });
   }
 });
@@ -102,7 +103,7 @@ router.put('/:id', verifyRole(['admin']), async (req, res) => {
     
     return res.json(data);
   } catch (err: any) {
-    console.error("Supabase Error PUT /articles/:id:", err);
+    logger.error("Supabase Error PUT /articles/:id:", err);
     return res.status(500).json({ error: err.message });
   }
 });
@@ -121,7 +122,7 @@ router.delete('/:id', verifyRole(['admin']), async (req, res) => {
     
     return res.json({ success: true, message: "Article deleted" });
   } catch (err: any) {
-    console.error("Supabase Error DELETE /articles/:id:", err);
+    logger.error("Supabase Error DELETE /articles/:id:", err);
     return res.status(500).json({ error: err.message });
   }
 });

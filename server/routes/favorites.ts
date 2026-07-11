@@ -1,3 +1,4 @@
+import { logger } from '../utils/logger';
 import express from 'express';
 import { getSupabase } from '../db/supabaseClient';
 import { requireAuth } from '../middlewares/authMiddleware';
@@ -43,7 +44,7 @@ router.get('/', requireAuth, async (req, res) => {
     
     return res.json(enrichedFavs || []);
   } catch(e: any) {
-    console.error("Supabase Error GET /favorites:", e);
+    logger.error("Supabase Error GET /favorites:", e);
     return res.status(500).json({ error: e.message });
   }
 });
@@ -65,7 +66,7 @@ router.delete('/item/:itemId', requireAuth, async (req, res) => {
     if (error) throw error;
     return res.json({ success: true });
   } catch (err: any) {
-    console.error("Supabase Error DELETE /favorites/item/:itemId:", err);
+    logger.error("Supabase Error DELETE /favorites/item/:itemId:", err);
     return res.status(500).json({ error: err.message });
   }
 });
@@ -87,7 +88,7 @@ router.delete('/:id', requireAuth, async (req, res) => {
     if (error) throw error;
     return res.json({ success: true });
   } catch (err: any) {
-    console.error("Supabase Error DELETE /favorites/:id:", err);
+    logger.error("Supabase Error DELETE /favorites/:id:", err);
     return res.status(500).json({ error: err.message });
   }
 });
@@ -108,7 +109,7 @@ router.post('/', requireAuth, async (req, res) => {
     if (error) throw error;
     return res.json(data);
   } catch (err: any) {
-    console.error("Supabase Error POST /favorites:", err);
+    logger.error("Supabase Error POST /favorites:", err);
     return res.status(500).json({ error: err.message });
   }
 });

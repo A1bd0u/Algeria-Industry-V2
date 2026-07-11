@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { ArrowLeft, ArrowRight, Building2, CheckCircle2, FileText, Loader2, Upload, AlertTriangle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const KYCUpload = () => {
+  const { t } = useTranslation();
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -101,7 +103,7 @@ const KYCUpload = () => {
         className="max-w-3xl w-full"
       >
          <button onClick={() => navigate(-1)} className="flex items-center text-gray-500 hover:text-primary mb-6 text-sm font-bold transition-colors">
-            <ArrowLeft className="h-4 w-4 me-2" /> Retour
+            <ArrowLeft className="h-4 w-4 me-2 rtl:rotate-180" /> Retour
          </button>
          
          <div className="bg-white p-8 md:p-12 rounded-[40px] shadow-xl border border-gray-100 relative overflow-hidden">
@@ -114,14 +116,14 @@ const KYCUpload = () => {
                   <div className="mx-auto w-20 h-20 bg-success/10 text-success rounded-full flex items-center justify-center mb-6">
                      <CheckCircle2 className="h-10 w-10" />
                   </div>
-                  <h2 className="text-3xl font-black text-primary uppercase tracking-tighter mb-4">Demande Envoyée</h2>
-                  <p className="text-gray-500 font-medium">Votre dossier est maintenant en cours de vérification par nos agents.<br/>Vous recevrez une notification d'ici 24h à 48h.</p>
+                  <h2 className="text-3xl font-black text-primary uppercase tracking-tighter mb-4">{t('kyc.success_title')}</h2>
+                  <p className="text-gray-500 font-medium">{t('kyc.success_desc')}</p>
                </div>
             ) : (
                <form onSubmit={handleSubmit} className="relative z-10">
                   <div className="mb-10">
-                     <h1 className="text-3xl font-black text-primary uppercase tracking-tighter mb-4">Vérification de l'Entreprise (KYC)</h1>
-                     <p className="text-gray-500 font-medium">Conformément à nos CGU, nous devons vérifier la légitimité de votre entreprise pour délivrer le badge "Fournisseur Vérifié".</p>
+                     <h1 className="text-3xl font-black text-primary uppercase tracking-tighter mb-4">{t('kyc.upload_title')}</h1>
+                     <p className="text-gray-500 font-medium">{t('kyc.upload_desc')}</p>
                   </div>
 
                   {error && (
@@ -133,7 +135,7 @@ const KYCUpload = () => {
 
                   <div className="space-y-8">
                      <div>
-                        <label className="block text-sm font-black text-gray-700 uppercase tracking-widest mb-3">Secteur d'Activité Principal</label>
+                        <label className="block text-sm font-black text-gray-700 uppercase tracking-widest mb-3">{t('kyc.sector')}</label>
                         <input 
                           type="text" 
                           required
@@ -145,7 +147,7 @@ const KYCUpload = () => {
                      </div>
 
                      <div className="pt-6 border-t border-gray-100">
-                        <label className="block text-sm font-black text-gray-700 uppercase tracking-widest mb-6">Documents Légaux (PDF/Image)</label>
+                        <label className="block text-sm font-black text-gray-700 uppercase tracking-widest mb-6">{t('kyc.legal_docs')}</label>
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                            {files.map((f, i) => (
@@ -169,7 +171,7 @@ const KYCUpload = () => {
                                     ) : f.file ? (
                                        <span className="text-xs font-bold text-primary truncate px-4">{f.file.name}</span>
                                     ) : (
-                                       <span className="text-xs font-bold text-gray-400 uppercase tracking-widest flex items-center"><Upload className="h-4 w-4 me-2" /> Uploader</span>
+                                       <span className="text-xs font-bold text-gray-400 uppercase tracking-widest flex items-center"><Upload className="h-4 w-4 me-2" />{t('kyc.upload_btn')}</span>
                                     )}
                                  </div>
                               </div>
@@ -183,9 +185,9 @@ const KYCUpload = () => {
                        className="w-full btn-primary py-5 rounded-2xl flex items-center justify-center space-x-3 text-sm font-black uppercase tracking-widest disabled:opacity-50 disabled:cursor-not-allowed shadow-xl"
                      >
                         {isSubmitting ? (
-                          <><Loader2 className="h-5 w-5 animate-spin" /> <span>Envoi en cours...</span></>
+                          <><Loader2 className="h-5 w-5 animate-spin" /> <span>{t('kyc.sending')}</span></>
                         ) : (
-                          <><CheckCircle2 className="h-5 w-5" /> <span>Soumettre le Dossier</span></>
+                          <><CheckCircle2 className="h-5 w-5" /> <span>{t('kyc.submit_dossier')}</span></>
                         )}
                      </button>
                   </div>

@@ -1,5 +1,6 @@
 /* eslint-disable */
 import React from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '../../../lib/utils';
 import { 
@@ -16,6 +17,14 @@ import {
 } from 'recharts';
 
 export default function GovTelemetry({ state }: { state: any }) {
+  const { data: viewData = [], isLoading } = useQuery({
+          queryKey: ['admin-GovTelemetry'],
+          queryFn: async () => {
+            const res = await fetch('/api/admin/telemetry', { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }});
+            const json = await res.json();
+            return json.data || [];
+          }
+        });
   const {
     activeTab, setActiveTab, chartTimeframe, setChartTimeframe, showArticleForm, setShowArticleForm,
     exhibitors, setExhibitors, showExhibitorForm, setShowExhibitorForm, pendingKYC, setPendingKYC,

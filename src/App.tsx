@@ -1,12 +1,15 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AnimatePresence } from 'motion/react';
 import { Route, Routes, useLocation } from 'react-router-dom';
+import { HelmetProvider } from 'react-helmet-async';
 import BackToTop from './components/BackToTop';
 import Footer from './components/Footer';
 import HelpWidget from './components/HelpWidget';
 import HeroSlider from './components/HeroSlider';
 import Navbar from './components/Navbar';
+import VerificationBanner from './components/VerificationBanner';
 import PageTransition from './components/PageTransition';
+import ErrorBoundary from './components/ErrorBoundary';
 import ProtectedRoute from './components/ProtectedRoute';
 import ScrollToTop from './components/ScrollToTop';
 import { DEFAULT_SLIDES, SLIDES_BY_PATH } from './constants/slides';
@@ -90,7 +93,9 @@ export default function App() {
   }, [i18n]);
 
   return (
-    <QueryClientProvider client={queryClient}>
+    <HelmetProvider>
+      <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <TrackingProvider>
           <CurrencyProvider>
@@ -98,6 +103,7 @@ export default function App() {
               <VerifyAccountModal />
               <ScrollToTop />
               <div className="flex flex-col min-h-screen">
+              <VerificationBanner />
               {!isExtranet && <Navbar />}
               {!hideHeroSlider && <HeroSlider slides={currentSlides} />}
               <main className="flex-grow">
@@ -173,5 +179,7 @@ export default function App() {
         </TrackingProvider>
       </AuthProvider>
     </QueryClientProvider>
+    </ErrorBoundary>
+    </HelmetProvider>
   );
 }

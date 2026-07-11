@@ -98,7 +98,7 @@ const Register = () => {
     }
   };
 
-  const turnstileSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY || '1x00000000000000000000AA';
+  const turnstileSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-neutral-bg px-4 py-12">
@@ -234,13 +234,13 @@ const Register = () => {
                   className="w-full btn-primary mt-8 py-4 rounded-xl flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <span>Continuer</span>
-                  <ArrowRight className="h-5 w-5" />
+                  <ArrowRight className="h-5 w-5 rtl:rotate-180" />
                 </button>
               </div>
             ) : (
               <div className="animate-in slide-in-from-right duration-500">
                 <button onClick={() => setStep(1)} className="text-xs font-bold text-gray-400 hover:text-primary mb-4 flex items-center space-x-1">
-                  <ArrowRight className="h-3 w-3 rotate-180" />
+                  <ArrowRight className="h-3 w-3 rotate-180 rtl:rotate-180" />
                   <span>Retour au choix du profil</span>
                 </button>
                 <h3 className="text-2xl font-bold text-primary mb-6">Créer votre compte</h3>
@@ -254,8 +254,9 @@ const Register = () => {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Nom</label>
+                      <label htmlFor="lastName" className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Nom</label>
                       <input 
+                        id="lastName"
                         type="text"
                         {...register('lastName')}
                         className={`w-full px-4 py-3 bg-gray-50 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary/20 ${errors.lastName ? 'border-red-400' : 'border-gray-200'}`}
@@ -264,8 +265,9 @@ const Register = () => {
                       {errors.lastName && <p className="text-red-500 text-[10px] mt-1 font-medium">{errors.lastName.message}</p>}
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Prénom</label>
+                      <label htmlFor="firstName" className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Prénom</label>
                       <input 
+                        id="firstName"
                         type="text" 
                         {...register('firstName')}
                         className={`w-full px-4 py-3 bg-gray-50 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary/20 ${errors.firstName ? 'border-red-400' : 'border-gray-200'}`}
@@ -276,10 +278,11 @@ const Register = () => {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Nom de l'entreprise</label>
+                    <label htmlFor="companyName" className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Nom de l'entreprise</label>
                     <div className="relative">
                       <Building2 className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
                       <input 
+                        id="companyName"
                         type="text" 
                         {...register('companyName')}
                         className={`w-full ps-10 pe-4 py-3 bg-gray-50 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary/20 ${errors.companyName ? 'border-red-400' : 'border-gray-200'}`}
@@ -290,10 +293,11 @@ const Register = () => {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Email professionnel</label>
+                    <label htmlFor="email" className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Email professionnel</label>
                     <div className="relative">
                       <Mail className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
                       <input 
+                        id="email"
                         type="email" 
                         {...register('email')}
                         className={`w-full ps-10 pe-4 py-3 bg-gray-50 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary/20 ${errors.email ? 'border-red-400' : 'border-gray-200'}`}
@@ -304,10 +308,11 @@ const Register = () => {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Mot de passe</label>
+                    <label htmlFor="password" className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Mot de passe</label>
                     <div className="relative">
                       <Lock className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
                       <input 
+                        id="password"
                         type="password" 
                         {...register('password')}
                         className={`w-full ps-10 pe-4 py-3 bg-gray-50 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary/20 ${errors.password ? 'border-red-400' : 'border-gray-200'}`}
@@ -319,12 +324,16 @@ const Register = () => {
                   </div>
 
                   <div className="flex justify-center py-2">
-                    <Turnstile
-                      siteKey={turnstileSiteKey}
-                      onSuccess={(token) => setCaptchaToken(token)}
-                      onError={() => setCaptchaToken(null)}
-                      onExpire={() => setCaptchaToken(null)}
-                    />
+                    {turnstileSiteKey ? (
+                      <Turnstile
+                        siteKey={turnstileSiteKey}
+                        onSuccess={(token) => setCaptchaToken(token)}
+                        onError={() => setCaptchaToken(null)}
+                        onExpire={() => setCaptchaToken(null)}
+                      />
+                    ) : (
+                      <p className="text-red-500 text-sm font-bold">Erreur de configuration : VITE_TURNSTILE_SITE_KEY manquant</p>
+                    )}
                   </div>
 
                   <div className="pt-2">
@@ -373,7 +382,7 @@ const Register = () => {
                     className="flex items-center justify-center space-x-2 py-3 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors"
                   >
                     <div className="bg-[#0077b5] p-0.5 rounded text-white">
-                      <ArrowRight className="h-3 w-3" />
+                      <ArrowRight className="h-3 w-3 rtl:rotate-180" />
                     </div>
                     <span className="text-sm font-bold text-gray-700">LinkedIn</span>
                   </button>

@@ -1,6 +1,7 @@
+import { logger } from '../utils/logger';
 import express from 'express';
 import { getSupabase } from '../db/supabaseClient';
-import { requireAuth } from '../middlewares/authMiddleware';
+import { requireAuth, requireVerified } from '../middlewares/authMiddleware';
 
 const router = express.Router();
 
@@ -20,13 +21,13 @@ router.get('/', async (req, res) => {
     
     return res.json(rfqs || []);
   } catch(e: any) {
-    console.error("Supabase Error GET /rfqs:", e);
+    logger.error("Supabase Error GET /rfqs:", e);
     return res.status(500).json({ error: e.message });
   }
 });
 
 // POST /api/rfqs - Submit a new RFQ (Demande de devis)
-router.post('/', requireAuth, async (req, res) => {
+router.post('/', requireAuth, requireVerified, async (req, res) => {
   const { title, desiredDate, items, budget } = req.body;
   const user = (req as any).user;
 
@@ -42,7 +43,7 @@ router.post('/', requireAuth, async (req, res) => {
     if (error) throw error;
     return res.status(201).json(data);
   } catch (err: any) {
-    console.error("Supabase Error POST /rfqs:", err);
+    logger.error("Supabase Error POST /rfqs:", err);
     return res.status(500).json({ error: err.message });
   }
 });

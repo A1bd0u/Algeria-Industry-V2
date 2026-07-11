@@ -82,7 +82,8 @@ const Exhibitors = () => {
         setIsLoading(true);
         const res = await fetch('/api/companies');
         if (!res.ok) throw new Error('Erreur lors du chargement des exposants');
-        const data = await res.json();
+        let data = await res.json();
+        if (data && data.data) data = data.data;
         
         // Formatage des données pour correspondre à l'affichage attendu
         const formatted = data.map((c: any) => ({
@@ -320,7 +321,7 @@ const Exhibitors = () => {
                   <div className="flex gap-3">
                     <Link to={`/directory/${generateSlugUrl(exhibitor.name, String(exhibitor.id))}`} className="flex-1 py-3 bg-primary text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-secondary transition-all flex items-center justify-center space-x-2 shadow-lg group">
                       <span>Visiter</span>
-                      <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                      <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform rtl:rotate-180" />
                     </Link>
                     <Link to="/contact" className="w-12 h-12 bg-gray-50 text-gray-400 rounded-xl flex items-center justify-center hover:text-secondary hover:bg-secondary/5 transition-all shrink-0">
                       <MessageSquare className="h-4 w-4" />
@@ -340,7 +341,7 @@ const Exhibitors = () => {
               disabled={currentPage === 1}
               className="p-3 bg-white text-primary border border-gray-100 rounded-xl hover:text-secondary hover:border-secondary/20 hover:shadow-md disabled:opacity-40 disabled:hover:text-primary disabled:hover:border-gray-100 disabled:hover:shadow-none transition-all cursor-pointer disabled:cursor-not-allowed"
             >
-              <ChevronLeft className="h-4 w-4" />
+              <ChevronLeft className="h-4 w-4 rtl:rotate-180" />
             </button>
 
             {(() => {
@@ -400,7 +401,7 @@ const Exhibitors = () => {
               disabled={currentPage === totalPages}
               className="p-3 bg-white text-primary border border-gray-100 rounded-xl hover:text-secondary hover:border-secondary/20 hover:shadow-md disabled:opacity-40 disabled:hover:text-primary disabled:hover:border-gray-100 disabled:hover:shadow-none transition-all cursor-pointer disabled:cursor-not-allowed"
             >
-              <ChevronRight className="h-4 w-4" />
+              <ChevronRight className="h-4 w-4 rtl:rotate-180" />
             </button>
           </div>
         )}

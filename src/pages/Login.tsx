@@ -86,7 +86,7 @@ const Login = () => {
     }
   };
 
-  const turnstileSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY || '1x00000000000000000000AA'; // Dummy key for testing if not set
+  const turnstileSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY;
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center bg-neutral-bg px-4 py-12">
@@ -112,10 +112,11 @@ const Login = () => {
             )}
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Adresse Email</label>
+              <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">Adresse Email</label>
               <div className="relative">
                 <Mail className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5" />
                 <input 
+                  id="email"
                   type="text"
                   {...register('email')}
                   className={`w-full ps-10 pe-4 py-3 bg-gray-50 border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all ${errors.email ? 'border-red-400' : 'border-gray-200'}`}
@@ -135,6 +136,7 @@ const Login = () => {
               <div className="relative">
                 <Lock className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5" />
                 <input 
+                  id="password"
                   type={showPassword ? "text" : "password"}
                   {...register('password')}
                   className={`w-full ps-10 pe-12 py-3 bg-gray-50 border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all ${errors.password ? 'border-red-400' : 'border-gray-200'}`}
@@ -157,12 +159,16 @@ const Login = () => {
             </div>
 
             <div className="flex justify-center my-4">
-              <Turnstile
-                siteKey={turnstileSiteKey}
-                onSuccess={(token) => setCaptchaToken(token)}
-                onError={() => setCaptchaToken(null)}
-                onExpire={() => setCaptchaToken(null)}
-              />
+              {turnstileSiteKey ? (
+                <Turnstile
+                  siteKey={turnstileSiteKey}
+                  onSuccess={(token) => setCaptchaToken(token)}
+                  onError={() => setCaptchaToken(null)}
+                  onExpire={() => setCaptchaToken(null)}
+                />
+              ) : (
+                <p className="text-red-500 text-sm font-bold">Erreur de configuration : VITE_TURNSTILE_SITE_KEY manquant</p>
+              )}
             </div>
 
             <button 
@@ -178,7 +184,7 @@ const Login = () => {
               ) : (
                 <>
                   <span>Se connecter</span>
-                  <ArrowRight className="h-5 w-5" />
+                  <ArrowRight className="h-5 w-5 rtl:rotate-180" />
                 </>
               )}
             </button>
@@ -209,7 +215,7 @@ const Login = () => {
               className="flex items-center justify-center space-x-2 py-3 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors"
             >
               <div className="bg-[#0077b5] p-0.5 rounded text-white">
-                <ArrowRight className="h-3 w-3" />
+                <ArrowRight className="h-3 w-3 rtl:rotate-180" />
               </div>
               <span className="text-sm font-bold text-gray-700">LinkedIn</span>
             </button>
