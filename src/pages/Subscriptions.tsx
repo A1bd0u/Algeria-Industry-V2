@@ -78,7 +78,7 @@ const Subscriptions = () => {
   ];
 
   return (
-    <div className={cn("min-h-screen bg-neutral-bg pb-20 pt-32", i18n.language === 'ar' && "font-arabic")}>
+    <div className={cn("min-h-screen bg-neutral-bg pb-20 pt-32", i18n.language?.startsWith('ar') && "font-arabic")}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-12">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -96,7 +96,7 @@ const Subscriptions = () => {
                 animate={{ opacity: 1, y: 0 }}
                 className="text-4xl font-black text-primary uppercase tracking-tighter"
               >
-                {i18n.language === 'ar' ? 'إدارة الاشتراكات' : 'Gestion des Abonnements'}
+                {i18n.language?.startsWith('ar') ? 'إدارة الاشتراكات' : 'Gestion des Abonnements'}
               </motion.h1>
             </div>
             

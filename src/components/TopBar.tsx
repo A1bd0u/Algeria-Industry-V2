@@ -1,15 +1,32 @@
 import { ChevronDown, Star } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { useCurrency } from '../context/CurrencyContext';
 
 const TopBar = () => {
-  const [lang, setLang] = useState("FR");
   const [showLangMenu, setShowLangMenu] = useState(false);
   const { t, i18n } = useTranslation();
   const [showLang, setShowLang] = useState(false);
+  const langTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowLang(false);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const handleLangMouseEnter = () => {
+    if (langTimeoutRef.current) clearTimeout(langTimeoutRef.current);
+  };
+
+  const handleLangMouseLeave = () => {
+    langTimeoutRef.current = setTimeout(() => {
+      setShowLang(false);
+    }, 400);
+  };
 
   const languages = [
     { code: 'fr', name: 'Français', flag: 'https://flagcdn.com/w20/fr.png' },
@@ -26,7 +43,8 @@ const TopBar = () => {
           {/* Language Selector */}
           <div 
             className="relative py-2"
-            onMouseLeave={() => setShowLang(false)}
+            onMouseEnter={handleLangMouseEnter}
+            onMouseLeave={handleLangMouseLeave}
           >
             <button 
               onClick={() => setShowLang(!showLang)}
@@ -71,7 +89,7 @@ const TopBar = () => {
           </button>
 
           {/* Become Exhibitor Button */}
-          <Link to="/become-exhibitor" className="border border-white/40 px-3 py-1 rounded hover:bg-white hover:text-black transition-all text-[10px]">
+          <Link to="/register?role=fournisseur" className="border border-white/40 px-3 py-1 rounded hover:bg-white hover:text-black transition-all text-[10px]">
             {t('topbar.become_exhibitor')}
           </Link>
         </div>

@@ -136,7 +136,7 @@ const Exhibitors = () => {
   const regions = ['Toutes', 'Alger', 'Oran', 'Sétif', 'Annaba', 'Constantine', 'Blida'];
 
   return (
-    <div className={cn("min-h-screen bg-neutral-bg pt-8 pb-20", i18n.language === 'ar' && "font-arabic")}>
+    <div className={cn("min-h-screen bg-neutral-bg pt-8 pb-20", i18n.language?.startsWith('ar') && "font-arabic")}>
       <div className="max-w-full mx-auto px-4 sm:px-8 lg:px-12">
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-2">
           <div className="max-w-3xl">
@@ -193,7 +193,7 @@ const Exhibitors = () => {
                   className="w-full sm:w-auto flex items-center justify-between bg-white px-5 py-3 rounded-xl border border-gray-100 shadow-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all cursor-pointer text-gray-800 hover:border-gray-300 min-w-[260px] text-start"
                 >
                   <div className="flex flex-col gap-0.5">
-                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{i18n.language === 'ar' ? 'القطاع' : 'Secteur d\'activité'}</span>
+                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{i18n.language?.startsWith('ar') ? 'القطاع' : 'Secteur d\'activité'}</span>
                     <span className="text-xs font-black uppercase tracking-widest truncate">{activeSector === 'Tous' ? 'Tous les Secteurs' : activeSector}</span>
                   </div>
                   <ChevronDown className={cn("w-4 h-4 text-gray-400 transition-transform ms-4 shrink-0", isSectorOpen && "rotate-180")} />
@@ -202,7 +202,7 @@ const Exhibitors = () => {
                 {isSectorOpen && (
                   <div className="absolute top-full start-0 z-50 w-full mt-2 bg-white rounded-xl shadow-xl border border-gray-100 py-2 overflow-hidden transform origin-top animate-in fade-in slide-in-from-top-2 duration-200">
                     <div className="px-4 py-2">
-                       <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{i18n.language === 'ar' ? 'القطاعات' : 'Secteurs'}</span>
+                       <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{i18n.language?.startsWith('ar') ? 'القطاعات' : 'Secteurs'}</span>
                     </div>
                     {sectors.map(s => (
                       <button
@@ -230,7 +230,7 @@ const Exhibitors = () => {
                   className="w-full sm:w-auto flex items-center justify-between bg-white px-5 py-3 rounded-xl border border-gray-100 shadow-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all cursor-pointer text-gray-800 hover:border-gray-300 min-w-[200px] text-start"
                 >
                   <div className="flex flex-col gap-0.5">
-                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{i18n.language === 'ar' ? 'الولاية' : 'Wilaya'}</span>
+                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{i18n.language?.startsWith('ar') ? 'الولاية' : 'Wilaya'}</span>
                     <span className="text-xs font-black uppercase tracking-widest truncate">{activeRegion === 'Toutes' ? 'Toutes les Wilayas' : activeRegion}</span>
                   </div>
                   <ChevronDown className={cn("w-4 h-4 text-gray-400 transition-transform ms-4 shrink-0", isRegionOpen && "rotate-180")} />
@@ -239,7 +239,7 @@ const Exhibitors = () => {
                 {isRegionOpen && (
                   <div className="absolute top-full start-0 z-50 w-full mt-2 bg-white rounded-xl shadow-xl border border-gray-100 py-2 overflow-hidden transform origin-top animate-in fade-in slide-in-from-top-2 duration-200">
                     <div className="px-4 py-2">
-                       <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{i18n.language === 'ar' ? 'الولايات' : 'Wilayas'}</span>
+                       <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{i18n.language?.startsWith('ar') ? 'الولايات' : 'Wilayas'}</span>
                     </div>
                     {regions.map(r => (
                       <button
@@ -423,7 +423,7 @@ const Exhibitors = () => {
               Ne manquez pas l'opportunité de présenter vos innovations au plus grand réseau industriel en Algérie.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link to="/become-exhibitor" className="btn-secondary px-12 py-5 rounded-2xl text-sm font-black uppercase tracking-widest shadow-2xl">
+              <Link to="/register?role=fournisseur" className="btn-secondary px-12 py-5 rounded-2xl text-sm font-black uppercase tracking-widest shadow-2xl">
                 Devenir Exposant
               </Link>
               <Link to="/tarifs" className="bg-white/10 border border-white/20 px-12 py-5 rounded-2xl text-sm font-black uppercase tracking-widest hover:bg-white/20 transition-all flex items-center justify-center">

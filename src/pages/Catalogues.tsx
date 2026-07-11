@@ -52,13 +52,13 @@ const Catalogues = () => {
   });
 
   return (
-    <div className={cn("bg-neutral-bg min-h-screen pb-20", i18n.language === 'ar' && "font-arabic")}>
+    <div className={cn("bg-neutral-bg min-h-screen pb-20", i18n.language?.startsWith('ar') && "font-arabic")}>
       {/* Header */}
       <div className="bg-white border-b border-gray-200 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className={cn("flex flex-col md:flex-row md:items-center md:justify-between gap-8", i18n.language === 'ar' && "md:flex-row-reverse text-end")}>
-            <div className={cn(i18n.language === 'ar' && "ms-auto")}>
-              <div className={cn("flex items-center space-x-2 text-secondary mb-4", i18n.language === 'ar' && "flex-row-reverse space-x-reverse justify-end")}>
+          <div className={cn("flex flex-col md:flex-row md:items-center md:justify-between gap-8", i18n.language?.startsWith('ar') && "md:flex-row-reverse text-end")}>
+            <div className={cn(i18n.language?.startsWith('ar') && "ms-auto")}>
+              <div className={cn("flex items-center space-x-2 text-secondary mb-4", i18n.language?.startsWith('ar') && "flex-row-reverse space-x-reverse justify-end")}>
                 <div className="w-8 h-[2px] bg-secondary" />
                 <span className="text-xs font-black uppercase tracking-[0.3em]">{t('catalogues.tech_doc')}</span>
               </div>
@@ -73,7 +73,7 @@ const Catalogues = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Categories */}
-        <div className={cn("flex flex-wrap gap-2 mb-12", i18n.language === 'ar' && "flex-row-reverse")}>
+        <div className={cn("flex flex-wrap gap-2 mb-12", i18n.language?.startsWith('ar') && "flex-row-reverse")}>
           {categories.map((cat) => (
             <button
               key={cat.key}
@@ -109,7 +109,7 @@ const Catalogues = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  className={cn("bg-white border border-gray-200 group hover:border-secondary transition-all flex flex-col", i18n.language === 'ar' && "text-end")}
+                  className={cn("bg-white border border-gray-200 group hover:border-secondary transition-all flex flex-col", i18n.language?.startsWith('ar') && "text-end")}
                 >
                   <div className="aspect-[4/5] relative overflow-hidden bg-gray-100 border-b border-gray-200">
                     <img 
@@ -123,7 +123,7 @@ const Catalogues = () => {
                         <Download className="h-6 w-6" />
                       </button>
                     </div>
-                    <div className={cn("absolute top-4", i18n.language === 'ar' ? "end-4" : "start-4")}>
+                    <div className={cn("absolute top-4", i18n.language?.startsWith('ar') ? "end-4" : "start-4")}>
                       <span className="bg-primary text-white px-3 py-1 text-[9px] font-black uppercase tracking-tighter">
                         {t(`categories.${cat.categoryKey}`)}
                       </span>
@@ -131,7 +131,7 @@ const Catalogues = () => {
                   </div>
 
                   <div className="p-6 flex-grow flex flex-col">
-                    <div className={cn("flex items-center space-x-2 text-[10px] font-mono text-secondary mb-2 font-bold uppercase", i18n.language === 'ar' && "flex-row-reverse space-x-reverse justify-start")}>
+                    <div className={cn("flex items-center space-x-2 text-[10px] font-mono text-secondary mb-2 font-bold uppercase", i18n.language?.startsWith('ar') && "flex-row-reverse space-x-reverse justify-start")}>
                       <Building2 className="h-3 w-3" />
                       <span>{cat.company}</span>
                     </div>
@@ -154,12 +154,12 @@ const Catalogues = () => {
                       </div>
                     </div>
 
-                    <div className={cn("mt-6 flex items-center justify-between", i18n.language === 'ar' && "flex-row-reverse")}>
-                      <button className={cn("flex items-center space-x-2 text-[10px] font-black text-primary uppercase tracking-widest hover:text-secondary transition-colors", i18n.language === 'ar' && "flex-row-reverse space-x-reverse")} onClick={(e) => { e.preventDefault(); alert("Fonctionnalité en cours de développement"); }}>
+                    <div className={cn("mt-6 flex items-center justify-between", i18n.language?.startsWith('ar') && "flex-row-reverse")}>
+                      <button className={cn("flex items-center space-x-2 text-[10px] font-black text-primary uppercase tracking-widest hover:text-secondary transition-colors", i18n.language?.startsWith('ar') && "flex-row-reverse space-x-reverse")} onClick={(e) => { e.preventDefault(); alert("Fonctionnalité en cours de développement"); }}>
                         <ExternalLink className="h-4 w-4" />
                         <span>{t('catalogues.view')}</span>
                       </button>
-                      <button className={cn("flex items-center space-x-2 text-[10px] font-black text-secondary uppercase tracking-widest hover:underline", i18n.language === 'ar' && "flex-row-reverse space-x-reverse")} onClick={(e) => { e.preventDefault(); alert("Fonctionnalité en cours de développement"); }}>
+                      <button className={cn("flex items-center space-x-2 text-[10px] font-black text-secondary uppercase tracking-widest hover:underline", i18n.language?.startsWith('ar') && "flex-row-reverse space-x-reverse")} onClick={(e) => { e.preventDefault(); alert("Fonctionnalité en cours de développement"); }}>
                         <Download className="h-4 w-4" />
                         <span>{t('catalogues.download')}</span>
                       </button>

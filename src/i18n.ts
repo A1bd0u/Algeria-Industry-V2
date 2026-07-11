@@ -29,7 +29,7 @@ i18n
 
 // Support RTL
 i18n.on('languageChanged', (lng) => {
-  if (lng === 'ar') {
+  if (lng.startsWith('ar')) {
     document.documentElement.dir = 'rtl';
     document.documentElement.lang = 'ar';
   } else {
@@ -39,12 +39,13 @@ i18n.on('languageChanged', (lng) => {
 });
 
 // Initial load
-if (i18n.language === 'ar' || (i18n.languages && i18n.languages[0] === 'ar')) {
+const currentLang = i18n.language || (i18n.languages && i18n.languages[0]) || 'fr';
+if (currentLang.startsWith('ar')) {
   document.documentElement.dir = 'rtl';
   document.documentElement.lang = 'ar';
 } else {
   document.documentElement.dir = 'ltr';
-  document.documentElement.lang = i18n.language || 'fr';
+  document.documentElement.lang = currentLang;
 }
 
 export default i18n;

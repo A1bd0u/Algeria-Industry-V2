@@ -52,7 +52,7 @@ const SearchResults = () => {
   const totalResults = results.companies.length + results.products.length;
 
   return (
-    <div className={cn("min-h-screen bg-neutral-bg pt-10 pb-20", i18n.language === 'ar' && "font-arabic")}>
+    <div className={cn("min-h-screen bg-neutral-bg pt-10 pb-20", i18n.language?.startsWith('ar') && "font-arabic")}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-12">
           <div className="flex items-center space-x-3 mb-4">

@@ -1,7 +1,7 @@
 import { ArrowRight, Briefcase, Building2, CheckCircle2, Loader2, Lock, Mail, ShieldCheck, User } from 'lucide-react';
 import { motion } from 'motion/react';
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { cn } from '../lib/utils';
 import { useForm } from 'react-hook-form';
@@ -24,8 +24,12 @@ const registerSchema = z.object({
 type RegisterForm = z.infer<typeof registerSchema>;
 
 const Register = () => {
-  const [role, setRole] = useState<'acheteur' | 'fournisseur' | null>(null);
-  const [step, setStep] = useState(1);
+  const [searchParams] = useSearchParams();
+  const initialRole = searchParams.get('role');
+  const validInitialRole = (initialRole === 'acheteur' || initialRole === 'fournisseur') ? initialRole : null;
+  
+  const [role, setRole] = useState<'acheteur' | 'fournisseur' | null>(validInitialRole);
+  const [step, setStep] = useState(validInitialRole ? 2 : 1);
   const [isLoading, setIsLoading] = useState(false);
   const [authError, setAuthError] = useState('');
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);

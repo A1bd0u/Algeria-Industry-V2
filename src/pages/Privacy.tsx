@@ -6,11 +6,11 @@ import { legalContent } from '../data/legal';
 
 const Privacy = () => {
   const { i18n } = useTranslation();
-  const lang = (i18n.language === 'ar' || i18n.language === 'en') ? i18n.language : 'fr';
+  const lang = (i18n.language?.startsWith('ar') || i18n.language?.startsWith('en')) ? i18n.language : 'fr';
   const content = legalContent[lang].privacy;
 
   return (
-    <div className={cn("bg-neutral-bg min-h-screen pb-20", i18n.language === 'ar' && "font-arabic")}>
+    <div className={cn("bg-neutral-bg min-h-screen pb-20", i18n.language?.startsWith('ar') && "font-arabic")}>
       {/* Header section */}
       <section className="bg-primary pt-32 pb-20 text-white relative overflow-hidden">
         <div className="absolute inset-0 opacity-10"

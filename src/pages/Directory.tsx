@@ -95,25 +95,25 @@ const Directory = () => {
         description={t('directory.subtitle')}
         url="https://votre-domaine.dz/directory"
       />
-    <div className={cn("bg-neutral-bg min-h-screen pb-20", i18n.language === 'ar' && "font-arabic")}>
+    <div className={cn("bg-neutral-bg min-h-screen pb-20", i18n.language?.startsWith('ar') && "font-arabic")}>
       {/* Header Section */}
       <div className="bg-white border-b border-border-tech py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className={cn("flex flex-col md:flex-row md:items-end md:justify-between gap-6", i18n.language === 'ar' && "md:flex-row-reverse")}>
-            <div className={i18n.language === 'ar' ? "text-end" : ""}>
-              <div className={cn("flex items-center space-x-2 text-secondary mb-4", i18n.language === 'ar' && "space-x-reverse justify-end")}>
+          <div className={cn("flex flex-col md:flex-row md:items-end md:justify-between gap-6", i18n.language?.startsWith('ar') && "md:flex-row-reverse")}>
+            <div className={i18n.language?.startsWith('ar') ? "text-end" : ""}>
+              <div className={cn("flex items-center space-x-2 text-secondary mb-4", i18n.language?.startsWith('ar') && "space-x-reverse justify-end")}>
                 <div className="w-8 h-[2px] bg-secondary" />
                 <span className="text-xs font-black uppercase tracking-[0.3em] font-sans">{t('directory.db_label')}</span>
               </div>
               <h1 className="text-4xl font-black text-primary uppercase tracking-tighter leading-none">{t('directory.title')}</h1>
               <p className="text-sm text-gray-500 mt-4 font-medium uppercase tracking-wider">{t('directory.subtitle')}</p>
             </div>
-            <div className={cn("flex bg-neutral-bg p-1 border border-border-tech self-start", i18n.language === 'ar' && "flex-row-reverse")}>
+            <div className={cn("flex bg-neutral-bg p-1 border border-border-tech self-start", i18n.language?.startsWith('ar') && "flex-row-reverse")}>
               <button 
                 onClick={() => setViewMode('list')}
                 className={cn(
                   "flex items-center space-x-2 px-6 py-2 text-[11px] font-black uppercase tracking-widest transition-all",
-                  i18n.language === 'ar' && "space-x-reverse",
+                  i18n.language?.startsWith('ar') && "space-x-reverse",
                   viewMode === 'list' ? "bg-white text-primary shadow-sm border border-border-tech" : "text-gray-400 hover:text-primary"
                 )}
               >
@@ -124,7 +124,7 @@ const Directory = () => {
                 onClick={() => setViewMode('map')}
                 className={cn(
                   "flex items-center space-x-2 px-6 py-2 text-[11px] font-black uppercase tracking-widest transition-all",
-                  i18n.language === 'ar' && "space-x-reverse",
+                  i18n.language?.startsWith('ar') && "space-x-reverse",
                   viewMode === 'map' ? "bg-white text-primary shadow-sm border border-border-tech" : "text-gray-400 hover:text-primary"
                 )}
               >
@@ -137,17 +137,17 @@ const Directory = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
-        <div className={cn("flex flex-col lg:flex-row gap-12", i18n.language === 'ar' && "lg:flex-row-reverse")}>
+        <div className={cn("flex flex-col lg:flex-row gap-12", i18n.language?.startsWith('ar') && "lg:flex-row-reverse")}>
           
           {/* Sidebar Filters */}
           <aside className="w-full lg:w-80 space-y-8">
             <div className="bg-white p-8 border border-border-tech">
-              <div className={cn("flex items-center space-x-3 mb-8", i18n.language === 'ar' && "space-x-reverse justify-end")}>
+              <div className={cn("flex items-center space-x-3 mb-8", i18n.language?.startsWith('ar') && "space-x-reverse justify-end")}>
                 <Filter className="h-5 w-5 text-secondary" />
                 <h3 className="text-sm font-black text-primary uppercase tracking-widest">{t('directory.search_params')}</h3>
               </div>
 
-              <div className={cn("mb-8", i18n.language === 'ar' && "text-end")}>
+              <div className={cn("mb-8", i18n.language?.startsWith('ar') && "text-end")}>
                 <span className="text-[10px] font-black text-primary uppercase tracking-widest">{t('common.search')}</span>
                 <div className="mt-4 flex items-center bg-white p-2 rounded-2xl border border-gray-100 shadow-sm focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary transition-all">
                   <Search className="h-4 w-4 text-gray-400 ms-2" />
@@ -162,11 +162,11 @@ const Directory = () => {
               </div>
 
               {/* Sector Filter */}
-              <div className={cn("mb-8 pt-8 border-t border-gray-100", i18n.language === 'ar' && "text-end")}>
+              <div className={cn("mb-8 pt-8 border-t border-gray-100", i18n.language?.startsWith('ar') && "text-end")}>
                 <span className="text-[10px] font-black text-primary uppercase tracking-widest">{t('directory.sector')}</span>
                 <div className="space-y-3 mt-4">
                   {sectors.map((sector) => (
-                    <label key={sector} className={cn("flex items-center space-x-3 cursor-pointer group", i18n.language === 'ar' && "flex-row-reverse space-x-reverse")}>
+                    <label key={sector} className={cn("flex items-center space-x-3 cursor-pointer group", i18n.language?.startsWith('ar') && "flex-row-reverse space-x-reverse")}>
                       <input 
                         type="checkbox" 
                         checked={selectedSectors.includes(sector)}
@@ -183,7 +183,7 @@ const Directory = () => {
               </div>
 
               {/* Region Filter */}
-              <div className={cn("mb-8 pt-8 border-t border-gray-100", i18n.language === 'ar' && "text-end")}>
+              <div className={cn("mb-8 pt-8 border-t border-gray-100", i18n.language?.startsWith('ar') && "text-end")}>
                 <span className="text-[10px] font-black text-primary uppercase tracking-widest">{t('directory.region')}</span>
                 <select 
                   value={selectedRegion}
@@ -196,9 +196,9 @@ const Directory = () => {
               </div>
 
               {/* Zones Industrielles */}
-              <div className={cn("mb-8 pt-8 border-t border-gray-100", i18n.language === 'ar' && "text-end")}>
+              <div className={cn("mb-8 pt-8 border-t border-gray-100", i18n.language?.startsWith('ar') && "text-end")}>
                 <span className="text-[10px] font-black text-primary uppercase tracking-widest">{t('directory.zones')}</span>
-                <div className={cn("flex flex-wrap gap-2 mt-4", i18n.language === 'ar' && "justify-end")}>
+                <div className={cn("flex flex-wrap gap-2 mt-4", i18n.language?.startsWith('ar') && "justify-end")}>
                   {["Rouiba", "Hassi Messaoud", "Arzew", "Chelghoum Laid"].map(zone => (
                     <button key={zone} className="px-3 py-1 bg-gray-50 border border-gray-100 text-[9px] font-black uppercase tracking-widest text-gray-400 hover:border-secondary hover:text-secondary transition-all" onClick={(e) => { e.preventDefault(); alert("Fonctionnalité en cours de développement"); }}>
                       {zone}
@@ -211,7 +211,7 @@ const Directory = () => {
               <div className="pt-8 border-t border-gray-100">
                 <button 
                   onClick={() => setIsCertifiedOnly(!isCertifiedOnly)}
-                  className={cn("flex items-center justify-between w-full cursor-pointer group", i18n.language === 'ar' && "flex-row-reverse")}
+                  className={cn("flex items-center justify-between w-full cursor-pointer group", i18n.language?.startsWith('ar') && "flex-row-reverse")}
                 >
                   <span className="text-[11px] font-black text-primary uppercase tracking-widest">{t('directory.iso_only')}</span>
                   <div className={cn(
@@ -230,16 +230,16 @@ const Directory = () => {
             {/* Ad Slot */}
             <AdSpace 
               type="vertical" 
-              title={i18n.language === 'ar' ? "تأمين المخاطر الصناعية" : "Assurance Risques Industriels"}
-              description={i18n.language === 'ar' ? "احمِ أصولك من خلال حلولنا المخصصة للشركات الصغيرة والمتوسطة." : "Protégez vos actifs avec nos solutions sur mesure pour les PME."}
+              title={i18n.language?.startsWith('ar') ? "تأمين المخاطر الصناعية" : "Assurance Risques Industriels"}
+              description={i18n.language?.startsWith('ar') ? "احمِ أصولك من خلال حلولنا المخصصة للشركات الصغيرة والمتوسطة." : "Protégez vos actifs avec nos solutions sur mesure pour les PME."}
               imageUrl="https://picsum.photos/seed/insurance/400/600"
             />
           </aside>
 
           {/* Main Content */}
           <div className="flex-1">
-            <div className={cn("flex justify-between items-center mb-8", i18n.language === 'ar' && "flex-row-reverse")}>
-               <div className={cn("flex items-center space-x-3", i18n.language === 'ar' && "space-x-reverse")}>
+            <div className={cn("flex justify-between items-center mb-8", i18n.language?.startsWith('ar') && "flex-row-reverse")}>
+               <div className={cn("flex items-center space-x-3", i18n.language?.startsWith('ar') && "space-x-reverse")}>
                  <span className="text-[10px] font-black text-primary uppercase tracking-widest bg-white border border-border-tech px-3 py-1">
                    {filteredCompanies.length} resultats
                  </span>
@@ -283,18 +283,18 @@ const Directory = () => {
                       className="bg-white p-8 border border-border-tech hover:bg-neutral-bg transition-all group relative overflow-hidden"
                     >
                       {/* Technical ID Watermark */}
-                      <div className={cn("absolute text-[80px] font-black text-gray-50/50 pointer-events-none tech-mono leading-none", i18n.language === 'ar' ? "-start-4 -top-4" : "-end-4 -top-4")}>
+                      <div className={cn("absolute text-[80px] font-black text-gray-50/50 pointer-events-none tech-mono leading-none", i18n.language?.startsWith('ar') ? "-start-4 -top-4" : "-end-4 -top-4")}>
                         {company.id.toString().padStart(3, '0')}
                       </div>
 
-                      <div className={cn("flex flex-col md:flex-row gap-8 relative z-10", i18n.language === 'ar' && "md:flex-row-reverse")}>
+                      <div className={cn("flex flex-col md:flex-row gap-8 relative z-10", i18n.language?.startsWith('ar') && "md:flex-row-reverse")}>
                         <div className="w-24 h-24 bg-white border border-border-tech p-2 flex-shrink-0">
                           <img src={company.logo} alt={company.name} className="w-full h-full object-contain grayscale group-hover:grayscale-0 transition-all" referrerPolicy="no-referrer" />
                         </div>
                         <div className="flex-1">
-                          <div className={cn("flex flex-col md:flex-row items-start justify-between gap-4", i18n.language === 'ar' && "md:flex-row-reverse")}>
-                            <div className={i18n.language === 'ar' ? "text-end" : ""}>
-                              <div className={cn("flex items-center space-x-3", i18n.language === 'ar' && "flex-row-reverse space-x-reverse justify-end")}>
+                          <div className={cn("flex flex-col md:flex-row items-start justify-between gap-4", i18n.language?.startsWith('ar') && "md:flex-row-reverse")}>
+                            <div className={i18n.language?.startsWith('ar') ? "text-end" : ""}>
+                              <div className={cn("flex items-center space-x-3", i18n.language?.startsWith('ar') && "flex-row-reverse space-x-reverse justify-end")}>
                                 <h3 className="text-xl font-black text-primary uppercase tracking-tighter group-hover:text-secondary transition-colors">{company.name}</h3>
                                 {company.certified && (
                                   <div className="bg-secondary/10 text-secondary px-2 py-0.5 border border-secondary/20 flex items-center space-x-1" title="Certifié ISO">
@@ -303,12 +303,12 @@ const Directory = () => {
                                   </div>
                                 )}
                               </div>
-                              <div className={cn("flex items-center space-x-6 mt-2", i18n.language === 'ar' && "flex-row-reverse space-x-reverse justify-end")}>
-                                <div className={cn("flex items-center space-x-2", i18n.language === 'ar' && "space-x-reverse")}>
+                              <div className={cn("flex items-center space-x-6 mt-2", i18n.language?.startsWith('ar') && "flex-row-reverse space-x-reverse justify-end")}>
+                                <div className={cn("flex items-center space-x-2", i18n.language?.startsWith('ar') && "space-x-reverse")}>
                                   <Building2 className="h-3 w-3 text-gray-400" />
                                   <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">{company.sector}</span>
                                 </div>
-                                <div className={cn("flex items-center space-x-2", i18n.language === 'ar' && "space-x-reverse")}>
+                                <div className={cn("flex items-center space-x-2", i18n.language?.startsWith('ar') && "space-x-reverse")}>
                                   <MapPin className="h-3 w-3 text-gray-400" />
                                   <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">{company.region}</span>
                                 </div>
@@ -318,28 +318,28 @@ const Directory = () => {
                               <ExternalLink className="h-5 w-5" />
                             </button>
                           </div>
-                          <p className={cn("text-gray-500 text-[13px] mt-4 leading-relaxed font-medium uppercase tracking-tight", i18n.language === 'ar' && "text-end")}>{company.description}</p>
+                          <p className={cn("text-gray-500 text-[13px] mt-4 leading-relaxed font-medium uppercase tracking-tight", i18n.language?.startsWith('ar') && "text-end")}>{company.description}</p>
                           
-                          <div className={cn("mt-8 pt-6 border-t border-border-tech grid grid-cols-2 md:grid-cols-4 gap-6", i18n.language === 'ar' && "md:flex md:flex-row-reverse md:justify-between")}>
-                            <div className={i18n.language === 'ar' ? "text-end" : ""}>
+                          <div className={cn("mt-8 pt-6 border-t border-border-tech grid grid-cols-2 md:grid-cols-4 gap-6", i18n.language?.startsWith('ar') && "md:flex md:flex-row-reverse md:justify-between")}>
+                            <div className={i18n.language?.startsWith('ar') ? "text-end" : ""}>
                               <span className="tech-label">{t('directory.id_reg')}</span>
                               <span className="text-[11px] font-mono font-bold text-primary">{company.reference_id ? company.reference_id : `${company.founded}-DZ-${company.id.toString().substring(0, 4)}`}</span>
                             </div>
-                            <div className={i18n.language === 'ar' ? "text-end" : ""}>
+                            <div className={i18n.language?.startsWith('ar') ? "text-end" : ""}>
                               <span className="tech-label">{t('directory.workforce')}</span>
                               <span className="text-[11px] font-mono font-bold text-primary">{company.employees}</span>
                             </div>
-                            <div className={i18n.language === 'ar' ? "text-end" : ""}>
+                            <div className={i18n.language?.startsWith('ar') ? "text-end" : ""}>
                               <span className="tech-label">{t('directory.founded')}</span>
                               <span className="text-[11px] font-mono font-bold text-primary">{company.founded}</span>
                             </div>
-                            <div className={cn("flex items-end justify-end", i18n.language === 'ar' && "justify-start")}>
+                            <div className={cn("flex items-end justify-end", i18n.language?.startsWith('ar') && "justify-start")}>
                               <Link 
                                 to={`/directory/${generateSlugUrl(company.name, company.id)}`}
-                                className={cn("btn-primary py-2 px-4 flex items-center space-x-2", i18n.language === 'ar' && "flex-row-reverse space-x-reverse")}
+                                className={cn("btn-primary py-2 px-4 flex items-center space-x-2", i18n.language?.startsWith('ar') && "flex-row-reverse space-x-reverse")}
                               >
                                 <span>{t('directory.tech_sheet')}</span>
-                                <ChevronRight className={cn("h-4 w-4", i18n.language === 'ar' && "rotate-180")} />
+                                <ChevronRight className={cn("h-4 w-4", i18n.language?.startsWith('ar') && "rotate-180")} />
                               </Link>
                             </div>
                           </div>
@@ -385,9 +385,9 @@ const Directory = () => {
                           <div className="bg-white p-4 shadow-2xl border border-border-tech relative">
                             <p className="text-[10px] font-black text-secondary tracking-widest uppercase mb-1">{company.region}</p>
                             <p className="text-xs font-black text-primary uppercase truncate">{company.name}</p>
-                            <div className={cn("mt-2 flex items-center justify-between text-[8px] font-bold text-gray-400 uppercase", i18n.language === 'ar' && "flex-row-reverse")}>
+                            <div className={cn("mt-2 flex items-center justify-between text-[8px] font-bold text-gray-400 uppercase", i18n.language?.startsWith('ar') && "flex-row-reverse")}>
                                <span>{company.sector}</span>
-                               <ChevronRight className={cn("h-3 w-3", i18n.language === 'ar' && "rotate-180")} />
+                               <ChevronRight className={cn("h-3 w-3", i18n.language?.startsWith('ar') && "rotate-180")} />
                             </div>
                             <div className="absolute -bottom-2 start-1/2 -translate-x-1/2 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[8px] border-t-white" />
                           </div>
@@ -396,14 +396,14 @@ const Directory = () => {
                     </motion.div>
                   ))}
 
-                  <div className={cn("absolute bottom-12", i18n.language === 'ar' ? "end-12" : "start-12")}>
-                     <div className={cn("flex items-center space-x-2 bg-white/80 backdrop-blur-md px-4 py-2 border border-border-tech", i18n.language === 'ar' && "flex-row-reverse space-x-reverse")}>
+                  <div className={cn("absolute bottom-12", i18n.language?.startsWith('ar') ? "end-12" : "start-12")}>
+                     <div className={cn("flex items-center space-x-2 bg-white/80 backdrop-blur-md px-4 py-2 border border-border-tech", i18n.language?.startsWith('ar') && "flex-row-reverse space-x-reverse")}>
                         <div className="w-2 h-2 bg-primary rounded-full" />
                         <span className="text-[8px] font-black uppercase tracking-widest text-primary">{t('directory.headquarters')}</span>
                      </div>
                   </div>
                   
-                  <div className={cn("absolute top-12", i18n.language === 'ar' ? "start-12 text-start" : "end-12 text-end")}>
+                  <div className={cn("absolute top-12", i18n.language?.startsWith('ar') ? "start-12 text-start" : "end-12 text-end")}>
                     <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Coordonnées : 36.7538° N, 3.0588° E</p>
                     <p className="text-[8px] text-gray-300 font-mono">MAP ENGINE V1.0 - SYNCED</p>
                   </div>

@@ -60,13 +60,13 @@ const Blog = () => {
         description="Les dernières actualités et tendances de l'industrie en Algérie."
         url="https://votre-domaine.dz/blog"
       />
-      <div className={cn("bg-neutral-bg min-h-screen pb-20", i18n.language === 'ar' && "font-arabic")}>
+      <div className={cn("bg-neutral-bg min-h-screen pb-20", i18n.language?.startsWith('ar') && "font-arabic")}>
         {/* Header */}
         <section className="bg-primary py-16 text-white relative overflow-hidden">
           <div className="absolute inset-0 opacity-10">
           </div>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div className={cn("flex flex-col md:flex-row md:items-center justify-between gap-8", i18n.language === 'ar' && "md:flex-row-reverse text-end")}>
+            <div className={cn("flex flex-col md:flex-row md:items-center justify-between gap-8", i18n.language?.startsWith('ar') && "md:flex-row-reverse text-end")}>
               <div>
                 <h1 className="text-4xl font-extrabold mb-4">{t('blog.title').split(' ')[0]} <span className="text-secondary">{t('blog.title').split(' ')[1]}</span></h1>
                 <p className="text-primary-foreground/80 text-lg max-w-xl">
@@ -79,7 +79,7 @@ const Blog = () => {
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
           {/* Categories */}
-          <div className={cn("flex items-center space-x-2 overflow-x-auto pb-4 mb-12 no-scrollbar", i18n.language === 'ar' && "flex-row-reverse space-x-reverse")}>
+          <div className={cn("flex items-center space-x-2 overflow-x-auto pb-4 mb-12 no-scrollbar", i18n.language?.startsWith('ar') && "flex-row-reverse space-x-reverse")}>
             {CATEGORIES.map(cat => (
               <button
                 key={cat}
@@ -115,7 +115,7 @@ const Blog = () => {
               animate={{ opacity: 1, y: 0 }}
               className="mb-16"
             >
-              <div className={cn("bg-white rounded-[40px] overflow-hidden shadow-xl border border-gray-100 flex flex-col lg:flex-row group", i18n.language === 'ar' && "lg:flex-row-reverse text-end")}>
+              <div className={cn("bg-white rounded-[40px] overflow-hidden shadow-xl border border-gray-100 flex flex-col lg:flex-row group", i18n.language?.startsWith('ar') && "lg:flex-row-reverse text-end")}>
                 <Link to={`/blog/${generateSlugUrl(featuredPost.title, featuredPost.id)}`} className="lg:w-3/5 h-64 lg:h-auto overflow-hidden">
                   <img 
                     src={featuredPost.image} 
@@ -125,7 +125,7 @@ const Blog = () => {
                   />
                 </Link>
                 <div className="lg:w-2/5 p-8 md:p-12 flex flex-col justify-center">
-                  <div className={cn("flex items-center space-x-2 mb-6", i18n.language === 'ar' && "flex-row-reverse space-x-reverse justify-start")}>
+                  <div className={cn("flex items-center space-x-2 mb-6", i18n.language?.startsWith('ar') && "flex-row-reverse space-x-reverse justify-start")}>
                     <span className="bg-secondary/10 text-secondary px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest">
                       {featuredPost.category}
                     </span>
@@ -142,8 +142,8 @@ const Blog = () => {
                   <p className="text-gray-500 text-lg mb-8 leading-relaxed">
                     {featuredPost.excerpt}
                   </p>
-                  <div className={cn("flex items-center justify-between mt-auto", i18n.language === 'ar' && "flex-row-reverse")}>
-                    <div className={cn("flex items-center space-x-3", i18n.language === 'ar' && "flex-row-reverse space-x-reverse")}>
+                  <div className={cn("flex items-center justify-between mt-auto", i18n.language?.startsWith('ar') && "flex-row-reverse")}>
+                    <div className={cn("flex items-center space-x-3", i18n.language?.startsWith('ar') && "flex-row-reverse space-x-reverse")}>
                       <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-primary">
                         <User className="h-5 w-5" />
                       </div>
@@ -152,7 +152,7 @@ const Blog = () => {
                         <p className="text-xs text-gray-400">{featuredPost.date}</p>
                       </div>
                     </div>
-                    <Link to={`/blog/${generateSlugUrl(featuredPost.title, featuredPost.id)}`} className={cn("btn-primary p-3 rounded-xl", i18n.language === 'ar' && "rotate-180")}>
+                    <Link to={`/blog/${generateSlugUrl(featuredPost.title, featuredPost.id)}`} className={cn("btn-primary p-3 rounded-xl", i18n.language?.startsWith('ar') && "rotate-180")}>
                       <ArrowRight className="h-5 w-5 rtl:rotate-180" />
                     </Link>
                   </div>
@@ -169,7 +169,7 @@ const Blog = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1 }}
-                className={cn("bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-xl transition-all group flex flex-col", i18n.language === 'ar' && "text-end")}
+                className={cn("bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-xl transition-all group flex flex-col", i18n.language?.startsWith('ar') && "text-end")}
               >
                 <Link to={`/blog/${generateSlugUrl(post.title, post.id)}`} className="h-48 overflow-hidden relative block">
                   <img 
@@ -178,14 +178,14 @@ const Blog = () => {
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     referrerPolicy="no-referrer"
                   />
-                  <div className={cn("absolute top-4", i18n.language === 'ar' ? "end-4" : "start-4")}>
+                  <div className={cn("absolute top-4", i18n.language?.startsWith('ar') ? "end-4" : "start-4")}>
                     <span className="bg-white/90 backdrop-blur-sm text-primary px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">
                       {post.category}
                     </span>
                   </div>
                 </Link>
                 <div className="p-6 flex flex-col flex-1">
-                  <div className={cn("flex items-center space-x-3 text-[10px] font-bold text-gray-400 mb-3 uppercase", i18n.language === 'ar' && "flex-row-reverse space-x-reverse justify-start")}>
+                  <div className={cn("flex items-center space-x-3 text-[10px] font-bold text-gray-400 mb-3 uppercase", i18n.language?.startsWith('ar') && "flex-row-reverse space-x-reverse justify-start")}>
                     <span className="flex items-center space-x-1">
                       <Calendar className="h-3 w-3" />
                       <span>{post.date}</span>
@@ -204,8 +204,8 @@ const Blog = () => {
                   <p className="text-sm text-gray-500 line-clamp-3 mb-6 flex-1">
                     {post.excerpt}
                   </p>
-                  <div className={cn("flex items-center justify-between pt-6 border-t border-gray-50", i18n.language === 'ar' && "flex-row-reverse")}>
-                    <div className={cn("flex items-center space-x-2", i18n.language === 'ar' && "flex-row-reverse space-x-reverse")}>
+                  <div className={cn("flex items-center justify-between pt-6 border-t border-gray-50", i18n.language?.startsWith('ar') && "flex-row-reverse")}>
+                    <div className={cn("flex items-center space-x-2", i18n.language?.startsWith('ar') && "flex-row-reverse space-x-reverse")}>
                       <div className="w-6 h-6 bg-gray-50 rounded-full flex items-center justify-center text-primary">
                         <User className="h-3 w-3" />
                       </div>
@@ -233,11 +233,11 @@ const Blog = () => {
               <p className="text-primary-foreground/80 mb-8">
                 {t('blog.newsletter_subtitle')}
               </p>
-              <form className={cn("flex flex-col sm:flex-row gap-4", i18n.language === 'ar' && "sm:flex-row-reverse")}>
+              <form className={cn("flex flex-col sm:flex-row gap-4", i18n.language?.startsWith('ar') && "sm:flex-row-reverse")}>
                 <input 
                   type="email" 
                   placeholder="votre-email@entreprise.dz" 
-                  className={cn("flex-1 px-6 py-4 bg-white/10 border border-white/20 rounded-2xl text-white placeholder:text-white/40 outline-none focus:bg-white/20 transition-all", i18n.language === 'ar' && "text-end")}
+                  className={cn("flex-1 px-6 py-4 bg-white/10 border border-white/20 rounded-2xl text-white placeholder:text-white/40 outline-none focus:bg-white/20 transition-all", i18n.language?.startsWith('ar') && "text-end")}
                   required
                 />
                 <button className="bg-secondary text-white px-8 py-4 rounded-2xl font-bold hover:scale-105 transition-all shadow-xl" onClick={(e) => { e.preventDefault(); window.scrollTo(0,0); }}>

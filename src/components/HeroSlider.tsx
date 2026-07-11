@@ -65,7 +65,7 @@ const HeroSlider: React.FC<HeroSliderProps> = ({ slides }) => {
   const activeSlide = displaySlides[current] || displaySlides[0];
 
   return (
-    <div className={cn("relative h-[150px] md:h-[180px] w-full overflow-hidden bg-primary border-b border-border-tech", i18n.language === 'ar' && "font-arabic")}>
+    <div className={cn("relative h-[150px] md:h-[180px] w-full overflow-hidden bg-primary border-b border-border-tech", i18n.language?.startsWith('ar') && "font-arabic")}>
       {/* Technical Grid Background Overlay */}
       <div className="absolute inset-0 opacity-[0.03] pointer-events-none z-10" 
            style={{ backgroundImage: 'radial-gradient(#fff 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
@@ -84,13 +84,13 @@ const HeroSlider: React.FC<HeroSliderProps> = ({ slides }) => {
         >
           <div className={cn(
             "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full grid grid-cols-1 lg:grid-cols-2 gap-8 items-center relative z-20",
-            i18n.language === 'ar' && "lg:flex lg:flex-row-reverse"
+            i18n.language?.startsWith('ar') && "lg:flex lg:flex-row-reverse"
           )}>
             
             {/* Left Content: Product */}
-            <div className={cn("flex items-center space-x-12", i18n.language === 'ar' && "flex-row-reverse space-x-reverse text-end")}>
+            <div className={cn("flex items-center space-x-12", i18n.language?.startsWith('ar') && "flex-row-reverse space-x-reverse text-end")}>
               <motion.div 
-                initial={{ x: i18n.language === 'ar' ? 50 : -50, opacity: 0 }}
+                initial={{ x: i18n.language?.startsWith('ar') ? 50 : -50, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ delay: 0.2, duration: 0.6 }}
                 className="hidden md:block w-24 h-32 lg:w-32 lg:h-40 flex-shrink-0 bg-white/5 backdrop-blur-sm p-3 border border-white/10"
@@ -104,13 +104,13 @@ const HeroSlider: React.FC<HeroSliderProps> = ({ slides }) => {
               </motion.div>
               <div className="text-white">
                 <motion.div
-                  initial={{ opacity: 0, x: i18n.language === 'ar' ? -20 : 20 }}
+                  initial={{ opacity: 0, x: i18n.language?.startsWith('ar') ? -20 : 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.2 }}
-                  className={cn("flex items-center space-x-2 mb-2", i18n.language === 'ar' && "flex-row-reverse space-x-reverse justify-end")}
+                  className={cn("flex items-center space-x-2 mb-2", i18n.language?.startsWith('ar') && "flex-row-reverse space-x-reverse justify-end")}
                 >
                   <span className="text-[9px] font-black uppercase tracking-[0.3em] text-secondary">
-                    {i18n.language === 'ar' ? 'المواصفات الفنية' : 'Technical Specification'}
+                    {i18n.language?.startsWith('ar') ? 'المواصفات الفنية' : 'Technical Specification'}
                   </span>
                   <div className="h-[1px] w-8 bg-secondary" />
                 </motion.div>
@@ -143,12 +143,12 @@ const HeroSlider: React.FC<HeroSliderProps> = ({ slides }) => {
 
             {/* Right Content: Brand */}
             <motion.div 
-              initial={{ x: i18n.language === 'ar' ? -50 : 50, opacity: 0 }}
+              initial={{ x: i18n.language?.startsWith('ar') ? -50 : 50, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               transition={{ delay: 0.4, duration: 0.6 }}
               className={cn(
                 "hidden lg:flex flex-col items-center text-white border-white/10",
-                i18n.language === 'ar' ? "lg:items-start border-r pe-12 ps-0" : "lg:items-end border-l ps-12"
+                i18n.language?.startsWith('ar') ? "lg:items-start border-r pe-12 ps-0" : "lg:items-end border-l ps-12"
               )}
             >
               <div className="bg-white/10 backdrop-blur-sm p-4 border border-white/10 mb-4">
@@ -167,7 +167,7 @@ const HeroSlider: React.FC<HeroSliderProps> = ({ slides }) => {
       </AnimatePresence>
 
       {/* Slide Counter (Technical Style) */}
-      <div className={cn("absolute bottom-6 z-30 flex items-baseline space-x-2 text-white/40 font-mono", i18n.language === 'ar' ? "start-10 space-x-reverse" : "end-10")}>
+      <div className={cn("absolute bottom-6 z-30 flex items-baseline space-x-2 text-white/40 font-mono", i18n.language?.startsWith('ar') ? "start-10 space-x-reverse" : "end-10")}>
         <span className="text-xl font-black text-white">{(current + 1).toString().padStart(2, '0')}</span>
         <span className="text-[10px]">/</span>
         <span className="text-[10px]">{displaySlides.length.toString().padStart(2, '0')}</span>
@@ -175,7 +175,7 @@ const HeroSlider: React.FC<HeroSliderProps> = ({ slides }) => {
 
       {/* Navigation Dots */}
       {displaySlides.length > 1 && (
-        <div className={cn("absolute bottom-6 flex space-x-2 z-30", i18n.language === 'ar' ? "end-10 space-x-reverse" : "start-10")}>
+        <div className={cn("absolute bottom-6 flex space-x-2 z-30", i18n.language?.startsWith('ar') ? "end-10 space-x-reverse" : "start-10")}>
           {displaySlides.map((_, i) => (
             <button
               key={i}
@@ -194,15 +194,15 @@ const HeroSlider: React.FC<HeroSliderProps> = ({ slides }) => {
         <>
           <button 
             onClick={prev}
-            className={cn("absolute top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/10 text-white hover:bg-black/30 transition-all z-20", i18n.language === 'ar' ? "end-4" : "start-4")}
+            className={cn("absolute top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/10 text-white hover:bg-black/30 transition-all z-20", i18n.language?.startsWith('ar') ? "end-4" : "start-4")}
           >
-            {i18n.language === 'ar' ? <ChevronRight className="h-6 w-6 rtl:rotate-180" /> : <ChevronLeft className="h-6 w-6 rtl:rotate-180" />}
+            {i18n.language?.startsWith('ar') ? <ChevronRight className="h-6 w-6 rtl:rotate-180" /> : <ChevronLeft className="h-6 w-6 rtl:rotate-180" />}
           </button>
           <button 
             onClick={next}
-            className={cn("absolute top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/10 text-white hover:bg-black/30 transition-all z-20", i18n.language === 'ar' ? "start-4" : "end-4")}
+            className={cn("absolute top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/10 text-white hover:bg-black/30 transition-all z-20", i18n.language?.startsWith('ar') ? "start-4" : "end-4")}
           >
-            {i18n.language === 'ar' ? <ChevronLeft className="h-6 w-6 rtl:rotate-180" /> : <ChevronRight className="h-6 w-6 rtl:rotate-180" />}
+            {i18n.language?.startsWith('ar') ? <ChevronLeft className="h-6 w-6 rtl:rotate-180" /> : <ChevronRight className="h-6 w-6 rtl:rotate-180" />}
           </button>
         </>
       )}

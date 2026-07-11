@@ -84,7 +84,7 @@ const BlogDetail = () => {
   }
 
   return (
-    <div className={cn("min-h-screen bg-white pb-20", i18n.language === 'ar' && "font-arabic")}>
+    <div className={cn("min-h-screen bg-white pb-20", i18n.language?.startsWith('ar') && "font-arabic")}>
       {/* Article Header */}
       <div className="relative h-[60vh] min-h-[400px] bg-primary overflow-hidden">
         <img 

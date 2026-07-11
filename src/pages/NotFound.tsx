@@ -8,7 +8,7 @@ const NotFound = () => {
   const { i18n } = useTranslation();
 
   return (
-    <div className={cn("min-h-screen bg-neutral-bg flex items-center justify-center p-4", i18n.language === 'ar' && "font-arabic")}>
+    <div className={cn("min-h-screen bg-neutral-bg flex items-center justify-center p-4", i18n.language?.startsWith('ar') && "font-arabic")}>
       <div className="max-w-xl w-full text-center">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}

@@ -41,7 +41,7 @@ const FAQ = () => {
   })).filter(cat => cat.questions.length > 0);
 
   return (
-    <div className={cn("min-h-screen bg-neutral-bg pt-32 pb-20", i18n.language === 'ar' && "font-arabic")}>
+    <div className={cn("min-h-screen bg-neutral-bg pt-32 pb-20", i18n.language?.startsWith('ar') && "font-arabic")}>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <motion.div 

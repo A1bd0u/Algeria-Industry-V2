@@ -8,7 +8,7 @@ const RegisterSuccess = () => {
   const { i18n } = useTranslation();
 
   return (
-    <div className={cn("min-h-screen bg-neutral-bg flex items-center justify-center px-4 py-20", i18n.language === 'ar' && "font-arabic")}>
+    <div className={cn("min-h-screen bg-neutral-bg flex items-center justify-center px-4 py-20", i18n.language?.startsWith('ar') && "font-arabic")}>
       <div className="max-w-4xl w-full">
         <div className="bg-white rounded-[40px] shadow-2xl border border-gray-100 overflow-hidden">
           <div className="flex flex-col md:flex-row">
@@ -32,7 +32,7 @@ const RegisterSuccess = () => {
                 transition={{ delay: 0.2 }}
                 className="text-4xl font-black uppercase tracking-tighter leading-none mb-6 relative z-10"
               >
-                {i18n.language === 'ar' ? 'تم إنشاء الحساب بنجاح' : 'Compte Créé avec Succès'}
+                {i18n.language?.startsWith('ar') ? 'تم إنشاء الحساب بنجاح' : 'Compte Créé avec Succès'}
               </motion.h1>
               
               <motion.p
@@ -41,7 +41,7 @@ const RegisterSuccess = () => {
                 transition={{ delay: 0.3 }}
                 className="text-white/60 text-sm font-medium leading-relaxed relative z-10"
               >
-                {i18n.language === 'ar' 
+                {i18n.language?.startsWith('ar') 
                   ? 'مرحبًا بك في أكبر شبكة صناعية في الجزائر. حسابك جاهز الآن للاستخدام.'
                   : 'Bienvenue dans le plus grand réseau industriel d\'Algérie. Votre compte est maintenant prêt à l\'emploi.'}
               </motion.p>
@@ -50,29 +50,29 @@ const RegisterSuccess = () => {
             {/* Right side - Next Steps */}
             <div className="md:w-1/2 p-12">
               <h2 className="text-xs font-black text-secondary uppercase tracking-[0.3em] mb-8">
-                {i18n.language === 'ar' ? 'الخطوات التالية' : 'Prochaines étapes'}
+                {i18n.language?.startsWith('ar') ? 'الخطوات التالية' : 'Prochaines étapes'}
               </h2>
 
               <div className="space-y-6">
                 {[
                   {
                     icon: LayoutDashboard,
-                    title: i18n.language === 'ar' ? 'إكمال ملفك الشخصي' : 'Compléter votre profil',
-                    desc: i18n.language === 'ar' ? 'أضف المزيد من المعلومات لجذب العملاء.' : 'Ajoutez plus d\'informations pour attirer des clients.',
+                    title: i18n.language?.startsWith('ar') ? 'إكمال ملفك الشخصي' : 'Compléter votre profil',
+                    desc: i18n.language?.startsWith('ar') ? 'أضف المزيد من المعلومات لجذب العملاء.' : 'Ajoutez plus d\'informations pour attirer des clients.',
                     link: '/dashboard',
                     color: 'bg-blue-50 text-blue-600'
                   },
                   {
                     icon: Search,
-                    title: i18n.language === 'ar' ? 'استكشاف المنتجات' : 'Explorer les produits',
-                    desc: i18n.language === 'ar' ? 'تصفح الآلاف من المعدات الصناعية.' : 'Parcourez des milliers d\'équipements industriels.',
+                    title: i18n.language?.startsWith('ar') ? 'استكشاف المنتجات' : 'Explorer les produits',
+                    desc: i18n.language?.startsWith('ar') ? 'تصفح الآلاف من المعدات الصناعية.' : 'Parcourez des milliers d\'équipements industriels.',
                     link: '/products',
                     color: 'bg-orange-50 text-orange-600'
                   },
                   {
                     icon: Building2,
-                    title: i18n.language === 'ar' ? 'زيارة الصالون الافتراضي' : 'Visiter le salon virtuel',
-                    desc: i18n.language === 'ar' ? 'تجربة فريدة من نوعها في عالم الصناعة.' : 'Une expérience unique dans le monde de l\'industrie.',
+                    title: i18n.language?.startsWith('ar') ? 'زيارة الصالون الافتراضي' : 'Visiter le salon virtuel',
+                    desc: i18n.language?.startsWith('ar') ? 'تجربة فريدة من نوعها في عالم الصناعة.' : 'Une expérience unique dans le monde de l\'industrie.',
                     link: '/virtual-show',
                     color: 'bg-purple-50 text-purple-600'
                   }
@@ -103,13 +103,13 @@ const RegisterSuccess = () => {
               <div className="mt-12 flex flex-col space-y-4">
                 <Link to="/dashboard" className="w-full btn-secondary py-4 rounded-xl flex items-center justify-center space-x-2">
                   <span className="text-xs font-black uppercase tracking-widest">
-                    {i18n.language === 'ar' ? 'الانتقال إلى لوحة التحكم' : 'Aller au Tableau de Bord'}
+                    {i18n.language?.startsWith('ar') ? 'الانتقال إلى لوحة التحكم' : 'Aller au Tableau de Bord'}
                   </span>
                   <ArrowRight className="h-4 w-4 rtl:rotate-180" />
                 </Link>
                 
                 <Link to="/" className="text-center text-[10px] font-black text-gray-400 uppercase tracking-widest hover:text-primary transition-colors">
-                  {i18n.language === 'ar' ? 'العودة للرئيسية' : 'Retour à l\'accueil'}
+                  {i18n.language?.startsWith('ar') ? 'العودة للرئيسية' : 'Retour à l\'accueil'}
                 </Link>
               </div>
             </div>
