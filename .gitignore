@@ -9,3 +9,8 @@ coverage/
 patch_*
 *.py
 *.mjs
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
