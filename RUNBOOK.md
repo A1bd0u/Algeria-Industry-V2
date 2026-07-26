@@ -38,3 +38,19 @@ Si le PITR n'est pas actif :
 1. Connectez-vous à la console d'administration.
 2. Vérifiez que les données perdues sont de nouveau présentes.
 3. Vérifiez les logs d'audit (`/extranet/security`) pour analyser la source de l'incident (ex: compte compromis) et appliquez les correctifs nécessaires (changement de mot de passe, suspension de l'utilisateur).
+
+## 3. Rollback de l'Application (Docker / Cloud Run)
+
+En cas de mise en production d'une version défectueuse du code (bug bloquant, problème de performance) :
+
+### Si déployé sur Cloud Run (Recommandé)
+1. Allez dans la console Google Cloud > **Cloud Run** > Sélectionnez votre service.
+2. Allez dans l'onglet **Révisions**.
+3. Cochez la révision précédente qui était stable.
+4. Cliquez sur **Gérer le trafic** et allouez **100%** du trafic à cette révision stable.
+5. Cliquez sur **Enregistrer**. Le rollback est instantané.
+
+### Si déployé manuellement avec Docker
+1. Identifiez le tag de l'image précédente qui fonctionnait (ex: `algiers-industry:v1.2.0`).
+2. Arrêtez le conteneur actuel : `docker stop algiers-industry-prod && docker rm algiers-industry-prod`
+3. Relancez l'ancienne image : `docker run -d -p 3000:3000 --name algiers-industry-prod --env-file .env algiers-industry:v1.2.0`

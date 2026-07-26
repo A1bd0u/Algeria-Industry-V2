@@ -1,3 +1,4 @@
+import { useEffect, lazy, Suspense } from "react";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AnimatePresence } from 'motion/react';
 import { Route, Routes, useLocation } from 'react-router-dom';
@@ -13,40 +14,39 @@ import ErrorBoundary from './components/ErrorBoundary';
 import ProtectedRoute from './components/ProtectedRoute';
 import ScrollToTop from './components/ScrollToTop';
 import { DEFAULT_SLIDES, SLIDES_BY_PATH } from './constants/slides';
-import BecomeExhibitor from './pages/BecomeExhibitor';
-import AdsRequest from './pages/AdsRequest';
-import Blog from './pages/Blog';
-import BlogDetail from './pages/BlogDetail';
-import CompanyProfile from './pages/CompanyProfile';
-import Compare from './pages/Compare';
-import ConsolePro from './pages/ConsolePro';
-import AdminKYCReview from './pages/AdminKYCReview';
-import AdminContentModeration from './pages/AdminContentModeration';
-import Contact from './pages/Contact';
-import Dashboard from './pages/Dashboard';
-import Directory from './pages/Directory';
-import Events from './pages/Events';
-import Exhibitors from './pages/Exhibitors';
-import FAQ from './pages/FAQ';
-import Home from './pages/Home';
-import KYCUpload from './pages/KYCUpload';
-import Login from './pages/Login';
-import ForgotPassword from './pages/ForgotPassword';
-import ResetPassword from './pages/ResetPassword';
-import NotFound from './pages/NotFound';
-import Privacy from './pages/Privacy';
-import ProductDetail from './pages/ProductDetail';
-import Products from './pages/Products';
-import Favorites from './pages/Favorites';
-import Register from './pages/Register';
-import RegisterSuccess from './pages/RegisterSuccess';
-import Resources from './pages/Resources';
-import SearchResults from './pages/SearchResults';
-import Subscriptions from './pages/Subscriptions';
-import Tarifs from './pages/Tarifs';
-import Terms from './pages/Terms';
+const BecomeExhibitor = lazy(() => import('./pages/BecomeExhibitor'));
+const AdsRequest = lazy(() => import('./pages/AdsRequest'));
+const Blog = lazy(() => import('./pages/Blog'));
+const BlogDetail = lazy(() => import('./pages/BlogDetail'));
+const CompanyProfile = lazy(() => import('./pages/CompanyProfile'));
+const Compare = lazy(() => import('./pages/Compare'));
+const ConsolePro = lazy(() => import('./pages/ConsolePro'));
+const AdminKYCReview = lazy(() => import('./pages/AdminKYCReview'));
+const AdminContentModeration = lazy(() => import('./pages/AdminContentModeration'));
+const Contact = lazy(() => import('./pages/Contact'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Directory = lazy(() => import('./pages/Directory'));
+const Events = lazy(() => import('./pages/Events'));
+const Exhibitors = lazy(() => import('./pages/Exhibitors'));
+const FAQ = lazy(() => import('./pages/FAQ'));
+const Home = lazy(() => import('./pages/Home'));
+const KYCUpload = lazy(() => import('./pages/KYCUpload'));
+const Login = lazy(() => import('./pages/Login'));
+const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
+const ResetPassword = lazy(() => import('./pages/ResetPassword'));
+const NotFound = lazy(() => import('./pages/NotFound'));
+const Privacy = lazy(() => import('./pages/Privacy'));
+const ProductDetail = lazy(() => import('./pages/ProductDetail'));
+const Products = lazy(() => import('./pages/Products'));
+const Favorites = lazy(() => import('./pages/Favorites'));
+const Register = lazy(() => import('./pages/Register'));
+const RegisterSuccess = lazy(() => import('./pages/RegisterSuccess'));
+const Resources = lazy(() => import('./pages/Resources'));
+const SearchResults = lazy(() => import('./pages/SearchResults'));
+const Subscriptions = lazy(() => import('./pages/Subscriptions'));
+const Tarifs = lazy(() => import('./pages/Tarifs'));
+const Terms = lazy(() => import('./pages/Terms'));
 
-import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import ComparisonBar from './components/ComparisonBar';
 import { AuthProvider } from './context/AuthContext';
@@ -107,9 +107,10 @@ export default function App() {
               {!isExtranet && <Navbar />}
               {!hideHeroSlider && <HeroSlider slides={currentSlides} />}
               <main className="flex-grow">
-                <AnimatePresence mode="wait">
-                  {/* @ts-ignore - framer-motion requires key on Routes */}
-                  <Routes location={location} key={location.pathname}>
+                <Suspense fallback={<div className="flex items-center justify-center min-h-[50vh]"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
+                  <AnimatePresence mode="wait">
+                    {/* @ts-ignore - framer-motion requires key on Routes */}
+                    <Routes location={location} key={location.pathname}>
                       <Route path="/" element={<PageTransition><Home /></PageTransition>} />
                       <Route path="/directory" element={<PageTransition><Directory /></PageTransition>} />
                       <Route path="/directory/:id" element={<PageTransition><CompanyProfile /></PageTransition>} />
@@ -168,7 +169,8 @@ export default function App() {
                       <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
                     </Routes>
                   </AnimatePresence>
-                </main>
+                </Suspense>
+              </main>
                 {!isExtranet && <Footer />}
                 <HelpWidget />
                 <BackToTop />

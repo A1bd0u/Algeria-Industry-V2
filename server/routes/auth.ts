@@ -16,7 +16,7 @@ const router = express.Router();
 const loginSchema = z.object({
   email: z.string().email('Email invalide'),
   password: z.string().min(1, 'Mot de passe requis'),
-  captchaToken: z.string().min(1, 'Captcha requis')
+  captchaToken: z.string({ message: 'Captcha requis' }).min(1, 'Captcha requis')
 });
 
 const passwordValidation = z.string()
@@ -30,12 +30,12 @@ const registerSchema = z.object({
   password: passwordValidation,
   company: z.string().optional(),
   role: z.enum(['acheteur', 'fournisseur', 'exposant']).optional(),
-  captchaToken: z.string().min(1, 'Captcha requis')
+  captchaToken: z.string({ message: 'Captcha requis' }).min(1, 'Captcha requis')
 });
 
 const forgotPasswordSchema = z.object({
   email: z.string().email('Email invalide'),
-  captchaToken: z.string().min(1, 'Captcha requis')
+  captchaToken: z.string({ message: 'Captcha requis' }).min(1, 'Captcha requis')
 });
 
 const resetPasswordSchema = z.object({
@@ -50,7 +50,7 @@ const verifyCodeSchema = z.object({
 
 const resendCodeSchema = z.object({
   email: z.string().email('Email invalide'),
-  captchaToken: z.string().min(1, 'Captcha requis')
+  captchaToken: z.string({ message: 'Captcha requis' }).min(1, 'Captcha requis')
 });
 
 const JWT_SECRET = process.env.JWT_SECRET || '';

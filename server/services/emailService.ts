@@ -5,14 +5,21 @@ import path from 'path';
 
 // Note: If using ESM, process.cwd() can be used to resolve the path correctly.
 // Depending on where this is executed from (dist vs src), we will resolve relative to process.cwd().
+let resendClient: Resend | null = null;
+function getResendClient() {
+  if (!resendClient && process.env.RESEND_API_KEY) {
+    resendClient = new Resend(process.env.RESEND_API_KEY);
+  }
+  return resendClient;
+}
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-const SENDER_EMAIL = process.env.SENDER_EMAIL || 'onboarding@resend.dev'; // Use resend default for testing if not provided
+const getSenderEmail = () => process.env.SENDER_EMAIL || 'onboarding@resend.dev';
 
 export type TemplateType = 'verificationCode' | 'resetPassword' | 'kycApproved' | 'kycRejected' | 'securityAlert';
 
 export async function sendTransactionalEmail(to: string, templateType: TemplateType, variables: Record<string, string>) {
-  if (!process.env.RESEND_API_KEY) {
+  const resend = getResendClient();
+  if (!resend) {
     console.warn(`[Email Service] RESEND_API_KEY is not set. Simulating email to ${to} (Template: ${templateType})`, variables);
     return { success: true, simulated: true };
   }
@@ -62,7 +69,7 @@ export async function sendTransactionalEmail(to: string, templateType: TemplateT
     }
 
     const { data, error } = await resend.emails.send({
-      from: SENDER_EMAIL,
+      from: getSenderEmail(),
       to,
       subject,
       html: htmlContent

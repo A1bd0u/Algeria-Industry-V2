@@ -82,11 +82,14 @@ export async function createApp() {
   // Security HTTP Headers
   app.use(helmet({
     contentSecurityPolicy: {
-      reportOnly: true,
       directives: {
         defaultSrc: ["'self'"],
-        connectSrc: ["'self'", supabaseDomain].filter(Boolean),
-        imgSrc: ["'self'", 'data:', 'blob:', supabaseDomain].filter(Boolean),
+        connectSrc: ["'self'", supabaseDomain, "ws:", "wss:"].filter(Boolean),
+        imgSrc: ["'self'", 'data:', 'blob:', supabaseDomain, "https:"].filter(Boolean),
+        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+        styleSrc: ["'self'", "'unsafe-inline'", "https:"],
+        fontSrc: ["'self'", "data:", "https:"],
+        frameAncestors: ["*"],
       }
     },
     crossOriginEmbedderPolicy: false

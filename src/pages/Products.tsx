@@ -121,114 +121,7 @@ const Products = () => {
       
       let result = await res.json();
       
-      const mockProducts = [
-        {
-          id: 'mock-1',
-          reference_id: 'PRD-10293',
-          name: 'Pompe Hydraulique Industrielle PX-200',
-          brand: 'HydroTech Algerie',
-          price: 145000,
-          category: 'Chimie & Pétrochimie',
-          region: 'Alger',
-          image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=600&q=80',
-          features: ['Haute pression', 'Acier inoxydable', 'Garantie 2 ans'],
-          verified: true,
-          owner_id: 'mock-owner-1'
-        },
-        {
-          id: 'mock-2',
-          reference_id: 'PRD-88472',
-          name: 'Générateur Électrique 50kVA',
-          brand: 'PowerGen',
-          price: 850000,
-          category: 'Énergie & Mines',
-          region: 'Oran',
-          image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80',
-          features: ['Diesel', 'Silencieux', 'Démarrage auto'],
-          verified: true,
-          owner_id: 'mock-owner-2'
-        },
-        {
-          id: 'mock-3',
-          reference_id: 'PRD-33921',
-          name: 'Tracteur Agricole T-7000',
-          brand: 'AgriMech',
-          price: 4500000,
-          category: 'Agroalimentaire',
-          region: 'Sétif',
-          image: 'https://images.unsplash.com/photo-1592982537447-6f296d115e4f?auto=format&fit=crop&w=600&q=80',
-          features: ['4 Roues Motrices', 'Cabine climatisée', '120 CV'],
-          verified: false,
-          owner_id: 'mock-owner-3'
-        },
-        {
-          id: 'mock-4',
-          reference_id: 'PRD-55102',
-          name: 'Machine de Moulage par Injection',
-          brand: 'PlastMould',
-          price: 2100000,
-          category: 'Plasturgie & Caoutchouc',
-          region: 'Blida',
-          image: 'https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?auto=format&fit=crop&w=600&q=80',
-          features: ['Automatique', 'Haute précision', 'Faible conso'],
-          verified: true,
-          owner_id: 'mock-owner-4'
-        },
-        {
-          id: 'mock-5',
-          reference_id: 'PRD-99283',
-          name: 'Panneaux Solaires Monocristallins',
-          brand: 'SolarDZ',
-          price: 25000,
-          category: 'Énergies Renouvelables',
-          region: 'Ghardaïa',
-          image: 'https://images.unsplash.com/photo-1509391366360-2e959784a276?auto=format&fit=crop&w=600&q=80',
-          features: ['400W', 'Rendement 21%', 'Garantie 25 ans'],
-          verified: true,
-          owner_id: 'mock-owner-5'
-        },
-        {
-          id: 'mock-6',
-          reference_id: 'PRD-11029',
-          name: 'Compresseur d\'Air Industriel',
-          brand: 'AirForce',
-          price: 320000,
-          category: 'Métallurgie & Mécanique',
-          region: 'Annaba',
-          image: 'https://images.unsplash.com/photo-1621905252507-b35492cc74b4?auto=format&fit=crop&w=600&q=80',
-          features: ['500L', 'Triphasé', '10 Bar'],
-          verified: false,
-          owner_id: 'mock-owner-6'
-        },
-        {
-          id: 'mock-7',
-          reference_id: 'PRD-44820',
-          name: 'Produit Chimique Industriel Solvant',
-          brand: 'ChemPro',
-          price: 4500,
-          category: 'Chimie & Pétrochimie',
-          region: 'Biskra',
-          image: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?auto=format&fit=crop&w=600&q=80',
-          features: ['Fût 200L', 'Pur à 99%', 'Industriel'],
-          verified: true,
-          owner_id: 'mock-owner-7'
-        },
-        {
-          id: 'mock-8',
-          reference_id: 'PRD-77291',
-          name: 'Grue de Levage 10 Tonnes',
-          brand: 'LiftPro',
-          price: 12000000,
-          category: 'BTPH',
-          region: 'Alger',
-          image: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=600&q=80',
-          features: ['Flèche télescopique', 'Cabine confort', 'Sécurité max'],
-          verified: true,
-          owner_id: 'mock-owner-8'
-        }
-      ];
-
-      const formattedData = [...(result.data || []).map((p: any) => ({
+      const formattedData = (result.data || []).map((p: any) => ({
           id: p.id,
           reference_id: p.reference_id,
           name: p.name,
@@ -240,7 +133,7 @@ const Products = () => {
           features: p.features || ['Produit de qualité'],
           verified: p.verified || false,
           owner_id: p.owner_id || p.company_id
-      })), ...mockProducts];
+      }));
       return {
         data: formattedData,
         totalItems: result.total || 0,

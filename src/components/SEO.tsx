@@ -13,7 +13,7 @@ interface SEOProps {
 export default function SEO({ title, description, url, image, type = 'website', structuredData }: SEOProps) {
   const siteName = "Algiers Industry";
   const fullTitle = `${title} | ${siteName}`;
-  const defaultImage = "https://picsum.photos/seed/algiersindustry/1200/630"; // Placeholder image
+  const defaultImage = "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=1200&auto=format&fit=crop"; // Industrial placeholder
 
   return (
     <Helmet>
