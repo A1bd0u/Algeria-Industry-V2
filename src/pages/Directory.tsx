@@ -29,6 +29,7 @@ const Directory = () => {
     queryKey: ['companies', isCertifiedOnly, selectedRegion, selectedSectors],
     queryFn: async () => {
       const params = new URLSearchParams();
+      params.append('limit', '1000');
       if (isCertifiedOnly) params.append('certified', 'true');
       if (selectedRegion !== t('common.all') && selectedRegion) params.append('region', selectedRegion);
       if (selectedSectors.length > 0) params.append('sectors', selectedSectors.join(','));

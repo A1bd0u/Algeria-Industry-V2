@@ -110,21 +110,125 @@ const Products = () => {
 
 
   const { data: productsData = { data: [], totalItems: 0, totalPages: 1 }, isLoading, isError, refetch } = useQuery({
-    queryKey: ['products', searchParams.toString()],
+    queryKey: ['products'],
     queryFn: async () => {
       const params = new URLSearchParams();
-      const page = searchParams.get('page') || '1';
-      params.append('page', page);
-      params.append('limit', '12');
-      if (searchParams.get('search')) params.append('search', searchParams.get('search')!);
-      if (searchParams.get('category')) params.append('category', searchParams.get('category')!);
+      params.append('limit', '1000');
       if (searchParams.get('companyId')) params.append('company_id', searchParams.get('companyId')!);
       
       const res = await fetch(`/api/products?${params.toString()}`);
       if (!res.ok) throw new Error('Erreur lors du chargement des produits');
       
       let result = await res.json();
-      const formattedData = (result.data || []).map((p: any) => ({
+      
+      const mockProducts = [
+        {
+          id: 'mock-1',
+          reference_id: 'PRD-10293',
+          name: 'Pompe Hydraulique Industrielle PX-200',
+          brand: 'HydroTech Algerie',
+          price: 145000,
+          category: 'Chimie & Pétrochimie',
+          region: 'Alger',
+          image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=600&q=80',
+          features: ['Haute pression', 'Acier inoxydable', 'Garantie 2 ans'],
+          verified: true,
+          owner_id: 'mock-owner-1'
+        },
+        {
+          id: 'mock-2',
+          reference_id: 'PRD-88472',
+          name: 'Générateur Électrique 50kVA',
+          brand: 'PowerGen',
+          price: 850000,
+          category: 'Énergie & Mines',
+          region: 'Oran',
+          image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80',
+          features: ['Diesel', 'Silencieux', 'Démarrage auto'],
+          verified: true,
+          owner_id: 'mock-owner-2'
+        },
+        {
+          id: 'mock-3',
+          reference_id: 'PRD-33921',
+          name: 'Tracteur Agricole T-7000',
+          brand: 'AgriMech',
+          price: 4500000,
+          category: 'Agroalimentaire',
+          region: 'Sétif',
+          image: 'https://images.unsplash.com/photo-1592982537447-6f296d115e4f?auto=format&fit=crop&w=600&q=80',
+          features: ['4 Roues Motrices', 'Cabine climatisée', '120 CV'],
+          verified: false,
+          owner_id: 'mock-owner-3'
+        },
+        {
+          id: 'mock-4',
+          reference_id: 'PRD-55102',
+          name: 'Machine de Moulage par Injection',
+          brand: 'PlastMould',
+          price: 2100000,
+          category: 'Plasturgie & Caoutchouc',
+          region: 'Blida',
+          image: 'https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?auto=format&fit=crop&w=600&q=80',
+          features: ['Automatique', 'Haute précision', 'Faible conso'],
+          verified: true,
+          owner_id: 'mock-owner-4'
+        },
+        {
+          id: 'mock-5',
+          reference_id: 'PRD-99283',
+          name: 'Panneaux Solaires Monocristallins',
+          brand: 'SolarDZ',
+          price: 25000,
+          category: 'Énergies Renouvelables',
+          region: 'Ghardaïa',
+          image: 'https://images.unsplash.com/photo-1509391366360-2e959784a276?auto=format&fit=crop&w=600&q=80',
+          features: ['400W', 'Rendement 21%', 'Garantie 25 ans'],
+          verified: true,
+          owner_id: 'mock-owner-5'
+        },
+        {
+          id: 'mock-6',
+          reference_id: 'PRD-11029',
+          name: 'Compresseur d\'Air Industriel',
+          brand: 'AirForce',
+          price: 320000,
+          category: 'Métallurgie & Mécanique',
+          region: 'Annaba',
+          image: 'https://images.unsplash.com/photo-1621905252507-b35492cc74b4?auto=format&fit=crop&w=600&q=80',
+          features: ['500L', 'Triphasé', '10 Bar'],
+          verified: false,
+          owner_id: 'mock-owner-6'
+        },
+        {
+          id: 'mock-7',
+          reference_id: 'PRD-44820',
+          name: 'Produit Chimique Industriel Solvant',
+          brand: 'ChemPro',
+          price: 4500,
+          category: 'Chimie & Pétrochimie',
+          region: 'Biskra',
+          image: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?auto=format&fit=crop&w=600&q=80',
+          features: ['Fût 200L', 'Pur à 99%', 'Industriel'],
+          verified: true,
+          owner_id: 'mock-owner-7'
+        },
+        {
+          id: 'mock-8',
+          reference_id: 'PRD-77291',
+          name: 'Grue de Levage 10 Tonnes',
+          brand: 'LiftPro',
+          price: 12000000,
+          category: 'BTPH',
+          region: 'Alger',
+          image: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=600&q=80',
+          features: ['Flèche télescopique', 'Cabine confort', 'Sécurité max'],
+          verified: true,
+          owner_id: 'mock-owner-8'
+        }
+      ];
+
+      const formattedData = [...(result.data || []).map((p: any) => ({
           id: p.id,
           reference_id: p.reference_id,
           name: p.name,
@@ -136,7 +240,7 @@ const Products = () => {
           features: p.features || ['Produit de qualité'],
           verified: p.verified || false,
           owner_id: p.owner_id || p.company_id
-      }));
+      })), ...mockProducts];
       return {
         data: formattedData,
         totalItems: result.total || 0,
@@ -202,6 +306,11 @@ const Products = () => {
      }
      return true;
   });
+
+  const itemsPerPage = 12;
+  const totalFilteredItems = filteredProducts.length;
+  const calculatedTotalPages = Math.ceil(totalFilteredItems / itemsPerPage) || 1;
+  const paginatedProducts = filteredProducts.slice((activePage - 1) * itemsPerPage, activePage * itemsPerPage);
 
   return (
     <React.Fragment>
@@ -433,7 +542,7 @@ const Products = () => {
               "grid gap-6",
               view === 'grid' ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3" : "grid-cols-1"
             )}>
-              {filteredProducts.map(product => (
+              {paginatedProducts.map(product => (
                 <motion.div 
                   layout
                   key={product.id}
@@ -442,7 +551,7 @@ const Products = () => {
                     view === 'list' && "flex md:flex-row"
                   )}
                 >
-                  <div className={cn("relative overflow-hidden", view === 'grid' ? "aspect-[4/3]" : "md:w-72 aspect-square")}>
+                  <div className={cn("relative overflow-hidden", view === 'grid' ? "aspect-video" : "md:w-72 aspect-square")}>
                     <img 
                       src={product.image} 
                       alt={product.name}
@@ -460,13 +569,15 @@ const Products = () => {
                     </div>
                   </div>
 
-                  <div className="p-6 flex flex-col justify-between flex-1">
+                  <div className="p-5 flex flex-col justify-between flex-1">
                     <div>
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-[10px] font-black text-secondary tracking-[0.2em] uppercase">{product.brand}</span>
+                      <div className="flex items-start justify-between mb-2">
+                        <h3 className="text-base font-black text-primary leading-tight group-hover:text-secondary transition-colors line-clamp-2">
+                          {product.name}
+                        </h3>
                         <button 
                           className={cn(
-                            "transition-colors hover:scale-110",
+                            "transition-colors hover:scale-110 ms-3 shrink-0 mt-0.5",
                             favorites.some(f => f.item_id === product.id)
                               ? "text-red-500" 
                               : "text-gray-300 hover:text-red-400"
@@ -476,37 +587,17 @@ const Products = () => {
                           <Star className="h-4 w-4" fill={favorites.some(f => f.item_id === product.id) ? "currentColor" : "none"} />
                         </button>
                       </div>
-                      <h3 className="text-lg font-black text-primary leading-tight mb-2 group-hover:text-secondary transition-colors">
-                        {product.name}
-                      </h3>
                       {product.reference_id && (
-                        <p className="text-[10px] font-mono text-gray-400 mb-4 tracking-wider">
+                        <p className="text-[10px] font-mono text-gray-400 tracking-wider">
                           REF: {product.reference_id}
                         </p>
                       )}
-                      <div className="grid grid-cols-1 gap-2 mb-6">
-                        {product.features.map((f, i) => (
-                          <div key={i} className="flex items-center space-x-2 text-[10px] text-gray-400 font-bold uppercase italic">
-                            <div className="w-1 h-1 rounded-full bg-gray-200" />
-                            <span>{f}</span>
-                          </div>
-                        ))}
-                      </div>
-                      
-                      <div className="flex items-center space-x-2 mb-6">
-                        <span className="text-[10px] font-black tracking-widest uppercase text-gray-400 flex items-center bg-gray-50 px-2 py-1 rounded-lg">
-                          📍 {product.region}
-                        </span>
-                      </div>
                     </div>
 
-                    <div className="flex items-center justify-between pt-6 border-t border-gray-50">
-                      <div>
-                        <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">{t('products.quotes')}</p>
-                        <p className="text-lg font-black text-primary uppercase tracking-tighter">{product.price}</p>
-                      </div>
-                      <Link to={`/products/${generateSlugUrl(product.name, product.id)}`} className="w-12 h-12 rounded-2xl bg-primary text-white flex items-center justify-center hover:bg-secondary transition-all shadow-lg">
-                        <ArrowRight className="h-5 w-5 rtl:rotate-180" />
+                    <div className="pt-4 mt-4 border-t border-gray-50">
+                      <Link to={`/products/${generateSlugUrl(product.name, product.id)}`} className="w-full py-2.5 rounded-xl bg-primary/5 text-primary text-[10px] font-black uppercase tracking-widest flex items-center justify-center hover:bg-primary hover:text-white transition-all group-hover:bg-primary group-hover:text-white">
+                        Voir détails
+                        <ArrowRight className="h-3.5 w-3.5 ms-2 rtl:rotate-180 transition-transform group-hover:translate-x-1" />
                       </Link>
                     </div>
                   </div>
@@ -516,55 +607,85 @@ const Products = () => {
             )}
             
             {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="mt-12 flex items-center justify-between border-t border-gray-100 pt-8">
+            {calculatedTotalPages > 1 && (
+              <div className="mt-12 flex justify-center items-center space-x-2">
                 <button 
                   disabled={activePage === 1}
                   onClick={() => {
                     const p = new URLSearchParams(searchParams);
-                    p.set('page', String(activePage - 1));
+                    p.set('page', String(Math.max(activePage - 1, 1)));
                     setSearchParams(p);
-                    window.scrollTo(0, 0);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
                   }}
-                  className="disabled:opacity-50 flex items-center space-x-2 text-sm font-bold text-gray-500 hover:text-primary transition-colors px-4 py-2 rounded-xl hover:bg-gray-50 border border-transparent hover:border-gray-100"
+                  className="p-3 bg-white text-primary border border-gray-100 rounded-xl hover:text-secondary hover:border-secondary/20 hover:shadow-md disabled:opacity-40 disabled:hover:text-primary disabled:hover:border-gray-100 disabled:hover:shadow-none transition-all cursor-pointer disabled:cursor-not-allowed"
                 >
                   <ChevronLeft className="h-4 w-4 rtl:rotate-180" />
-                  <span>{t('products.prev')}</span>
                 </button>
                 
-                <div className="flex space-x-2 overflow-x-auto max-w-[50vw]">
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                    <button 
-                      key={page}
-                      onClick={() => {
-                        const p = new URLSearchParams(searchParams);
-                        p.set('page', String(page));
-                        setSearchParams(p);
-                        window.scrollTo(0, 0);
-                      }}
-                      className={cn(
-                        "min-w-[40px] h-10 px-2 rounded-xl text-sm font-bold flex items-center justify-center transition-all",
-                        page === activePage 
-                          ? "bg-primary text-white shadow-md"
-                          : "text-gray-500 hover:bg-gray-50 hover:text-primary"
-                      )}
-                    >
-                      {page}
-                    </button>
-                  ))}
-                </div>
+                {(() => {
+                  const range = [];
+                  const rangeWithDots = [];
+                  let l;
+
+                  for (let i = 1; i <= calculatedTotalPages; i++) {
+                    if (i === 1 || i === calculatedTotalPages || (i >= activePage - 1 && i <= activePage + 1)) {
+                      range.push(i);
+                    }
+                  }
+
+                  for (const i of range) {
+                    if (l) {
+                      if (i - l === 2) {
+                        rangeWithDots.push(l + 1);
+                      } else if (i - l > 2) {
+                        rangeWithDots.push('...');
+                      }
+                    }
+                    rangeWithDots.push(i);
+                    l = i;
+                  }
+
+                  return rangeWithDots.map((page, index) => {
+                    if (page === '...') {
+                      return (
+                        <span key={`dots-${index}`} className="px-3 py-2 text-gray-400 font-bold select-none">
+                          .....
+                        </span>
+                      );
+                    }
+                    
+                    return (
+                      <button 
+                        key={page}
+                        onClick={() => {
+                          const p = new URLSearchParams(searchParams);
+                          p.set('page', String(page));
+                          setSearchParams(p);
+                          window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }}
+                        className={cn(
+                          "px-4 py-2.5 rounded-xl text-xs font-black transition-all cursor-pointer",
+                          activePage === page 
+                            ? "bg-secondary text-white"
+                            : "bg-white text-primary border border-gray-100 hover:text-secondary hover:border-secondary/20 hover:shadow-md"
+                        )}
+                      >
+                        {page}
+                      </button>
+                    );
+                  });
+                })()}
                 
                 <button 
-                  disabled={activePage === totalPages}
+                  disabled={activePage === calculatedTotalPages}
                   onClick={() => {
                     const p = new URLSearchParams(searchParams);
-                    p.set('page', String(activePage + 1));
+                    p.set('page', String(Math.min(activePage + 1, calculatedTotalPages)));
                     setSearchParams(p);
-                    window.scrollTo(0, 0);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
                   }}
-                  className="disabled:opacity-50 flex items-center space-x-2 text-sm font-bold text-gray-500 hover:text-primary transition-colors px-4 py-2 rounded-xl hover:bg-gray-50 border border-transparent hover:border-gray-100"
+                  className="p-3 bg-white text-primary border border-gray-100 rounded-xl hover:text-secondary hover:border-secondary/20 hover:shadow-md disabled:opacity-40 disabled:hover:text-primary disabled:hover:border-gray-100 disabled:hover:shadow-none transition-all cursor-pointer disabled:cursor-not-allowed"
                 >
-                  <span>{t('products.next')}</span>
                   <ChevronRight className="h-4 w-4 rtl:rotate-180" />
                 </button>
               </div>

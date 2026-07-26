@@ -24,7 +24,7 @@ router.get('/', async (req, res) => {
   try {
     const page = parseInt(req.query.page as string) || 1;
     let limit = parseInt(req.query.limit as string) || 12;
-    if (limit > 50) limit = 50;
+    if (limit > 1000) limit = 1000;
     const from = (page - 1) * limit;
     const to = from + limit - 1;
 

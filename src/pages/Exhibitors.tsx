@@ -80,7 +80,7 @@ const Exhibitors = () => {
     const fetchExhibitors = async () => {
       try {
         setIsLoading(true);
-        const res = await fetch('/api/companies');
+        const res = await fetch('/api/companies?limit=1000');
         if (!res.ok) throw new Error('Erreur lors du chargement des exposants');
         let data = await res.json();
         if (data && data.data) data = data.data;
@@ -386,7 +386,7 @@ const Exhibitors = () => {
                     className={cn(
                       "px-4 py-2.5 rounded-xl text-xs font-black transition-all cursor-pointer",
                       currentPage === page
-                        ? "bg-secondary text-white shadow-lg shadow-secondary/20"
+                        ? "bg-secondary text-white"
                         : "bg-white text-primary border border-gray-100 hover:text-secondary hover:border-secondary/20 hover:shadow-md"
                     )}
                   >
