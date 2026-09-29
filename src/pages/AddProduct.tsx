@@ -1,37 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { X, Upload, Loader2, CheckCircle2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { useTranslation } from 'react-i18next';
+import { productCategories } from '../data/productCategories';
+import { ApiError, apiErrorMessage } from '../lib/apiError';
 
 interface AddProductProps {
   initialData?: any;
   isOpen: boolean;
   onClose: () => void;
   onSuccess: (product: any) => void;
-  productCategories?: any[];
 }
 
 const STORAGE_KEY = 'addProductFormDraft';
 
-const DEFAULT_CATEGORIES = [
-  {
-    id: 1,
-    name: 'Équipements Industriels',
-    subCategories: [
-      { id: 101, name: 'Machines-Outils' },
-      { id: 102, name: 'Pompes & Vannes' }
-    ]
-  },
-  {
-    id: 2,
-    name: 'Matières Premières',
-    subCategories: [
-      { id: 201, name: 'Métaux' },
-      { id: 202, name: 'Chimie' }
-    ]
-  }
-];
 
-const AddProduct: React.FC<AddProductProps> = ({ isOpen, onClose, onSuccess, productCategories = DEFAULT_CATEGORIES, initialData }) => {
+const AddProduct: React.FC<AddProductProps> = ({ isOpen, onClose, onSuccess, initialData }) => {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState(initialData || {
     name: '',
     category: '',
@@ -117,21 +102,21 @@ const AddProduct: React.FC<AddProductProps> = ({ isOpen, onClose, onSuccess, pro
           setFileUrl(response.url);
           setUploadProgress(100);
         } catch(err) {
-          setError('Erreur lors du traitement de la réponse du serveur.');
+          setError(t('addProduct.uploadParseError'));
         }
       } else {
         try {
           const response = JSON.parse(xhr.responseText);
-          setError(response.error || 'Erreur lors de l\'upload');
+          setError(apiErrorMessage(response, 'addProduct.uploadError'));
         } catch {
-          setError('Erreur de réseau ou serveur.');
+          setError(t('addProduct.uploadError'));
         }
       }
     });
 
     xhr.addEventListener('error', () => {
       setIsUploading(false);
-      setError('Erreur réseau lors de l\'upload.');
+      setError(t('auth.networkError'));
     });
 
     xhr.open('POST', '/api/upload?bucket=product-images');
@@ -159,7 +144,7 @@ const AddProduct: React.FC<AddProductProps> = ({ isOpen, onClose, onSuccess, pro
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.error || 'Erreur lors de la sauvegarde du produit');
+        throw new ApiError(data, 'addProduct.saveError');
       }
       const addedProd = await res.json();
       
@@ -191,10 +176,10 @@ const AddProduct: React.FC<AddProductProps> = ({ isOpen, onClose, onSuccess, pro
         <div className="p-10 overflow-y-auto">
           <div className="flex justify-between items-center mb-8">
             <div>
-              <h3 className="text-2xl font-black text-primary uppercase tracking-tighter italic">{initialData ? 'Modifier le Produit' : 'Nouveau Produit'}</h3>
-              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Référencement au catalogue (Brouillon sauvegardé)</p>
+              <h3 className="text-2xl font-black text-primary uppercase tracking-tighter italic">{initialData ? t('addProduct.titleEdit') : t('addProduct.titleNew')}</h3>
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">{t('addProduct.subtitle')}</p>
             </div>
-            <button onClick={onClose} className="p-3 text-gray-400 hover:text-primary transition-all">
+            <button type="button" onClick={onClose} aria-label={t('addProduct.close')} className="p-3 text-gray-400 hover:text-primary transition-all">
               <X className="h-6 w-6" />
             </button>
           </div>
@@ -207,65 +192,69 @@ const AddProduct: React.FC<AddProductProps> = ({ isOpen, onClose, onSuccess, pro
             )}
             
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-primary uppercase tracking-widest italic">Nom du Produit</label>
+              <label htmlFor="product_name" className="text-[10px] font-black text-primary uppercase tracking-widest italic">{t('addProduct.name')}</label>
               <input 
+                id="product_name"
                 name="name"
                 required
                 type="text" 
                 value={formData.name}
                 onChange={handleChange}
-                placeholder="Ex: Pompe à engrenages HP-300" 
+                placeholder={t('addProduct.namePlaceholder')} 
                 className="w-full bg-gray-50 border-none px-8 py-5 rounded-2xl text-sm font-bold outline-none ring-2 ring-transparent focus:ring-secondary/20 transition-all" 
               />
             </div>
 
             <div className="grid grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-primary uppercase tracking-widest italic">Catégorie</label>
+                <label htmlFor="product_category" className="text-[10px] font-black text-primary uppercase tracking-widest italic">{t('addProduct.category')}</label>
                 <select 
+                  id="product_category"
                   name="category" 
                   value={formData.category}
                   onChange={handleChange}
                   className="w-full bg-gray-50 border-none px-6 py-5 rounded-2xl text-[10px] font-black uppercase tracking-widest outline-none cursor-pointer"
                 >
-                  <option value="" disabled>Sélectionner...</option>
+                  <option value="" disabled>{t('addProduct.selectCategory')}</option>
                   {productCategories.map(group => (
-                    <optgroup key={group.id} label={group.name}>
+                    <optgroup key={group.id} label={t(`productCategories.${group.id}`)}>
                       {group.subCategories.map((sub: any) => (
-                        <option key={sub.id} value={sub.name}>{sub.name}</option>
+                        <option key={sub.id} value={sub.name}>{t(`productCategories.${sub.id}`)}</option>
                       ))}
                     </optgroup>
                   ))}
                 </select>
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-primary uppercase tracking-widest italic">Gamme de Prix (DZD)</label>
+                <label htmlFor="product_price" className="text-[10px] font-black text-primary uppercase tracking-widest italic">{t('addProduct.price')}</label>
                 <input 
+                  id="product_price"
                   name="price" 
                   required 
                   type="text" 
                   value={formData.price}
                   onChange={handleChange}
-                  placeholder="Ex: 50,000" 
+                  placeholder={t('addProduct.pricePlaceholder')} 
                   className="w-full bg-gray-50 border-none px-6 py-5 rounded-2xl text-sm font-bold outline-none" 
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-primary uppercase tracking-widest italic">Description Technique</label>
+              <label htmlFor="product_description" className="text-[10px] font-black text-primary uppercase tracking-widest italic">{t('addProduct.description')}</label>
               <textarea 
+                id="product_description"
                 name="description"
                 rows={4} 
                 value={formData.description}
                 onChange={handleChange}
-                placeholder="Spécifications, dimensions, usage..." 
+                placeholder={t('addProduct.descriptionPlaceholder')} 
                 className="w-full bg-gray-50 border-none px-8 py-6 rounded-3xl text-sm font-medium outline-none resize-none" 
               />
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-primary uppercase tracking-widest italic">Image ou Document</label>
+              <label className="text-[10px] font-black text-primary uppercase tracking-widest italic">{t('addProduct.file')}</label>
               <div className="p-6 bg-gray-50 rounded-3xl border border-dashed border-gray-200 text-center relative hover:bg-gray-100 transition-colors">
                 <input 
                   type="file" 
@@ -286,14 +275,14 @@ const AddProduct: React.FC<AddProductProps> = ({ isOpen, onClose, onSuccess, pro
                   <div className="flex flex-col items-center">
                     <CheckCircle2 className="h-8 w-8 text-emerald-500 mb-2" />
                     <div className="text-emerald-600 font-black text-sm uppercase tracking-widest break-all">
-                      Fichier Ajouté: {fileUrl.split('-').pop()}
+                      {t('addProduct.fileAdded', { name: fileUrl.split('-').pop() })}
                     </div>
-                    <p className="text-[10px] text-gray-400 uppercase tracking-widest mt-2">Cliquez pour remplacer</p>
+                    <p className="text-[10px] text-gray-400 uppercase tracking-widest mt-2">{t('addProduct.clickToReplace')}</p>
                   </div>
                 ) : (
                   <>
                     <Upload className="h-6 w-6 text-gray-300 mx-auto mb-2" />
-                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Cliquez ou glissez-déposez</p>
+                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{t('addProduct.dropHere')}</p>
                   </>
                 )}
               </div>
@@ -305,14 +294,14 @@ const AddProduct: React.FC<AddProductProps> = ({ isOpen, onClose, onSuccess, pro
                 disabled={isLoading || isUploading}
                 className="flex-1 bg-primary text-white py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl hover:bg-secondary transition-all flex items-center justify-center space-x-3 disabled:opacity-50"
               >
-                {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <span>{initialData ? 'Mettre à jour' : 'Ajouter au catalogue'}</span>}
+                {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <span>{initialData ? t('addProduct.update') : t('addProduct.add')}</span>}
               </button>
               <button 
                 type="button"
                 onClick={onClose}
                 className="px-8 border border-gray-100 text-gray-400 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:text-primary transition-all"
               >
-                Annuler
+                {t('addProduct.cancel')}
               </button>
             </div>
           </form>

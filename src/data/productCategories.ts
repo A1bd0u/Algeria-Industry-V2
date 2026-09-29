@@ -55,3 +55,18 @@ export const productCategories = [
     ]
   }
 ];
+
+// Les produits stockent le libellé français de la sous-catégorie : on retrouve
+// son identifiant pour l'afficher dans la langue de l'interface.
+const idByName = new Map<string, string>(
+  productCategories.flatMap((group) => [
+    [group.name, group.id] as [string, string],
+    ...group.subCategories.map((sub) => [sub.name, sub.id] as [string, string]),
+  ])
+);
+
+export const categoryLabel = (t: (key: string, options?: any) => string, value?: string | null) => {
+  if (!value || value === 'Non catégorisé') return t('productCategories.uncategorized');
+  const id = idByName.get(value);
+  return id ? t(`productCategories.${id}`) : value;
+};

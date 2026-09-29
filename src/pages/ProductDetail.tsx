@@ -23,6 +23,7 @@ import { useCurrency } from '../context/CurrencyContext';
 import { useAuth } from '../context/AuthContext';
 import { cn, extractIdFromSlug, generateSlugUrl } from '../lib/utils';
 import axios from 'axios';
+import { categoryLabel } from '../data/productCategories';
 
 const ProductDetail = () => {
   const { t } = useTranslation();
@@ -235,7 +236,7 @@ const ProductDetail = () => {
           <div className="flex flex-col">
             <div className="mb-8">
               <div className="flex items-center justify-between mb-4">
-                <span className="tech-label">{product.category}</span>
+                <span className="tech-label">{categoryLabel(t, product.category)}</span>
                 {product.companyVerified && (
                   <span className="flex items-center space-x-1 text-success text-[10px] font-black uppercase tracking-widest">
                     <ShieldCheck className="h-4 w-4" />

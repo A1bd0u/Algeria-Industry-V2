@@ -42,7 +42,6 @@ const Register = lazy(() => import('./pages/Register'));
 const RegisterSuccess = lazy(() => import('./pages/RegisterSuccess'));
 const Resources = lazy(() => import('./pages/Resources'));
 const SearchResults = lazy(() => import('./pages/SearchResults'));
-const Subscriptions = lazy(() => import('./pages/Subscriptions'));
 const Tarifs = lazy(() => import('./pages/Tarifs'));
 const Terms = lazy(() => import('./pages/Terms'));
 const Catalogues = lazy(() => import('./pages/Catalogues'));
@@ -138,7 +137,8 @@ export default function App() {
                       <Route path="/reset-password" element={<PageTransition><ResetPassword /></PageTransition>} />
                       <Route path="/register" element={<PageTransition><Register /></PageTransition>} />
                       <Route path="/register-success" element={<PageTransition><RegisterSuccess /></PageTransition>} />
-                      <Route path="/subscriptions" element={<PageTransition><Subscriptions /></PageTransition>} />
+                      {/* Ancienne page de démonstration : l'abonnement se gère dans le tableau de bord. */}
+                      <Route path="/subscriptions" element={<Navigate to="/dashboard?tab=subscription" replace />} />
                       <Route path="/tarifs" element={<PageTransition><Tarifs /></PageTransition>} />
                       <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
                       <Route path="/faq" element={<FAQ />} />

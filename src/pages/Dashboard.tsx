@@ -44,39 +44,18 @@ import {
   XAxis, YAxis
 } from 'recharts';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
+import { ApiError } from '../lib/apiError';
+import { categoryLabel } from '../data/productCategories';
 import SubscriptionPanel from '../components/SubscriptionPanel';
 import TwoFactorSettings from '../components/TwoFactorSettings';
 import { cn, generateSlugUrl } from '../lib/utils';
 
 
-const productCategories = [
-  {
-    id: 1,
-    name: 'Équipements Industriels',
-    subCategories: [
-      { id: 101, name: 'Machines-Outils' },
-      { id: 102, name: 'Pompes & Vannes' }
-    ]
-  },
-  {
-    id: 2,
-    name: 'Matières Premières',
-    subCategories: [
-      { id: 201, name: 'Métaux' },
-      { id: 202, name: 'Chimie' }
-    ]
-  }
-];
-
-const PLAN_BADGES: Record<string, string> = {
-  free: 'Offre gratuite',
-  basic: 'Abonnement Basic actif',
-  pro: 'Abonnement Pro actif',
-  founder: 'Membre fondateur',
-};
 
 const Dashboard = () => {
+  const { t } = useTranslation();
   const { user, logout, isAuthenticated, setUser, refreshUser } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -178,7 +157,7 @@ const Dashboard = () => {
   const handleUpdateCompany = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user?.company_id) {
-      showNotify("Aucune entreprise n'est rattachée à votre compte.", "error");
+      showNotify(t('dashboard.noCompany'), "error");
       return;
     }
     setIsLoading(true);
@@ -190,9 +169,9 @@ const Dashboard = () => {
       });
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
-        throw new Error(d.error || 'Erreur lors de la mise à jour.');
+        throw new ApiError(d, 'dashboard.updateError');
       }
-      showNotify("Informations entreprise mises à jour.", "success");
+      showNotify(t('dashboard.companyUpdated'), "success");
     } catch (err: any) {
       showNotify(err.message, "error");
     } finally {
@@ -211,12 +190,13 @@ const Dashboard = () => {
       if (res.ok) {
         setShowAdForm(false);
         setAdFormData({ name: '', type: 'Bannière Accueil', url: '', duration: '1 Semaine' });
-        showNotify("Votre demande d'espace pub a été envoyée pour validation.", "success");
+        showNotify(t('dashboard.adSent'), "success");
       } else {
-        showNotify("Erreur lors de la soumission", "error");
+        const d = await res.json().catch(() => ({}));
+        showNotify(new ApiError(d, 'dashboard.adError').message, "error");
       }
     } catch (err) {
-      showNotify("Erreur réseau", "error");
+      showNotify(t('auth.networkError'), "error");
     } finally {
       setIsLoading(false);
     }
@@ -226,7 +206,7 @@ const Dashboard = () => {
     try {
       await fetch(`/api/favorites/${id}`, { method: 'DELETE' });
       setFavorites(prev => prev.filter(f => f.id !== id));
-      showNotify("Favoris supprimé.");
+      showNotify(t('dashboard.favoriteRemoved'));
     } catch (e) {
       console.error(e);
     }
@@ -265,9 +245,9 @@ const Dashboard = () => {
         body: JSON.stringify({ name: profileInfo.name, company: profileInfo.company })
       });
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.error || 'Erreur lors de la mise à jour du profil.');
+      if (!res.ok) throw new ApiError(data, 'dashboard.updateError');
       if (data.user) setUser(data.user);
-      showNotify("Profil mis à jour avec succès.", "success");
+      showNotify(t('dashboard.profileUpdated'), "success");
     } catch (err: any) {
       showNotify(err.message, "error");
     } finally {
@@ -283,43 +263,46 @@ const Dashboard = () => {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'mes-donnees-algeria-industry.json';
+      a.download = t('dashboard.exportFileName');
       a.click();
       URL.revokeObjectURL(url);
     } catch {
-      showNotify("L'export a échoué. Veuillez réessayer.", "error");
+      showNotify(t('dashboard.exportFailed'), "error");
     }
   };
 
   const handleDeleteAccount = async () => {
-    if (!window.confirm('Supprimer définitivement votre compte et toutes vos données ? Cette action est irréversible.')) return;
+    if (!window.confirm(t('dashboard.deleteAccountConfirm'))) return;
     try {
       const res = await fetch('/api/users/me', { method: 'DELETE' });
       if (!res.ok) throw new Error();
       setUser(null);
       navigate('/');
     } catch {
-      showNotify("La suppression a échoué. Contactez le support.", "error");
+      showNotify(t('dashboard.deleteFailed'), "error");
     }
   };
 
-  const filteredProducts = products.filter(p => 
-    p.name.toLowerCase().includes(globalSearch.toLowerCase()) || 
-    p.cat.toLowerCase().includes(globalSearch.toLowerCase())
+  const search = globalSearch.trim().toLowerCase();
+  const filteredProducts = products.filter(p =>
+    !search ||
+    String(p.name || '').toLowerCase().includes(search) ||
+    categoryLabel(t, p.category).toLowerCase().includes(search)
   );
+  const roleLabel = (role?: string) => t(`dashboard.roles.${role}`, { defaultValue: role || '' });
 
   const renderContent = () => {
     if (!user) return null;
     switch(activeTab) {
       case 'overview':
-        const kycLabels: Record<string, string> = { none: 'À faire', pending: 'En cours', approved: 'Approuvé', rejected: 'Refusé' };
+
         const stats = (user.role === 'fournisseur' || user.role === 'exposant') ? [
-          { label: 'Produits publiés', value: apiStats?.metrics?.items || 0, icon: Package, color: 'text-emerald-600', bg: 'bg-emerald-50' },
-          { label: 'Messages', value: apiStats?.metrics?.messages || 0, icon: MessageSquare, color: 'text-blue-600', bg: 'bg-blue-50' },
-          { label: 'Vérification KYC', value: kycLabels[user.kycStatus || 'none'], icon: ShieldCheck, color: 'text-orange-600', bg: 'bg-orange-50' },
+          { label: t('dashboard.stats.products'), value: apiStats?.metrics?.items || 0, icon: Package, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+          { label: t('dashboard.stats.messages'), value: apiStats?.metrics?.messages || 0, icon: MessageSquare, color: 'text-blue-600', bg: 'bg-blue-50' },
+          { label: t('dashboard.stats.kyc'), value: t(`dashboard.kyc.${user.kycStatus || 'none'}`), icon: ShieldCheck, color: 'text-orange-600', bg: 'bg-orange-50' },
         ] : [
-          { label: 'Messages', value: apiStats?.metrics?.messages || 0, icon: MessageSquare, color: 'text-orange-600', bg: 'bg-orange-50' },
-          { label: 'Favoris', value: favorites.length, icon: Heart, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+          { label: t('dashboard.stats.messages'), value: apiStats?.metrics?.messages || 0, icon: MessageSquare, color: 'text-orange-600', bg: 'bg-orange-50' },
+          { label: t('dashboard.stats.favorites'), value: favorites.length, icon: Heart, color: 'text-emerald-600', bg: 'bg-emerald-50' },
         ];
 
         return (
@@ -353,20 +336,20 @@ const Dashboard = () => {
               <div className="lg:col-span-2 bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
                 <div className="flex items-center justify-between mb-8">
                   <h3 className="font-bold text-primary text-lg">
-                    {user.role === 'fournisseur' ? 'Contacts reçus' : 'Messages échangés'}
+                    {user.role === 'fournisseur' ? t('dashboard.chart.contacts') : t('dashboard.chart.messages')}
                   </h3>
                   <div className="flex bg-gray-50 p-1 rounded-lg">
                     <button 
                       onClick={() => setChartTimeframe('6m')}
                       className={cn("px-3 py-1 rounded-md text-[10px] font-black uppercase transition-all", chartTimeframe === '6m' ? "bg-white shadow-sm text-primary" : "text-gray-400 hover:text-primary")}
                     >
-                      6 mois
+                      {t('dashboard.chart.6m')}
                     </button>
                     <button 
                       onClick={() => setChartTimeframe('1y')}
                       className={cn("px-3 py-1 rounded-md text-[10px] font-black uppercase transition-all", chartTimeframe === '1y' ? "bg-white shadow-sm text-primary" : "text-gray-400 hover:text-primary")}
                     >
-                      1 an
+                      {t('dashboard.chart.1y')}
                     </button>
                   </div>
                 </div>
@@ -400,26 +383,26 @@ const Dashboard = () => {
 
               {/* Prochaines actions */}
               <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
-                <h3 className="font-bold text-primary text-lg mb-6">Prochaines actions</h3>
+                <h3 className="font-bold text-primary text-lg mb-6">{t('dashboard.next.title')}</h3>
                 <div className="space-y-3">
                   {(user.role === 'fournisseur' || user.role === 'exposant') && user.kycStatus !== 'approved' && user.kycStatus !== 'pending' && (
                     <Link to="/kyc-upload" className="flex items-center justify-between p-4 rounded-2xl border border-orange-100 bg-orange-50 text-orange-700 text-sm font-bold">
-                      <span>Faire vérifier mon entreprise (KYC)</span>
+                      <span>{t('dashboard.next.kyc')}</span>
                       <ChevronRight className="h-4 w-4 rtl:rotate-180" />
                     </Link>
                   )}
                   {(user.role === 'fournisseur' || user.role === 'exposant') && user.kycStatus === 'approved' && products.length === 0 && (
                     <button onClick={() => setActiveTab('products')} className="w-full flex items-center justify-between p-4 rounded-2xl border border-gray-100 text-sm font-bold text-primary hover:border-secondary">
-                      <span>Publier mon premier produit</span>
+                      <span>{t('dashboard.next.firstProduct')}</span>
                       <ChevronRight className="h-4 w-4 rtl:rotate-180" />
                     </button>
                   )}
                   <button onClick={() => setActiveTab('messages')} className="w-full flex items-center justify-between p-4 rounded-2xl border border-gray-100 text-sm font-bold text-primary hover:border-secondary">
-                    <span>Ouvrir la messagerie</span>
+                    <span>{t('dashboard.next.messages')}</span>
                     <ChevronRight className="h-4 w-4 rtl:rotate-180" />
                   </button>
                   <Link to="/directory" className="flex items-center justify-between p-4 rounded-2xl border border-gray-100 text-sm font-bold text-primary hover:border-secondary">
-                    <span>Parcourir l'annuaire</span>
+                    <span>{t('dashboard.next.directory')}</span>
                     <ChevronRight className="h-4 w-4 rtl:rotate-180" />
                   </Link>
                 </div>
@@ -441,14 +424,14 @@ const Dashboard = () => {
                </div>
                <div>
                   <h3 className="text-xl font-black text-primary uppercase italic">{profileInfo.name}</h3>
-                  <p className="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em]">{user.role}</p>
+                  <p className="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em]">{roleLabel(user.role)}</p>
                </div>
             </div>
 
             <form onSubmit={handleUpdateProfile} className="space-y-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="space-y-2">
-                  <label htmlFor="profile_name" className="text-[10px] font-black text-primary uppercase tracking-widest italic">Nom complet</label>
+                  <label htmlFor="profile_name" className="text-[10px] font-black text-primary uppercase tracking-widest italic">{t('dashboard.profile.fullName')}</label>
                   <input
                     id="profile_name"
                     type="text"
@@ -460,7 +443,7 @@ const Dashboard = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label htmlFor="profile_email" className="text-[10px] font-black text-primary uppercase tracking-widest italic">Email professionnel</label>
+                  <label htmlFor="profile_email" className="text-[10px] font-black text-primary uppercase tracking-widest italic">{t('dashboard.profile.email')}</label>
                   <input
                     id="profile_email"
                     type="email"
@@ -470,7 +453,7 @@ const Dashboard = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label htmlFor="profile_company" className="text-[10px] font-black text-primary uppercase tracking-widest italic">Entreprise</label>
+                  <label htmlFor="profile_company" className="text-[10px] font-black text-primary uppercase tracking-widest italic">{t('dashboard.profile.company')}</label>
                   <input
                     id="profile_company"
                     type="text"
@@ -483,25 +466,25 @@ const Dashboard = () => {
 
               <div className="pt-8 border-t border-gray-50 flex flex-wrap gap-4 items-center justify-between">
                 <div>
-                   <h4 className="text-[10px] font-black text-primary uppercase italic mb-1">Sécurité</h4>
-                   <Link to="/forgot-password" className="text-[9px] font-black text-secondary hover:underline uppercase tracking-widest">Changer mon mot de passe</Link>
+                   <h4 className="text-[10px] font-black text-primary uppercase italic mb-1">{t('dashboard.profile.security')}</h4>
+                   <Link to="/forgot-password" className="text-[9px] font-black text-secondary hover:underline uppercase tracking-widest">{t('dashboard.profile.changePassword')}</Link>
                 </div>
                 <button type="submit" disabled={isLoading} className="bg-primary text-white px-10 py-5 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl hover:bg-secondary transition-all flex items-center space-x-2">
-                  {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <span>Sauvegarder les changements</span>}
+                  {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <span>{t('dashboard.profile.save')}</span>}
                 </button>
               </div>
             </form>
 
             <div className="mt-12 pt-8 border-t border-gray-100">
-              <h4 className="text-[10px] font-black text-primary uppercase italic mb-2">Mes données personnelles</h4>
-              <p className="text-xs text-gray-500 mb-4">Conformément à la loi 18-07, vous pouvez exporter ou supprimer vos données à tout moment.</p>
+              <h4 className="text-[10px] font-black text-primary uppercase italic mb-2">{t('dashboard.profile.dataTitle')}</h4>
+              <p className="text-xs text-gray-500 mb-4">{t('dashboard.profile.dataText')}</p>
               <div className="flex flex-wrap gap-4">
                 <button type="button" onClick={handleExportData} className="px-6 py-3 rounded-2xl border border-gray-200 text-[10px] font-black uppercase tracking-widest text-primary hover:border-secondary">
-                  Exporter mes données
+                  {t('dashboard.profile.export')}
                 </button>
                 {user.role !== 'admin' && (
                   <button type="button" onClick={handleDeleteAccount} className="px-6 py-3 rounded-2xl border border-red-200 bg-red-50 text-[10px] font-black uppercase tracking-widest text-red-600 hover:bg-red-100">
-                    Supprimer mon compte
+                    {t('dashboard.profile.deleteAccount')}
                   </button>
                 )}
               </div>
@@ -544,6 +527,7 @@ const Dashboard = () => {
                   </div>
                   <button 
                     onClick={() => removeFavorite(fav.id)}
+                    aria-label={t('dashboard.favorites.remove')}
                     className="p-3 bg-red-50 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all shrink-0 ms-4"
                   >
                     <Heart className="h-4 w-4 fill-current" />
@@ -557,7 +541,7 @@ const Dashboard = () => {
                     to={fav.item_type === 'product' ? `/products/${generateSlugUrl(fav.name, String(fav.item_id))}` : `/directory/${generateSlugUrl(fav.name, String(fav.item_id))}`}
                     className="text-[10px] font-black text-secondary hover:underline uppercase tracking-widest flex items-center space-x-1"
                    >
-                     <span>{fav.item_type === 'product' ? 'Voir produit' : 'Voir profil'}</span>
+                     <span>{fav.item_type === 'product' ? t('dashboard.favorites.viewProduct') : t('dashboard.favorites.viewProfile')}</span>
                      <ChevronRight className="h-3 w-3 rtl:rotate-180" />
                    </Link>
                 </div>
@@ -568,8 +552,8 @@ const Dashboard = () => {
                  <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6 text-gray-300">
                     <Heart className="h-10 w-10" />
                  </div>
-                 <h4 className="text-xl font-black text-primary uppercase italic mb-2">Aucun favoris</h4>
-                 <p className="text-sm text-gray-500">Explorez le catalogue pour ajouter des produits à vos favoris.</p>
+                 <h4 className="text-xl font-black text-primary uppercase italic mb-2">{t('dashboard.favorites.emptyTitle')}</h4>
+                 <p className="text-sm text-gray-500">{t('dashboard.favorites.emptyText')}</p>
               </div>
             )}
           </motion.div>
@@ -584,52 +568,52 @@ const Dashboard = () => {
           >
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-8 rounded-[40px] border border-gray-100 shadow-sm">
               <div>
-                <h3 className="text-2xl font-black text-primary uppercase italic">Espace Publicitaire</h3>
-                <p className="text-gray-500 mt-2">Gérez vos campagnes et maximisez votre visibilité sur la plateforme.</p>
+                <h3 className="text-2xl font-black text-primary uppercase italic">{t('dashboard.ads.title')}</h3>
+                <p className="text-gray-500 mt-2">{t('dashboard.ads.subtitle')}</p>
               </div>
               <button 
                 onClick={() => setShowAdForm(true)}
                 className="bg-secondary text-white px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-xl flex items-center gap-2"
               >
                 <Plus className="h-4 w-4" />
-                <span>Demander un espace pub</span>
+                <span>{t('dashboard.ads.request')}</span>
               </button>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               <div className="lg:col-span-2 space-y-6">
-                <h4 className="font-bold text-primary text-lg">Vos campagnes actives</h4>
+                <h4 className="font-bold text-primary text-lg">{t('dashboard.ads.activeTitle')}</h4>
                 <div className="bg-white p-12 text-center rounded-3xl border border-dashed border-gray-200">
                    <div className="bg-gray-50 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4">
                      <Zap className="h-8 w-8 text-gray-400" />
                    </div>
-                   <h5 className="font-bold text-gray-900 mb-2">Aucune campagne en cours</h5>
-                   <p className="text-sm text-gray-500">Vous n'avez pas de publicité active actuellement.</p>
+                   <h5 className="font-bold text-gray-900 mb-2">{t('dashboard.ads.noneTitle')}</h5>
+                   <p className="text-sm text-gray-500">{t('dashboard.ads.noneText')}</p>
                 </div>
                
                 <div className="bg-primary/5 border border-primary/10 p-6 rounded-3xl mt-4">
-                   <h5 className="font-bold text-primary mb-2">Pourquoi annoncer ici ?</h5>
+                   <h5 className="font-bold text-primary mb-2">{t('dashboard.ads.whyTitle')}</h5>
                    <ul className="space-y-2 text-sm text-gray-700">
-                      <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" /> Touchez des acheteurs industriels ciblés</li>
-                      <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" /> Augmentez vos chances de remporter des AO</li>
-                      <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" /> Bannières affichées en page d'accueil et annuaire</li>
+                      <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" /> {t('dashboard.ads.why1')}</li>
+                      <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" /> {t('dashboard.ads.why2')}</li>
+                      <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" /> {t('dashboard.ads.why3')}</li>
                    </ul>
                 </div>
               </div>
               
               <div className="space-y-6">
-                 <h4 className="font-bold text-primary text-lg">Statistiques</h4>
+                 <h4 className="font-bold text-primary text-lg">{t('dashboard.ads.stats')}</h4>
                  <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm space-y-4">
                     <div className="flex items-center justify-between pb-4 border-b border-gray-50">
-                       <span className="text-sm text-gray-500 font-bold">Vues (30j)</span>
+                       <span className="text-sm text-gray-500 font-bold">{t('dashboard.ads.views')}</span>
                        <span className="font-black text-primary">0</span>
                     </div>
                     <div className="flex items-center justify-between pb-4 border-b border-gray-50">
-                       <span className="text-sm text-gray-500 font-bold">Clics (30j)</span>
+                       <span className="text-sm text-gray-500 font-bold">{t('dashboard.ads.clicks')}</span>
                        <span className="font-black text-primary">0</span>
                     </div>
                     <div className="flex items-center justify-between">
-                       <span className="text-sm text-gray-500 font-bold">CTR</span>
+                       <span className="text-sm text-gray-500 font-bold">{t('dashboard.ads.ctr')}</span>
                        <span className="font-black text-primary">0.0%</span>
                     </div>
                  </div>
@@ -657,10 +641,9 @@ const Dashboard = () => {
             className="bg-white p-12 rounded-[40px] border border-gray-100 shadow-sm text-center"
           >
             <BarChart3 className="h-12 w-12 text-gray-300 mx-auto mb-6" />
-            <h3 className="text-xl font-black text-primary uppercase italic mb-2">Statistiques bientôt disponibles</h3>
+            <h3 className="text-xl font-black text-primary uppercase italic mb-2">{t('dashboard.statsSoon.title')}</h3>
             <p className="text-sm text-gray-500 max-w-md mx-auto">
-              La mesure des visites et des clics sur vos fiches est en cours de mise en place.
-              En attendant, la vue d'ensemble affiche vos produits et vos messages réels.
+              {t('dashboard.statsSoon.text')}
             </p>
           </motion.div>
         );
@@ -672,17 +655,17 @@ const Dashboard = () => {
             exit={{ opacity: 0, y: -10 }}
           >
             <div className="flex justify-between items-center mb-8">
-               <h3 className="text-2xl font-black text-primary uppercase italic">Mes Produits</h3>
+               <h3 className="text-2xl font-black text-primary uppercase italic">{t('dashboard.products.title')}</h3>
                <button 
                  onClick={() => setShowAddProduct(true)}
                  className="bg-primary text-white px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-widest flex items-center space-x-2 hover:bg-secondary transition-all"
                >
                  <Package className="h-4 w-4" />
-                 <span>Ajouter</span>
+                 <span>{t('dashboard.products.add')}</span>
                </button>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-               {products.map(p => (
+               {filteredProducts.map(p => (
                  <div key={p.id} className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm relative group hover:shadow-md transition-all flex flex-col">
                    {p.file_url ? (
                      <img src={p.file_url} className="w-full h-40 object-cover rounded-2xl mb-4" alt={p.name} />
@@ -692,31 +675,35 @@ const Dashboard = () => {
                      </div>
                    )}
                    <h4 className="font-bold text-primary mb-1">{p.name}</h4>
-                   <p className="text-xs text-gray-500 mb-2">{p.category}</p>
+                   <p className="text-xs text-gray-500 mb-2">{categoryLabel(t, p.category)}</p>
                    <div className="mt-auto pt-4 border-t border-gray-50 flex justify-between items-center">
-                     <span className={cn("text-[10px] font-black uppercase tracking-widest", p.status === 'Actif' ? 'text-success' : 'text-orange-500')}>{p.status}</span>
+                     <span className={cn("text-[10px] font-black uppercase tracking-widest", p.status === 'Actif' ? 'text-success' : 'text-orange-500')}>{t(`dashboard.products.status.${p.status}`, { defaultValue: p.status })}</span>
                      <div className="flex gap-2">
                        <button 
+                         type="button"
+                         onClick={() => {
+                           setEditProduct(p);
+                           setShowAddProduct(true);
+                         }}
+                         aria-label={t('dashboard.products.edit')}
+                         className="p-2 text-primary hover:bg-primary/5 rounded-lg transition-colors"
+                       >
+                         <Edit2 className="h-4 w-4" />
+                       </button>
+                       <button 
+                         type="button"
                          onClick={async () => {
-                           if(window.confirm('Supprimer ce produit ?')) {
+                           if (window.confirm(t('dashboard.products.deleteConfirm'))) {
                              const res = await fetch(`/api/products/${p.id}`, { method: 'DELETE' });
                              if (res.ok) {
                                setProducts(products.filter(prod => prod.id !== p.id));
                              }
                            }
                          }}
+                         aria-label={t('dashboard.products.delete')}
                          className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                        >
-                         <button 
-                         onClick={() => {
-                           setEditProduct(p);
-                           setShowAddProduct(true);
-                         }}
-                         className="p-2 text-primary hover:bg-primary/5 rounded-lg transition-colors me-2"
-                       >
-                         <Edit2 className="h-4 w-4" />
-                       </button>
-                       <Trash2 className="h-4 w-4" />
+                         <Trash2 className="h-4 w-4" />
                        </button>
                      </div>
                    </div>
@@ -725,8 +712,8 @@ const Dashboard = () => {
                {products.length === 0 && (
                  <div className="col-span-full py-12 flex flex-col items-center justify-center text-center bg-gray-50 rounded-3xl border border-dashed border-gray-200">
                     <Package className="h-12 w-12 text-gray-300 mb-4" />
-                    <p className="text-gray-500 font-bold uppercase tracking-widest text-sm">Aucun produit</p>
-                    <p className="text-gray-400 text-xs mt-2 max-w-xs">Vous n'avez pas encore ajouté de produits à votre catalogue.</p>
+                    <p className="text-gray-500 font-bold uppercase tracking-widest text-sm">{t('dashboard.products.emptyTitle')}</p>
+                    <p className="text-gray-400 text-xs mt-2 max-w-xs">{t('dashboard.products.emptyText')}</p>
                  </div>
                )}
             </div>
@@ -757,7 +744,7 @@ const Dashboard = () => {
                <form onSubmit={handleUpdateCompany} className="p-12 pt-20 space-y-8">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                      <div className="space-y-2">
-                        <label htmlFor="company_name" className="text-[10px] font-black text-primary uppercase tracking-widest italic">Nom de l'entreprise</label>
+                        <label htmlFor="company_name" className="text-[10px] font-black text-primary uppercase tracking-widest italic">{t('dashboard.company.name')}</label>
                         <input
                           id="company_name"
                           type="text"
@@ -769,11 +756,11 @@ const Dashboard = () => {
                         />
                      </div>
                      <div className="space-y-2">
-                        <label htmlFor="company_wilaya" className="text-[10px] font-black text-primary uppercase tracking-widest italic">Wilaya</label>
+                        <label htmlFor="company_wilaya" className="text-[10px] font-black text-primary uppercase tracking-widest italic">{t('dashboard.company.wilaya')}</label>
                         <input
                           id="company_wilaya"
                           type="text"
-                          placeholder="Ex : Sétif"
+                          placeholder={t('dashboard.company.wilayaPlaceholder')}
                           value={companyInfo.wilaya}
                           onChange={(e) => setCompanyInfo({...companyInfo, wilaya: e.target.value})}
                           className="w-full bg-gray-50 border-none px-6 py-4 rounded-2xl text-sm font-bold outline-none"
@@ -781,7 +768,7 @@ const Dashboard = () => {
                      </div>
                   </div>
                   <div className="space-y-2">
-                     <label htmlFor="company_bio" className="text-[10px] font-black text-primary uppercase tracking-widest italic">Description de l'activité</label>
+                     <label htmlFor="company_bio" className="text-[10px] font-black text-primary uppercase tracking-widest italic">{t('dashboard.company.bio')}</label>
                      <textarea
                         id="company_bio"
                         rows={4}
@@ -793,7 +780,7 @@ const Dashboard = () => {
                   <div className="pt-4">
                      <button type="submit" disabled={isLoading} className="bg-primary text-white px-10 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl hover:bg-secondary transition-all flex items-center space-x-2">
                         {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
-                        <span>Mettre à jour la fiche</span>
+                        <span>{t('dashboard.company.save')}</span>
                      </button>
                   </div>
                </form>
@@ -804,16 +791,16 @@ const Dashboard = () => {
   };
 
   const menuItems = [
-    { id: 'overview', name: 'Vue d\'ensemble', icon: LayoutDashboard },
-    { id: 'profile', name: 'Mon Profil', icon: User },
-    { id: 'messages', name: 'Messagerie', icon: MessageSquare },
-    { id: 'products', name: 'Mes Produits', icon: Package, roles: ['fournisseur', 'exposant'] },
-    { id: 'company', name: 'Ma Fiche Entreprise', icon: Building2, roles: ['fournisseur', 'exposant'] },
-    { id: 'favorites', name: 'Favoris', icon: Heart, roles: ['acheteur'] },
-    { id: 'ads', name: 'Publicité', icon: Zap },
-    { id: 'subscription', name: 'Abonnement', icon: CreditCard },
-    { id: 'stats', name: 'Statistiques', icon: BarChart3 },
-    { id: 'admin', name: 'Console Pro', icon: ShieldCheck, isExternal: true, roles: ['admin'] },
+    { id: 'overview', name: t('dashboard.menu.overview'), icon: LayoutDashboard },
+    { id: 'profile', name: t('dashboard.menu.profile'), icon: User },
+    { id: 'messages', name: t('dashboard.menu.messages'), icon: MessageSquare },
+    { id: 'products', name: t('dashboard.menu.products'), icon: Package, roles: ['fournisseur', 'exposant'] },
+    { id: 'company', name: t('dashboard.menu.company'), icon: Building2, roles: ['fournisseur', 'exposant'] },
+    { id: 'favorites', name: t('dashboard.menu.favorites'), icon: Heart, roles: ['acheteur'] },
+    { id: 'ads', name: t('dashboard.menu.ads'), icon: Zap },
+    { id: 'subscription', name: t('dashboard.menu.subscription'), icon: CreditCard },
+    { id: 'stats', name: t('dashboard.menu.stats'), icon: BarChart3 },
+    { id: 'admin', name: t('dashboard.menu.admin'), icon: ShieldCheck, isExternal: true, roles: ['admin'] },
   ].filter(item => !item.roles || item.roles.includes(user?.role || ''));
 
   return (
@@ -827,7 +814,7 @@ const Dashboard = () => {
             </div>
             <div className="min-w-0">
               <p className="text-sm font-bold text-primary truncate">{user?.company}</p>
-              <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">{user?.role}</p>
+              <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">{roleLabel(user?.role)}</p>
             </div>
           </div>
 
@@ -835,7 +822,6 @@ const Dashboard = () => {
             {menuItems.map((item) => {
               const isActive = activeTab === item.id;
               const path = item.id === 'admin' ? '/extranet' : 
-                          item.id === 'subscription' ? '/subscriptions' :
                           item.id === 'overview' ? '/dashboard' : 
                           `/dashboard?tab=${item.id}`;
 
@@ -867,7 +853,7 @@ const Dashboard = () => {
             className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-red-500 hover:bg-red-50 transition-all"
           >
             <LogOut className="h-5 w-5" />
-            <span>Déconnexion</span>
+            <span>{t('dashboard.logout')}</span>
           </button>
         </div>
       </aside>
@@ -878,18 +864,19 @@ const Dashboard = () => {
           {/* Header */}
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-6">
             <div className="flex-1">
-              <h1 className="text-2xl font-bold text-primary">Tableau de Bord</h1>
-              <p className="text-sm text-gray-500">Bienvenue, {user?.name}. Voici un résumé de votre activité.</p>
+              <h1 className="text-2xl font-bold text-primary">{t('dashboard.title')}</h1>
+              <p className="text-sm text-gray-500">{t('dashboard.welcome', { name: user?.name })}</p>
             </div>
             
-            <div className="flex-1 max-w-md hidden xl:block">
+            <div className={cn("flex-1 max-w-md hidden", activeTab === 'products' && "xl:block")}>
                <div className="relative group">
                   <Search className="absolute start-6 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-secondary transition-colors" />
                   <input 
                     type="text" 
                     value={globalSearch}
                     onChange={(e) => setGlobalSearch(e.target.value)}
-                    placeholder="Filtrer partout (produits, entreprises...)"
+                    placeholder={t('dashboard.searchPlaceholder')}
+                    aria-label={t('dashboard.searchPlaceholder')}
                     className="w-full bg-white border border-gray-100 px-16 py-4 rounded-[32px] text-xs font-bold outline-none focus:border-secondary focus:shadow-xl transition-all"
                   />
                </div>
@@ -906,13 +893,13 @@ const Dashboard = () => {
                   )}
                 >
                   <div className={cn("w-1.5 h-1.5 rounded-full", currentPlan && currentPlan !== 'free' ? "bg-success animate-pulse" : "bg-gray-400")} />
-                  <span>{PLAN_BADGES[currentPlan || 'free'] || 'Offre gratuite'}</span>
+                  <span>{t(`dashboard.planBadge.${currentPlan || 'free'}`, { defaultValue: t('dashboard.planBadge.free') })}</span>
                 </Link>
               )}
               {user?.role === 'fournisseur' && (
                 <button onClick={() => setShowProductForm(true)} className="btn-primary py-2 px-4 text-sm flex items-center space-x-2">
                    <Plus className="h-4 w-4" />
-                   <span>Ajouter Produit</span>
+                   <span>{t('dashboard.addProduct')}</span>
                 </button>
               )}
             </div>
@@ -934,18 +921,18 @@ const Dashboard = () => {
                   </div>
                   <div>
                      <h3 className="font-black text-primary uppercase text-sm mt-1">
-                       {user?.companyStatus === 'pending' ? 'Vérification en cours' : 'Vérification de Profil Requise (KYC)'}
+                       {user?.companyStatus === 'pending' ? t('dashboard.kycBanner.pendingTitle') : t('dashboard.kycBanner.requiredTitle')}
                      </h3>
                      <p className="text-xs text-gray-600 mt-1">
                        {user?.companyStatus === 'pending' 
-                        ? 'Vos documents légaux ont été transmis et sont actuellement en cours de vérification par nos équipes. Vous serez notifié dès que votre compte sera validé.' 
-                        : 'Votre entreprise n\'est pas encore vérifiée. Vous devez soumettre vos documents légaux pour débloquer toutes les fonctionnalités et publier au catalogue.'}
+                        ? t('dashboard.kycBanner.pendingText')
+                        : t('dashboard.kycBanner.requiredText')}
                      </p>
                   </div>
                </div>
                {user?.companyStatus !== 'pending' && (
                   <Link to="/kyc-upload" className="bg-primary text-white px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-secondary transition-all whitespace-nowrap shadow-lg shrink-0">
-                     Transmettre mes documents
+                     {t('dashboard.kycBanner.submit')}
                   </Link>
                )}
             </motion.div>
@@ -963,7 +950,6 @@ const Dashboard = () => {
         isOpen={showProductForm}
         onClose={() => setShowProductForm(false)}
         onSuccess={(addedProd) => setProducts(prev => [addedProd, ...prev])}
-        productCategories={productCategories}
       />
 
       {/* Ad Space Request Form Modal */}
@@ -979,11 +965,12 @@ const Dashboard = () => {
               <div className="p-8 md:p-12 overflow-y-auto">
                 <div className="flex justify-between items-start mb-8">
                   <div>
-                    <h2 className="text-3xl font-black text-primary uppercase italic mb-2">Demande d'Espace Pub</h2>
-                    <p className="text-gray-500 font-medium">Bostez votre visibilité auprès des professionnels de l'industrie.</p>
+                    <h2 className="text-3xl font-black text-primary uppercase italic mb-2">{t('dashboard.adForm.title')}</h2>
+                    <p className="text-gray-500 font-medium">{t('dashboard.adForm.subtitle')}</p>
                   </div>
                   <button 
                     onClick={() => setShowAdForm(false)}
+                    aria-label={t('dashboard.adForm.close')}
                     className="p-3 bg-gray-50 text-gray-400 hover:text-red-500 rounded-full transition-colors"
                   >
                     <X className="h-6 w-6" />
@@ -992,18 +979,19 @@ const Dashboard = () => {
 
                 <div className="space-y-8">
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-primary uppercase tracking-widest italic">Nom de la campagne</label>
+                    <label htmlFor="ad_name" className="text-[10px] font-black text-primary uppercase tracking-widest italic">{t('dashboard.adForm.name')}</label>
                     <input 
+                      id="ad_name"
                       type="text" 
                       value={adFormData.name}
                       onChange={e => setAdFormData({...adFormData, name: e.target.value})}
-                      placeholder="Ex: Lancement produit 2026"
+                      placeholder={t('dashboard.adForm.namePlaceholder')}
                       className="w-full bg-gray-50 border-none px-6 py-5 rounded-2xl text-sm font-bold text-gray-900 placeholder-gray-400 focus:ring-4 focus:ring-primary/10 transition-all outline-none"
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-primary uppercase tracking-widest italic">Type d'emplacement</label>
+                    <label className="text-[10px] font-black text-primary uppercase tracking-widest italic">{t('dashboard.adForm.placement')}</label>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <label className="flex flex-col p-4 bg-gray-50 rounded-2xl border-2 border-transparent hover:border-gray-200 cursor-pointer transition-all">
                         <div className="flex items-center space-x-3 mb-2">
@@ -1014,9 +1002,9 @@ const Dashboard = () => {
                             onChange={() => setAdFormData({...adFormData, type: 'Bannière Accueil'})}
                             className="text-secondary" 
                           />
-                          <span className="text-sm font-bold text-primary">Bannière Accueil</span>
+                          <span className="text-sm font-bold text-primary">{t('dashboard.adForm.homeBanner')}</span>
                         </div>
-                        <span className="text-[10px] text-gray-500 ms-7">Visibilité maximale sur la première page</span>
+                        <span className="text-[10px] text-gray-500 ms-7">{t('dashboard.adForm.homeBannerText')}</span>
                       </label>
                       <label className="flex flex-col p-4 bg-gray-50 rounded-2xl border-2 border-transparent hover:border-gray-200 cursor-pointer transition-all">
                         <div className="flex items-center space-x-3 mb-2">
@@ -1027,60 +1015,40 @@ const Dashboard = () => {
                             onChange={() => setAdFormData({...adFormData, type: 'Encart Annuaire'})}
                             className="text-secondary" 
                           />
-                          <span className="text-sm font-bold text-primary">Encart Annuaire</span>
+                          <span className="text-sm font-bold text-primary">{t('dashboard.adForm.directorySlot')}</span>
                         </div>
-                        <span className="text-[10px] text-gray-500 ms-7">Ciblage précis lors des recherches B2B</span>
+                        <span className="text-[10px] text-gray-500 ms-7">{t('dashboard.adForm.directorySlotText')}</span>
                       </label>
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-primary uppercase tracking-widest italic">Visuel de la bannière</label>
-                    <div className="mt-2 flex justify-center rounded-2xl border border-dashed border-gray-300 px-6 py-10 hover:border-secondary transition-colors cursor-pointer bg-gray-50 hover:bg-gray-100 group relative">
-                      <input 
-                        type="file" 
-                        accept="image/*"
-                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                        onChange={(e) => {
-                          if (e.target.files && e.target.files.length > 0) {
-                            showNotify(`Image ${e.target.files[0].name} sélectionnée`, 'success');
-                          }
-                        }}
-                      />
-                      <div className="text-center">
-                        <Upload className="mx-auto h-8 w-8 text-gray-400 group-hover:text-secondary mb-3 transition-colors" aria-hidden="true" />
-                        <div className="mt-4 flex text-sm leading-6 text-gray-600 justify-center">
-                          <span className="relative cursor-pointer rounded-md font-bold text-secondary focus-within:outline-none focus-within:ring-2 focus-within:ring-secondary focus-within:ring-offset-2 hover:text-secondary">
-                            <span>Télécharger un fichier</span>
-                          </span>
-                          <p className="ps-1">ou glisser-déposer</p>
-                        </div>
-                        <p className="text-xs leading-5 text-gray-500 mt-2">PNG, JPG, GIF jusqu'à 10MB</p>
-                        <p className="text-xs leading-5 text-gray-500">Dimensions recommandées : 1200x300px</p>
-                      </div>
-                    </div>
+                    <label className="text-[10px] font-black text-primary uppercase tracking-widest italic">{t('dashboard.adForm.visual')}</label>
+                    <p className="text-sm text-gray-600 bg-gray-50 rounded-2xl p-5">{t('dashboard.adForm.visualText')}</p>
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-primary uppercase tracking-widest italic">URL de redirection (Optionnel)</label>
+                    <label htmlFor="ad_url" className="text-[10px] font-black text-primary uppercase tracking-widest italic">{t('dashboard.adForm.url')}</label>
                     <input 
+                      id="ad_url"
                       type="url" 
                       value={adFormData.url}
                       onChange={e => setAdFormData({...adFormData, url: e.target.value})}
-                      placeholder="https://votre-site.com/produit"
+                      placeholder={t('dashboard.adForm.urlPlaceholder')}
                       className="w-full bg-gray-50 border-none px-6 py-5 rounded-2xl text-sm font-bold text-gray-900 placeholder-gray-400 focus:ring-4 focus:ring-primary/10 transition-all outline-none"
                     />
                   </div>
                   
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-primary uppercase tracking-widest italic">Durée souhaitée</label>
+                    <label htmlFor="ad_duration" className="text-[10px] font-black text-primary uppercase tracking-widest italic">{t('dashboard.adForm.duration')}</label>
                     <select 
+                      id="ad_duration"
                       value={adFormData.duration}
                       onChange={e => setAdFormData({...adFormData, duration: e.target.value})}
                       className="w-full bg-gray-50 border-none px-6 py-5 rounded-2xl text-[10px] font-black uppercase tracking-widest outline-none">
-                      <option>1 Semaine</option>
-                      <option>1 Mois</option>
-                      <option>3 Mois</option>
+                      <option value="1 Semaine">{t('dashboard.adForm.duration1w')}</option>
+                      <option value="1 Mois">{t('dashboard.adForm.duration1m')}</option>
+                      <option value="3 Mois">{t('dashboard.adForm.duration3m')}</option>
                     </select>
                   </div>
 
@@ -1089,16 +1057,17 @@ const Dashboard = () => {
                       onClick={() => setShowAdForm(false)}
                       className="px-8 py-4 rounded-2xl text-[10px] font-black text-gray-500 uppercase tracking-widest hover:bg-gray-50 transition-colors"
                     >
-                      Annuler
+                      {t('dashboard.adForm.cancel')}
                     </button>
                     <button 
                       onClick={submitAd}
+                      disabled={isLoading}
                       className="bg-secondary text-white px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center space-x-3"
                     >
                       {isLoading ? (
                         <Loader2 className="h-4 w-4 animate-spin" />
                       ) : (
-                        <span>Soumettre la demande</span>
+                        <span>{t('dashboard.adForm.submit')}</span>
                       )}
                     </button>
                   </div>

@@ -52,7 +52,7 @@ const Navbar = () => {
 
   const profileMenuItems = [
     { label: t('nav.my_profile'), path: '/dashboard', icon: UserCircle },
-    { label: t('nav.subscription'), path: '/subscriptions', icon: Award },
+    { label: t('nav.subscription'), path: '/dashboard?tab=subscription', icon: Award },
     { label: t('nav.favorites'), path: '/favorites', icon: Zap },
     { label: t('nav.requests'), path: '/dashboard?tab=orders', icon: FileText },
   ];

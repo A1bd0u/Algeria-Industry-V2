@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import fr from '../src/locales/fr.json';
 import en from '../src/locales/en.json';
 import ar from '../src/locales/ar.json';
+import { categoryLabel, productCategories } from '../src/data/productCategories';
 
 // Toutes les langues doivent exposer exactement les mêmes clés : une clé
 // absente s'afficherait en français (ou brute) dans l'interface traduite.
@@ -43,5 +44,23 @@ describe('Fichiers de traduction', () => {
     for (const key of codes) {
       expect(locales.ar[key]).not.toEqual(locales.fr[key]);
     }
+  });
+
+  it('traduisent toute la nomenclature des produits', () => {
+    for (const group of productCategories) {
+      expect(locales.en[`productCategories.${group.id}`], group.id).toBeTruthy();
+      for (const sub of group.subCategories) {
+        expect(locales.ar[`productCategories.${sub.id}`], sub.id).toBeTruthy();
+        // La valeur stockée reste le libellé français de la nomenclature.
+        expect(locales.fr[`productCategories.${sub.id}`]).toBe(sub.name);
+      }
+    }
+  });
+
+  it('affiche une catégorie stockée dans la langue demandée', () => {
+    const t = (key: string) => locales.en[key] ?? key;
+    expect(categoryLabel(t, productCategories[1].subCategories[0].name)).toBe(locales.en['productCategories.B1']);
+    expect(categoryLabel(t, 'Catégorie libre')).toBe('Catégorie libre');
+    expect(categoryLabel(t, null)).toBe(locales.en['productCategories.uncategorized']);
   });
 });
