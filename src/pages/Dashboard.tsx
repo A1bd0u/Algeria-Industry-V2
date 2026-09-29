@@ -136,7 +136,7 @@ const Dashboard = () => {
     setTimeout(() => setNotification(null), 3000);
   };
 
-  const [companyInfo, setCompanyInfo] = useState({ name: '', bio: '', wilaya: '' });
+  const [companyInfo, setCompanyInfo] = useState({ name: '', bio: '', wilaya: '', whatsapp: '' });
 
   useEffect(() => {
     const loadCompany = async () => {
@@ -145,7 +145,7 @@ const Dashboard = () => {
         const res = await fetch(`/api/companies/${user.company_id}`);
         if (res.ok) {
           const c = await res.json();
-          setCompanyInfo({ name: c.name || '', bio: c.description || '', wilaya: c.wilaya || '' });
+          setCompanyInfo({ name: c.name || '', bio: c.description || '', wilaya: c.wilaya || '', whatsapp: c.whatsapp ? `+${c.whatsapp}` : '' });
         }
       } catch (e) {
         console.error('Erreur chargement entreprise', e);
@@ -165,7 +165,7 @@ const Dashboard = () => {
       const res = await fetch(`/api/companies/${user.company_id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: companyInfo.name, description: companyInfo.bio, wilaya: companyInfo.wilaya || undefined })
+        body: JSON.stringify({ name: companyInfo.name, description: companyInfo.bio, wilaya: companyInfo.wilaya || undefined, whatsapp: companyInfo.whatsapp.trim() })
       });
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
@@ -765,6 +765,22 @@ const Dashboard = () => {
                           onChange={(e) => setCompanyInfo({...companyInfo, wilaya: e.target.value})}
                           className="w-full bg-gray-50 border-none px-6 py-4 rounded-2xl text-sm font-bold outline-none"
                         />
+                     </div>
+                     <div className="space-y-2 md:col-span-2">
+                        <label htmlFor="company_whatsapp" className="text-[10px] font-black text-primary uppercase tracking-widest italic">{t('dashboard.company.whatsapp')}</label>
+                        <input
+                          id="company_whatsapp"
+                          type="tel"
+                          inputMode="tel"
+                          dir="ltr"
+                          autoComplete="tel"
+                          placeholder={t('dashboard.company.whatsappPlaceholder')}
+                          value={companyInfo.whatsapp}
+                          onChange={(e) => setCompanyInfo({...companyInfo, whatsapp: e.target.value})}
+                          aria-describedby="company_whatsapp_help"
+                          className="w-full bg-gray-50 border-none px-6 py-4 rounded-2xl text-sm font-bold outline-none"
+                        />
+                        <p id="company_whatsapp_help" className="text-xs text-gray-500">{t('dashboard.company.whatsappHelp')}</p>
                      </div>
                   </div>
                   <div className="space-y-2">

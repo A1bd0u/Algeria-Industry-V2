@@ -84,15 +84,22 @@ Balises `title`, description, Open Graph, `canonical` et JSON-LD (`Organization`
 - 🔐 Générer `MFA_ENCRYPTION_KEY` (`openssl rand -hex 32`) avant la première activation, puis activer la 2FA de chaque admin.
 - ☁️ Créer une base Upstash Redis (région Europe) et renseigner `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` avant de passer à plusieurs instances.
 
+## Finitions (mise à jour du 3 octobre)
+
+- **Traductions** : tout le site public et l'espace fournisseur en français, anglais et arabe (RTL) ; erreurs de l'API traduites par code ; test de parité des clés. La console admin reste en français.
+- **Fonctionnalités factices retirées** : fausse page /subscriptions, événements, ressources, devenir exposant, brochure, statut « en ligne », faux téléchargements.
+- **Recherche** : configuration `fr_unaccent` commune à l'index et aux requêtes (« securite » trouve « sécurité », pluriels, arabe) ; seuls les produits publiés remontent.
+- **WhatsApp** sur les fiches des entreprises vérifiées ; RC et NIF verrouillés après validation KYC.
+- **Carte** : dépendances Leaflet inutilisées supprimées.
+- **Audience** : Plausible sans cookie, activé par `VITE_PLAUSIBLE_DOMAIN`.
+- **Déploiement** : variables `VITE_*` passées au build Docker ; guide `docs/DEPLOYMENT.md`.
+- Migration `20261003090000_search_and_whatsapp.sql`.
+
 ## Reste à faire (code)
 
-1. i18n : 35 vues sans `useTranslation` (priorité : authentification et KYC, puis annuaire et fiches). Traduire côté client les codes d'erreur API (`AUTH_INVALID`, `KYC_REQUIRED`…).
-2. URL lisibles `/entreprises/{slug}-{id}` et préfixes de langue `/fr`, `/ar`, `/en` avec `hreflang`.
-3. Bouton « contacter sur WhatsApp » sur les fiches fournisseurs (nécessite un champ téléphone vérifié).
-4. Recherche plein texte : configurations `french` + `unaccent` et `simple` pour l'arabe.
-5. Tuiles cartographiques via un fournisseur (MapTiler, Stadia) plutôt que les serveurs OSM publics.
-6. Mesure d'audience sans cookie (Plausible ou Umami).
-7. Client Supabase `anon` + JWT pour les lectures utilisateur (défense en profondeur).
+1. URL lisibles `/entreprises/{slug}-{id}` et préfixes de langue `/fr`, `/ar`, `/en` avec `hreflang`.
+2. Client Supabase `anon` + JWT pour les lectures utilisateur (défense en profondeur).
+3. Écran admin de gestion des événements.
 
 ## Décisions ouvertes (hors code)
 

@@ -404,7 +404,9 @@
     "REVIEW_OWN_COMPANY": "لا يمكنك تقييم شركتك.",
     "COMPANY_UNCLAIMED": "هذه الشركة ليس لديها حساب على المنصة بعد.",
     "AI_UNAVAILABLE": "المساعد غير متاح مؤقتًا.",
-    "INVALID_ID": "معرّف غير صالح."
+    "INVALID_ID": "معرّف غير صالح.",
+    "WHATSAPP_INVALID": "رقم واتساب غير صالح. استخدم رقم هاتف جزائري (05، 06، 07) أو الصيغة الدولية.",
+    "COMPANY_LEGAL_LOCKED": "لا يمكن تعديل السجل التجاري ورقم التعريف الجبائي بعد توثيقهما. تواصل مع الدعم."
   },
   "mfa": {
     "title": "المصادقة الثنائية",
@@ -662,7 +664,10 @@
       "wilaya": "الولاية",
       "wilayaPlaceholder": "مثال: سطيف",
       "bio": "وصف النشاط",
-      "save": "تحديث الملف"
+      "save": "تحديث الملف",
+      "whatsapp": "رقم واتساب",
+      "whatsappPlaceholder": "مثال: 0550123456",
+      "whatsappHelp": "يظهر في صفحتك العامة بعد توثيق شركتك. اتركه فارغًا لإخفائه."
     },
     "menu": {
       "overview": "نظرة عامة",
@@ -981,6 +986,8 @@
     "reviewError": "حدث خطأ.",
     "cataloguesCtaTitle": "وثائق الشركة",
     "cataloguesCtaText": "اطّلع على الكتالوجات التي نشرتها {{name}}.",
-    "cataloguesCtaButton": "عرض الكتالوجات"
+    "cataloguesCtaButton": "عرض الكتالوجات",
+    "whatsapp": "واتساب",
+    "whatsappMessage": "مرحبًا، أتواصل معكم عبر Algeria Industry بخصوص {{name}}."
   }
 }

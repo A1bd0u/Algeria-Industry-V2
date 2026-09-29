@@ -404,7 +404,9 @@
     "REVIEW_OWN_COMPANY": "Vous ne pouvez pas évaluer votre propre entreprise.",
     "COMPANY_UNCLAIMED": "Cette entreprise n'a pas encore de compte sur la plateforme.",
     "AI_UNAVAILABLE": "L'assistant est momentanément indisponible.",
-    "INVALID_ID": "Identifiant invalide."
+    "INVALID_ID": "Identifiant invalide.",
+    "WHATSAPP_INVALID": "Numéro WhatsApp invalide. Utilisez un mobile algérien (05, 06, 07) ou le format international.",
+    "COMPANY_LEGAL_LOCKED": "Le RC et le NIF vérifiés ne peuvent plus être modifiés. Contactez le support."
   },
   "mfa": {
     "title": "Double authentification",
@@ -662,7 +664,10 @@
       "wilaya": "Wilaya",
       "wilayaPlaceholder": "Ex : Sétif",
       "bio": "Description de l'activité",
-      "save": "Mettre à jour la fiche"
+      "save": "Mettre à jour la fiche",
+      "whatsapp": "Numéro WhatsApp",
+      "whatsappPlaceholder": "Ex : 0550 12 34 56",
+      "whatsappHelp": "Affiché sur votre fiche publique une fois votre entreprise vérifiée. Laissez vide pour ne pas l'afficher."
     },
     "menu": {
       "overview": "Vue d'ensemble",
@@ -981,6 +986,8 @@
     "reviewError": "Une erreur est survenue.",
     "cataloguesCtaTitle": "Documentation de l'entreprise",
     "cataloguesCtaText": "Consultez les catalogues publiés par {{name}}.",
-    "cataloguesCtaButton": "Voir les catalogues"
+    "cataloguesCtaButton": "Voir les catalogues",
+    "whatsapp": "WhatsApp",
+    "whatsappMessage": "Bonjour, je vous contacte via Algeria Industry au sujet de {{name}}."
   }
 }

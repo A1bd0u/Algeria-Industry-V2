@@ -34,9 +34,6 @@ build: {
               if (id.includes('@supabase') || id.includes('@tanstack')) {
                 return 'vendor-data';
               }
-              if (id.includes('leaflet') || id.includes('react-leaflet')) {
-                return 'vendor-map';
-              }
             }
           }
         }

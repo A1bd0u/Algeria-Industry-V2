@@ -1,11 +1,12 @@
 import { logger } from '../utils/logger';
+import { normalizeWhatsapp } from '../utils/phone';
 import express from 'express';
 import { getSupabase } from '../db/supabaseClient';
 import { z } from 'zod';
 import { validate } from '../middlewares/validateMiddleware';
 
 import { generateReferenceId } from '../utils/reference';
-import { requireAuth, requireEmailVerified } from '../middlewares/authMiddleware';
+import { requireAuth, requireEmailVerified, getOptionalUser } from '../middlewares/authMiddleware';
 import { requireUuidParams } from '../middlewares/validateParams';
 
 const router = express.Router();
@@ -16,7 +17,9 @@ const companySchema = z.object({
   rc: z.string().trim().max(50).optional(),
   description: z.string().max(5000).optional(),
   activity_sector: z.string().max(200).optional(),
-  wilaya: z.string().max(100).optional()
+  wilaya: z.string().max(100).optional(),
+  // Chaîne vide : supprime le numéro.
+  whatsapp: z.string().trim().max(30).optional()
 });
 
 const reviewSchema = z.object({
@@ -25,6 +28,8 @@ const reviewSchema = z.object({
 });
 
 // Colonnes publiques d'une entreprise : ni NIF/RC bruts ni motifs KYC.
+const PUBLISHED_PRODUCT_STATUSES = ['Actif', 'active'];
+
 const PUBLIC_COMPANY_COLUMNS = 'id, reference_id, name, description, activity_sector, wilaya, status, certified, created_at';
 
 
@@ -84,7 +89,7 @@ router.get('/:id', requireUuidParams('id'), async (req, res, next) => {
     // kyc_requests n'est jamais exposé publiquement (motifs de rejet, notes internes).
     const { data: company, error } = await supabase
       .from('companies')
-      .select(`${PUBLIC_COMPANY_COLUMNS}, owner_id, products(*)`)
+      .select(`${PUBLIC_COMPANY_COLUMNS}, owner_id, whatsapp, products(*)`)
       .eq('id', req.params.id)
       .maybeSingle();
 
@@ -94,7 +99,19 @@ router.get('/:id', requireUuidParams('id'), async (req, res, next) => {
       return res.status(404).json({ error: "Entreprise introuvable" });
     }
 
-    return res.json(company);
+    const viewer = await getOptionalUser(req);
+    const isOwnerOrAdmin = Boolean(viewer && (viewer.id === company.owner_id || viewer.role === 'admin'));
+    const result: any = {
+      ...company,
+      // Le public ne voit que les produits publiés.
+      products: isOwnerOrAdmin
+        ? company.products || []
+        : (company.products || []).filter((p: any) => PUBLISHED_PRODUCT_STATUSES.includes(p.status)),
+    };
+    // Le numéro WhatsApp n'est affiché publiquement que pour une entreprise vérifiée (KYC).
+    if (company.status !== 'approved' && !isOwnerOrAdmin) delete result.whatsapp;
+
+    return res.json(result);
   } catch (err: any) {
     logger.error("Supabase Error GET /companies/:id:", err);
     next(err);
@@ -173,15 +190,23 @@ router.post('/', requireAuth, validate(companySchema), async (req, res) => {
 
 // PUT /api/companies/:id - Mettre à jour une entreprise spécifique
 router.put('/:id', requireAuth, requireUuidParams('id'), validate(companySchema), async (req, res) => {
-  const { name, nif, rc, description, activity_sector, wilaya } = req.body;
+  const { name, nif, rc, description, activity_sector, wilaya, whatsapp } = req.body;
   const user = (req as any).user;
+
+  let whatsappValue: string | null | undefined;
+  if (whatsapp !== undefined) {
+    whatsappValue = whatsapp === '' ? null : normalizeWhatsapp(whatsapp);
+    if (whatsapp !== '' && !whatsappValue) {
+      return res.status(400).json({ error: 'Numéro WhatsApp invalide.', code: 'WHATSAPP_INVALID' });
+    }
+  }
 
   try {
     const supabase = getSupabase();
     
     const { data: existing, error: checkError } = await supabase
       .from('companies')
-      .select('owner_id')
+      .select('owner_id, status, nif, rc')
       .eq('id', req.params.id)
       .maybeSingle();
 
@@ -191,9 +216,15 @@ router.put('/:id', requireAuth, requireUuidParams('id'), validate(companySchema)
       return res.status(403).json({ error: "Non autorisé à modifier cette entreprise" });
     }
 
+    // RC et NIF ont été contrôlés lors du KYC : seul un admin peut les modifier ensuite.
+    const legalChanged = (nif !== undefined && nif !== existing.nif) || (rc !== undefined && rc !== existing.rc);
+    if (existing.status === 'approved' && legalChanged && user.role !== 'admin') {
+      return res.status(409).json({ error: 'Le RC et le NIF vérifiés ne peuvent plus être modifiés. Contactez le support.', code: 'COMPANY_LEGAL_LOCKED' });
+    }
+
     const { data, error } = await supabase
       .from('companies')
-      .update({ name, nif, rc, description, activity_sector, wilaya })
+      .update({ name, nif, rc, description, activity_sector, wilaya, whatsapp: whatsappValue })
       .eq('id', req.params.id)
       .select()
       .single();

@@ -404,7 +404,9 @@
     "REVIEW_OWN_COMPANY": "You cannot review your own company.",
     "COMPANY_UNCLAIMED": "This company does not have an account on the platform yet.",
     "AI_UNAVAILABLE": "The assistant is temporarily unavailable.",
-    "INVALID_ID": "Invalid identifier."
+    "INVALID_ID": "Invalid identifier.",
+    "WHATSAPP_INVALID": "Invalid WhatsApp number. Use an Algerian mobile (05, 06, 07) or the international format.",
+    "COMPANY_LEGAL_LOCKED": "The verified trade register and tax ID can no longer be changed. Please contact support."
   },
   "mfa": {
     "title": "Two-factor authentication",
@@ -662,7 +664,10 @@
       "wilaya": "Province (wilaya)",
       "wilayaPlaceholder": "e.g. Sétif",
       "bio": "Business description",
-      "save": "Update the profile"
+      "save": "Update the profile",
+      "whatsapp": "WhatsApp number",
+      "whatsappPlaceholder": "e.g. +213 550 12 34 56",
+      "whatsappHelp": "Shown on your public profile once your company is verified. Leave empty to hide it."
     },
     "menu": {
       "overview": "Overview",
@@ -981,6 +986,8 @@
     "reviewError": "Something went wrong.",
     "cataloguesCtaTitle": "Company documentation",
     "cataloguesCtaText": "View the catalogues published by {{name}}.",
-    "cataloguesCtaButton": "View catalogues"
+    "cataloguesCtaButton": "View catalogues",
+    "whatsapp": "WhatsApp",
+    "whatsappMessage": "Hello, I am contacting you via Algeria Industry about {{name}}."
   }
 }

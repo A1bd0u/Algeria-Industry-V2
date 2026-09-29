@@ -12,6 +12,7 @@ import { Upload, XCircle, CheckCircle, Clock,
   Heart,
   Mail,
   MapPin,
+  MessageCircle,
   MessageSquare,
   Package,
   Phone,
@@ -30,6 +31,7 @@ import { absoluteUrl } from '../config/site';
 import { categoryLabel } from '../data/productCategories';
 import { useTranslation } from 'react-i18next';
 import { ApiError } from '../lib/apiError';
+import { whatsappHref } from '../config/site';
 import { formatDate, currentLocale } from '../lib/format';
 
 const CompanyProfile = () => {
@@ -434,6 +436,17 @@ const CompanyProfile = () => {
                         <MessageSquare className="h-5 w-5" />
                         <span>{t('company.contact')}</span>
                       </button>}
+                      {company.whatsapp && company.owner_id !== user?.id && (
+                        <a
+                          href={`${whatsappHref(company.whatsapp)}?text=${encodeURIComponent(t('company.whatsappMessage', { name: company.name }))}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="w-full sm:w-auto py-3.5 px-6 rounded-lg flex items-center justify-center gap-2 shadow-lg text-sm font-black uppercase tracking-wider bg-[#25D366] text-white hover:opacity-90"
+                        >
+                          <MessageCircle className="h-5 w-5" />
+                          <span>{t('company.whatsapp')}</span>
+                        </a>
+                      )}
                     </div>
                   </div>
                 </div>

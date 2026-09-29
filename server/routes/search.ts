@@ -6,6 +6,15 @@ const router = express.Router();
 
 const COMPANY_COLUMNS = 'id, reference_id, name, description, activity_sector, wilaya, status, certified, created_at';
 
+// Même configuration que les colonnes fts (migration 20261003090000) :
+// français sans accents, racines communes à l'index et à la requête.
+const TS_CONFIG = 'fr_unaccent';
+
+// Statuts visibles publiquement (identiques à /api/products).
+const PUBLISHED_PRODUCT_STATUSES = ['Actif', 'active'];
+
+const escapeLike = (value: string) => value.replace(/[%_,()]/g, ' ').slice(0, 100);
+
 // Construit une requête tsquery préfixe sûre : seuls lettres et chiffres
 // (latin, arabe) sont conservés, pour éviter les erreurs de syntaxe tsquery.
 const toPrefixQuery = (q: string) =>
@@ -46,7 +55,7 @@ router.get('/', async (req, res) => {
          // Format search query to be prefix matching: "word:*"
          const formattedQuery = toPrefixQuery(q);
          if (formattedQuery) {
-            query = query.textSearch('fts', formattedQuery);
+            query = query.textSearch('fts', formattedQuery, { config: TS_CONFIG });
          }
       }
       
@@ -61,12 +70,11 @@ router.get('/', async (req, res) => {
       const { data, error } = await query;
       if (error) {
          logger.error('Company search error:', error);
-         // Fallback if columns don't exist
-         if (error.code === '42703') {
-            const fallbackQuery = supabase.from('companies').select(COMPANY_COLUMNS).order('created_at', { ascending: false }).limit(limit + 1);
-            const { data: fbData } = await fallbackQuery;
-            if (fbData) companies = fbData;
-         }
+         // Repli : recherche simple sur le nom (migration de recherche absente).
+         let fallbackQuery = supabase.from('companies').select(COMPANY_COLUMNS);
+         if (q) fallbackQuery = fallbackQuery.ilike('name', `%${escapeLike(q)}%`);
+         const { data: fbData } = await fallbackQuery.order('created_at', { ascending: false }).limit(limit + 1);
+         if (fbData) companies = fbData;
       } else {
          if (data) companies = data;
       }
@@ -74,12 +82,12 @@ router.get('/', async (req, res) => {
 
     // Search Products
     if (type === 'all' || type === 'products') {
-      let query = supabase.from('products').select('*');
+      let query = supabase.from('products').select('*').in('status', PUBLISHED_PRODUCT_STATUSES);
       
       if (q) {
          const formattedQuery = toPrefixQuery(q);
          if (formattedQuery) {
-            query = query.textSearch('fts', formattedQuery);
+            query = query.textSearch('fts', formattedQuery, { config: TS_CONFIG });
          }
       }
       
@@ -94,11 +102,10 @@ router.get('/', async (req, res) => {
       const { data, error } = await query;
       if (error) {
          logger.error('Product search error:', error);
-         if (error.code === '42703') {
-            const fallbackQuery = supabase.from('products').select('*').order('created_at', { ascending: false }).limit(limit + 1);
-            const { data: fbData } = await fallbackQuery;
-            if (fbData) products = fbData;
-         }
+         let fallbackQuery = supabase.from('products').select('*').in('status', PUBLISHED_PRODUCT_STATUSES);
+         if (q) fallbackQuery = fallbackQuery.ilike('name', `%${escapeLike(q)}%`);
+         const { data: fbData } = await fallbackQuery.order('created_at', { ascending: false }).limit(limit + 1);
+         if (fbData) products = fbData;
       } else {
          if (data) products = data;
       }
