@@ -1,9 +1,17 @@
 import { logger } from '../utils/logger';
 import express from 'express';
 import { getSupabase } from '../db/supabaseClient';
+import { z } from 'zod';
 import { requireAuth } from '../middlewares/authMiddleware';
+import { validate } from '../middlewares/validateMiddleware';
+import { requireUuidParams } from '../middlewares/validateParams';
 
 const router = express.Router();
+
+const favoriteSchema = z.object({
+  item_type: z.enum(['product', 'company']),
+  item_id: z.string().uuid(),
+});
 
 // GET /api/favorites - Get specific user favorites
 router.get('/', requireAuth, async (req, res) => {
@@ -26,6 +34,12 @@ router.get('/', requireAuth, async (req, res) => {
       const { data: prodData } = await supabase.from('products').select('*').in('id', productIds);
       products = prodData || [];
     }
+    const companyIds = favs?.filter((f: any) => f.item_type === 'company').map((f: any) => f.item_id) || [];
+    let companies: any[] = [];
+    if (companyIds.length > 0) {
+      const { data: companyData } = await supabase.from('companies').select('id, name, wilaya, activity_sector').in('id', companyIds);
+      companies = companyData || [];
+    }
 
     const enrichedFavs = favs?.map((f: any) => {
        if (f.item_type === 'product') {
@@ -39,6 +53,10 @@ router.get('/', requireAuth, async (req, res) => {
              product_id: p.id
           } : f;
        }
+       if (f.item_type === 'company') {
+          const c = companies.find((company) => company.id === f.item_id);
+          return c ? { ...f, name: c.name, category: c.activity_sector || null, location: c.wilaya || null } : f;
+       }
        return f;
     });
     
@@ -50,7 +68,7 @@ router.get('/', requireAuth, async (req, res) => {
 });
 
 // DELETE /api/favorites/item/:itemId
-router.delete('/item/:itemId', requireAuth, async (req, res) => {
+router.delete('/item/:itemId', requireAuth, requireUuidParams('itemId'), async (req, res) => {
   const { itemId } = req.params;
   const user = (req as any).user;
   try {
@@ -72,7 +90,7 @@ router.delete('/item/:itemId', requireAuth, async (req, res) => {
 });
 
 // DELETE /api/favorites/:id
-router.delete('/:id', requireAuth, async (req, res) => {
+router.delete('/:id', requireAuth, requireUuidParams('id'), async (req, res) => {
   const { id } = req.params;
   const user = (req as any).user;
   try {
@@ -94,11 +112,21 @@ router.delete('/:id', requireAuth, async (req, res) => {
 });
 
 // POST /api/favorites
-router.post('/', requireAuth, async (req, res) => {
+router.post('/', requireAuth, validate(favoriteSchema), async (req, res) => {
   const { item_type, item_id } = req.body;
   const user = (req as any).user;
   try {
     const supabase = getSupabase();
+
+    // Un même élément n'est enregistré qu'une fois.
+    const { data: existing } = await supabase
+      .from('favorites')
+      .select('*')
+      .eq('user_id', user.id)
+      .eq('item_type', item_type)
+      .eq('item_id', item_id)
+      .maybeSingle();
+    if (existing) return res.json(existing);
     
     const { data, error } = await supabase
       .from('favorites')

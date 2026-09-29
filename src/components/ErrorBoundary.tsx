@@ -1,5 +1,6 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
+import i18n from '../i18n';
 
 interface Props {
   children?: ReactNode;
@@ -33,17 +34,17 @@ export class ErrorBoundary extends React.Component<Props, State> {
               <AlertTriangle className="w-8 h-8 text-red-600" />
             </div>
             <h2 className="text-xl font-bold text-gray-900 mb-2">
-              Une erreur est survenue
+              {i18n.t('common.errorTitle')}
             </h2>
             <p className="text-gray-500 mb-6 text-sm">
-              {this.state.error?.message || "Nous n'avons pas pu charger cette section. Veuillez réessayer."}
+              {i18n.t('common.errorText')}
             </p>
             <button
               onClick={() => window.location.reload()}
               className="inline-flex items-center gap-2 px-6 py-2 bg-primary text-white font-medium rounded-lg hover:bg-primary-dark transition-colors"
             >
               <RefreshCw className="w-4 h-4" />
-              Recharger la page
+              {i18n.t('common.reload')}
             </button>
           </div>
         </div>

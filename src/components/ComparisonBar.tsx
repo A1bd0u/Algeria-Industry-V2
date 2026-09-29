@@ -3,9 +3,11 @@ import { AnimatePresence, motion } from 'motion/react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useComparison } from '../context/ComparisonContext';
+import { useTranslation } from 'react-i18next';
 
 const ComparisonBar = () => {
   const { comparedProducts, removeFromCompare, clearCompare } = useComparison();
+  const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
 
   if (comparedProducts.length === 0) return null;
@@ -23,10 +25,11 @@ const ComparisonBar = () => {
             <div className="p-8 border-b border-gray-100 flex items-center justify-between bg-primary text-white">
               <div className="flex items-center space-x-3">
                 <Columns className="h-6 w-6 text-secondary" />
-                <h3 className="font-black uppercase tracking-widest text-sm">Comparaison technique</h3>
+                <h3 className="font-black uppercase tracking-widest text-sm">{t('compare.title')}</h3>
               </div>
               <button 
                 onClick={() => setIsExpanded(false)}
+                aria-label={t('compare.collapse')}
                 className="p-2 hover:bg-white/10 rounded-full transition-colors"
               >
                 <ChevronDown className="h-6 w-6" />
@@ -43,6 +46,7 @@ const ComparisonBar = () => {
                       </div>
                       <button 
                         onClick={() => removeFromCompare(product.id)}
+                        aria-label={t('compare.remove')}
                         className="absolute -top-2 -end-2 bg-white text-error p-1.5 rounded-full shadow-lg hover:scale-110 transition-all"
                       >
                         <X className="h-4 w-4" />
@@ -68,7 +72,7 @@ const ComparisonBar = () => {
                     <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
                       <Zap className="h-8 w-8" />
                     </div>
-                    <p className="text-[10px] font-black uppercase tracking-widest text-center">Ajoutez un autre produit pour comparer</p>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-center">{t('compare.addAnother')}</p>
                   </div>
                 )}
               </div>
@@ -79,10 +83,10 @@ const ComparisonBar = () => {
                 onClick={clearCompare}
                 className="text-[10px] font-black text-gray-400 hover:text-error uppercase tracking-[0.2em] transition-colors"
               >
-                Vider la liste
+                {t('compare.clear')}
               </button>
               <Link to="/compare" className="btn-primary px-8 py-3 rounded-2xl flex items-center space-x-3 group">
-                <span className="text-xs font-black uppercase tracking-widest">Demander un devis comparatif</span>
+                <span className="text-xs font-black uppercase tracking-widest">{t('compare.requestQuote')}</span>
                 <ChevronUp className="h-4 w-4 group-hover:-translate-y-1 transition-transform" />
               </Link>
             </div>
@@ -100,7 +104,7 @@ const ComparisonBar = () => {
                   {comparedProducts.length}
                 </span>
               </div>
-              <span className="text-[10px] font-black uppercase tracking-[0.2em]">Comparer</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.2em]">{t('compare.open')}</span>
             </div>
             
             <div className="flex -space-x-3 overflow-hidden">

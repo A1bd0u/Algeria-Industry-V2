@@ -20,7 +20,15 @@
     "favorites": "Mes favoris",
     "requests": "Mes demandes",
     "logout": "Déconnexion",
-    "settings": "Paramètres"
+    "settings": "Paramètres",
+    "exhibitors": "Exposants",
+    "pricing": "Tarifs",
+    "searchShort": "Rechercher...",
+    "workspace": "Espace industriel",
+    "workspaceText": "Gérez votre activité",
+    "memberSpace": "Espace membre",
+    "openMenu": "Ouvrir le menu",
+    "closeMenu": "Fermer le menu"
   },
   "hero": {
     "title": "Connectez-vous à l'industrie",
@@ -160,7 +168,11 @@
     "request_quote": "Demander un devis",
     "contact_supplier": "Contacter le fournisseur",
     "see_details": "Voir détails",
-    "dzd": "DA"
+    "dzd": "DA",
+    "backToTop": "Retour en haut",
+    "errorTitle": "Une erreur est survenue",
+    "errorText": "Nous n'avons pas pu charger cette section. Veuillez réessayer.",
+    "reload": "Recharger la page"
   },
   "hero_slider": {
     "tech_spec": "Spécification Technique"
@@ -698,5 +710,277 @@
       "cancel": "Annuler",
       "submit": "Soumettre la demande"
     }
+  },
+  "help": {
+    "dialog": "Aide et support",
+    "title": "Besoin d'aide ?",
+    "hours": "Équipe disponible du dimanche au jeudi, 08:30 - 16:30",
+    "faq": "F.A.Q",
+    "guides": "Guides",
+    "direct": "Assistance directe",
+    "call": "Appeler le support",
+    "email": "Envoyer un e-mail",
+    "whatsapp": "WhatsApp Business",
+    "write": "Écrire à l'équipe",
+    "responseTime": "Réponse sous 48 h ouvrées",
+    "open": "Ouvrir l'aide",
+    "close": "Fermer l'aide"
+  },
+  "compare": {
+    "title": "Comparaison technique",
+    "collapse": "Réduire",
+    "remove": "Retirer de la comparaison",
+    "addAnother": "Ajoutez un autre produit pour comparer",
+    "clear": "Vider la liste",
+    "requestQuote": "Demander un devis comparatif",
+    "open": "Comparer"
+  },
+  "contact": {
+    "titleStart": "Contactez",
+    "titleHighlight": "l'équipe",
+    "subtitle": "Une question ? Un besoin d'accompagnement ? Nous sommes là pour vous aider à développer votre activité industrielle.",
+    "details": "Nos coordonnées",
+    "phone": "Téléphone",
+    "phoneHours": "Dim - Jeu, 08:30 - 16:30",
+    "email": "E-mail",
+    "emailDelay": "Réponse sous 48 h ouvrées",
+    "fastest": "Le moyen le plus rapide de nous joindre reste le formulaire ci-contre.",
+    "priorityTitle": "Support prioritaire",
+    "priorityText": "Les abonnés Pro bénéficient d'un support prioritaire avec une réponse sous 24 heures ouvrées.",
+    "languages": "Support disponible en FR / EN / AR",
+    "sentTitle": "Message envoyé !",
+    "sentText": "Merci de nous avoir contactés. Notre équipe reviendra vers vous dans les plus brefs délais.",
+    "sendAnother": "Envoyer un autre message",
+    "formTitle": "Envoyez-nous un message",
+    "name": "Nom complet",
+    "namePlaceholder": "Ex : Ahmed Benali",
+    "proEmail": "E-mail professionnel",
+    "subject": "Sujet",
+    "subjectSelect": "Sélectionnez un sujet",
+    "subjectSupport": "Support technique",
+    "subjectSales": "Service commercial / abonnements",
+    "subjectPartnership": "Partenariat",
+    "subjectOther": "Autre demande",
+    "message": "Message",
+    "messagePlaceholder": "Comment pouvons-nous vous aider ?",
+    "submit": "Envoyer le message",
+    "captcha": "Veuillez valider le captcha pour envoyer votre message.",
+    "sendError": "L'envoi a échoué. Veuillez réessayer.",
+    "faqTitle": "Foire aux questions",
+    "faqSubtitle": "Trouvez des réponses rapides aux questions les plus fréquentes.",
+    "faq": {
+      "q1": "Comment inscrire mon entreprise sur l'annuaire ?",
+      "a1": "Inscrivez-vous en choisissant le profil « Fournisseur », puis transmettez vos documents légaux (registre du commerce, NIF) depuis votre tableau de bord. Après vérification par notre équipe, votre fiche et vos produits sont publiés.",
+      "q2": "Quelles sont les offres payantes ?",
+      "a2": "L'offre gratuite permet de publier 5 produits. L'offre Basic (18 000 DA TTC par an) en permet 15, l'offre Pro (29 900 DA TTC par an) est illimitée avec un support sous 24 h. Vous souscrivez et payez par virement ou carte CIB / Edahabia depuis l'onglet Abonnement de votre tableau de bord.",
+      "q3": "Comment contacter un fournisseur ?",
+      "a3": "Depuis la fiche d'une entreprise ou d'un produit, utilisez le bouton de contact. Vos échanges sont ensuite regroupés dans la messagerie de votre tableau de bord.",
+      "q4": "La plateforme est-elle disponible en dehors de l'Algérie ?",
+      "a4": "Oui, Algeria Industry a pour vocation de connecter l'industrie algérienne au monde entier. La plateforme est disponible en français, en arabe et en anglais."
+    }
+  },
+  "favorites": {
+    "eyebrow": "Mes sauvegardes",
+    "title": "Mes favoris",
+    "subtitle": "Retrouvez ici tous les produits et entreprises que vous avez sauvegardés.",
+    "emptyTitle": "Aucun favori",
+    "emptyText": "Vous n'avez pas encore ajouté d'éléments à vos favoris. Explorez notre catalogue pour sauvegarder des produits.",
+    "details": "Voir détails",
+    "remove": "Retirer des favoris",
+    "removed": "Retiré des favoris"
+  },
+  "messages": {
+    "filter": "Filtrer les conversations...",
+    "loading": "Chargement...",
+    "empty": "Aucune conversation",
+    "noMatch": "Aucune conversation ne correspond.",
+    "contact": "Contact",
+    "attach": "Joindre un fichier",
+    "placeholder": "Écrivez votre message...",
+    "send": "Envoyer",
+    "select": "Sélectionnez une conversation",
+    "uploadError": "L'envoi du fichier a échoué.",
+    "sendError": "Le message n'a pas pu être envoyé. Réessayez."
+  },
+  "events": {
+    "titleStart": "Agenda des",
+    "titleHighlight": "événements",
+    "subtitle": "Ne manquez aucun rendez-vous majeur de l'industrie algérienne : salons, forums et webinaires.",
+    "upcoming": "À venir",
+    "past": "Passés",
+    "loadError": "Impossible de charger les événements. Réessayez plus tard.",
+    "noUpcoming": "Aucun événement à venir pour le moment.",
+    "noPast": "Aucun événement passé.",
+    "organizer": "Organisé par {{name}}",
+    "submitTitle": "Vous organisez un événement industriel ?",
+    "submitText": "Faites connaître votre salon, conférence ou webinaire à toute la communauté Algeria Industry.",
+    "submitButton": "Proposer un événement"
+  },
+  "resources": {
+    "title": "Centre de ressources",
+    "subtitle": "Articles de l'équipe et liens vers les sources officielles pour vos démarches industrielles.",
+    "latest": "Dernières publications",
+    "seeAll": "Voir tout",
+    "noArticles": "Aucun article publié pour le moment.",
+    "readMore": "Lire la suite",
+    "officialTitle": "Sources officielles",
+    "officialText": "Textes de loi et démarches à jour, directement auprès des organismes publics.",
+    "links": {
+      "joradp": {
+        "name": "Journal officiel (JORADP)",
+        "text": "Lois, décrets et arrêtés"
+      },
+      "aapi": {
+        "name": "AAPI",
+        "text": "Agence algérienne de promotion de l'investissement"
+      },
+      "industry": {
+        "name": "Ministère de l'Industrie",
+        "text": "Politique industrielle et programmes d'appui"
+      },
+      "customs": {
+        "name": "Douanes algériennes",
+        "text": "Régimes douaniers, import et export"
+      },
+      "cnrc": {
+        "name": "CNRC",
+        "text": "Centre national du registre du commerce"
+      }
+    },
+    "customTitle": "Besoin d'une information précise ?",
+    "customText": "Posez-nous votre question : nous vous orientons vers le bon interlocuteur.",
+    "customButton": "Nous contacter"
+  },
+  "exhibitor": {
+    "eyebrow": "Fournisseurs industriels",
+    "titleStart": "Boostez votre visibilité",
+    "titleHighlight": "industrielle",
+    "subtitle": "Référencez votre entreprise et vos produits dans l'annuaire industriel algérien, et recevez les demandes d'acheteurs professionnels.",
+    "cta": "Créer mon compte fournisseur",
+    "seePricing": "Voir les tarifs",
+    "benefitsTitle": "Pourquoi rejoindre la plateforme ?",
+    "benefits": {
+      "directory": {
+        "title": "Annuaire et catalogue",
+        "text": "Votre fiche entreprise et vos produits apparaissent dans la recherche et dans le catalogue par catégorie."
+      },
+      "verified": {
+        "title": "Entreprise vérifiée",
+        "text": "Après contrôle de vos documents légaux, votre fiche affiche un badge qui rassure les acheteurs."
+      },
+      "messages": {
+        "title": "Contact direct",
+        "text": "Les acheteurs vous écrivent depuis votre fiche ; vous répondez depuis la messagerie de votre tableau de bord."
+      },
+      "languages": {
+        "title": "Trois langues",
+        "text": "La plateforme est disponible en français, en arabe et en anglais pour toucher aussi les acheteurs étrangers."
+      }
+    },
+    "stepsTitle": "Comment ça marche ?",
+    "steps": {
+      "register": {
+        "title": "Inscrivez-vous",
+        "text": "Créez votre compte fournisseur et confirmez votre adresse e-mail."
+      },
+      "kyc": {
+        "title": "Faites vérifier votre entreprise",
+        "text": "Transmettez votre registre du commerce et votre NIF ; notre équipe les vérifie."
+      },
+      "publish": {
+        "title": "Publiez vos produits",
+        "text": "Ajoutez vos produits au catalogue et répondez aux demandes des acheteurs."
+      }
+    },
+    "plansTitle": "Nos offres",
+    "productsCount": "{{count}} produits publiés",
+    "unlimitedProducts": "Produits illimités",
+    "planExtra": {
+      "free": "Fiche entreprise et messagerie",
+      "basic": "5 images par produit, support sous 48 h",
+      "pro": "10 images par produit, support sous 24 h"
+    },
+    "start": "Commencer",
+    "comparePlans": "Comparer les offres en détail"
+  },
+  "searchModal": {
+    "dialog": "Recherche",
+    "placeholder": "Rechercher un produit ou une entreprise...",
+    "close": "Fermer la recherche",
+    "suggestions": "Suggestions",
+    "results": "Résultats ({{count}})",
+    "noResults": "Aucun résultat pour « {{query}} »",
+    "quit": "Quitter",
+    "select": "Sélectionner",
+    "type": {
+      "product": "Produit",
+      "company": "Entreprise"
+    }
+  },
+  "company": {
+    "notFound": "Entreprise introuvable",
+    "backToDirectory": "Retour à l'annuaire",
+    "tabs": {
+      "about": "Présentation",
+      "products": "Produits",
+      "catalogues": "Catalogues",
+      "news": "Actualités & salons"
+    },
+    "reviewsCount": "{{count}} avis",
+    "follow": "Suivre",
+    "following": "Suivie",
+    "share": "Partager",
+    "linkCopied": "Lien copié dans le presse-papier.",
+    "wilaya": "Wilaya",
+    "memberSince": "Inscrite depuis",
+    "verification": "Vérification",
+    "verified": "Entreprise vérifiée (RC et NIF contrôlés)",
+    "notVerified": "Vérification non effectuée",
+    "unclaimed": "Fiche non revendiquée",
+    "contact": "Contacter l'entreprise",
+    "about": "À propos de l'entreprise",
+    "noDescription": "Cette entreprise n'a pas encore rédigé sa présentation.",
+    "legalTitle": "Informations légales",
+    "legalName": "Dénomination",
+    "legalDocs": "Registre du commerce et NIF",
+    "legalChecked": "Contrôlés par Algeria Industry (KYC)",
+    "legalUnchecked": "Non vérifiés",
+    "sector": "Secteur d'activité",
+    "productsIntro": "Découvrez la gamme de produits proposée par {{name}}.",
+    "noProducts": "Aucun produit disponible",
+    "noProductsText": "Cette entreprise n'a pas encore ajouté de produits.",
+    "onQuote": "Sur devis",
+    "cataloguesIntro": "Téléchargez ou visualisez les catalogues officiels de {{name}}.",
+    "cataloguesLoading": "Chargement des catalogues...",
+    "noCatalogues": "Aucun catalogue disponible",
+    "noCataloguesText": "Aucun document n'a été publié par cette entreprise.",
+    "downloadPdf": "Télécharger le PDF",
+    "newsTitle": "Actualités & communiqués",
+    "newsIntro": "Suivez les dernières nouvelles de {{name}}.",
+    "loading": "Chargement...",
+    "noNews": "Aucune actualité disponible",
+    "readMore": "Lire la suite",
+    "eventsTitle": "Salons & événements",
+    "eventsIntro": "Découvrez les expositions et salons professionnels de {{name}}.",
+    "noEvents": "Aucun salon disponible",
+    "reviewsTitle": "Avis & évaluations ({{count}})",
+    "reviewsIntro": "Découvrez ce que les autres utilisateurs pensent de {{name}}.",
+    "averageRating": "Note moyenne",
+    "close": "Fermer",
+    "leaveReview": "Laisser mon avis",
+    "yourRating": "Votre note",
+    "yourComment": "Votre commentaire",
+    "commentPlaceholder": "Qu'avez-vous pensé des services de cette entreprise ? Partagez votre expérience...",
+    "publishing": "Publication...",
+    "publish": "Publier l'avis",
+    "loginToReview": "Vous devez être connecté pour donner votre avis sur cette entreprise.",
+    "reviewsLoading": "Chargement des avis...",
+    "noReviews": "Aucun avis pour le moment",
+    "beFirst": "Soyez le premier à partager votre expérience !",
+    "anonymousUser": "Utilisateur",
+    "reviewError": "Une erreur est survenue.",
+    "cataloguesCtaTitle": "Documentation de l'entreprise",
+    "cataloguesCtaText": "Consultez les catalogues publiés par {{name}}.",
+    "cataloguesCtaButton": "Voir les catalogues"
   }
 }

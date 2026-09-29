@@ -54,7 +54,6 @@ const Navbar = () => {
     { label: t('nav.my_profile'), path: '/dashboard', icon: UserCircle },
     { label: t('nav.subscription'), path: '/dashboard?tab=subscription', icon: Award },
     { label: t('nav.favorites'), path: '/favorites', icon: Zap },
-    { label: t('nav.requests'), path: '/dashboard?tab=orders', icon: FileText },
   ];
 
   const languages = [
@@ -67,10 +66,10 @@ const Navbar = () => {
 
   const navItems = [
     { name: t('nav.products'), path: '/products', hasMega: true, icon: Package },
-    { name: i18n.language?.startsWith('ar') ? 'العارضين' : 'Exposants', path: '/exhibitors', icon: BookOpen },
+    { name: t('nav.exhibitors'), path: '/exhibitors', icon: BookOpen },
     { name: t('nav.news'), path: '/blog', icon: Newspaper },
     { name: t('nav.resources'), path: '/resources', icon: Library },
-    { name: i18n.language?.startsWith('ar') ? 'الأسعار' : 'Tarifs', path: '/tarifs', icon: Award },
+    { name: t('nav.pricing'), path: '/tarifs', icon: Award },
   ];
 
   const categories = [
@@ -112,7 +111,7 @@ const Navbar = () => {
               )}
             >
               <Search className="h-3.5 w-3.5 text-white/20 group-hover/search:text-secondary transition-colors" />
-              <span className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em]">RECHERCHER...</span>
+              <span className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em]">{t('nav.searchShort')}</span>
             </div>
           </div>
 
@@ -276,8 +275,8 @@ const Navbar = () => {
                           </>
                         ) : (
                           <>
-                            <p className="text-[10px] font-black text-secondary uppercase tracking-[0.2em] mb-1">{i18n.language?.startsWith('ar') ? 'مساحة العمل' : 'Espace Industriel'}</p>
-                            <p className="text-[9px] text-white/40 font-bold uppercase">{i18n.language?.startsWith('ar') ? 'إدارة نشاطك الصناعي' : 'Gérez votre activité'}</p>
+                            <p className="text-[10px] font-black text-secondary uppercase tracking-[0.2em] mb-1">{t('nav.workspace')}</p>
+                            <p className="text-[9px] text-white/40 font-bold uppercase">{t('nav.workspaceText')}</p>
                           </>
                         )}
                       </div>
@@ -305,13 +304,13 @@ const Navbar = () => {
                               to="/login"
                               className="flex items-center justify-center py-3 rounded-xl bg-white/5 hover:bg-white/10 text-[10px] font-black text-secondary uppercase tracking-widest transition-all"
                             >
-                              {i18n.language?.startsWith('ar') ? 'دخول' : 'Connexion'}
+                              {t('nav.login')}
                             </Link>
                             <Link
                               to="/register"
                               className="flex items-center justify-center py-3 rounded-xl bg-secondary text-white hover:bg-secondary/90 text-[10px] font-black uppercase tracking-widest transition-all shadow-lg"
                             >
-                              {i18n.language?.startsWith('ar') ? 'تسجيل' : 'Inscription'}
+                              {t('nav.register')}
                             </Link>
                           </div>
                         ) : (
@@ -336,7 +335,7 @@ const Navbar = () => {
             <button
               onClick={() => setIsOpen(!isOpen)}
               aria-expanded={isOpen}
-              aria-label={isOpen ? "Fermer le menu" : "Ouvrir le menu"}
+              aria-label={isOpen ? t('nav.closeMenu') : t('nav.openMenu')}
               className="text-white hover:text-secondary focus:outline-none p-3 bg-white/5 rounded-lg min-h-[44px] min-w-[44px] flex items-center justify-center"
             >
               {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -382,7 +381,7 @@ const Navbar = () => {
 
                 <div className="bg-white/5 rounded-[24px] p-3 border border-white/5 shadow-2xl">
                   <div className="p-3 mb-3 border-b border-white/5 flex items-center justify-between">
-                    <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em]">{i18n.language?.startsWith('ar') ? 'مساحة العمل' : 'Espace Membre'}</span>
+                    <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em]">{t('nav.memberSpace')}</span>
                     <div className="w-2 h-2 rounded-full bg-secondary animate-pulse" />
                   </div>
                   <div className="grid grid-cols-2 gap-2 mb-4">
@@ -404,14 +403,14 @@ const Navbar = () => {
                       onClick={() => setIsOpen(false)}
                       className="flex-1 py-4 bg-white/5 rounded-xl text-center text-[10px] font-black uppercase tracking-widest text-secondary border border-white/5"
                     >
-                      {i18n.language?.startsWith('ar') ? 'دخول' : 'Connexion'}
+                      {t('nav.login')}
                     </Link>
                     <Link
                       to="/register"
                       onClick={() => setIsOpen(false)}
                       className="flex-1 py-4 bg-secondary rounded-xl text-center text-[10px] font-black uppercase tracking-widest text-white shadow-lg"
                     >
-                      {i18n.language?.startsWith('ar') ? 'تسجيل' : 'Inscription'}
+                      {t('nav.register')}
                     </Link>
                   </div>
                 </div>

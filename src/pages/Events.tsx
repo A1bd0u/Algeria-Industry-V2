@@ -1,211 +1,144 @@
-import {
-  AlertCircle,
-  Bell,
-  Calendar,
-  ChevronRight, Clock,
-  ExternalLink,
-  Filter,
-  MapPin,
-  Ticket
-} from 'lucide-react';
+import { AlertCircle, Calendar, CalendarX, MapPin, Ticket, User } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import PageTransition from '../components/PageTransition';
-import { cn } from '../lib/utils';
-
 import { EventSkeleton } from '../components/Skeleton';
+import { cn } from '../lib/utils';
+import { currentLocale } from '../lib/format';
+
+// Agenda publié par l'équipe (table events : titre, description, date, lieu,
+// organisateur). Les événements passés restent consultables à part.
+interface EventRow {
+  id: string;
+  title: string;
+  description?: string | null;
+  date?: string | null;
+  location?: string | null;
+  organizer?: string | null;
+}
+
+const formatEventDate = (iso?: string | null) =>
+  iso
+    ? new Date(iso).toLocaleDateString(currentLocale(), {
+        weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', numberingSystem: 'latn',
+      } as Intl.DateTimeFormatOptions)
+    : '';
 
 const Events = () => {
-  const [activeType, setActiveType] = useState('Tous');
-  
-  const [events, setEvents] = useState<any[]>([]);
+  const { t } = useTranslation();
+  const [view, setView] = useState<'upcoming' | 'past'>('upcoming');
+  const [events, setEvents] = useState<EventRow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        setIsLoading(true);
         const res = await fetch('/api/events');
-        if (!res.ok) throw new Error("Erreur de récupération des événements");
-        const data = await res.json();
-        setEvents(data);
-      } catch (err: any) {
-        setError(err.message);
+        if (!res.ok) throw new Error();
+        setEvents(await res.json());
+      } catch {
+        setHasError(true);
       } finally {
         setIsLoading(false);
       }
     };
-    
     fetchEvents();
   }, []);
 
-  const filteredEvents = events.filter(event => {
-    const matchesType = activeType === 'Tous' || event.type === activeType;
-    return matchesType;
-  });
+  const startOfToday = new Date();
+  startOfToday.setHours(0, 0, 0, 0);
+  const isPast = (e: EventRow) => Boolean(e.date && new Date(e.date) < startOfToday);
+  const visible = events
+    .filter((e) => (view === 'past' ? isPast(e) : !isPast(e)))
+    .sort((a, b) => {
+      const diff = new Date(a.date || 0).getTime() - new Date(b.date || 0).getTime();
+      return view === 'past' ? -diff : diff;
+    });
 
   return (
     <PageTransition>
       <div className="bg-neutral-bg min-h-screen pb-20">
-        {/* Header */}
-        <section className="bg-primary py-16 text-white relative overflow-hidden">
-          <div className="absolute inset-0 opacity-10">
-          </div>
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
-              <div>
-                <h1 className="text-4xl font-extrabold mb-4">Agenda des <span className="text-secondary">Événements</span></h1>
-                <p className="text-primary-foreground/80 text-lg max-w-xl">
-                  Ne manquez aucun rendez-vous majeur de l'industrie algérienne : salons, forums et webinaires.
-                </p>
-              </div>
-            </div>
+        <section className="bg-primary py-16 text-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h1 className="text-4xl font-extrabold mb-4">
+              {t('events.titleStart')} <span className="text-secondary">{t('events.titleHighlight')}</span>
+            </h1>
+            <p className="text-white/80 text-lg max-w-xl">{t('events.subtitle')}</p>
           </div>
         </section>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
-          {/* Filters */}
-          <div className="flex flex-wrap items-center justify-between gap-6 mb-12">
-            <div className="flex items-center space-x-2 bg-white p-1.5 rounded-2xl shadow-sm border border-gray-100">
-              {['Tous', 'Physique', 'En ligne'].map(type => (
-                <button
-                  key={type}
-                  onClick={() => setActiveType(type)}
-                  className={cn(
-                    "px-6 py-2.5 rounded-xl text-sm font-bold transition-all",
-                    activeType === type 
-                      ? "bg-primary text-white shadow-lg" 
-                      : "text-gray-500 hover:text-primary"
-                  )}
-                >
-                  {type}
-                </button>
-              ))}
-            </div>
-            <div className="flex items-center space-x-4">
-              <button className="flex items-center space-x-2 text-sm font-bold text-gray-500 hover:text-primary transition-colors" onClick={(e) => { e.preventDefault(); alert("Fonctionnalité en cours de développement"); }}>
-                <Filter className="h-4 w-4" />
-                <span>Plus de filtres</span>
+          <div className="inline-flex items-center gap-1 bg-white p-1.5 rounded-2xl shadow-sm border border-gray-100 mb-12" role="tablist">
+            {(['upcoming', 'past'] as const).map((key) => (
+              <button
+                key={key}
+                role="tab"
+                aria-selected={view === key}
+                onClick={() => setView(key)}
+                className={cn(
+                  'px-6 py-2.5 rounded-xl text-sm font-bold transition-all',
+                  view === key ? 'bg-primary text-white shadow-lg' : 'text-gray-500 hover:text-primary'
+                )}
+              >
+                {t(`events.${key}`)}
               </button>
-              <button className="flex items-center space-x-2 text-sm font-bold text-secondary hover:underline" onClick={(e) => { e.preventDefault(); alert("Fonctionnalité en cours de développement"); }}>
-                <Calendar className="h-4 w-4" />
-                <span>Vue calendrier</span>
-              </button>
-            </div>
+            ))}
           </div>
 
-          {/* Events Grid */}
           {isLoading ? (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-               {[1, 2, 3, 4].map(i => <EventSkeleton key={i} />)}
+              {[1, 2, 3, 4].map((i) => <EventSkeleton key={i} />)}
             </div>
-          ) : error ? (
-            <div className="py-20 flex flex-col items-center justify-center">
-               <AlertCircle className="h-10 w-10 text-red-500 mb-4" />
-               <p className="text-[10px] font-black uppercase text-red-500 tracking-widest">{error}</p>
+          ) : hasError ? (
+            <div className="py-20 flex flex-col items-center justify-center text-center">
+              <AlertCircle className="h-10 w-10 text-red-500 mb-4" />
+              <p className="text-sm font-bold text-red-500">{t('events.loadError')}</p>
+            </div>
+          ) : visible.length === 0 ? (
+            <div className="py-20 flex flex-col items-center justify-center text-center bg-white rounded-3xl border border-dashed border-gray-200">
+              <CalendarX className="h-10 w-10 text-gray-300 mb-4" />
+              <p className="font-bold text-primary">{view === 'past' ? t('events.noPast') : t('events.noUpcoming')}</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {filteredEvents.map((event, i) => (
-              <motion.div 
-                key={event.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1 }}
-                className="bg-white rounded-[32px] overflow-hidden shadow-sm border border-gray-100 hover:shadow-xl transition-all group flex flex-col md:flex-row"
-              >
-                <div className="md:w-2/5 h-48 md:h-auto overflow-hidden relative">
-                  <img 
-                    src={event.image} 
-                    alt={event.title} 
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                    referrerPolicy="no-referrer"
-                  />
-                  <div className="absolute top-4 start-4">
-                    <span className={cn(
-                      "px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider backdrop-blur-md",
-                      event.type === 'Physique' ? "bg-primary/80 text-white" : "bg-secondary/80 text-white"
-                    )}>
-                      {event.type}
-                    </span>
-                  </div>
-                </div>
-                <div className="md:w-3/5 p-8 flex flex-col">
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest bg-gray-50 px-2 py-1 rounded">
-                      {event.category}
-                    </span>
-                    <span className={cn(
-                      "text-[10px] font-bold px-2 py-1 rounded uppercase",
-                      event.status === 'Ouvert' ? "bg-success/10 text-success" : "bg-gray-100 text-gray-400"
-                    )}>
-                      {event.status}
-                    </span>
-                  </div>
-                  <h3 className="text-xl font-bold text-primary mb-4 group-hover:text-secondary transition-colors leading-tight">
-                    {event.title}
-                  </h3>
-                  <div className="space-y-2 mb-6">
-                    <div className="flex items-center space-x-3 text-sm text-gray-600">
-                      <Calendar className="h-4 w-4 text-secondary" />
-                      <span className="font-medium">{event.date}</span>
-                    </div>
-                    {event.time && (
-                      <div className="flex items-center space-x-3 text-sm text-gray-600">
-                        <Clock className="h-4 w-4 text-secondary" />
-                        <span className="font-medium">{event.time}</span>
-                      </div>
+              {visible.map((event, i) => (
+                <motion.article
+                  key={event.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: Math.min(i, 6) * 0.05 }}
+                  className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 flex flex-col"
+                >
+                  <h2 className="text-xl font-bold text-primary mb-4 leading-tight">{event.title}</h2>
+                  <div className="space-y-2 mb-4 text-sm text-gray-600">
+                    {event.date && (
+                      <p className="flex items-center gap-3"><Calendar className="h-4 w-4 text-secondary shrink-0" /><span className="font-medium">{formatEventDate(event.date)}</span></p>
                     )}
-                    <div className="flex items-center space-x-3 text-sm text-gray-600">
-                      <MapPin className="h-4 w-4 text-secondary" />
-                      <span className="font-medium truncate">{event.location}</span>
-                    </div>
+                    {event.location && (
+                      <p className="flex items-center gap-3"><MapPin className="h-4 w-4 text-secondary shrink-0" /><span className="font-medium">{event.location}</span></p>
+                    )}
+                    {event.organizer && (
+                      <p className="flex items-center gap-3"><User className="h-4 w-4 text-secondary shrink-0" /><span className="font-medium">{t('events.organizer', { name: event.organizer })}</span></p>
+                    )}
                   </div>
-                  <div className="mt-auto flex items-center justify-between pt-6 border-t border-gray-50">
-                    <button className="text-primary font-bold text-sm flex items-center space-x-1 hover:translate-x-1 transition-transform" onClick={(e) => { e.preventDefault(); alert("Fonctionnalité en cours de développement"); }}>
-                      <span>Détails</span>
-                      <ChevronRight className="h-4 w-4 rtl:rotate-180" />
-                    </button>
-                    <button className="btn-primary py-2 px-6 rounded-xl text-xs" onClick={(e) => { e.preventDefault(); alert("Inscription confirmée et ajoutée à votre calendrier !"); }}>
-                      S'inscrire
-                    </button>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+                  {event.description && <p className="text-sm text-gray-500 leading-relaxed whitespace-pre-line">{event.description}</p>}
+                </motion.article>
+              ))}
+            </div>
           )}
 
-          {/* Organizer CTA */}
-          <section className="mt-24 bg-neutral-bg border-2 border-dashed border-gray-200 p-12 rounded-2xl text-center">
+          <section className="mt-24 border-2 border-dashed border-gray-200 p-12 rounded-2xl text-center">
             <div className="bg-white w-16 h-16 rounded-2xl shadow-sm flex items-center justify-center text-primary mx-auto mb-6">
               <Ticket className="h-8 w-8" />
             </div>
-            <h2 className="text-2xl font-bold text-primary mb-4">Vous organisez un événement industriel ?</h2>
-            <p className="text-gray-500 max-w-xl mx-auto mb-8">
-              Faites connaître votre salon, conférence ou webinaire à toute la communauté Algeria Industry.
-            </p>
-            <button className="bg-white border border-primary text-primary px-8 py-4 rounded-2xl font-bold hover:bg-primary hover:text-white transition-all flex items-center space-x-2 mx-auto" onClick={(e) => { e.preventDefault(); alert("Redirection vers la billetterie..."); }}>
-              <span>Soumettre un événement</span>
-              <ExternalLink className="h-5 w-5" />
-            </button>
-          </section>
-
-          {/* Reminder Section */}
-          <section className="mt-12 bg-white p-8 rounded-2xl border border-gray-100 flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center space-x-4">
-              <div className="bg-secondary/10 p-3 rounded-xl text-secondary">
-                <Bell className="h-6 w-6" />
-              </div>
-              <div>
-                <h4 className="font-bold text-primary">Alerte Événements</h4>
-                <p className="text-sm text-gray-400">Recevez une notification 24h avant chaque événement qui vous intéresse.</p>
-              </div>
-            </div>
-            <button className="text-secondary font-bold text-sm hover:underline" onClick={(e) => { e.preventDefault(); alert("Fonctionnalité en cours de développement"); }}>
-              Activer les notifications
-            </button>
+            <h2 className="text-2xl font-bold text-primary mb-4">{t('events.submitTitle')}</h2>
+            <p className="text-gray-500 max-w-xl mx-auto mb-8">{t('events.submitText')}</p>
+            <Link to="/contact" className="inline-flex bg-white border border-primary text-primary px-8 py-4 rounded-2xl font-bold hover:bg-primary hover:text-white transition-all">
+              {t('events.submitButton')}
+            </Link>
           </section>
         </div>
       </div>

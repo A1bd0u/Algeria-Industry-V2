@@ -14,16 +14,18 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { cn } from '../lib/utils';
 import { SUPPORT, telHref, whatsappHref } from '../config/site';
+import { useTranslation } from 'react-i18next';
 
 // Assistance : FAQ, guides et coordonnées réelles (configurées par variables
 // d'environnement). L'assistant IA est retiré du v1.
 const HelpWidget = () => {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
 
   const contactOptions = [
-    SUPPORT.phone && { icon: Phone, label: 'Appeler le support', value: SUPPORT.phone, href: telHref(SUPPORT.phone) },
-    SUPPORT.email && { icon: Mail, label: 'Envoyer un email', value: SUPPORT.email, href: `mailto:${SUPPORT.email}` },
-    SUPPORT.whatsapp && { icon: MessageCircle, label: 'WhatsApp Business', value: SUPPORT.whatsapp, href: whatsappHref(SUPPORT.whatsapp) },
+    SUPPORT.phone && { icon: Phone, label: t('help.call'), value: SUPPORT.phone, href: telHref(SUPPORT.phone) },
+    SUPPORT.email && { icon: Mail, label: t('help.email'), value: SUPPORT.email, href: `mailto:${SUPPORT.email}` },
+    SUPPORT.whatsapp && { icon: MessageCircle, label: t('help.whatsapp'), value: SUPPORT.whatsapp, href: whatsappHref(SUPPORT.whatsapp) },
   ].filter(Boolean) as { icon: typeof Phone; label: string; value: string; href: string }[];
 
   return (
@@ -35,13 +37,13 @@ const HelpWidget = () => {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             role="dialog"
-            aria-label="Aide et support"
+            aria-label={t('help.dialog')}
             className="absolute bottom-20 end-0 w-[calc(100vw-2rem)] max-w-[380px] bg-white rounded-[32px] shadow-2xl border border-gray-100 overflow-hidden"
           >
             <div className="bg-primary p-8 text-white">
-              <h3 className="text-2xl font-black uppercase tracking-tighter">Besoin d'aide ?</h3>
+              <h3 className="text-2xl font-black uppercase tracking-tighter">{t('help.title')}</h3>
               <p className="text-xs text-gray-300 font-bold uppercase tracking-wider mt-1">
-                Équipe disponible du dimanche au jeudi, 08:30 - 16:30
+                {t('help.hours')}
               </p>
             </div>
 
@@ -53,7 +55,7 @@ const HelpWidget = () => {
                   className="bg-neutral-bg p-4 rounded-2xl border border-gray-100 hover:border-secondary hover:bg-white transition-all"
                 >
                   <HelpCircle className="h-5 w-5 text-secondary mb-2" />
-                  <p className="text-[10px] font-black uppercase tracking-widest text-primary">F.A.Q</p>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-primary">{t('help.faq')}</p>
                 </Link>
                 <Link
                   to="/resources"
@@ -61,13 +63,13 @@ const HelpWidget = () => {
                   className="bg-neutral-bg p-4 rounded-2xl border border-gray-100 hover:border-secondary hover:bg-white transition-all"
                 >
                   <FileText className="h-5 w-5 text-secondary mb-2" />
-                  <p className="text-[10px] font-black uppercase tracking-widest text-primary">Guides</p>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-primary">{t('help.guides')}</p>
                 </Link>
               </div>
 
               {contactOptions.length > 0 && (
                 <div className="space-y-3">
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 px-2">Assistance directe</p>
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 px-2">{t('help.direct')}</p>
                   {contactOptions.map((option) => (
                     <a
                       key={option.label}
@@ -96,8 +98,8 @@ const HelpWidget = () => {
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <h4 className="font-black uppercase tracking-tight text-sm">Écrire à l'équipe</h4>
-                    <p className="text-[10px] opacity-90 font-bold uppercase tracking-widest">Réponse sous 48 h ouvrées</p>
+                    <h4 className="font-black uppercase tracking-tight text-sm">{t('help.write')}</h4>
+                    <p className="text-[10px] opacity-90 font-bold uppercase tracking-widest">{t('help.responseTime')}</p>
                   </div>
                   <Headset className="h-6 w-6" />
                 </div>
@@ -110,7 +112,7 @@ const HelpWidget = () => {
       <button
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}
-        aria-label={isOpen ? "Fermer l'aide" : "Ouvrir l'aide"}
+        aria-label={isOpen ? t('help.close') : t('help.open')}
         className={cn(
           "w-14 h-14 sm:w-16 sm:h-16 rounded-full shadow-2xl flex items-center justify-center transition-all duration-300 relative group",
           isOpen ? "bg-white text-primary rotate-90" : "bg-secondary text-white hover:scale-110 active:scale-95"
