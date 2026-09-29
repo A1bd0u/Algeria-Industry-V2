@@ -9,6 +9,8 @@ export default defineConfig({
   reporter: 'html',
   use: {
     baseURL: 'http://localhost:3000',
+    // L'interface suit la langue du navigateur : les scénarios sont écrits en français.
+    locale: 'fr-FR',
     trace: 'on-first-retry',
   },
   projects: [

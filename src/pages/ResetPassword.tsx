@@ -3,8 +3,11 @@ import { motion } from 'motion/react';
 import { Lock, ArrowRight, Loader2, Key, Eye, EyeOff, CheckCircle2 } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { PasswordStrengthIndicator } from '../components/PasswordStrengthIndicator';
+import { useTranslation } from 'react-i18next';
+import { ApiError } from '../lib/apiError';
 
 const ResetPassword = () => {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
   
@@ -20,22 +23,23 @@ const ResetPassword = () => {
     e.preventDefault();
     
     if (password !== confirmPassword) {
-      setError("Les mots de passe ne correspondent pas.");
+      setError(t('auth.validation.passwordMismatch'));
       return;
     }
     
-    if (password.length < 8) {
-      setError("Le mot de passe doit faire au moins 8 caractères.");
+    // Mêmes règles que le serveur (10 caractères, une lettre, un chiffre).
+    if (password.length < 10) {
+      setError(t('auth.validation.passwordMin'));
       return;
     }
     
     if (!/[a-zA-Z]/.test(password)) {
-      setError("Le mot de passe doit contenir au moins une lettre.");
+      setError(t('auth.validation.passwordLetter'));
       return;
     }
 
     if (!/[0-9]/.test(password)) {
-      setError("Le mot de passe doit contenir au moins un chiffre.");
+      setError(t('auth.validation.passwordDigit'));
       return;
     }
 
@@ -52,12 +56,12 @@ const ResetPassword = () => {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Une erreur est survenue.');
+        throw new ApiError(data);
       }
 
       setIsSuccess(true);
     } catch (err: any) {
-      setError(err.message || 'La réinitialisation a échoué. Veuillez réessayer.');
+      setError(err.message || t('auth.genericError'));
     } finally {
       setIsLoading(false);
     }
@@ -67,8 +71,8 @@ const ResetPassword = () => {
     return (
       <div className="min-h-[80vh] flex items-center justify-center bg-neutral-bg px-4 py-12">
          <div className="text-center">
-            <h2 className="text-2xl font-bold text-red-600 mb-4">Jeton de réinitialisation manquant ou invalide.</h2>
-            <Link to="/forgot-password" className="text-secondary hover:underline font-bold">Retour à la demande de réinitialisation</Link>
+            <h2 className="text-2xl font-bold text-red-600 mb-4">{t('auth.reset.missingToken')}</h2>
+            <Link to="/forgot-password" className="text-secondary hover:underline font-bold">{t('auth.reset.backToRequest')}</Link>
          </div>
       </div>
     );
@@ -86,8 +90,8 @@ const ResetPassword = () => {
             <div className="inline-flex items-center justify-center p-3 bg-primary/10 rounded-2xl mb-4">
               <Key className="h-8 w-8 text-primary" />
             </div>
-            <h2 className="text-3xl font-bold text-primary">Nouveau mot de passe</h2>
-            <p className="text-gray-500 mt-2">Créez votre nouveau mot de passe sécurisé.</p>
+            <h2 className="text-3xl font-bold text-primary">{t('auth.reset.title')}</h2>
+            <p className="text-gray-500 mt-2">{t('auth.reset.subtitle')}</p>
           </div>
 
           {isSuccess ? (
@@ -99,11 +103,11 @@ const ResetPassword = () => {
               <div className="inline-flex items-center justify-center p-3 rounded-full bg-green-100 text-green-600 mb-4">
                 <CheckCircle2 className="h-10 w-10" />
               </div>
-              <h3 className="font-bold text-xl mb-2 text-primary">Mot de passe mis à jour !</h3>
-              <p className="text-gray-500 mb-8">Vous pouvez maintenant vous connecter avec votre nouveau mot de passe.</p>
+              <h3 className="font-bold text-xl mb-2 text-primary">{t('auth.reset.doneTitle')}</h3>
+              <p className="text-gray-500 mb-8">{t('auth.reset.doneText')}</p>
               
               <Link to="/login" className="w-full btn-primary py-4 rounded-xl flex items-center justify-center space-x-2 shadow-lg">
-                <span>Aller à la connexion</span>
+                <span>{t('auth.reset.goToLogin')}</span>
                 <ArrowRight className="h-5 w-5 rtl:rotate-180" />
               </Link>
             </motion.div>
@@ -116,10 +120,12 @@ const ResetPassword = () => {
               )}
               
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Nouveau mot de passe</label>
+                <label htmlFor="new-password" className="block text-sm font-semibold text-gray-700 mb-2">{t('auth.reset.newPassword')}</label>
                 <div className="relative">
                   <Lock className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5" />
                   <input 
+                    id="new-password"
+                    autoComplete="new-password"
                     type={showPassword ? "text" : "password"} 
                     required
                     className="w-full ps-10 pe-12 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
@@ -130,6 +136,7 @@ const ResetPassword = () => {
                   <button 
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? t('auth.hidePassword') : t('auth.showPassword')}
                     className="absolute end-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary transition-colors"
                   >
                     {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
@@ -139,10 +146,12 @@ const ResetPassword = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Confirmez le mot de passe</label>
+                <label htmlFor="confirm-password" className="block text-sm font-semibold text-gray-700 mb-2">{t('auth.reset.confirmPassword')}</label>
                 <div className="relative">
                   <Lock className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5" />
                   <input 
+                    id="confirm-password"
+                    autoComplete="new-password"
                     type={showPassword ? "text" : "password"} 
                     required
                     className="w-full ps-10 pe-12 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
@@ -161,11 +170,11 @@ const ResetPassword = () => {
                 {isLoading ? (
                   <>
                     <Loader2 className="h-5 w-5 animate-spin" />
-                    <span>Enregistrement...</span>
+                    <span>{t('auth.reset.submitting')}</span>
                   </>
                 ) : (
                   <>
-                    <span>Mettre à jour</span>
+                    <span>{t('auth.reset.submit')}</span>
                     <ArrowRight className="h-5 w-5 rtl:rotate-180" />
                   </>
                 )}

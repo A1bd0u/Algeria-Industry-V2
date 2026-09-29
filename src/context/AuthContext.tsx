@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { ApiError } from '../lib/apiError';
 
 export interface User {
   id: string;
@@ -77,7 +78,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
-        throw new Error(errorData.error || 'Identifiants invalides.');
+        throw new ApiError(errorData, 'auth.login.invalid');
       }
 
       const data = await res.json();
@@ -126,7 +127,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
-        throw new Error(errorData.error || 'Erreur lors de la création du compte.');
+        throw new ApiError(errorData);
       }
       // Pas de session à ce stade : elle s'ouvre après vérification du code e-mail.
     } catch (err: any) {
@@ -145,9 +146,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
-      const error: any = new Error(data.error || 'Code incorrect.');
-      error.code = data.code;
-      throw error;
+      throw new ApiError(data, 'auth.mfa.invalid');
     }
     setUser(data.user);
     return data.user as User;
@@ -161,7 +160,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
     if (!res.ok) {
       const errData = await res.json().catch(() => ({}));
-      throw new Error(errData.error || 'Code invalide.');
+      throw new ApiError(errData, 'auth.verify.invalid');
     }
     // Le serveur ouvre la session et renvoie le profil à jour.
     const data = await res.json().catch(() => ({}));
@@ -180,7 +179,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
     if (!res.ok) {
       const errData = await res.json().catch(() => ({}));
-      throw new Error(errData.error || "Erreur lors de l'envoi du code.");
+      throw new ApiError(errData, 'auth.verify.resendError');
     }
   };
 

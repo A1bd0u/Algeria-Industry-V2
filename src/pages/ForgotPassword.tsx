@@ -3,8 +3,11 @@ import { motion } from 'motion/react';
 import { Mail, ArrowLeft, ArrowRight, Loader2, Key } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Turnstile } from '@marsidev/react-turnstile';
+import { useTranslation } from 'react-i18next';
+import { ApiError } from '../lib/apiError';
 
 const ForgotPassword = () => {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -16,7 +19,7 @@ const ForgotPassword = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!captchaToken) {
-      setError('Veuillez valider le captcha pour continuer.');
+      setError(t('auth.captchaRequired'));
       return;
     }
     setIsLoading(true);
@@ -32,12 +35,12 @@ const ForgotPassword = () => {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Une erreur est survenue.');
+        throw new ApiError(data);
       }
 
       setIsSuccess(true);
     } catch (err: any) {
-      setError(err.message || 'La demande a échoué. Veuillez réessayer.');
+      setError(err.message || t('auth.genericError'));
     } finally {
       setIsLoading(false);
     }
@@ -53,15 +56,15 @@ const ForgotPassword = () => {
         <div className="p-8">
           <Link to="/login" className="inline-flex items-center text-sm font-bold text-gray-400 hover:text-primary transition-colors mb-8">
             <ArrowLeft className="h-4 w-4 me-2 rtl:rotate-180" />
-            Retour à la connexion
+            {t('auth.forgot.back')}
           </Link>
 
           <div className="text-center mb-10">
             <div className="inline-flex items-center justify-center p-3 bg-primary/10 rounded-2xl mb-4">
               <Key className="h-8 w-8 text-primary" />
             </div>
-            <h2 className="text-3xl font-bold text-primary">Mot de passe oublié ?</h2>
-            <p className="text-gray-500 mt-2">Saisissez votre email et nous vous enverrons un lien de réinitialisation.</p>
+            <h2 className="text-3xl font-bold text-primary">{t('auth.forgot.title')}</h2>
+            <p className="text-gray-500 mt-2">{t('auth.forgot.subtitle')}</p>
           </div>
 
           {isSuccess ? (
@@ -70,9 +73,9 @@ const ForgotPassword = () => {
               animate={{ opacity: 1, scale: 1 }}
               className="bg-green-50 text-green-800 p-6 rounded-2xl border border-green-200 text-center"
             >
-              <h3 className="font-bold text-lg mb-2">Email envoyé !</h3>
-              <p className="text-sm">Si l'adresse correspond à un compte actif, vous recevrez bientôt un email de réinitialisation.</p>
-              <p className="text-xs mt-4 text-green-700">Le lien est valable 15 minutes. Pensez à vérifier vos courriers indésirables.</p>
+              <h3 className="font-bold text-lg mb-2">{t('auth.forgot.sentTitle')}</h3>
+              <p className="text-sm">{t('auth.forgot.sentText')}</p>
+              <p className="text-xs mt-4 text-green-700">{t('auth.forgot.sentHint')}</p>
             </motion.div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -82,14 +85,15 @@ const ForgotPassword = () => {
                 </div>
               )}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Adresse Email</label>
+                <label htmlFor="forgot-email" className="block text-sm font-semibold text-gray-700 mb-2">{t('auth.email')}</label>
                 <div className="relative">
                   <Mail className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5" />
                   <input 
+                    id="forgot-email"
                     type="email" 
                     required
                     className="w-full ps-10 pe-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
-                    placeholder="nom@entreprise.dz"
+                    placeholder={t('auth.emailPlaceholder')}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                   />
@@ -105,7 +109,7 @@ const ForgotPassword = () => {
                     onExpire={() => setCaptchaToken(null)}
                   />
                 ) : (
-                  <p className="text-red-500 text-sm font-bold">Erreur de configuration : VITE_TURNSTILE_SITE_KEY manquant</p>
+                  <p className="text-red-500 text-sm font-bold">{t('auth.captchaMissingConfig')}</p>
                 )}
               </div>
 
@@ -117,11 +121,11 @@ const ForgotPassword = () => {
                 {isLoading ? (
                   <>
                     <Loader2 className="h-5 w-5 animate-spin" />
-                    <span>Envoi en cours...</span>
+                    <span>{t('auth.forgot.submitting')}</span>
                   </>
                 ) : (
                   <>
-                    <span>Envoyer le lien</span>
+                    <span>{t('auth.forgot.submit')}</span>
                     <ArrowRight className="h-5 w-5 rtl:rotate-180" />
                   </>
                 )}
