@@ -17,14 +17,36 @@ import {
   ResponsiveContainer, Tooltip, XAxis, YAxis 
 } from 'recharts';
 
+const ACTION_LABELS: Record<string, string> = {
+  kyc_approve: 'KYC approuvé',
+  kyc_reject: 'KYC rejeté',
+  role_change: 'Rôle modifié',
+  suspension: 'Compte suspendu',
+  reactivation: 'Compte réactivé',
+  user_delete: 'Compte supprimé',
+  subscription_create: 'Facture émise',
+  subscription_activate: 'Abonnement activé',
+  subscription_cancel: 'Abonnement annulé',
+  ad_status_change: 'Publicité mise à jour',
+  content_approve: 'Signalement classé',
+  content_reject: 'Contenu dépublié',
+  product_delete: 'Produit supprimé',
+  company_delete: 'Entreprise supprimée',
+  support_message_update: 'Demande de support traitée',
+  kyc_document_view: 'Document KYC consulté',
+};
+
 export default function GovOverview({ state }: { state: any }) {
-  const { data: dashboardData, isLoading } = useQuery({
-      queryKey: ['admin-dashboard', state.chartTimeframe],
-      queryFn: async () => {
-        const res = await fetch('/api/admin/dashboard?days=' + state.chartTimeframe, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }});
-        return res.json();
-      }
-    });
+  // Dernières actions d'administration (hors simples consultations).
+  const { data: recentActivity = [] } = useQuery({
+    queryKey: ['admin-recent-activity'],
+    queryFn: async () => {
+      const res = await fetch('/api/admin/audit-logs');
+      if (!res.ok) return [];
+      const json = await res.json();
+      return (json.data || []).filter((l: any) => l.action !== 'dashboard_consultation').slice(0, 8);
+    },
+  });
   const {
     activeTab, setActiveTab, chartTimeframe, setChartTimeframe, showArticleForm, setShowArticleForm,
     exhibitors, setExhibitors, showExhibitorForm, setShowExhibitorForm, pendingKYC, setPendingKYC,
@@ -203,22 +225,26 @@ export default function GovOverview({ state }: { state: any }) {
               <Activity className="h-4 w-4 me-2 text-secondary" />
               Flux d'activité
             </h3>
-            <div className="space-y-6">
-              {[
-                { icon: Users, title: 'Nouvelle Inscription', desc: 'Sonelgaz (Acheteur)', time: 'À l\'instant' },
-                { icon: ShieldCheck, title: 'KYC Validé', desc: 'Algeria Tech Solutions', time: '2 min' },
-              ].map((activity, i) => (
-                <div key={i} className="flex space-x-4">
-                  <div className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center shrink-0">
-                    <activity.icon className="h-4 w-4 text-primary" />
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-black uppercase italic">{activity.title}</p>
-                    <p className="text-[9px] font-bold text-gray-400 uppercase truncate">{activity.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
+            {recentActivity.length === 0 ? (
+              <p className="text-xs text-gray-500">Aucune action d'administration enregistrée pour l'instant.</p>
+            ) : (
+              <ul className="space-y-5">
+                {recentActivity.map((log: any) => (
+                  <li key={log.id} className="flex gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-gray-50 flex items-center justify-center shrink-0">
+                      <ShieldCheck className="h-4 w-4 text-primary" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[11px] font-black text-primary">{ACTION_LABELS[log.action] || log.action}</p>
+                      <p className="text-[10px] text-gray-500 truncate">
+                        {[log.details?.targetCompanyName || log.details?.targetUserEmail || log.details?.invoiceNumber || log.details?.title, log.admin_email].filter(Boolean).join(' · ')}
+                      </p>
+                      <p className="text-[10px] text-gray-400">{new Date(log.created_at).toLocaleString('fr-DZ', { dateStyle: 'short', timeStyle: 'short' })}</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         </div>
       </div>

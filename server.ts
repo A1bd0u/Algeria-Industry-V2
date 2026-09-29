@@ -56,6 +56,7 @@ import aiRoutes from './server/routes/ai';
 import adminRoutes from './server/routes/admin';
 import searchRoutes from './server/routes/search';
 import contactRoutes from './server/routes/contact';
+import billingRoutes from './server/routes/billing';
 import { seoRouter, resolveMeta, injectMeta } from './server/seo';
 
 export async function createApp() {
@@ -156,6 +157,7 @@ export async function createApp() {
   app.use('/api/upload', uploadRoutes);
   app.use('/api/stats', statsRoutes);
   app.use('/api/ai', aiRoutes);
+  app.use('/api/admin/billing', billingRoutes);
   app.use('/api/admin', adminRoutes);
   app.use('/api/search', searchRoutes);
   app.use('/api/contact', contactRoutes);

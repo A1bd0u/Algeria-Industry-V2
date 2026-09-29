@@ -133,6 +133,18 @@ export default function GovSecurity({ state }: { state: any }) {
         return { label: 'Contenu Approuvé', color: 'text-teal-600 bg-teal-50 border-teal-100', icon: CheckCircle };
       case 'content_reject':
         return { label: 'Contenu Rejeté', color: 'text-red-600 bg-red-50 border-red-100', icon: AlertTriangle };
+      case 'subscription_create':
+        return { label: 'Facture Émise', color: 'text-indigo-600 bg-indigo-50 border-indigo-100', icon: FileText };
+      case 'subscription_activate':
+        return { label: 'Abonnement Activé', color: 'text-teal-600 bg-teal-50 border-teal-100', icon: CheckCircle };
+      case 'subscription_cancel':
+        return { label: 'Abonnement Annulé', color: 'text-red-600 bg-red-50 border-red-100', icon: AlertTriangle };
+      case 'ad_status_change':
+        return { label: 'Publicité Mise à Jour', color: 'text-gray-600 bg-gray-50 border-gray-100', icon: CheckCircle };
+      case 'support_message_update':
+        return { label: 'Support Traité', color: 'text-gray-600 bg-gray-50 border-gray-100', icon: CheckCircle };
+      case 'kyc_document_view':
+        return { label: 'Document KYC Consulté', color: 'text-gray-600 bg-gray-50 border-gray-100', icon: FileText };
       default:
         return { 
           label: action, 

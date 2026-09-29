@@ -55,6 +55,16 @@ Images picsum, prix par défaut de 850 000 DA, caractéristiques et spécificati
 ### SEO
 Balises `title`, description, Open Graph, `canonical` et JSON-LD (`Organization`, `LocalBusiness`, `Product`, `BreadcrumbList`) injectées côté serveur pour `/directory/:id`, `/products/:id` et `/blog/:id` ; `robots.txt` et sitemaps générés depuis la base (entreprises vérifiées, produits actifs, articles) ; `noindex` sur les pages privées et les fiches non revendiquées sans description ; image OG et favicon de la marque.
 
+## Console admin (mise à jour du 30 septembre)
+
+- **Abonnements & factures** : émission de facture (numérotation continue FA-AAAA-00001), activation pour 12 mois à réception du virement ou du chèque, annulation, facture imprimable (TVA 19 %), encaissements réels issus des transactions. Migration `20260930090000_admin_billing_and_support.sql`.
+- **Publicités** : publication, refus motivé et fin de campagne enregistrés en base.
+- **Support** : boîte de réception du formulaire de contact, note interne, suivi nouveau → en cours → traité.
+- **Catalogue produits** : retrait, remise en ligne, suppression.
+- **Blog** : création, édition, brouillon/publication et suppression d'articles ; API articles alignée sur le schéma.
+- **Menu** : badges des tâches en attente ; écrans sans données réelles retirés (rôles, exposants, catégories, configuration, télémétrie) ; vrai nom de l'admin connecté ; menu mobile.
+- 🧾 Renseigner `LEGAL_RIB` (ou `VITE_LEGAL_RIB`) pour afficher le RIB sur les factures.
+
 ## Reste à faire (code)
 
 1. Store de rate limiting partagé (Redis/Upstash) : plusieurs instances Cloud Run.
