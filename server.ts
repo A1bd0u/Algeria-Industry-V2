@@ -1,5 +1,6 @@
 import express from 'express';
 import path from 'path';
+import fs from 'fs';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import compression from 'compression';
@@ -17,12 +18,19 @@ if (process.env.SENTRY_DSN && process.env.SENTRY_DSN.startsWith('http')) {
     integrations: [
       nodeProfilingIntegration(),
     ],
-    tracesSampleRate: 1.0,
-    profilesSampleRate: 1.0,
+    // Échantillonnage réduit (coût) : 10 % des transactions.
+    tracesSampleRate: Number(process.env.SENTRY_TRACES_SAMPLE_RATE || 0.1),
+    profilesSampleRate: Number(process.env.SENTRY_PROFILES_SAMPLE_RATE || 0.1),
+    sendDefaultPii: false,
     beforeSend(event) {
-      if (event.request && event.request.headers) {
-        delete event.request.headers['authorization'];
-        delete event.request.headers['cookie'];
+      if (event.request) {
+        if (event.request.headers) {
+          delete event.request.headers['authorization'];
+          delete event.request.headers['cookie'];
+        }
+        delete event.request.cookies;
+        // Le corps peut contenir des mots de passe ou des codes.
+        delete event.request.data;
       }
       return event;
     }
@@ -47,6 +55,8 @@ import statsRoutes from './server/routes/stats';
 import aiRoutes from './server/routes/ai';
 import adminRoutes from './server/routes/admin';
 import searchRoutes from './server/routes/search';
+import contactRoutes from './server/routes/contact';
+import { seoRouter, resolveMeta, injectMeta } from './server/seo';
 
 export async function createApp() {
   const app = express();
@@ -59,15 +69,11 @@ export async function createApp() {
   // Compression (gzip)
   app.use(compression());
 
-  // Configuration du trust proxy
-  // 1 = Trust le premier proxy (ex: Cloud Run).
-  // Si vous placez Cloudflare devant :
-  // - Cloudflare offre un WAF (Web Application Firewall) et une protection anti-DDoS.
-  // - Il fait aussi office de CDN pour le cache.
-  // - Assurez-vous que l'application n'est accessible que via Cloudflare (règles de pare-feu)
-  //   auquel cas vous pouvez utiliser `app.set('trust proxy', true)` ou lister les IPs Cloudflare.
-  // - Turnstile s'intègre parfaitement avec Cloudflare (qui gère son backend).
-  app.set('trust proxy', 1);
+  // Trust proxy : 1 = le load balancer Cloud Run. Derrière Cloudflare, l'IP
+  // réelle du visiteur est lue dans CF-Connecting-IP (BEHIND_CLOUDFLARE=true,
+  // voir server/utils/clientIp.ts) ; n'accepter alors que le trafic Cloudflare.
+  app.set('trust proxy', Number(process.env.TRUST_PROXY_HOPS || 1));
+  app.disable('x-powered-by');
 
   const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || '';
   let supabaseDomain = '';
@@ -79,20 +85,32 @@ export async function createApp() {
     logger.error('Invalid Supabase URL for CSP config', e);
   }
 
+  const isDev = process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'test';
+  const sentryOrigins = ['https://*.ingest.sentry.io', 'https://*.ingest.de.sentry.io', 'https://*.ingest.us.sentry.io'];
+
   // Security HTTP Headers
+  // - frame-ancestors 'none' : pas de clickjacking de la console admin.
+  // - pas d'unsafe-eval ; connect-src limité à Supabase, Sentry et Turnstile.
+  // - le websocket (HMR Vite) n'est autorisé qu'en développement.
   app.use(helmet({
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
-        connectSrc: ["'self'", supabaseDomain, "ws:", "wss:"].filter(Boolean),
-        imgSrc: ["'self'", 'data:', 'blob:', supabaseDomain, "https:"].filter(Boolean),
-        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
-        styleSrc: ["'self'", "'unsafe-inline'", "https:"],
-        fontSrc: ["'self'", "data:", "https:"],
-        frameAncestors: ["*"],
+        connectSrc: ["'self'", supabaseDomain, ...sentryOrigins, 'https://challenges.cloudflare.com', ...(isDev ? ['ws:', 'wss:'] : [])].filter(Boolean),
+        imgSrc: ["'self'", 'data:', 'blob:', supabaseDomain, 'https:'].filter(Boolean),
+        scriptSrc: ["'self'", "'unsafe-inline'", 'https://challenges.cloudflare.com', ...(isDev ? ["'unsafe-eval'"] : [])],
+        styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
+        fontSrc: ["'self'", 'data:', 'https://fonts.gstatic.com'],
+        frameSrc: ["'self'", 'https://challenges.cloudflare.com'],
+        workerSrc: ["'self'", 'blob:'],
+        objectSrc: ["'none'"],
+        baseUri: ["'self'"],
+        formAction: ["'self'"],
+        frameAncestors: ["'none'"],
       }
     },
-    crossOriginEmbedderPolicy: false
+    crossOriginEmbedderPolicy: false,
+    referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
   }));
 
   // Global Rate Limiting
@@ -139,6 +157,15 @@ export async function createApp() {
   app.use('/api/ai', aiRoutes);
   app.use('/api/admin', adminRoutes);
   app.use('/api/search', searchRoutes);
+  app.use('/api/contact', contactRoutes);
+
+  // Route API inconnue : 404 JSON plutôt que la page SPA.
+  app.use('/api', (req, res) => {
+    res.status(404).json({ error: 'Ressource introuvable', code: 'NOT_FOUND' });
+  });
+
+  // robots.txt et sitemaps générés depuis la base.
+  app.use(seoRouter);
 
   // Error handling middleware should be the last middleware
   app.use(errorHandler);
@@ -151,9 +178,6 @@ async function startServer() {
   const app = await createApp();
 
 
-  // Serve uploaded files statically
-
-
   // Vite middleware setup
   if (process.env.NODE_ENV !== 'production') {
     const { createServer: createViteServer } = await import('vite');
@@ -164,23 +188,37 @@ async function startServer() {
     app.use(vite.middlewares);
   } else {
     const distPath = path.join(process.cwd(), 'dist');
-    app.use(express.static(distPath));
-    app.get('*', (req, res) => {
-      res.sendFile(path.join(distPath, 'index.html'));
+    const indexHtml = fs.readFileSync(path.join(distPath, 'index.html'), 'utf-8');
+
+    // Les assets fingerprintés sont mis en cache longtemps ; index.html jamais.
+    app.use('/assets', express.static(path.join(distPath, 'assets'), { immutable: true, maxAge: '1y' }));
+    app.use(express.static(distPath, { index: false }));
+
+    // Balises SEO (titre, description, Open Graph, canonical, JSON-LD) injectées côté serveur.
+    app.get('*', async (req, res) => {
+      const meta = await resolveMeta(req.path);
+      res.set('Cache-Control', 'no-cache');
+      res.type('html').send(injectMeta(indexHtml, meta));
     });
   }
 
-  // Validation des variables d'environnement obligatoires
+  // Validation des variables d'environnement obligatoires.
+  // GEMINI_API_KEY est optionnelle : sans elle, la traduction renvoie 503.
   const requiredEnvVars = [
     'JWT_SECRET',
     'SUPABASE_URL',
     'SUPABASE_SERVICE_ROLE_KEY',
-    'GEMINI_API_KEY'
+    ...(process.env.NODE_ENV === 'production' ? ['APP_URL', 'RESEND_API_KEY', 'SENDER_EMAIL', 'TURNSTILE_SECRET_KEY'] : [])
   ];
 
   const missingEnvVars = requiredEnvVars.filter(
     (varName) => !process.env[varName] || process.env[varName].trim() === ''
   );
+
+  if (process.env.JWT_SECRET && process.env.JWT_SECRET.length < 32) {
+    logger.error('[ERREUR CONFIGURATION] JWT_SECRET doit contenir au moins 32 caractères.');
+    process.exit(1);
+  }
 
   if (missingEnvVars.length > 0) {
     logger.error(`[ERREUR CONFIGURATION] Variables d'environnement requises manquantes ou vides : ${missingEnvVars.join(', ')}`);

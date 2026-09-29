@@ -1,7 +1,0 @@
-User-agent: *
-Allow: /
-Disallow: /admin
-Disallow: /dashboard
-Disallow: /extranet
-
-Sitemap: https://votre-domaine.dz/sitemap.xml

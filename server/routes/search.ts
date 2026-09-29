@@ -4,20 +4,35 @@ import { getSupabase } from '../db/supabaseClient';
 
 const router = express.Router();
 
+const COMPANY_COLUMNS = 'id, reference_id, name, description, activity_sector, wilaya, status, certified, created_at';
+
+// Construit une requête tsquery préfixe sûre : seuls lettres et chiffres
+// (latin, arabe) sont conservés, pour éviter les erreurs de syntaxe tsquery.
+const toPrefixQuery = (q: string) =>
+  q
+    .normalize('NFKC')
+    .split(/\s+/)
+    .map((w) => w.replace(/[^\p{L}\p{N}]/gu, ''))
+    .filter((w) => w.length > 0)
+    .slice(0, 8)
+    .map((w) => `${w}:*`)
+    .join(' & ');
+
 router.get('/', async (req, res) => {
   try {
     const supabase = getSupabase();
     
     // params
-    const q = req.query.q as string || '';
+    const q = typeof req.query.q === 'string' ? req.query.q.slice(0, 200) : '';
     const type = req.query.type as string || 'all'; // 'all', 'companies', 'products'
     const wilaya = req.query.wilaya as string;
     const sector = req.query.sector as string; // or category for products
     const minPrice = req.query.minPrice ? parseFloat(req.query.minPrice as string) : undefined;
     const maxPrice = req.query.maxPrice ? parseFloat(req.query.maxPrice as string) : undefined;
     const status = req.query.status as string; // KYC status for companies
-    const limit = parseInt(req.query.limit as string) || 12;
-    const cursor = req.query.cursor as string; // date string (e.g. 2026-07-05T00:00:00.000Z)
+    const limit = Math.min(Math.max(parseInt(req.query.limit as string) || 12, 1), 50);
+    const rawCursor = req.query.cursor as string;
+    const cursor = rawCursor && !Number.isNaN(Date.parse(rawCursor)) ? new Date(rawCursor).toISOString() : undefined; // date string (e.g. 2026-07-05T00:00:00.000Z)
 
     let companies: any[] = [];
     let products: any[] = [];
@@ -25,11 +40,11 @@ router.get('/', async (req, res) => {
 
     // Search Companies
     if (type === 'all' || type === 'companies') {
-      let query = supabase.from('companies').select('*');
+      let query = supabase.from('companies').select(COMPANY_COLUMNS);
       
       if (q) {
          // Format search query to be prefix matching: "word:*"
-         const formattedQuery = q.split(' ').filter(w => w.length > 0).map(w => `${w}:*`).join(' & ');
+         const formattedQuery = toPrefixQuery(q);
          if (formattedQuery) {
             query = query.textSearch('fts', formattedQuery);
          }
@@ -48,7 +63,7 @@ router.get('/', async (req, res) => {
          logger.error('Company search error:', error);
          // Fallback if columns don't exist
          if (error.code === '42703') {
-            const fallbackQuery = supabase.from('companies').select('*').order('created_at', { ascending: false }).limit(limit + 1);
+            const fallbackQuery = supabase.from('companies').select(COMPANY_COLUMNS).order('created_at', { ascending: false }).limit(limit + 1);
             const { data: fbData } = await fallbackQuery;
             if (fbData) companies = fbData;
          }
@@ -62,7 +77,7 @@ router.get('/', async (req, res) => {
       let query = supabase.from('products').select('*');
       
       if (q) {
-         const formattedQuery = q.split(' ').filter(w => w.length > 0).map(w => `${w}:*`).join(' & ');
+         const formattedQuery = toPrefixQuery(q);
          if (formattedQuery) {
             query = query.textSearch('fts', formattedQuery);
          }
@@ -109,7 +124,7 @@ router.get('/', async (req, res) => {
 
   } catch (err: any) {
     logger.error("Error GET /search:", err);
-    return res.status(500).json({ error: err.message });
+    return res.status(500).json({ error: 'Une erreur interne est survenue.' });
   }
 });
 

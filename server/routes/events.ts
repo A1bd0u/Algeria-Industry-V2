@@ -21,7 +21,7 @@ router.get('/', async (req, res) => {
     return res.json(events || []);
   } catch (err: any) {
     logger.error("Supabase Error GET /events:", err);
-    return res.status(500).json({ error: err.message });
+    return res.status(500).json({ error: 'Une erreur interne est survenue.' });
   }
 });
 

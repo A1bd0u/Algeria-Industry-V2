@@ -4,6 +4,8 @@ import { verifyRole } from '../middlewares/authMiddleware';
 import { getSupabase } from '../db/supabaseClient';
 import rateLimit from 'express-rate-limit';
 import { logAdminAction } from '../utils/auditLogger';
+import { requireUuidParams } from '../middlewares/validateParams';
+import { PUBLIC_USER_COLUMNS } from '../utils/userFields';
 
 const router = express.Router();
 
@@ -176,62 +178,45 @@ router.get('/dashboard', verifyRole(['admin']), adminDashboardLimiter, async (re
 });
 
 router.get('/analytics', verifyRole(['admin']), async (req, res) => {
-  const days = parseInt(req.query.timeframe as string, 10) || 30;
-  
-  const wilayaData = days <= 30 ? [
-    { name: 'Alger (16)', value: 4500, color: '#1B4D2E' },
-    { name: 'Oran (31)', value: 2800, color: '#0EA5E9' },
-    { name: 'Sétif (19)', value: 2100, color: '#F59E0B' },
-    { name: 'Hassi Messaoud (30)', value: 1900, color: '#8B5CF6' },
-    { name: 'Blida (09)', value: 1400, color: '#F43F5E' },
-  ] : [
-    { name: 'Alger (16)', value: 8500, color: '#1B4D2E' },
-    { name: 'Oran (31)', value: 4800, color: '#0EA5E9' },
-    { name: 'Sétif (19)', value: 3100, color: '#F59E0B' },
-    { name: 'Hassi Messaoud (30)', value: 3000, color: '#8B5CF6' },
-    { name: 'Blida (09)', value: 2400, color: '#F43F5E' },
-  ];
-  
-  const termsData = days <= 30 ? [
-    { term: 'Turbine', volume: 850 },
-    { term: 'Acier', volume: 620 },
-    { term: 'Solaire', volume: 540 },
-    { term: 'HSE', volume: 480 },
-    { term: 'Valves', volume: 390 },
-  ] : [
-    { term: 'Turbine', volume: 1650 },
-    { term: 'Acier', volume: 1420 },
-    { term: 'Solaire', volume: 1140 },
-    { term: 'HSE', volume: 980 },
-    { term: 'Valves', volume: 890 },
-  ];
+  const days = Math.min(Math.max(parseInt(req.query.timeframe as string, 10) || 30, 1), 365);
+  try {
+    const supabase = getSupabase();
+    const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
 
-  const registrationsData = days <= 30 ? [
-    { month: 'S1', count: 120 },
-    { month: 'S2', count: 150 },
-    { month: 'S3', count: 200 },
-    { month: 'S4', count: 180 },
-  ] : [
-    { month: 'Jan', count: 120 },
-    { month: 'Fév', count: 150 },
-    { month: 'Mar', count: 200 },
-    { month: 'Avr', count: 180 },
-    { month: 'Mai', count: 250 },
-    { month: 'Juin', count: 300 },
-    { month: 'Juil', count: 90 },
-    { month: 'Aoû', count: 110 },
-    { month: 'Sep', count: 160 },
-    { month: 'Oct', count: 140 },
-    { month: 'Nov', count: 190 },
-    { month: 'Déc', count: 210 },
-  ];
+    // Répartition réelle des entreprises par wilaya (colonne indexée).
+    const { data: companies } = await supabase.from('companies').select('wilaya').not('wilaya', 'is', null);
+    const palette = ['#1B4D2E', '#0EA5E9', '#F59E0B', '#8B5CF6', '#F43F5E'];
+    const wilayaCounts = new Map<string, number>();
+    (companies || []).forEach((c: any) => wilayaCounts.set(c.wilaya, (wilayaCounts.get(c.wilaya) || 0) + 1));
+    const wilayas = Array.from(wilayaCounts.entries())
+      .sort((x, y) => y[1] - x[1])
+      .slice(0, 5)
+      .map(([name, value], i) => ({ name, value, color: palette[i] }));
 
-  return res.json({
-    wilayas: wilayaData,
-    searchTerms: termsData,
-    registrations: registrationsData,
-    totalIntents: days <= 30 ? 12700 : 21800
-  });
+    // Inscriptions réelles, regroupées par semaine (≤ 30 j) ou par mois.
+    const { data: users } = await supabase.from('users').select('created_at').gte('created_at', since.toISOString());
+    const buckets = new Map<string, number>();
+    (users || []).forEach((u: any) => {
+      const d = new Date(u.created_at);
+      const key = days <= 30
+        ? `S${Math.floor((d.getTime() - since.getTime()) / (7 * 24 * 60 * 60 * 1000)) + 1}`
+        : d.toLocaleDateString('fr-FR', { month: 'short', year: '2-digit' });
+      buckets.set(key, (buckets.get(key) || 0) + 1);
+    });
+    const registrations = Array.from(buckets.entries()).map(([month, count]) => ({ month, count }));
+
+    // Les recherches ne sont pas encore mesurées : liste vide plutôt que des chiffres inventés.
+    return res.json({
+      wilayas,
+      searchTerms: [],
+      registrations,
+      totalIntents: null,
+      searchTrackingAvailable: false
+    });
+  } catch (err) {
+    logger.error('Error GET /api/admin/analytics', err);
+    return res.status(500).json({ error: 'Une erreur interne est survenue.' });
+  }
 });
 
 // GET /api/admin/audit-logs - Get admin audit logs
@@ -252,7 +237,7 @@ router.get('/audit-logs', verifyRole(['admin']), async (req, res) => {
     return res.json({ success: true, data });
   } catch (err: any) {
     logger.error("Error GET /api/admin/audit-logs:", err);
-    return res.status(500).json({ error: err.message });
+    return res.status(500).json({ error: 'Une erreur interne est survenue.' });
   }
 });
 
@@ -261,11 +246,11 @@ router.get('/audit-logs', verifyRole(['admin']), async (req, res) => {
 router.get('/users', verifyRole(['admin']), async (req, res) => {
   try {
     const supabase = getSupabase();
-    const { data, error } = await supabase.from('users').select('*').order('created_at', { ascending: false });
+    const { data, error } = await supabase.from('users').select(PUBLIC_USER_COLUMNS).order('created_at', { ascending: false });
     if (error) throw error;
     res.json({ success: true, data });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Une erreur interne est survenue.' });
   }
 });
 
@@ -277,7 +262,7 @@ router.get('/companies', verifyRole(['admin']), async (req, res) => {
     if (error) throw error;
     res.json({ success: true, data });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Une erreur interne est survenue.' });
   }
 });
 
@@ -285,18 +270,13 @@ router.get('/companies', verifyRole(['admin']), async (req, res) => {
 router.get('/roles', verifyRole(['admin']), async (req, res) => {
   try {
     const supabase = getSupabase();
-    // Assuming 'roles' table exists, if not return mock to avoid crashing
     const { data, error } = await supabase.from('roles').select('*');
     if (error) {
-      // Fallback
-      return res.json({ success: true, data: [
-         { id: 1, role: 'Super Admin', users: 2, access: 'Total', color: 'bg-primary' },
-         { id: 2, role: 'Modérateur Content', users: 5, access: 'Catalogue & Articles', color: 'bg-emerald-500' },
-      ]});
+      return res.json({ success: true, data: [] });
     }
     res.json({ success: true, data });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Une erreur interne est survenue.' });
   }
 });
 
@@ -306,13 +286,11 @@ router.get('/support/tickets', verifyRole(['admin']), async (req, res) => {
     const supabase = getSupabase();
     const { data, error } = await supabase.from('support_tickets').select('*');
     if (error) {
-       return res.json({ success: true, data: [
-          { id: 1, user: "Sarl Algeria Tech", subject: "Problème upload PDF catalogue", priority: "Haute", status: "Nouveau" }
-       ]});
+       return res.json({ success: true, data: [] });
     }
     res.json({ success: true, data });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Une erreur interne est survenue.' });
   }
 });
 
@@ -328,7 +306,7 @@ router.get('/categories', verifyRole(['admin']), async (req, res) => {
     }
     res.json({ success: true, data });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Une erreur interne est survenue.' });
   }
 });
 
@@ -339,7 +317,7 @@ router.get('/products', verifyRole(['admin']), async (req, res) => {
     const supabase = getSupabase();
     const { data, error } = await supabase.from('products').select('*').order('created_at', { ascending: false });
     res.json({ success: true, data: error ? [] : data });
-  } catch (error: any) { res.status(500).json({ error: error.message }); }
+  } catch (error: any) { res.status(500).json({ error: 'Une erreur interne est survenue.' }); }
 });
 
 // GET /api/admin/ads
@@ -348,7 +326,7 @@ router.get('/ads', verifyRole(['admin']), async (req, res) => {
     const supabase = getSupabase();
     const { data, error } = await supabase.from('ads').select('*').order('created_at', { ascending: false });
     res.json({ success: true, data: error ? [] : data });
-  } catch (error: any) { res.status(500).json({ error: error.message }); }
+  } catch (error: any) { res.status(500).json({ error: 'Une erreur interne est survenue.' }); }
 });
 
 // GET /api/admin/exhibitors
@@ -357,12 +335,10 @@ router.get('/exhibitors', verifyRole(['admin']), async (req, res) => {
     const supabase = getSupabase();
     const { data, error } = await supabase.from('exhibitors').select('*');
     if (error) {
-       return res.json({ success: true, data: [
-          { id: 1, name: "Sonatrach", category: "Énergie & Mines", type: "Grande Entreprise", region: "Alger", status: "Premium", added: "2023-11-20" }
-       ]});
+       return res.json({ success: true, data: [] });
     }
     res.json({ success: true, data });
-  } catch (error: any) { res.status(500).json({ error: error.message }); }
+  } catch (error: any) { res.status(500).json({ error: 'Une erreur interne est survenue.' }); }
 });
 
 // GET /api/admin/telemetry
@@ -381,51 +357,76 @@ router.get('/settings', verifyRole(['admin']), async (req, res) => {
 });
 
 
-// GET /api/admin/moderation - Get reported content
+// GET /api/admin/moderation - Signalements en attente
 router.get('/moderation', verifyRole(['admin']), async (req, res) => {
   try {
     const supabase = getSupabase();
-    const { data, error } = await supabase.from('reports').select('*').eq('status', 'pending').order('created_at', { ascending: false });
-    if (error) {
-      return res.json({ success: true, data: [
-        { id: '1', type: 'product', target_id: 'prod-123', reason: 'Contenu inapproprié', status: 'pending', created_at: new Date().toISOString() },
-        { id: '2', type: 'company', target_id: 'comp-456', reason: 'Informations frauduleuses', status: 'pending', created_at: new Date().toISOString() }
-      ]});
-    }
-    return res.json({ success: true, data });
+    const { data, error } = await supabase
+      .from('reports')
+      .select('id, target_type, target_id, reason, status, created_at, reporter:users!reporter_id(name)')
+      .eq('status', 'pending')
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    // "type" conservé pour la console existante.
+    return res.json({ success: true, data: (data || []).map((r: any) => ({ ...r, type: r.target_type })) });
   } catch (err: any) {
-    return res.status(500).json({ error: err.message });
+    logger.error('Error GET /api/admin/moderation', err);
+    return res.status(500).json({ error: 'Une erreur interne est survenue.' });
   }
 });
 
-// POST /api/admin/moderation/:id/approve
-router.post('/moderation/:id/approve', verifyRole(['admin']), async (req, res) => {
+const REPORT_TABLES: Record<string, string> = { product: 'products', tender: 'tenders' };
+
+// POST /api/admin/moderation/:id/approve - Signalement infondé : le contenu reste en ligne
+router.post('/moderation/:id/approve', verifyRole(['admin']), requireUuidParams('id'), async (req, res) => {
   try {
     const { id } = req.params;
+    const supabase = getSupabase();
+    const { error } = await supabase.from('reports').update({ status: 'resolved' }).eq('id', id);
+    if (error) throw error;
     await logAdminAction(req, 'content_approve', { reportId: id });
-    const supabase = getSupabase();
-    await supabase.from('reports').update({ status: 'resolved' }).eq('id', id);
     res.json({ success: true });
   } catch (err: any) {
-    res.status(500).json({ error: err.message });
+    logger.error('Error approve moderation', err);
+    res.status(500).json({ error: 'Une erreur interne est survenue.' });
   }
 });
 
-// POST /api/admin/moderation/:id/reject
-router.post('/moderation/:id/reject', verifyRole(['admin']), async (req, res) => {
+// POST /api/admin/moderation/:id/reject - Signalement fondé : le contenu est dépublié
+router.post('/moderation/:id/reject', verifyRole(['admin']), requireUuidParams('id'), async (req, res) => {
   try {
     const { id } = req.params;
-    await logAdminAction(req, 'content_reject', { reportId: id });
     const supabase = getSupabase();
-    await supabase.from('reports').update({ status: 'action_taken' }).eq('id', id);
+    const { data: report } = await supabase
+      .from('reports')
+      .select('target_type, target_id')
+      .eq('id', id)
+      .maybeSingle();
+    if (!report) {
+      return res.status(404).json({ error: 'Signalement introuvable' });
+    }
+
+    const table = REPORT_TABLES[report.target_type];
+    if (table) {
+      await supabase.from(table).update({ status: 'signalé' }).eq('id', report.target_id);
+    }
+    // Tous les signalements du même contenu sont clos ensemble.
+    await supabase
+      .from('reports')
+      .update({ status: 'action_taken' })
+      .eq('target_type', report.target_type)
+      .eq('target_id', report.target_id);
+
+    await logAdminAction(req, 'content_reject', { reportId: id, targetType: report.target_type, targetId: report.target_id });
     res.json({ success: true });
   } catch (err: any) {
-    res.status(500).json({ error: err.message });
+    logger.error('Error reject moderation', err);
+    res.status(500).json({ error: 'Une erreur interne est survenue.' });
   }
 });
 
 // DELETE /api/admin/products/:id
-router.delete('/products/:id', verifyRole(['admin']), async (req, res) => {
+router.delete('/products/:id', verifyRole(['admin']), requireUuidParams('id'), async (req, res) => {
   try {
     const { id } = req.params;
     await logAdminAction(req, 'product_delete', { productId: id });
@@ -433,12 +434,12 @@ router.delete('/products/:id', verifyRole(['admin']), async (req, res) => {
     await supabase.from('products').delete().eq('id', id);
     res.json({ success: true });
   } catch (err: any) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'Une erreur interne est survenue.' });
   }
 });
 
 // DELETE /api/admin/companies/:id
-router.delete('/companies/:id', verifyRole(['admin']), async (req, res) => {
+router.delete('/companies/:id', verifyRole(['admin']), requireUuidParams('id'), async (req, res) => {
   try {
     const { id } = req.params;
     await logAdminAction(req, 'company_delete', { companyId: id });
@@ -446,7 +447,7 @@ router.delete('/companies/:id', verifyRole(['admin']), async (req, res) => {
     await supabase.from('companies').delete().eq('id', id);
     res.json({ success: true });
   } catch (err: any) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'Une erreur interne est survenue.' });
   }
 });
 

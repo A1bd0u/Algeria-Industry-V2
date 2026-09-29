@@ -1,17 +1,32 @@
 import { logger } from '../utils/logger';
 import express from 'express';
+import { z } from 'zod';
 import { getSupabase } from '../db/supabaseClient';
-import { requireAuth, requireVerified } from '../middlewares/authMiddleware';
+import { requireAuth, requireEmailVerified } from '../middlewares/authMiddleware';
+import { requireUuidParams, isUuid } from '../middlewares/validateParams';
+import { validate } from '../middlewares/validateMiddleware';
 
 const router = express.Router();
 
+const messageSchema = z.object({
+  text: z.string().trim().min(1, 'Message vide').max(5000, 'Message trop long'),
+  receiver_id: z.string().uuid('Destinataire invalide'),
+});
+
+const formatTime = (iso: string) =>
+  new Date(iso).toLocaleTimeString('fr-DZ', { hour: '2-digit', minute: '2-digit' });
+
 // GET /api/messages/conversations - List conversations for the logged in user
-router.get('/conversations', requireAuth, async (req, res) => {
+router.get('/conversations', requireAuth, async (req, res, next) => {
   const user = (req as any).user;
+  // L'identifiant vient de la base (requireAuth), mais on le revalide
+  // avant de le concaténer dans un filtre PostgREST.
+  if (!isUuid(user.id)) {
+    return res.status(400).json({ error: 'Identifiant invalide', code: 'INVALID_ID' });
+  }
   try {
     const supabase = getSupabase();
-    
-    // Get all messages where user is sender or receiver
+
     const { data: messages, error } = await supabase
       .from('messages')
       .select('*, sender:users!sender_id(id, name), receiver:users!receiver_id(id, name)')
@@ -20,20 +35,19 @@ router.get('/conversations', requireAuth, async (req, res) => {
 
     if (error) throw error;
 
-    // Group into conversations
     const convos = new Map();
     (messages || []).forEach((m: any) => {
        const otherId = m.sender_id === user.id ? m.receiver_id : m.sender_id;
-       if (!otherId) return; // General? Or just ignore
-       
+       if (!otherId) return;
+
        if (!convos.has(otherId)) {
           const otherUser = m.sender_id === user.id ? m.receiver : m.sender;
           convos.set(otherId, {
              id: otherId,
-             name: otherUser?.name || `Utilisateur ${otherId.substring(0, 4)}`,
+             name: otherUser?.name || 'Utilisateur',
              lastMessage: {
                 text: m.text,
-                time: new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                time: formatTime(m.created_at),
                 created_at: m.created_at
              },
              unread: 0
@@ -44,71 +58,79 @@ router.get('/conversations', requireAuth, async (req, res) => {
     return res.json(Array.from(convos.values()));
   } catch (err: any) {
     logger.error("Error GET /conversations:", err);
-    return res.status(500).json({ error: err.message });
+    next(err);
   }
 });
 
 // GET /api/messages/:conversationId - Liste des messages d'une conversation
-router.get('/:conversationId', requireAuth, async (req, res) => {
+router.get('/:conversationId', requireAuth, requireUuidParams('conversationId'), async (req, res, next) => {
   const user = (req as any).user;
   const { conversationId } = req.params;
+  if (!isUuid(user.id)) {
+    return res.status(400).json({ error: 'Identifiant invalide', code: 'INVALID_ID' });
+  }
   try {
     const supabase = getSupabase();
-    
+
     const { data: messages, error } = await supabase
       .from('messages')
       .select('*')
       .or(`and(sender_id.eq.${user.id},receiver_id.eq.${conversationId}),and(sender_id.eq.${conversationId},receiver_id.eq.${user.id})`)
       .order('created_at', { ascending: true });
 
-    if (error) {
-      throw error;
-    }
+    if (error) throw error;
 
-    // Map sender info for the frontend
     const mapped = (messages || []).map((m: any) => ({
        ...m,
        sender: m.sender_id === user.id ? 'me' : 'them',
-       time: new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+       time: formatTime(m.created_at)
     }));
 
     return res.json(mapped);
   } catch (err: any) {
     logger.error("Supabase Error GET /messages/:conversationId:", err);
-    return res.status(500).json({ error: err.message });
+    next(err);
   }
 });
 
 // POST /api/messages - Envoyer un message
-router.post('/', requireAuth, requireVerified, async (req, res) => {
+router.post('/', requireAuth, requireEmailVerified, validate(messageSchema), async (req, res, next) => {
   const { text, receiver_id } = req.body;
   const user = (req as any).user;
 
-  if (!receiver_id || !text) {
-     return res.status(400).json({ error: "Missing text or receiver_id" });
+  if (receiver_id === user.id) {
+    return res.status(400).json({ error: 'Vous ne pouvez pas vous écrire à vous-même.', code: 'MESSAGE_SELF' });
   }
 
   try {
     const supabase = getSupabase();
-    
+
+    const { data: receiver } = await supabase
+      .from('users')
+      .select('id')
+      .eq('id', receiver_id)
+      .maybeSingle();
+
+    if (!receiver) {
+      return res.status(404).json({ error: 'Destinataire introuvable', code: 'RECEIVER_NOT_FOUND' });
+    }
+
     const { data, error } = await supabase
       .from('messages')
       .insert([{ text, sender_id: user.id, receiver_id }])
       .select()
       .single();
-      
+
     if (error) throw error;
-    
-    const mapped = {
+
+    return res.status(201).json({
        ...data,
        sender: 'me',
-       time: new Date(data.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    };
-
-    return res.status(201).json(mapped);
+       time: formatTime(data.created_at)
+    });
   } catch (err: any) {
     logger.error("Supabase Error POST /messages:", err);
-    return res.status(500).json({ error: err.message });
+    next(err);
   }
 });
 

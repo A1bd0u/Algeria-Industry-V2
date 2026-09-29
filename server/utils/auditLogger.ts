@@ -1,6 +1,7 @@
 import { logger } from './logger';
 import { Request } from 'express';
 import { getSupabase } from '../db/supabaseClient';
+import { getClientIp } from './clientIp';
 
 export interface AuditLogDetails {
   targetUserId?: string;
@@ -16,11 +17,11 @@ export interface AuditLogDetails {
  */
 export async function logAdminAction(
   req: Request,
-  action: 'suspension' | 'reactivation' | 'user_delete' | 'role_change' | 'kyc_approve' | 'kyc_reject' | 'dashboard_consultation' | 'product_delete' | 'company_delete' | 'content_approve' | 'content_reject',
+  action: 'suspension' | 'reactivation' | 'user_delete' | 'role_change' | 'kyc_approve' | 'kyc_reject' | 'dashboard_consultation' | 'product_delete' | 'company_delete' | 'content_approve' | 'content_reject' | 'kyc_document_view' | 'report_resolve',
   details: AuditLogDetails
 ): Promise<void> {
   const adminUser = (req as any).user;
-  const ipAddress = req.ip || req.socket.remoteAddress || 'unknown';
+  const ipAddress = getClientIp(req);
   const timestamp = new Date().toISOString();
 
   const logPayload = {

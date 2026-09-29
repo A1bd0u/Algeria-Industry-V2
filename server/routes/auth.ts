@@ -1,17 +1,26 @@
 import { logger } from '../utils/logger';
 import express from 'express';
 import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import { getSupabase } from '../db/supabaseClient';
 import { z } from 'zod';
 import { validate } from '../middlewares/validateMiddleware';
-import { authLimiter } from '../middlewares/rateLimiter';
-
+import { authLimiter, authIpLimiter, verifyCodeLimiter } from '../middlewares/rateLimiter';
+import { requireAuth } from '../middlewares/authMiddleware';
 import { generateReferenceId } from '../utils/reference';
-import crypto from 'crypto';
-import { sendTransactionalEmail } from '../services/emailService';
+import { sendTransactionalEmail, getAppUrl } from '../services/emailService';
+import { issueSession, clearSession } from '../utils/session';
+import { getClientIp } from '../utils/clientIp';
+import { PUBLIC_USER_COLUMNS, toPublicUser, extractCompanyStatus } from '../utils/userFields';
+import { isPasswordPwned } from '../utils/pwnedPasswords';
+import { verifyCaptcha } from '../utils/captcha';
 
 const router = express.Router();
+
+export const BCRYPT_COST = 12;
+const MAX_FAILED_LOGINS = 5;
+const LOGIN_WINDOW_MS = 15 * 60 * 1000;
 
 const loginSchema = z.object({
   email: z.string().email('Email invalide'),
@@ -20,15 +29,16 @@ const loginSchema = z.object({
 });
 
 const passwordValidation = z.string()
-  .min(8, 'Le mot de passe doit contenir au moins 8 caractères')
+  .min(10, 'Le mot de passe doit contenir au moins 10 caractères')
+  .max(128, 'Le mot de passe est trop long')
   .regex(/[a-zA-Z]/, 'Le mot de passe doit contenir au moins une lettre')
   .regex(/[0-9]/, 'Le mot de passe doit contenir au moins un chiffre');
 
 const registerSchema = z.object({
-  name: z.string().min(2, 'Nom trop court'),
+  name: z.string().trim().min(2, 'Nom trop court').max(120),
   email: z.string().email('Email invalide'),
   password: passwordValidation,
-  company: z.string().optional(),
+  company: z.string().trim().max(200).optional(),
   role: z.enum(['acheteur', 'fournisseur', 'exposant']).optional(),
   captchaToken: z.string({ message: 'Captcha requis' }).min(1, 'Captcha requis')
 });
@@ -45,7 +55,7 @@ const resetPasswordSchema = z.object({
 
 const verifyCodeSchema = z.object({
   email: z.string().email('Email invalide'),
-  code: z.string().min(1, 'Code invalide') // Was 6, make it 1 minimum
+  code: z.string().regex(/^\d{6}$/, 'Code invalide')
 });
 
 const resendCodeSchema = z.object({
@@ -53,391 +63,263 @@ const resendCodeSchema = z.object({
   captchaToken: z.string({ message: 'Captcha requis' }).min(1, 'Captcha requis')
 });
 
-const JWT_SECRET = process.env.JWT_SECRET || '';
+const normalizeEmail = (email: string) => email.trim().toLowerCase();
 
-const normalizeUser = (user: any) => {
-  if (!user) return user;
-  if (user.passwordhash !== undefined && user.passwordHash === undefined) {
-    user.passwordHash = user.passwordhash;
-  }
-  if (user.isverified !== undefined && user.isVerified === undefined) {
-    user.isVerified = user.isverified;
-  }
-  return user;
+const generateCode = () => crypto.randomInt(100000, 1000000).toString();
+
+const hashPassword = (password: string) => bcrypt.hash(password, BCRYPT_COST);
+
+const readPasswordHash = (row: any): string => row?.passwordHash ?? row?.passwordhash ?? '';
+
+const fetchPublicUser = async (userId: string) => {
+  const supabase = getSupabase();
+  const { data } = await supabase
+    .from('users')
+    .select(`${PUBLIC_USER_COLUMNS}, companies!users_company_id_fkey(status)`)
+    .eq('id', userId)
+    .maybeSingle();
+  if (!data) return null;
+  return toPublicUser(data, extractCompanyStatus((data as any).companies));
+};
+
+const storeVerificationCode = async (email: string, name: string) => {
+  const supabase = getSupabase();
+  const code = generateCode();
+  const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString();
+
+  await supabase.from('email_verification_codes').delete().eq('email', email);
+  await supabase.from('email_verification_codes').insert({ email, code, expires_at: expiresAt });
+  await sendTransactionalEmail(email, 'verificationCode', { name, code });
 };
 
 // API - Auth - Get Current User
-router.get('/me', async (req, res) => {
-  const token = req.cookies.token;
-  if (!token) {
-    return res.status(401).json({ error: 'Non authentifié - Aucun token fourni' });
-  }
-
+// Les données viennent exclusivement de la base, via une liste blanche de colonnes.
+router.get('/me', requireAuth, async (req, res, next) => {
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as any;
-    
-    // Attempt to fetch from Supabase
-    try {
-      const supabase = getSupabase();
-      const { data: foundUser, error } = await supabase
-        .from('users')
-        .select('*, companies!users_company_id_fkey(status)')
-        .eq('id', decoded.id)
-        .single();
-        
-      if (foundUser && !error) {
-        normalizeUser(foundUser);
-        foundUser.isVerified = Boolean(foundUser.isVerified);
-        
-        let cStatus = null;
-        if (foundUser.companies && foundUser.companies.status) {
-           cStatus = foundUser.companies.status;
-        } else if (Array.isArray(foundUser.companies) && foundUser.companies.length > 0 && foundUser.companies[0].status) {
-           cStatus = foundUser.companies[0].status;
-        }
-        
-        foundUser.companyStatus = cStatus;
-        foundUser.emailVerified = foundUser.isVerified || false;
-        delete foundUser.companies; // optional cleanup
-        return res.json({ user: foundUser });
-      }
-    } catch (dbError) {
-      // Supabase not configured yet, fallback to JWT decoded payload for smooth preview
-      console.warn("Supabase check failed on /me:", dbError);
+    const user = await fetchPublicUser((req as any).user.id);
+    if (!user) {
+      return res.status(401).json({ error: 'Session expirée ou invalide' });
     }
-    
-    return res.json({ user: decoded }); // Fallback to token data
+    return res.json({ user });
   } catch (err) {
-    return res.status(401).json({ error: 'Session expirée ou invalide' });
+    next(err);
   }
 });
 
 // API - Auth - Login
-// Verify Captcha helper
-const verifyCaptcha = async (token: string) => {
-  const secret = process.env.TURNSTILE_SECRET_KEY;
-  if (!secret) {
-    if (process.env.NODE_ENV === 'production') {
-      logger.error('Configuration error: TURNSTILE_SECRET_KEY is missing');
-      return false; // Force verification failure in production if no secret
-    }
-    return true; // Skip verification in dev
-  }
-  try {
-    const formData = new URLSearchParams();
-    formData.append('secret', secret);
-    formData.append('response', token);
-    const result = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
-      method: 'POST',
-      body: formData
-    });
-    const outcome = await result.json();
-    return outcome.success;
-  } catch (err) {
-    logger.error('Captcha verification error:', err);
-    return false;
-  }
-};
-
-router.post('/login', authLimiter, validate(loginSchema), async (req, res) => {
-  const { email, password, captchaToken } = req.body;
+router.post('/login', authIpLimiter, authLimiter, validate(loginSchema), async (req, res) => {
+  const { password, captchaToken } = req.body;
+  const email = normalizeEmail(req.body.email);
 
   const isCaptchaValid = await verifyCaptcha(captchaToken);
   if (!isCaptchaValid) {
-    return res.status(400).json({ error: 'Validation captcha échouée' });
-  }
-
-  if (!email || !password) {
-    return res.status(400).json({ error: 'Veuillez saisir l\'email et le mot de passe' });
+    return res.status(400).json({ error: 'Validation captcha échouée', code: 'CAPTCHA_FAILED' });
   }
 
   try {
     const supabase = getSupabase();
-    const ipAddress = req.ip || req.socket?.remoteAddress || 'unknown';
+    const ipAddress = getClientIp(req);
 
-    // 1. Verrouillage anti-brute-force avec la table login_attempts
-    const fifteenMinsAgo = new Date(Date.now() - 15 * 60 * 1000).toISOString();
-    const { count } = await supabase
+    // Délai progressif plutôt que blocage sec : après 5 échecs, l'attente
+    // double à chaque nouvel échec (1, 2, 4… min, plafonnée à 15 min).
+    // La réinitialisation du mot de passe par e-mail efface le compteur.
+    const windowStart = new Date(Date.now() - LOGIN_WINDOW_MS).toISOString();
+    const { data: attempts } = await supabase
       .from('login_attempts')
-      .select('*', { count: 'exact', head: true })
+      .select('attempt_time')
       .eq('email', email)
-      .gte('attempt_time', fifteenMinsAgo);
+      .gte('attempt_time', windowStart)
+      .order('attempt_time', { ascending: false });
 
-    if (count !== null && count >= 5) {
-      return res.status(401).json({ error: 'Email ou mot de passe incorrect' });
+    const failedCount = attempts?.length || 0;
+    if (failedCount >= MAX_FAILED_LOGINS && attempts?.[0]) {
+      const delayMs = Math.min(2 ** (failedCount - MAX_FAILED_LOGINS) * 60 * 1000, LOGIN_WINDOW_MS);
+      const retryAt = new Date(attempts[0].attempt_time).getTime() + delayMs;
+      if (Date.now() < retryAt) {
+        res.setHeader('Retry-After', Math.ceil((retryAt - Date.now()) / 1000).toString());
+        return res.status(429).json({
+          error: 'Trop de tentatives. Réessayez dans quelques minutes ou réinitialisez votre mot de passe.',
+          code: 'LOGIN_THROTTLED'
+        });
+      }
     }
-    
-    // Check if exists
-    const { data: dbUser, error } = await supabase
+
+    // select('*') reste côté serveur : le hash n'est jamais renvoyé.
+    const { data: dbUser } = await supabase
       .from('users')
-      .select('*, companies!users_company_id_fkey(status)')
+      .select('*')
       .ilike('email', email)
       .maybeSingle();
 
-    const isValid = dbUser ? await bcrypt.compare(password, dbUser.passwordHash || '') : false;
+    const isValid = dbUser ? await bcrypt.compare(password, readPasswordHash(dbUser)) : false;
 
     if (!dbUser || !isValid) {
-      // 2. Enregistrement de la tentative échouée
       await supabase.from('login_attempts').insert({
         email,
         ip_address: ipAddress,
         attempt_time: new Date().toISOString()
       });
 
-      // Vérifier si on vient d'atteindre la limite pour alerter
-      const { count: newCount } = await supabase
-        .from('login_attempts')
-        .select('*', { count: 'exact', head: true })
-        .eq('email', email)
-        .gte('attempt_time', fifteenMinsAgo);
-
-      if (newCount === 5) {
-        await sendTransactionalEmail(email, 'securityAlert', { ip: ipAddress });
+      if (dbUser && failedCount + 1 === MAX_FAILED_LOGINS) {
+        await sendTransactionalEmail(dbUser.email, 'securityAlert', { ip: ipAddress });
       }
 
-      return res.status(401).json({ error: 'Email ou mot de passe incorrect' });
+      return res.status(401).json({ error: 'Email ou mot de passe incorrect', code: 'AUTH_INVALID' });
     }
 
-    const user = normalizeUser(dbUser);
-
-    const { companies, ...userData } = user;
-    if (companies && !Array.isArray(companies)) {
-       (userData as any).companyStatus = (companies as any).status;
-    } else if (Array.isArray(companies) && companies.length > 0) {
-       (userData as any).companyStatus = companies[0].status;
-    }
-    
-    if (user.role && user.role.endsWith('_suspended')) {
-      return res.status(403).json({ error: 'Ce compte a été suspendu par l\'administrateur.' });
+    if (dbUser.role && String(dbUser.role).endsWith('_suspended')) {
+      return res.status(403).json({ error: 'Ce compte a été suspendu par l\'administrateur.', code: 'ACCOUNT_SUSPENDED' });
     }
 
-    // 3. Réinitialisation du compteur après succès
     await supabase.from('login_attempts').delete().eq('email', email);
 
-    // Legacy fields cleanup (optional but good for consistency)
-    if ((user.failed_login_attempts && user.failed_login_attempts > 0) || user.account_locked_until || user.last_failed_login_at) {
-      await supabase.from('users').update({ 
-        failed_login_attempts: 0, 
-        account_locked_until: null,
-        last_failed_login_at: null
-      }).eq('id', user.id);
-    }
+    issueSession(res, dbUser);
 
-    const payload = {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      company: user.company,
-      role: user.role,
-      isVerified: Boolean(user.isVerified),
-      emailVerified: Boolean(user.isVerified),
-      token_version: user.token_version || 0
-    };
-
-    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
-
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      path: '/',
-      maxAge: 7 * 24 * 60 * 60 * 1000
-    });
-
-    return res.json({ user: { ...payload, companyStatus: (userData as any).companyStatus } });
+    const user = await fetchPublicUser(dbUser.id);
+    return res.json({ user });
   } catch (err: any) {
     logger.error("Login Error:", err);
-    return res.status(500).json({ error: 'Internal Server Error' });
+    return res.status(500).json({ error: 'Erreur interne du serveur' });
   }
 });
 
 // API - Auth - Register
-router.post('/register', authLimiter, validate(registerSchema), async (req, res) => {
-  const { name, email, company, role, password, captchaToken } = req.body;
+// Réponse identique que l'adresse soit libre ou déjà utilisée (pas d'énumération) :
+// la session n'est ouverte qu'après vérification du code reçu par e-mail.
+const REGISTER_RESPONSE = {
+  success: true,
+  pendingVerification: true,
+  message: 'Si cette adresse peut être utilisée, un code de vérification vient d\'y être envoyé.'
+};
+
+router.post('/register', authIpLimiter, authLimiter, validate(registerSchema), async (req, res) => {
+  const { name, company, role, password, captchaToken } = req.body;
+  const email = normalizeEmail(req.body.email);
 
   const isCaptchaValid = await verifyCaptcha(captchaToken);
   if (!isCaptchaValid) {
-    return res.status(400).json({ error: 'Validation captcha échouée' });
+    return res.status(400).json({ error: 'Validation captcha échouée', code: 'CAPTCHA_FAILED' });
   }
 
-  if (!email || !password || !name) {
-    return res.status(400).json({ error: 'Champs obligatoires manquants' });
+  if (await isPasswordPwned(password)) {
+    return res.status(400).json({
+      error: 'Ce mot de passe figure dans des fuites de données connues. Choisissez-en un autre.',
+      code: 'PASSWORD_PWNED'
+    });
   }
 
   try {
     const supabase = getSupabase();
-    
-    // Check if exists
+
     const { data: existingUser } = await supabase
-      .from('users')
-      .select('id')
-      .ilike('email', email)
-      .maybeSingle();
-
-    if (existingUser) {
-      return res.status(400).json({ error: 'Un compte avec cette adresse email existe déjà' });
-    }
-
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-    
-    const cRoles = role || 'acheteur';
-    const cCompany = company || 'Entreprise DZ';
-    const userRefId = generateReferenceId('USR');
-    
-    const { data: newUserRow, error: insertError } = await supabase
-      .from('users')
-      .insert([
-        {
-          reference_id: userRefId,
-          name: name,
-          email: email,
-          company: cCompany,
-          role: cRoles,
-          passwordHash: hashedPassword,
-          isVerified: false
-        }
-      ])
-      .select()
-      .single();
-      
-    if (insertError || !newUserRow) {
-      logger.error(insertError);
-      return res.status(500).json({ error: "Erreur lors de l'inscription dans la base de données: " + (insertError?.message || JSON.stringify(insertError)) });
-    }
-
-    // Automatically create a company for 'fournisseur' / 'exposant'
-    if (cRoles === 'fournisseur' || cRoles === 'exposant') {
-      try {
-        const companyRefId = generateReferenceId('CMP');
-        // Create the company entity
-        const { data: companyRow, error: companyError } = await supabase
-          .from('companies')
-          .insert([
-            {
-              reference_id: companyRefId,
-              name: cCompany,
-              owner_id: newUserRow.id,
-              status: 'unverified'
-            }
-          ])
-          .select()
-          .single();
-
-        if (companyRow && !companyError) {
-          // Link user to the new company 
-          await supabase.from('users').update({ company_id: companyRow.id }).eq('id', newUserRow.id);
-        } else {
-          logger.error("Erreur création company: ", companyError);
-        }
-      } catch (err) {
-        logger.error("KYC Generation Error: ", err);
-      }
-    }
-
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
-    const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString();
-
-    // Nettoyer les anciens codes pour cet email
-    await supabase.from('email_verification_codes').delete().eq('email', email);
-
-    await supabase.from('email_verification_codes').insert({
-      email,
-      code,
-      expires_at: expiresAt
-    });
-
-    await sendTransactionalEmail(email, 'verificationCode', {
-      name,
-      code
-    });
-
-    const payload = {
-        id: newUserRow.id,
-        name: newUserRow.name,
-        email: newUserRow.email,
-        company: newUserRow.company,
-        role: newUserRow.role,
-        isVerified: false,
-        emailVerified: false,
-        token_version: newUserRow.token_version || 0
-    };
-
-    const token = jwt.sign(
-      payload,
-      JWT_SECRET,
-      { expiresIn: '7d' }
-    );
-
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      path: '/',
-      maxAge: 7 * 24 * 60 * 60 * 1000
-    });
-
-    return res.json({ success: true, user: payload, message: "Inscription réussie avec Supabase" });
-  } catch (err: any) {
-    logger.error("Register Error:", err);
-    return res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
-
-// API - Auth - Forgot Password
-router.post('/forgot-password', validate(forgotPasswordSchema), async (req, res) => {
-  const { email, captchaToken } = req.body;
-
-  const isCaptchaValid = await verifyCaptcha(captchaToken);
-  if (!isCaptchaValid) {
-    return res.status(400).json({ error: 'Validation captcha échouée' });
-  }
-
-  if (!email) {
-    return res.status(400).json({ error: 'Veuillez fournir une adresse email' });
-  }
-
-  try {
-    const supabase = getSupabase();
-    // Simulate checking if user exists
-    const { data: user } = await supabase
       .from('users')
       .select('id, name')
       .ilike('email', email)
       .maybeSingle();
 
-    if (!user) {
-      // Don't leak that the email doesn't exist for security
-      return res.json({ success: true, message: 'Si cette adresse existe, un email a été envoyé.' });
+    if (existingUser) {
+      await sendTransactionalEmail(email, 'accountExists', {
+        name: existingUser.name || 'Utilisateur',
+        resetUrl: `${getAppUrl()}/forgot-password`
+      });
+      return res.json(REGISTER_RESPONSE);
     }
 
-    // Generate a secure random token
+    const hashedPassword = await hashPassword(password);
+    const cRole = role || 'acheteur';
+    const cCompany = company || null;
+
+    const { data: newUserRow, error: insertError } = await supabase
+      .from('users')
+      .insert([{
+        reference_id: generateReferenceId('USR'),
+        name,
+        email,
+        company: cCompany,
+        role: cRole,
+        passwordHash: hashedPassword,
+        email_verified: false,
+        kyc_status: 'none'
+      }])
+      .select('id')
+      .single();
+
+    if (insertError || !newUserRow) {
+      logger.error('Register insert error', insertError);
+      return res.status(500).json({ error: 'Erreur lors de l\'inscription. Veuillez réessayer.' });
+    }
+
+    // Fournisseurs et exposants : l'entreprise est créée dès l'inscription.
+    if ((cRole === 'fournisseur' || cRole === 'exposant') && cCompany) {
+      const { data: companyRow, error: companyError } = await supabase
+        .from('companies')
+        .insert([{
+          reference_id: generateReferenceId('CMP'),
+          name: cCompany,
+          owner_id: newUserRow.id,
+          status: 'unverified'
+        }])
+        .select('id')
+        .single();
+
+      if (companyRow && !companyError) {
+        await supabase.from('users').update({ company_id: companyRow.id }).eq('id', newUserRow.id);
+      } else {
+        logger.error('Company creation error on register', companyError);
+      }
+    }
+
+    await storeVerificationCode(email, name);
+
+    return res.json(REGISTER_RESPONSE);
+  } catch (err: any) {
+    logger.error("Register Error:", err);
+    return res.status(500).json({ error: 'Erreur interne du serveur' });
+  }
+});
+
+// API - Auth - Forgot Password
+router.post('/forgot-password', authIpLimiter, authLimiter, validate(forgotPasswordSchema), async (req, res) => {
+  const { captchaToken } = req.body;
+  const email = normalizeEmail(req.body.email);
+  const neutral = { success: true, message: 'Si cette adresse existe, un email a été envoyé.' };
+
+  const isCaptchaValid = await verifyCaptcha(captchaToken);
+  if (!isCaptchaValid) {
+    return res.status(400).json({ error: 'Validation captcha échouée', code: 'CAPTCHA_FAILED' });
+  }
+
+  try {
+    const supabase = getSupabase();
+    const { data: user } = await supabase
+      .from('users')
+      .select('id, name, email')
+      .ilike('email', email)
+      .maybeSingle();
+
+    if (!user) {
+      return res.json(neutral);
+    }
+
     const resetToken = crypto.randomBytes(32).toString('hex');
     const tokenHash = crypto.createHash('sha256').update(resetToken).digest('hex');
-    const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString(); // 15 minutes
+    const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString();
 
     const { error: insertError } = await supabase
       .from('password_reset_tokens')
-      .insert({
-        user_id: user.id,
-        token_hash: tokenHash,
-        expires_at: expiresAt
-      });
+      .insert({ user_id: user.id, token_hash: tokenHash, expires_at: expiresAt });
 
     if (insertError) {
       logger.error("Error inserting reset token:", insertError);
       return res.status(500).json({ error: 'Erreur lors de la génération du lien de réinitialisation' });
     }
 
-    const appUrl = process.env.APP_URL || process.env.VITE_APP_URL || 'http://localhost:3000';
-    const resetUrl = `${appUrl}/reset-password?token=${resetToken}`;
-
-    await sendTransactionalEmail(email, 'resetPassword', {
+    await sendTransactionalEmail(user.email, 'resetPassword', {
       name: user.name || 'Utilisateur',
-      resetUrl
+      resetUrl: `${getAppUrl()}/reset-password?token=${resetToken}`
     });
 
-    return res.json({ success: true, message: 'Si cette adresse existe, un email a été envoyé.' });
+    return res.json(neutral);
   } catch (err: any) {
     logger.error("Forgot Password Error:", err);
     return res.status(500).json({ error: 'Erreur interne du serveur' });
@@ -445,18 +327,13 @@ router.post('/forgot-password', validate(forgotPasswordSchema), async (req, res)
 });
 
 // API - Auth - Reset Password
-router.post('/reset-password', validate(resetPasswordSchema), async (req, res) => {
+router.post('/reset-password', authIpLimiter, validate(resetPasswordSchema), async (req, res) => {
   const { token, newPassword } = req.body;
-
-  if (!token || !newPassword) {
-    return res.status(400).json({ error: 'Le jeton de réinitialisation et le nouveau mot de passe sont requis' });
-  }
 
   try {
     const supabase = getSupabase();
     const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
 
-    // Find the token
     const { data: resetRecord } = await supabase
       .from('password_reset_tokens')
       .select('*')
@@ -465,25 +342,33 @@ router.post('/reset-password', validate(resetPasswordSchema), async (req, res) =
       .maybeSingle();
 
     if (!resetRecord) {
-      return res.status(400).json({ error: 'Jeton de réinitialisation invalide ou déjà utilisé.' });
+      return res.status(400).json({ error: 'Jeton de réinitialisation invalide ou déjà utilisé.', code: 'RESET_TOKEN_INVALID' });
     }
 
     if (new Date(resetRecord.expires_at) < new Date()) {
-      return res.status(400).json({ error: 'Le jeton de réinitialisation a expiré.' });
+      return res.status(400).json({ error: 'Le jeton de réinitialisation a expiré.', code: 'RESET_TOKEN_EXPIRED' });
     }
 
-    // Hash new password
-    const salt = await bcrypt.genSalt(10);
-    const passwordHash = await bcrypt.hash(newPassword, salt);
+    if (await isPasswordPwned(newPassword)) {
+      return res.status(400).json({
+        error: 'Ce mot de passe figure dans des fuites de données connues. Choisissez-en un autre.',
+        code: 'PASSWORD_PWNED'
+      });
+    }
 
-    // Fetch current token_version
-    const { data: userRecord } = await supabase.from('users').select('token_version').eq('id', resetRecord.user_id).maybeSingle();
+    const passwordHash = await hashPassword(newPassword);
+
+    const { data: userRecord } = await supabase
+      .from('users')
+      .select('token_version, email')
+      .eq('id', resetRecord.user_id)
+      .maybeSingle();
     const nextVersion = (userRecord?.token_version || 0) + 1;
 
-    // Update user password and token_version
+    // Nouveau token_version : toutes les sessions ouvertes sont invalidées.
     const { error: updateError } = await supabase
       .from('users')
-      .update({ passwordHash: passwordHash, token_version: nextVersion })
+      .update({ passwordHash, token_version: nextVersion })
       .eq('id', resetRecord.user_id);
 
     if (updateError) {
@@ -491,13 +376,15 @@ router.post('/reset-password', validate(resetPasswordSchema), async (req, res) =
       return res.status(500).json({ error: 'Erreur lors de la mise à jour du mot de passe.' });
     }
 
-    // Mark token as used
     await supabase
       .from('password_reset_tokens')
       .update({ used_at: new Date().toISOString() })
       .eq('id', resetRecord.id);
 
-    // TODO: Invalider les sessions actives de cet utilisateur
+    // Déblocage : la preuve de possession de la boîte e-mail efface les échecs de connexion.
+    if (userRecord?.email) {
+      await supabase.from('login_attempts').delete().eq('email', normalizeEmail(userRecord.email));
+    }
 
     return res.json({ success: true, message: 'Votre mot de passe a été réinitialisé avec succès.' });
   } catch (err: any) {
@@ -511,7 +398,7 @@ router.post('/logout', async (req, res) => {
   const token = req.cookies?.token;
   if (token) {
     try {
-      const decoded = jwt.verify(token, JWT_SECRET, { ignoreExpiration: true }) as any;
+      const decoded = jwt.verify(token, process.env.JWT_SECRET || '', { ignoreExpiration: true }) as any;
       if (decoded?.id) {
         const supabase = getSupabase();
         const { data: user } = await supabase.from('users').select('token_version').eq('id', decoded.id).maybeSingle();
@@ -519,218 +406,109 @@ router.post('/logout', async (req, res) => {
           await supabase.from('users').update({ token_version: (user.token_version || 0) + 1 }).eq('id', decoded.id);
         }
       }
-    } catch(err) {
+    } catch (err) {
       logger.error("Logout token invalidation error", err);
     }
   }
 
-  res.clearCookie('token', {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
-    path: '/'
-  });
+  clearSession(res);
   return res.json({ success: true, message: 'Déconnexion réussie' });
 });
 
-// Helper: Get redirect URI safely considering reverse proxy
-const getRedirectUri = (req: express.Request, provider: "google" | "linkedin") => {
-  // Try to use app's base URL from env, default to local if not available
-  const origin = req.headers.origin || process.env.APP_URL || `http://${req.headers.host}`;
-  return `${origin}/api/auth/oauth/callback/${provider}`;
-};
-
-// API - Auth - Get OAuth URL
-router.get('/oauth/url', (req, res) => {
-  const provider = req.query.provider as string;
-  const origin = req.headers.origin || process.env.APP_URL || `http://${req.headers.host}`;
-  const redirectUri = `${origin}/api/auth/oauth/callback/${provider}`;
-
-  let authUrl = '';
-  if (provider === 'google') {
-    const params = new URLSearchParams({
-      client_id: process.env.GOOGLE_CLIENT_ID || '',
-      redirect_uri: redirectUri,
-      response_type: 'code',
-      scope: 'openid email profile',
-    });
-    authUrl = `https://accounts.google.com/o/oauth2/v2/auth?${params}`;
-  } else if (provider === 'linkedin') {
-    const params = new URLSearchParams({
-      client_id: process.env.LINKEDIN_CLIENT_ID || '',
-      redirect_uri: redirectUri,
-      response_type: 'code',
-      scope: 'r_liteprofile r_emailaddress',
-    });
-    authUrl = `https://www.linkedin.com/oauth/v2/authorization?${params}`;
-  } else {
-    return res.status(400).json({ error: 'Fournisseur non supporté' });
-  }
-
-  res.json({ url: authUrl });
-});
-
-// API - Auth - OAuth Callback
-router.get(['/oauth/callback/:provider', '/oauth/callback/:provider/'], async (req, res) => {
-  const { provider } = req.params;
-  const { code } = req.query;
-
-  // Since we only want to make it "operational" in terms of the flow, and actually verifying the code requires secrets that the user must configure:
-  // We simulate user successful lookup or creation based on the flow. 
-  // Normally you exchange code for tokens here using GOOGLE_CLIENT_SECRET / LINKEDIN_CLIENT_SECRET.
-
-  if (!code) {
-     return res.status(400).send('No code provided');
-  }
+// API - Auth - Verify Code
+// Un code valide prouve la possession de la boîte e-mail : il confirme l'adresse
+// et ouvre la session (fin du parcours d'inscription).
+router.post('/verify-code', authIpLimiter, verifyCodeLimiter, validate(verifyCodeSchema), async (req, res) => {
+  const { code } = req.body;
+  const email = normalizeEmail(req.body.email);
 
   try {
-    // [REAL INTEGRATION NOTE] Here we would exchange the code for access token via backend-to-backend API call.
-    // If the user has secrets configured, this would fetch real tokens. I will simulate the "afterwards" part 
-    // to give a functional OAuth experience while being technically accurate to the flow constraints.
-    // In a real flow, use: fetch('https://oauth2.googleapis.com/token', { method: 'POST', body: ... })
+    const supabase = getSupabase();
 
-    // Simulate the creation/login of an OAuth user 
-    const payload = {
-        id: 'oauth-' + Date.now(),
-        name: 'Utilisateur ' + provider,
-        email: `user@${provider}.com`,
-        company: 'N/A',
-        role: 'acheteur',
-        isVerified: true,
-        token_version: 0
-    };
-
-    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
-
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      path: '/',
-      maxAge: 7 * 24 * 60 * 60 * 1000
-    });
-
-    res.send(`
-      <html>
-        <body>
-          <script>
-            if (window.opener) {
-              window.opener.postMessage({ type: 'OAUTH_AUTH_SUCCESS', user: ${JSON.stringify(payload)} }, '*');
-              window.close();
-            } else {
-              window.location.href = '/';
-            }
-          </script>
-          <p>Authentification réussie via ${provider}. Cette fenêtre devrait se fermer automatiquement.</p>
-        </body>
-      </html>
-    `);
-  } catch (err) {
-    res.status(500).send('Erreur lors de l\'authentification OAuth');
-  }
-});
-
-// API - Auth - Verify Code
-router.post('/verify-code', validate(verifyCodeSchema), async (req, res) => {
-  const { email, code } = req.body;
-  if (!email || !code) {
-    return res.status(400).json({ error: 'Email et code requis' });
-  }
-
-  const supabase = getSupabase();
-
-  const { data: verifyRecord } = await supabase
-    .from('email_verification_codes')
-    .select('*')
-    .eq('email', email)
-    .maybeSingle();
-
-  if (!verifyRecord) {
-    return res.status(400).json({ error: 'Code invalide ou expiré' });
-  }
-
-  if (verifyRecord.attempts >= 5) {
-    return res.status(400).json({ error: 'Trop de tentatives échouées. Veuillez demander un nouveau code.' });
-  }
-
-  if (new Date(verifyRecord.expires_at) < new Date()) {
-    return res.status(400).json({ error: 'Le code a expiré. Veuillez en demander un nouveau.' });
-  }
-
-  if (verifyRecord.code !== code.toString()) {
-    await supabase
+    const { data: verifyRecord } = await supabase
       .from('email_verification_codes')
-      .update({ attempts: verifyRecord.attempts + 1 })
-      .eq('id', verifyRecord.id);
-    return res.status(400).json({ error: 'Code invalide' });
-  }
+      .select('*')
+      .eq('email', email)
+      .maybeSingle();
 
-  // Code valide
-  await supabase.from('email_verification_codes').delete().eq('id', verifyRecord.id);
-  
-  // Mettre à jour l'utilisateur
-  await supabase.from('users').update({ isVerified: true }).eq('email', email);
-
-  // Mettre à jour le JWT avec emailVerified = true s'il y a un token existant
-  const token = req.cookies.token;
-  if (token) {
-    try {
-      const decoded = jwt.verify(token, JWT_SECRET) as any;
-      delete decoded.iat;
-      delete decoded.exp;
-      decoded.emailVerified = true;
-      decoded.isVerified = true;
-      const newToken = jwt.sign(decoded, JWT_SECRET, { expiresIn: '7d' });
-      res.cookie('token', newToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
-        path: '/',
-        maxAge: 7 * 24 * 60 * 60 * 1000
-      });
-    } catch (e) {
-      logger.error("Erreur mise à jour token:", e);
+    if (!verifyRecord) {
+      return res.status(400).json({ error: 'Code invalide ou expiré', code: 'CODE_INVALID' });
     }
-  }
 
-  return res.json({ success: true, message: 'Email vérifié avec succès' });
+    if ((verifyRecord.attempts || 0) >= 5) {
+      return res.status(400).json({ error: 'Trop de tentatives échouées. Veuillez demander un nouveau code.', code: 'CODE_TOO_MANY_ATTEMPTS' });
+    }
+
+    if (new Date(verifyRecord.expires_at) < new Date()) {
+      return res.status(400).json({ error: 'Le code a expiré. Veuillez en demander un nouveau.', code: 'CODE_EXPIRED' });
+    }
+
+    const expected = Buffer.from(String(verifyRecord.code));
+    const received = Buffer.from(code);
+    const matches = expected.length === received.length && crypto.timingSafeEqual(expected, received);
+
+    if (!matches) {
+      await supabase
+        .from('email_verification_codes')
+        .update({ attempts: (verifyRecord.attempts || 0) + 1 })
+        .eq('id', verifyRecord.id);
+      return res.status(400).json({ error: 'Code invalide', code: 'CODE_INVALID' });
+    }
+
+    await supabase.from('email_verification_codes').delete().eq('id', verifyRecord.id);
+
+    const { data: userRow } = await supabase
+      .from('users')
+      .update({ email_verified: true })
+      .ilike('email', email)
+      .select('id, token_version, role')
+      .maybeSingle();
+
+    if (!userRow) {
+      return res.status(400).json({ error: 'Code invalide ou expiré', code: 'CODE_INVALID' });
+    }
+
+    if (!String(userRow.role || '').endsWith('_suspended')) {
+      issueSession(res, userRow);
+    }
+
+    const user = await fetchPublicUser(userRow.id);
+    return res.json({ success: true, message: 'Email vérifié avec succès', user });
+  } catch (err) {
+    logger.error('Verify code error', err);
+    return res.status(500).json({ error: 'Erreur interne du serveur' });
+  }
 });
 
 // API - Auth - Resend Code
-router.post('/resend-code', validate(resendCodeSchema), async (req, res) => {
-  const { email, captchaToken } = req.body;
+router.post('/resend-code', authIpLimiter, authLimiter, validate(resendCodeSchema), async (req, res) => {
+  const { captchaToken } = req.body;
+  const email = normalizeEmail(req.body.email);
+  const neutral = { success: true, message: 'Si un compte non vérifié existe pour cette adresse, un code a été envoyé.' };
 
   const isCaptchaValid = await verifyCaptcha(captchaToken);
   if (!isCaptchaValid) {
-    return res.status(400).json({ error: 'Validation captcha échouée' });
+    return res.status(400).json({ error: 'Validation captcha échouée', code: 'CAPTCHA_FAILED' });
   }
 
-  if (!email) {
-    return res.status(400).json({ error: 'Email requis' });
+  try {
+    const supabase = getSupabase();
+    const { data: user } = await supabase
+      .from('users')
+      .select('name, email_verified')
+      .ilike('email', email)
+      .maybeSingle();
+
+    // Aucun code pour une adresse inconnue ou déjà vérifiée.
+    if (user && !user.email_verified) {
+      await storeVerificationCode(email, user.name || 'Utilisateur');
+    }
+
+    return res.json(neutral);
+  } catch (err) {
+    logger.error('Resend code error', err);
+    return res.status(500).json({ error: 'Erreur interne du serveur' });
   }
-  
-  const supabase = getSupabase();
-  const { data: user } = await supabase.from('users').select('name').eq('email', email).maybeSingle();
-  const name = user?.name || 'Utilisateur';
-
-  const code = Math.floor(100000 + Math.random() * 900000).toString();
-  const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString();
-
-  // Nettoyer les anciens codes pour cet email
-  await supabase.from('email_verification_codes').delete().eq('email', email);
-
-  await supabase.from('email_verification_codes').insert({
-    email,
-    code,
-    expires_at: expiresAt
-  });
-
-  await sendTransactionalEmail(email, 'verificationCode', {
-    name,
-    code
-  });
-
-  return res.json({ success: true, message: 'Code envoyé' });
 });
 
 export default router;

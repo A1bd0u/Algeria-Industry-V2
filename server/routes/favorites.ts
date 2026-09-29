@@ -34,7 +34,7 @@ router.get('/', requireAuth, async (req, res) => {
              ...f,
              name: p.name,
              category: p.category,
-             location: p.region || 'Alger',
+             location: p.region || null,
              image: p.file_url,
              product_id: p.id
           } : f;
@@ -45,7 +45,7 @@ router.get('/', requireAuth, async (req, res) => {
     return res.json(enrichedFavs || []);
   } catch(e: any) {
     logger.error("Supabase Error GET /favorites:", e);
-    return res.status(500).json({ error: e.message });
+    return res.status(500).json({ error: 'Une erreur interne est survenue.' });
   }
 });
 
@@ -67,7 +67,7 @@ router.delete('/item/:itemId', requireAuth, async (req, res) => {
     return res.json({ success: true });
   } catch (err: any) {
     logger.error("Supabase Error DELETE /favorites/item/:itemId:", err);
-    return res.status(500).json({ error: err.message });
+    return res.status(500).json({ error: 'Une erreur interne est survenue.' });
   }
 });
 
@@ -89,7 +89,7 @@ router.delete('/:id', requireAuth, async (req, res) => {
     return res.json({ success: true });
   } catch (err: any) {
     logger.error("Supabase Error DELETE /favorites/:id:", err);
-    return res.status(500).json({ error: err.message });
+    return res.status(500).json({ error: 'Une erreur interne est survenue.' });
   }
 });
 
@@ -110,7 +110,7 @@ router.post('/', requireAuth, async (req, res) => {
     return res.json(data);
   } catch (err: any) {
     logger.error("Supabase Error POST /favorites:", err);
-    return res.status(500).json({ error: err.message });
+    return res.status(500).json({ error: 'Une erreur interne est survenue.' });
   }
 });
 
