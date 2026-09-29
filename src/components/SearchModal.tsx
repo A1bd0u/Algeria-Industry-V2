@@ -2,6 +2,7 @@ import { ArrowRight, Building2, FileText, Package, Search, TrendingUp, X } from 
 import { AnimatePresence, motion } from 'motion/react';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { generateSlugUrl } from '../lib/utils';
 
 interface SearchResult {
   id: string;
@@ -15,13 +16,37 @@ const SearchModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void
   const [query, setQuery] = useState('');
   const navigate = useNavigate();
 
-  const results: SearchResult[] = ([
-    { id: '1', type: 'product', title: 'Pompe Hydraulique P3', subtitle: 'Global Industry', category: 'Hydraulique' },
-    { id: '2', type: 'company', title: 'Sonatrach', subtitle: 'Alger, Algérie', category: 'Énergie' },
-  ] as const).filter(r => 
-    r.title.toLowerCase().includes(query.toLowerCase()) || 
-    r.subtitle.toLowerCase().includes(query.toLowerCase())
-  ) as SearchResult[];
+  const [results, setResults] = useState<SearchResult[]>([]);
+
+  // Recherche réelle (entreprises et produits), avec anti-rebond.
+  useEffect(() => {
+    const q = query.trim();
+    if (q.length < 2) {
+      setResults([]);
+      return;
+    }
+    const controller = new AbortController();
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/search?q=${encodeURIComponent(q)}&limit=8`, { signal: controller.signal });
+        if (!res.ok) return;
+        const data = await res.json();
+        const companies = (data.results?.companies || []).map((c: any) => ({
+          id: c.id, type: 'company', title: c.name, subtitle: c.wilaya || '', category: c.activity_sector || ''
+        }));
+        const products = (data.results?.products || []).map((p: any) => ({
+          id: p.id, type: 'product', title: p.name, subtitle: p.brand || '', category: p.category || ''
+        }));
+        setResults([...companies, ...products]);
+      } catch {
+        // requête annulée ou réseau indisponible
+      }
+    }, 250);
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
+  }, [query]);
 
   const getIcon = (type: string) => {
     switch(type) {
@@ -34,8 +59,8 @@ const SearchModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void
   const handleSelect = (result: SearchResult) => {
     onClose();
     switch(result.type) {
-      case 'product': navigate(`/products/${result.id}`); break;
-      case 'company': navigate(`/directory/${result.id}`); break;
+      case 'product': navigate(`/products/${generateSlugUrl(result.title, result.id)}`); break;
+      case 'company': navigate(`/directory/${generateSlugUrl(result.title, result.id)}`); break;
     }
   };
 

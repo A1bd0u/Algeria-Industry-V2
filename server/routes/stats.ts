@@ -1,13 +1,18 @@
 import { logger } from '../utils/logger';
 import express from 'express';
 import { getSupabase } from '../db/supabaseClient';
-import { requireAuth } from '../middlewares/authMiddleware';
+import { requireAuth, verifyRole } from '../middlewares/authMiddleware';
+import { isUuid } from '../middlewares/validateParams';
 
 const router = express.Router();
 
 router.get('/dashboard', requireAuth, async (req, res) => {
   const user = (req as any).user;
-  const timeframe = req.query.timeframe || '6m';
+  const timeframe = req.query.timeframe === '1y' ? '1y' : '6m';
+
+  if (!isUuid(user.id)) {
+    return res.status(400).json({ error: 'Identifiant invalide', code: 'INVALID_ID' });
+  }
 
   try {
     const supabase = getSupabase();
@@ -24,18 +29,12 @@ router.get('/dashboard', requireAuth, async (req, res) => {
         .from('ads')
         .select('*', { count: 'exact', head: true }); // Assuming global count for now as ads don't have owner_id
 
-    // Check if user is associated with a company
-    const { data: userCompany } = await supabase.from('companies').select('id').eq('owner_id', user.id).single();
-    const companyId = userCompany ? userCompany.id : null;
-    
-    let productsCount = 0;
-    if (companyId) {
-        const { count } = await supabase
-            .from('products')
-            .select('*', { count: 'exact', head: true })
-            .eq('company_id', companyId);
-        productsCount = count || 0;
-    }
+    // Les produits sont rattachés à leur créateur (owner_id).
+    const { count: ownedProducts } = await supabase
+        .from('products')
+        .select('*', { count: 'exact', head: true })
+        .eq('owner_id', user.id);
+    const productsCount = ownedProducts || 0;
 
     // Fetch messages group by month for the chart
     const daysLimit = timeframe === '1y' ? 365 : 180;
@@ -48,11 +47,11 @@ router.get('/dashboard', requireAuth, async (req, res) => {
         .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
         .gte('created_at', dateLimit.toISOString());
 
-    const { data: productsData } = companyId ? await supabase
+    const { data: productsData } = await supabase
         .from('products')
         .select('created_at')
-        .eq('company_id', companyId)
-        .gte('created_at', dateLimit.toISOString()) : { data: [] };
+        .eq('owner_id', user.id)
+        .gte('created_at', dateLimit.toISOString());
 
     // Aggregate by month
     const months6 = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin'];
@@ -89,9 +88,12 @@ router.get('/dashboard', requireAuth, async (req, res) => {
            favoris: 0
          }
       } else {
+         // Les visites ne sont pas encore mesurées : null = « bientôt disponible »
+         // plutôt qu'un chiffre inventé.
          return {
            name: month,
-           visites: groupedProducts[index] * 5, // Just slightly simulate view correlation
+           produits: groupedProducts[index],
+           visites: null,
            contacts: groupedMessages[index]
          }
       }
@@ -99,6 +101,7 @@ router.get('/dashboard', requireAuth, async (req, res) => {
 
     return res.json({
         chartData,
+        visitsAvailable: false,
         metrics: {
             items: productsCount,
             messages: messagesCount || 0,
@@ -111,7 +114,7 @@ router.get('/dashboard', requireAuth, async (req, res) => {
   }
 });
 
-router.get('/admin', requireAuth, async (req, res) => {
+router.get('/admin', verifyRole(['admin']), async (req, res) => {
   try {
     const supabase = getSupabase();
     const now = new Date();

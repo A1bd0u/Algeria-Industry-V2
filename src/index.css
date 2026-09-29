@@ -1,10 +1,12 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Cairo:wght@400;600;700;800&display=swap');
+/* Polices auto-hébergées (woff2, sous-ensembles chargés via unicode-range). */
+@import "@fontsource-variable/inter";
+@import "@fontsource-variable/cairo";
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
-  --font-arabic: "Cairo", sans-serif;
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-arabic: "Cairo Variable", sans-serif;
   
   /* Algeria Industry Technical Palette */
   --color-primary: #1a1a1a;

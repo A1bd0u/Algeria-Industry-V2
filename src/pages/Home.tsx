@@ -7,18 +7,11 @@ import { Skeleton } from '../components/Skeleton';
 import { useCurrency } from '../context/CurrencyContext';
 import { cn, generateSlugUrl } from '../lib/utils';
 import SEO from '../components/SEO';
-
-const PARTNERS = [
-  { name: "Sonatrach", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Sonatrach_Logo.svg/1200px-Sonatrach_Logo.svg.png" },
-  { name: "Cevital", logo: "https://upload.wikimedia.org/wikipedia/fr/thumb/a/a3/Logo_Cevital.svg/1200px-Logo_Cevital.svg.png" },
-  { name: "Condor", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Logo_Condor_Electronics.svg/1200px-Logo_Condor_Electronics.svg.png" },
-  { name: "Ooredoo", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/03/Ooredoo_logo.svg/1200px-Ooredoo_logo.svg.png" },
-  { name: "Djezzy", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Djezzy_logo.svg/1200px-Djezzy_logo.svg.png" },
-  { name: "Mobilis", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Logo_Mobilis.svg/1200px-Logo_Mobilis.svg.png" },
-];
+import { SITE_NAME, absoluteUrl } from '../config/site';
 
 const Home = () => {
   const { t, i18n } = useTranslation();
+  const isAr = i18n.language?.startsWith('ar');
   const { formatPrice } = useCurrency();
   const [visibleProducts, setVisibleProducts] = useState(4);
   const [products, setProducts] = useState<any[]>([]);
@@ -32,12 +25,8 @@ const Home = () => {
           fetch('/api/products').catch(() => null)
         ]);
         
-        let pData = [
-          { id: '1', name: "Pompe Hydraulique", company: "Mecanique Plus", price: "245000", image: "https://picsum.photos/seed/p1/400/400" },
-          { id: '2', name: "Unité de Filtration", company: "Global Filtration", price: "Sur Devis", image: "https://picsum.photos/seed/p2/400/400" },
-          { id: '3', name: "Alternateur Industriel", company: "Electric DZ", price: "120000", image: "https://picsum.photos/seed/p3/400/400" },
-          { id: '4', name: "Compresseur d'air", company: "Air Tech", price: "850000", image: "https://picsum.photos/seed/p4/400/400" }
-        ];
+        // Pas de produits fictifs : état vide si le catalogue est encore vide.
+        let pData: any[] = [];
 
         if (prodRes && prodRes.ok) {
           try { const res = await prodRes.json(); pData = res.data || res; } catch(e){}
@@ -61,77 +50,50 @@ const Home = () => {
     <>
       <SEO 
         title={t('nav.home', 'Accueil')} 
-        description="Le 1er portail B2B de l'industrie en Algérie. Découvrez les entreprises, les produits, et les appels d'offres."
-        url="https://votre-domaine.dz/"
+        description="Trouvez un fournisseur industriel algérien vérifié et obtenez un devis en 48 h."
+        url={absoluteUrl('/')}
         structuredData={{
           "@context": "https://schema.org",
           "@type": "WebSite",
-          "name": "Algiers Industry",
-          "url": "https://votre-domaine.dz/",
+          "name": SITE_NAME,
+          "url": absoluteUrl('/'),
           "potentialAction": {
             "@type": "SearchAction",
-            "target": "https://votre-domaine.dz/search?q={search_term_string}",
+            "target": absoluteUrl('/search?q={search_term_string}'),
             "query-input": "required name=search_term_string"
           }
         }}
       />
     <div className={cn("flex flex-col min-h-screen", i18n.language?.startsWith('ar') && "font-arabic")}>
-      {/* Stats Section (Technical Dashboard Style) */}
+      {/* Promesse */}
       <section className="py-12 bg-white border-b border-border-tech">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className={cn(
             "grid grid-cols-1 md:grid-cols-3 gap-0 border border-border-tech divide-y md:divide-y-0 md:divide-x divide-border-tech",
-            i18n.language?.startsWith('ar') && "md:divide-x-reverse"
+            isAr && "md:divide-x-reverse"
           )}>
-            <div className={cn("p-8 hover:bg-neutral-bg transition-colors group", i18n.language?.startsWith('ar') && "text-end")}>
-              <span className="tech-label">{i18n.language?.startsWith('ar') ? 'قاعدة البيانات' : 'Base de données'}</span>
-              <div className={cn("flex items-baseline space-x-2", i18n.language?.startsWith('ar') && "space-x-reverse justify-end")}>
-                <span className="text-4xl font-black text-primary tech-mono">550,000+</span>
-                <span className="text-xs font-bold text-secondary uppercase tracking-tighter">SKU</span>
+            {[
+              {
+                label: isAr ? 'التحقق' : 'Vérification',
+                title: isAr ? 'موردون موثقون' : 'Fournisseurs vérifiés',
+                desc: isAr ? 'كل مؤسسة تحمل شارة "موثقة" بعد مراجعة السجل التجاري و NIF.' : 'Badge « entreprise vérifiée » après contrôle du RC et du NIF (KYC).'
+              },
+              {
+                label: isAr ? 'عرض السعر' : 'Devis',
+                title: isAr ? 'عرض سعر في 48 ساعة' : 'Un devis en 48 h',
+                desc: isAr ? 'تواصل مباشرة مع المورد عبر الرسائل.' : 'Contactez directement le fournisseur via la messagerie intégrée.'
+              },
+              {
+                label: isAr ? 'اللغات' : 'Langues',
+                title: 'FR · AR · EN',
+                desc: isAr ? 'منصة مصممة للصناعة الجزائرية.' : "Une plateforme pensée pour l'industrie algérienne."
+              }
+            ].map((item) => (
+              <div key={item.title} className={cn("p-8 hover:bg-neutral-bg transition-colors", isAr && "text-end")}>
+                <span className="tech-label">{item.label}</span>
+                <p className="text-2xl font-black text-primary">{item.title}</p>
+                <p className="text-[11px] text-gray-500 mt-2 font-medium uppercase tracking-wider">{item.desc}</p>
               </div>
-              <p className="text-[11px] text-gray-500 mt-2 font-medium uppercase tracking-wider">
-                {i18n.language?.startsWith('ar') ? 'المكونات والمعدات الصناعية المرجعية' : 'Composants et équipements industriels référencés'}
-              </p>
-            </div>
-            <div className={cn("p-8 hover:bg-neutral-bg transition-colors group", i18n.language?.startsWith('ar') && "text-end")}>
-              <span className="tech-label">{i18n.language?.startsWith('ar') ? 'حركة الشبكة' : 'Trafic Réseau'}</span>
-              <div className={cn("flex items-baseline space-x-2", i18n.language?.startsWith('ar') && "space-x-reverse justify-end")}>
-                <span className="text-4xl font-black text-primary tech-mono">2.7M</span>
-                <span className="text-xs font-bold text-secondary uppercase tracking-tighter">REQ/MO</span>
-              </div>
-              <p className="text-[11px] text-gray-500 mt-2 font-medium uppercase tracking-wider">
-                {i18n.language?.startsWith('ar') ? 'صناع القرار والمهندسين المتصلين شهرياً' : 'Décideurs et ingénieurs connectés mensuellement'}
-              </p>
-            </div>
-            <div className={cn("p-8 hover:bg-neutral-bg transition-colors group", i18n.language?.startsWith('ar') && "text-end")}>
-              <span className="tech-label">{i18n.language?.startsWith('ar') ? 'الشهادات' : 'Certification'}</span>
-              <div className={cn("flex items-baseline space-x-2", i18n.language?.startsWith('ar') && "space-x-reverse justify-end")}>
-                <span className="text-4xl font-black text-primary tech-mono">5,000+</span>
-                <span className="text-xs font-bold text-secondary uppercase tracking-tighter">ISO</span>
-              </div>
-              <p className="text-[11px] text-gray-500 mt-2 font-medium uppercase tracking-wider">
-                {i18n.language?.startsWith('ar') ? 'الشركات المحلية والدولية المعتمدة' : 'Entreprises locales et internationales certifiées'}
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Partners Slider */}
-      <section className="py-8 bg-neutral-bg border-b border-border-tech overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className={cn(
-            "flex items-center justify-between gap-12 opacity-40 grayscale hover:grayscale-0 transition-all duration-700 overflow-x-auto no-scrollbar pb-2",
-            i18n.language?.startsWith('ar') && "flex-row-reverse"
-          )}>
-            {PARTNERS.map((partner, i) => (
-              <img 
-                key={i} 
-                src={partner.logo} 
-                alt={partner.name} 
-                className="h-6 md:h-10 w-auto object-contain flex-shrink-0"
-                referrerPolicy="no-referrer"
-              />
             ))}
           </div>
         </div>
@@ -182,7 +144,8 @@ const Home = () => {
               ))
             ) : products.length === 0 ? (
               <div className="col-span-full py-12 text-center text-gray-500 font-medium">
-                Aucun produit publié pour le moment.
+                <p className="mb-4">Aucun produit publié pour le moment.</p>
+                <Link to="/register?role=fournisseur" className="text-secondary font-bold hover:underline">Soyez le premier fournisseur à publier votre catalogue</Link>
               </div>
             ) : products.slice(0, visibleProducts).map((product, i) => (
               <motion.div 
@@ -194,7 +157,8 @@ const Home = () => {
               >
                 <Link to={`/products/${generateSlugUrl(product.name, product.id)}`} className="block aspect-square overflow-hidden mb-6 bg-gray-50 border border-border-tech p-4 group-hover:border-secondary transition-colors">
                   <img 
-                    src={product.image || `https://picsum.photos/seed/${product.id}/400/400`} 
+                    src={product.file_url || product.image || '/placeholder.svg'} 
+                    loading="lazy"
                     alt={product.name} 
                     className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
                     referrerPolicy="no-referrer"
@@ -202,7 +166,7 @@ const Home = () => {
                 </Link>
                 <div className={cn("space-y-4", i18n.language?.startsWith('ar') && "text-end")}>
                   <div>
-                    <span className="tech-label">{product.company || 'Entreprise ID: ' + (product.owner_id ? product.owner_id.substring(0, 8) : 'Inconnu')}</span>
+                    {product.company && <span className="tech-label">{product.company}</span>}
                     <Link to={`/products/${generateSlugUrl(product.name, product.id)}`}>
                       <h3 className={cn("text-sm font-black text-primary uppercase tracking-tight line-clamp-2 min-h-[40px] group-hover:text-secondary transition-colors", i18n.language?.startsWith('ar') && "text-base tracking-normal")}>
                         {product.name}
@@ -213,7 +177,7 @@ const Home = () => {
                   <div className={cn("flex items-center justify-between pt-4 border-t border-border-tech", i18n.language?.startsWith('ar') && "flex-row-reverse")}>
                     <div className={cn("flex flex-col", i18n.language?.startsWith('ar') && "text-end")}>
                       <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">{i18n.language?.startsWith('ar') ? 'السعر' : 'Cotation'}</span>
-                      <span className="text-sm font-mono font-bold text-primary">{formatPrice(product.price || 'Sur Devis')}</span>
+                      <span className="text-sm font-mono font-bold text-primary">{Number(product.price) > 0 ? formatPrice(Number(product.price)) : 'Sur devis'}</span>
                     </div>
                     <Link to={`/products/${generateSlugUrl(product.name, product.id)}`} className="bg-primary text-white p-2 hover:bg-secondary transition-colors">
                       <ArrowRight className={cn("h-4 w-4", i18n.language?.startsWith('ar') && "rotate-180")} />
@@ -247,7 +211,7 @@ const Home = () => {
             {[
               i18n.language?.startsWith('ar') ? 'زيادة الرؤية للموردين' : "Visibilité accrue pour les fournisseurs",
               i18n.language?.startsWith('ar') ? 'تبسيط عمليات التوريد للمشترين' : "Sourcing simplifié pour les acheteurs",
-              i18n.language?.startsWith('ar') ? 'منصة آمنة بنسبة ١٠٠٪' : "Plateforme 100% sécurisée",
+              i18n.language?.startsWith('ar') ? 'مؤسسات موثقة (KYC)' : "Entreprises vérifiées (KYC)",
               i18n.language?.startsWith('ar') ? 'دعم فني محلي' : "Support technique local"
             ].map((text, i) => (
               <div key={i} className={cn("flex items-center justify-center space-x-2 bg-white p-4 rounded-lg shadow-sm border border-border-tech", i18n.language?.startsWith('ar') && "flex-row-reverse space-x-reverse")}>

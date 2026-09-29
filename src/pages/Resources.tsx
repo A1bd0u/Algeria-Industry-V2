@@ -15,10 +15,10 @@ import { Link } from 'react-router-dom';
 
 const Resources = () => {
   const categories = [
-    { name: "Guides & Articles", icon: BookOpen, count: 124 },
-    { name: "Études de cas", icon: FileText, count: 42 },
-    { name: "Formations", icon: GraduationCap, count: 15 },
-    { name: "Réglementation", icon: Gavel, count: 86 },
+    { name: "Guides & Articles", icon: BookOpen },
+    { name: "Études de cas", icon: FileText },
+    { name: "Formations", icon: GraduationCap },
+    { name: "Réglementation", icon: Gavel },
   ];
 
   const articles = [
@@ -27,21 +27,14 @@ const Resources = () => {
       desc: "Tout ce qu'il faut savoir sur les nouvelles lois d'investissement et les avantages fiscaux.",
       category: "Réglementation",
       date: "12 Mars 2026",
-      image: "https://picsum.photos/seed/guide/400/250"
-    },
-    {
-      title: "Optimisation de la chaîne logistique : Cas Sonatrach",
-      desc: "Comment le leader de l'énergie a réduit ses coûts de transport de 15% en un an.",
-      category: "Études de cas",
-      date: "05 Mars 2026",
-      image: "https://picsum.photos/seed/case/400/250"
+      image: "/placeholder.svg"
     },
     {
       title: "Introduction à l'Industrie 4.0 pour les PME",
       desc: "Les premières étapes pour digitaliser votre production sans investissements massifs.",
       category: "Guides",
       date: "28 Fév 2026",
-      image: "https://picsum.photos/seed/industry4/400/250"
+      image: "/placeholder.svg"
     }
   ];
 
@@ -76,7 +69,7 @@ const Resources = () => {
               </div>
               <div>
                 <h3 className="font-bold text-primary">{cat.name}</h3>
-                <p className="text-xs text-gray-400 font-medium">{cat.count} documents</p>
+                <p className="text-xs text-gray-500 font-medium">Bientôt disponible</p>
               </div>
             </motion.div>
           ))}

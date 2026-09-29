@@ -24,7 +24,7 @@ router.get('/', async (req, res) => {
     return res.json(articles || []);
   } catch (err: any) {
     logger.error("Supabase Error GET /articles:", err);
-    return res.status(500).json({ error: err.message });
+    return res.status(500).json({ error: 'Une erreur interne est survenue.' });
   }
 });
 
@@ -48,7 +48,7 @@ router.get('/:id', async (req, res) => {
     return res.json(article);
   } catch (err: any) {
     logger.error("Supabase Error GET /articles/:id:", err);
-    return res.status(500).json({ error: err.message });
+    return res.status(500).json({ error: 'Une erreur interne est survenue.' });
   }
 });
 
@@ -81,7 +81,7 @@ router.post('/', verifyRole(['admin']), async (req, res) => {
     return res.status(201).json(data);
   } catch (err: any) {
     logger.error("Supabase Error POST /articles:", err);
-    return res.status(500).json({ error: err.message });
+    return res.status(500).json({ error: 'Une erreur interne est survenue.' });
   }
 });
 
@@ -104,7 +104,7 @@ router.put('/:id', verifyRole(['admin']), async (req, res) => {
     return res.json(data);
   } catch (err: any) {
     logger.error("Supabase Error PUT /articles/:id:", err);
-    return res.status(500).json({ error: err.message });
+    return res.status(500).json({ error: 'Une erreur interne est survenue.' });
   }
 });
 
@@ -123,7 +123,7 @@ router.delete('/:id', verifyRole(['admin']), async (req, res) => {
     return res.json({ success: true, message: "Article deleted" });
   } catch (err: any) {
     logger.error("Supabase Error DELETE /articles/:id:", err);
-    return res.status(500).json({ error: err.message });
+    return res.status(500).json({ error: 'Une erreur interne est survenue.' });
   }
 });
 

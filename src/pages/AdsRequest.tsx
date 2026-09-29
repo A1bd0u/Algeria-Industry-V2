@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Megaphone, Mail, Phone, Building, User, Info, CheckCircle2, AlertCircle, Upload, FileImage, X } from 'lucide-react';
+import { motion } from 'motion/react';
+import { Megaphone, Mail, Phone, Building, User, Info, CheckCircle2, AlertCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { cn } from '../lib/utils';
+import { Turnstile } from '@marsidev/react-turnstile';
+import { TURNSTILE_SITE_KEY } from '../config/site';
 
 const AdsRequest = () => {
   const { t, i18n } = useTranslation();
@@ -13,25 +15,39 @@ const AdsRequest = () => {
     phone: string;
     placement: string;
     message: string;
-    designFile: File | null;
   }>({
     companyName: '',
     contactName: '',
     email: '',
     phone: '',
     placement: 'homepage_banner',
-    message: '',
-    designFile: null
+    message: ''
   });
   
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMessage('');
+    if (TURNSTILE_SITE_KEY && !captchaToken) {
+      setErrorMessage('Veuillez valider le captcha.');
+      setStatus('error');
+      return;
+    }
     setStatus('submitting');
-    
-    // Simulate API call
-    setTimeout(() => {
+
+    try {
+      const res = await fetch('/api/campaigns/request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...formData, captchaToken })
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || '');
+      }
       setStatus('success');
       setFormData({
         companyName: '',
@@ -39,24 +55,16 @@ const AdsRequest = () => {
         email: '',
         phone: '',
         placement: 'homepage_banner',
-        message: '',
-        designFile: null
+        message: ''
       });
-    }, 1500);
+    } catch (err: any) {
+      setErrorMessage(err.message || '');
+      setStatus('error');
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setFormData(prev => ({ ...prev, designFile: e.target.files![0] }));
-    }
-  };
-
-  const removeFile = () => {
-    setFormData(prev => ({ ...prev, designFile: null }));
   };
 
   const adPlacements = [
@@ -219,50 +227,25 @@ const AdsRequest = () => {
                 ></textarea>
               </div>
 
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-gray-500 uppercase">{t('ads.upload_design')}</label>
-                {!formData.designFile ? (
-                  <div className="relative group">
-                    <input 
-                      type="file" 
-                      accept="image/*"
-                      onChange={handleFileChange}
-                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                    />
-                    <div className="w-full p-8 bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl flex flex-col items-center justify-center text-center group-hover:border-primary group-hover:bg-primary/5 transition-all">
-                      <div className="h-12 w-12 bg-white rounded-full flex items-center justify-center shadow-sm mb-3 group-hover:scale-110 transition-transform">
-                        <Upload className="h-6 w-6 text-primary" />
-                      </div>
-                      <p className="font-bold text-gray-900 mb-1">{t('ads.click_drop')}</p>
-                      <p className="text-xs text-gray-500">{t('ads.formats')}</p>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="w-full p-4 bg-white border border-gray-200 rounded-2xl flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <div className="h-10 w-10 bg-primary/10 rounded-xl flex items-center justify-center">
-                        <FileImage className="h-5 w-5 text-primary" />
-                      </div>
-                      <div>
-                        <p className="font-bold text-sm text-gray-900 line-clamp-1">{formData.designFile.name}</p>
-                        <p className="text-xs text-gray-500">{(formData.designFile.size / 1024 / 1024).toFixed(2)} MB</p>
-                      </div>
-                    </div>
-                    <button 
-                      type="button" 
-                      onClick={removeFile}
-                      className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                    >
-                      <X className="h-5 w-5" />
-                    </button>
-                  </div>
-                )}
-              </div>
+              <p className="text-xs text-gray-500">
+                Vos visuels vous seront demandés par notre équipe après validation de la demande.
+              </p>
+
+              {TURNSTILE_SITE_KEY && (
+                <div className="flex justify-center">
+                  <Turnstile
+                    siteKey={TURNSTILE_SITE_KEY}
+                    onSuccess={(token) => setCaptchaToken(token)}
+                    onError={() => setCaptchaToken(null)}
+                    onExpire={() => setCaptchaToken(null)}
+                  />
+                </div>
+              )}
 
               {status === 'error' && (
                 <div className="bg-red-50 text-red-600 p-4 rounded-xl flex items-start space-x-3 text-sm">
                   <AlertCircle className="h-5 w-5 shrink-0 mt-0.5" />
-                  <p>{t('ads.error_send')}</p>
+                  <p>{errorMessage || t('ads.error_send')}</p>
                 </div>
               )}
 

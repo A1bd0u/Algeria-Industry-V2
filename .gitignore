@@ -9,3 +9,5 @@ coverage/
 patch_*
 *.py
 *.mjs
+test-results/
+playwright-report/

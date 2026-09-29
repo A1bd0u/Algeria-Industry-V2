@@ -20,7 +20,7 @@ router.get('/', async (req, res) => {
     return res.json(catalogues || []);
   } catch (err: any) {
     logger.error("Supabase Error GET /catalogues:", err);
-    return res.status(500).json({ error: err.message });
+    return res.status(500).json({ error: 'Une erreur interne est survenue.' });
   }
 });
 

@@ -15,7 +15,8 @@ test.describe('Vendor Product Creation', () => {
             role: 'fournisseur',
             isVerified: true,
             emailVerified: true,
-            companyStatus: 'verified'
+            kycStatus: 'approved',
+            companyStatus: 'approved'
           }
         }),
       });
@@ -44,6 +45,9 @@ test.describe('Vendor Product Creation', () => {
     await context.addCookies([
       { name: 'token', value: 'fake-jwt-token', domain: 'localhost', path: '/' }
     ]);
+
+    // Choix de consentement déjà enregistré : le bandeau cookies ne masque pas la page.
+    await page.addInitScript(() => localStorage.setItem('ai_cookie_consent_v1', 'rejected'));
 
     // Aller sur le tableau de bord fournisseur - onglet produits
     await page.goto('/dashboard?tab=products');

@@ -72,12 +72,7 @@ const ForgotPassword = () => {
             >
               <h3 className="font-bold text-lg mb-2">Email envoyé !</h3>
               <p className="text-sm">Si l'adresse correspond à un compte actif, vous recevrez bientôt un email de réinitialisation.</p>
-              <div className="mt-6">
-                 {/* For simulation purposes, we provide a quick link to reset */}
-                 <Link to="/reset-password?token=demo-token" className="text-xs font-bold text-secondary hover:underline">
-                   [Simulation] Aller à la page de réinitialisation
-                 </Link>
-              </div>
+              <p className="text-xs mt-4 text-green-700">Le lien est valable 15 minutes. Pensez à vérifier vos courriers indésirables.</p>
             </motion.div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-6">

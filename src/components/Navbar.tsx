@@ -4,13 +4,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { useCurrency } from '../context/CurrencyContext';
 import { cn } from '../lib/utils';
 import SearchModal from './SearchModal';
 
 const Navbar = () => {
   const { t, i18n } = useTranslation();
-  const { currency, setCurrency } = useCurrency();
   const { user, logout, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
@@ -431,20 +429,6 @@ const Navbar = () => {
                         )}
                       >
                         <span className="text-[10px] font-black">{lang.code.toUpperCase()}</span>
-                      </button>
-                    ))}
-                 </div>
-                 <div className="flex space-x-2">
-                    {['DZD', 'EUR', 'USD'].map(curr => (
-                      <button
-                        key={curr}
-                        onClick={() => { setCurrency(curr as any); setIsOpen(false); }}
-                        className={cn(
-                          "px-3 py-2 rounded-xl text-[10px] font-black uppercase transition-all",
-                          currency === curr ? "bg-white/10 text-secondary" : "text-white/40"
-                        )}
-                      >
-                        {curr}
                       </button>
                     ))}
                  </div>

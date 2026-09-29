@@ -36,14 +36,14 @@ describe('Middlewares', () => {
     const res = mockResponse();
     const next = vi.fn();
 
-    vi.mocked(jwt.verify).mockReturnValue({ id: '1', role: 'acheteur', token_version: 1 } as any);
-    
-    // Mock supabase to return valid token_version
+    // Le JWT prétend "admin" mais le rôle réel, lu en base, est "acheteur".
+    vi.mocked(jwt.verify).mockReturnValue({ id: '1', role: 'admin', token_version: 1 } as any);
+
     const mockSupabase = {
       from: vi.fn().mockReturnThis(),
       select: vi.fn().mockReturnThis(),
       eq: vi.fn().mockReturnThis(),
-      maybeSingle: vi.fn().mockResolvedValue({ data: { token_version: 1 } }),
+      maybeSingle: vi.fn().mockResolvedValue({ data: { id: '1', token_version: 1, role: 'acheteur' } }),
     };
     vi.mocked(getSupabase).mockReturnValue(mockSupabase as any);
 
@@ -59,13 +59,13 @@ describe('Middlewares', () => {
     const res = mockResponse();
     const next = vi.fn();
 
-    vi.mocked(jwt.verify).mockReturnValue({ id: '1', role: 'fournisseur', token_version: 1 } as any);
+    vi.mocked(jwt.verify).mockReturnValue({ id: '1', token_version: 1 } as any);
 
     const mockSupabase = {
       from: vi.fn().mockReturnThis(),
       select: vi.fn().mockReturnThis(),
       eq: vi.fn().mockReturnThis(),
-      maybeSingle: vi.fn().mockResolvedValue({ data: { token_version: 1 } }),
+      maybeSingle: vi.fn().mockResolvedValue({ data: { id: '1', token_version: 1, role: 'fournisseur' } }),
     };
     vi.mocked(getSupabase).mockReturnValue(mockSupabase as any);
 
@@ -73,6 +73,42 @@ describe('Middlewares', () => {
     await middleware(req, res, next);
 
     expect(next).toHaveBeenCalled();
+  });
+
+  it('requireAuth devrait rejeter un compte suspendu même avec un JWT valide', async () => {
+    const req: any = { cookies: { token: 'valid-token' } };
+    const res = mockResponse();
+    const next = vi.fn();
+
+    vi.mocked(jwt.verify).mockReturnValue({ id: '1', token_version: 1 } as any);
+    vi.mocked(getSupabase).mockReturnValue({
+      from: vi.fn().mockReturnThis(),
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      maybeSingle: vi.fn().mockResolvedValue({ data: { id: '1', token_version: 1, role: 'fournisseur_suspended' } }),
+    } as any);
+
+    await requireAuth(req, res, next);
+    expect(res.status).toHaveBeenCalledWith(403);
+    expect(next).not.toHaveBeenCalled();
+  });
+
+  it('requireAuth devrait rejeter un JWT dont le token_version est révoqué', async () => {
+    const req: any = { cookies: { token: 'valid-token' } };
+    const res = mockResponse();
+    const next = vi.fn();
+
+    vi.mocked(jwt.verify).mockReturnValue({ id: '1', token_version: 1 } as any);
+    vi.mocked(getSupabase).mockReturnValue({
+      from: vi.fn().mockReturnThis(),
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      maybeSingle: vi.fn().mockResolvedValue({ data: { id: '1', token_version: 2, role: 'admin' } }),
+    } as any);
+
+    await requireAuth(req, res, next);
+    expect(res.status).toHaveBeenCalledWith(401);
+    expect(next).not.toHaveBeenCalled();
   });
 
   it('verifyOwnership devrait accepter si le rôle est admin', async () => {

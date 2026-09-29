@@ -32,8 +32,8 @@ const Tarifs = () => {
       id: 'basic',
       name: 'Basic',
       price: '18 000 DA',
-      originalPrice: '30 000 DA',
-      discount: '-40%',
+      originalPrice: null,
+      discount: null,
       period: '/ an',
       description: 'Le meilleur rapport qualité-prix',
       features: [
@@ -53,8 +53,8 @@ const Tarifs = () => {
       id: 'pro',
       name: 'Pro',
       price: '29 900 DA',
-      originalPrice: '55 000 DA',
-      discount: '-46%',
+      originalPrice: null,
+      discount: null,
       period: '/ an',
       description: 'Pour les entreprises ambitieuses',
       features: [
@@ -93,6 +93,19 @@ const Tarifs = () => {
               <span>Tarifs Exposants</span>
             </h2>
             <p className="text-gray-700 font-bold max-w-xl mx-auto text-base md:text-lg">Pour présenter vos produits et services</p>
+          </div>
+          <div className="max-w-4xl mx-auto mb-12 bg-primary text-white rounded-2xl p-6 md:p-8 flex flex-col md:flex-row items-center gap-6">
+            <ShieldCheck className="h-10 w-10 text-secondary shrink-0" />
+            <div className="flex-1 text-center md:text-start">
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-secondary mb-1">Offre membre fondateur</p>
+              <p className="font-bold">
+                Premium offert pendant 12 mois aux 100 premiers fournisseurs vérifiés (KYC approuvé)
+                qui publient un catalogue d'au moins 10 produits. Offre valable jusqu'au 31 décembre 2026.
+              </p>
+            </div>
+            <Link to="/register?role=fournisseur" className="bg-secondary text-white px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest whitespace-nowrap">
+              Devenir membre fondateur
+            </Link>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto items-stretch">
             {exhibitorPlans.map((plan, i) => (
@@ -140,21 +153,10 @@ const Tarifs = () => {
                         )}>{plan.period}</span>
                       </div>
                       
-                      {plan.originalPrice && (
-                        <div className="flex items-center gap-2 mt-2">
-                          <span className={cn(
-                            "text-sm line-through decoration-red-500 decoration-2 font-bold",
-                            plan.id === 'pro' ? "text-neutral-400" : "text-neutral-500"
-                          )}>
-                            {plan.originalPrice} / an
-                          </span>
-                          {plan.discount && (
-                            <span className="bg-[#E86A17] text-white text-[11px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-md">
-                              {plan.discount}
-                            </span>
-                          )}
-                        </div>
-                      )}
+                      <span className={cn(
+                        "text-[11px] font-bold mt-2 uppercase tracking-wider",
+                        plan.id === 'pro' ? "text-neutral-400" : "text-neutral-500"
+                      )}>Prix TTC (TVA 19 % incluse)</span>
                     </div>
                   </div>
                   
@@ -207,22 +209,10 @@ const Tarifs = () => {
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   <tr>
-                    <td className="px-6 py-4 text-sm font-extrabold text-gray-800">Prix normal</td>
+                    <td className="px-6 py-4 text-sm font-extrabold text-gray-800">Prix annuel TTC</td>
                     <td className="px-6 py-4 text-center text-sm font-black text-primary bg-gray-100/30">0 DA</td>
-                    <td className="px-6 py-4 text-center text-sm font-black text-neutral-900 bg-[#E86A17]/15">30 000 DA/an</td>
-                    <td className="px-6 py-4 text-center text-sm font-black text-neutral-950 bg-neutral-950/10">55 000 DA/an</td>
-                  </tr>
-                  <tr>
-                    <td className="px-6 py-4 text-sm font-extrabold text-gray-800">Prix de lancement</td>
-                    <td className="px-6 py-4 text-center text-sm font-black text-primary bg-gray-100/30">0 DA</td>
-                    <td className="px-6 py-4 text-center text-sm font-black text-[#E86A17] bg-[#E86A17]/15">18 000 DA/an</td>
-                    <td className="px-6 py-4 text-center text-sm font-black text-[#E86A17] bg-neutral-950/10">29 900 DA/an</td>
-                  </tr>
-                  <tr>
-                    <td className="px-6 py-4 text-sm font-extrabold text-gray-800">Économie</td>
-                    <td className="px-6 py-4 text-center text-sm font-extrabold text-gray-500 bg-gray-100/30">-</td>
-                    <td className="px-6 py-4 text-center text-sm font-black text-green-700 bg-[#E86A17]/15">-40%</td>
-                    <td className="px-6 py-4 text-center text-sm font-black text-green-700 bg-neutral-950/10">-46%</td>
+                    <td className="px-6 py-4 text-center text-sm font-black text-neutral-900 bg-[#E86A17]/15">18 000 DA/an</td>
+                    <td className="px-6 py-4 text-center text-sm font-black text-neutral-950 bg-neutral-950/10">29 900 DA/an</td>
                   </tr>
                   <tr>
                     <td className="px-6 py-4 text-sm font-extrabold text-gray-800">Produits</td>
@@ -295,33 +285,15 @@ const Tarifs = () => {
         <div className="mt-6 max-w-4xl mx-auto bg-white rounded-2xl p-10 text-center shadow-lg shadow-gray-200/50 border border-gray-100 relative">
           <div>
             <ShieldCheck className="h-16 w-16 text-secondary mx-auto mb-6 drop-shadow-md" />
-            <h3 className="text-2xl font-black text-primary tracking-tighter uppercase mb-4">Paiement Sécurisé</h3>
-            <p className="text-sm text-gray-500 max-w-lg mx-auto leading-relaxed font-medium mb-8">
-              Tous nos abonnements sont facturés en Dinar Algérien (DZD). Nous acceptons les paiements par virement bancaire, chèque certifié et paiement électronique via CIB / Dahabia.
+            <h3 className="text-2xl font-black text-primary tracking-tighter uppercase mb-4">Paiement par facture</h3>
+            <p className="text-sm text-gray-600 max-w-lg mx-auto leading-relaxed font-medium">
+              Tous nos abonnements sont facturés en dinars algériens (DZD), TVA 19 % incluse. Au lancement, le règlement
+              se fait par virement bancaire sur facture ; votre abonnement est activé dès réception du paiement.
+              Le paiement en ligne par carte CIB / Edahabia sera proposé ultérieurement.
             </p>
-
-            {/* Cartes CIB et Edahabia */}
-            <div className="flex items-center justify-center gap-6 mt-6">
-              {/* Carte CIB - Taille Moyenne */}
-              <div className="relative w-28 h-16 rounded-lg shadow-lg overflow-hidden bg-gradient-to-br from-[#0F2027] to-[#2C5364] border border-white/10 flex items-center justify-center hover:scale-105 transition-transform duration-200 cursor-pointer" title="Carte CIB">
-                {/* REMPLACEMENT FACILE PAR UNE IMAGE : 
-                    <img src="/images/cib.png" alt="CIB" className="w-full h-full object-cover absolute inset-0 rounded-lg" /> 
-                */}
-                <span className="text-xs font-black tracking-widest text-white relative z-10">CIB</span>
-                <div className="absolute top-2 left-2 w-5 h-3.5 rounded-[1px] bg-gradient-to-r from-amber-200 to-amber-400 opacity-85"></div>
-                <div className="absolute right-2 bottom-2 w-3 h-3 rounded-full bg-cyan-400 opacity-50"></div>
-              </div>
-
-              {/* Carte Edahabia - Taille Moyenne */}
-              <div className="relative w-28 h-16 rounded-lg shadow-lg overflow-hidden bg-gradient-to-br from-[#1C160E] to-[#3E2D1A] border border-[#D4AF37]/30 flex items-center justify-center hover:scale-105 transition-transform duration-200 cursor-pointer" title="Carte Edahabia">
-                {/* REMPLACEMENT FACILE PAR UNE IMAGE : 
-                    <img src="/images/edahabia.png" alt="Edahabia" className="w-full h-full object-cover absolute inset-0 rounded-lg" /> 
-                */}
-                <span className="text-[10px] font-black tracking-widest text-[#D4AF37] uppercase relative z-10">Gold</span>
-                <div className="absolute top-2 left-2 w-5 h-3.5 rounded-[1px] bg-gradient-to-r from-amber-200 to-amber-400 opacity-85"></div>
-                <div className="absolute right-2 bottom-2 w-3 h-3 rounded-full bg-amber-500 opacity-50"></div>
-              </div>
-            </div>
+            <p className="text-xs text-gray-500 mt-4">
+              Durée, renouvellement, résiliation et remboursement : voir nos <Link to="/terms" className="font-bold text-primary hover:underline">conditions générales</Link>.
+            </p>
           </div>
         </div>
       </div>

@@ -1,6 +1,6 @@
 import { ArrowRight, Briefcase, Building2, CheckCircle2, Loader2, Lock, Mail, ShieldCheck, User } from 'lucide-react';
 import { motion } from 'motion/react';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { cn } from '../lib/utils';
@@ -16,7 +16,7 @@ const registerSchema = z.object({
   companyName: z.string().min(2, "Nom de l'entreprise requis"),
   email: z.string().email('Adresse email invalide'),
   password: z.string()
-    .min(8, 'Le mot de passe doit contenir au moins 8 caractères')
+    .min(10, 'Le mot de passe doit contenir au moins 10 caractères')
     .regex(/[a-zA-Z]/, 'Le mot de passe doit contenir au moins une lettre')
     .regex(/[0-9]/, 'Le mot de passe doit contenir au moins un chiffre'),
 });
@@ -42,41 +42,6 @@ const Register = () => {
   
   const passwordValue = watch('password');
 
-  useEffect(() => {
-    const handleMessage = (event: MessageEvent) => {
-      const origin = event.origin;
-      if (!origin.endsWith('.run.app') && !origin.includes('localhost')) {
-        return;
-      }
-      if (event.data?.type === 'OAUTH_AUTH_SUCCESS') {
-        window.location.href = '/dashboard';
-      }
-    };
-    window.addEventListener('message', handleMessage);
-    return () => window.removeEventListener('message', handleMessage);
-  }, []);
-
-  const handleOAuthConnect = async (provider: 'google' | 'linkedin') => {
-    try {
-      const response = await fetch(`/api/auth/oauth/url?provider=${provider}`);
-      if (!response.ok) {
-        throw new Error('Failed to get auth URL');
-      }
-      const { url } = await response.json();
-      const authWindow = window.open(
-        url,
-        'oauth_popup',
-        'width=600,height=700'
-      );
-      if (!authWindow) {
-        setAuthError('Veuillez autoriser les popups pour vous inscrire.');
-      }
-    } catch (err: any) {
-      console.error('OAuth error:', err);
-      setAuthError('Impossible d\'initier l\'inscription avec ' + provider);
-    }
-  };
-
   const onSubmit = async (data: RegisterForm) => {
     if (!captchaToken) {
       setAuthError('Veuillez valider le captcha pour continuer.');
@@ -94,7 +59,7 @@ const Register = () => {
         password: data.password,
         captchaToken: captchaToken
       });
-      navigate('/register-success');
+      navigate('/register-success', { state: { email: data.email.trim().toLowerCase() } });
     } catch (err: any) {
       setAuthError(err.message || 'Une erreur est survenue');
     } finally {
@@ -151,13 +116,11 @@ const Register = () => {
           
           <div className="relative z-10 mt-12">
             <div className="flex -space-x-2">
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className={`w-10 h-10 rounded-full border-2 border-primary flex items-center justify-center font-bold text-xs bg-white text-primary z-[${5-i}]`}>
-                  {i === 4 ? '+5k' : `U${i}`}
-                </div>
-              ))}
+              <div className="w-10 h-10 rounded-full border-2 border-primary flex items-center justify-center bg-white text-primary">
+                <ShieldCheck className="h-5 w-5" />
+              </div>
             </div>
-            <p className="text-sm text-primary-100 mt-3 font-medium">Déjà plus de 5000 entreprises inscrites</p>
+            <p className="text-sm text-primary-100 mt-3 font-medium">Fiches fournisseurs vérifiées par KYC</p>
           </div>
         </div>
 
@@ -361,36 +324,6 @@ const Register = () => {
                   </div>
                 </form>
 
-                <div className="mt-8 relative">
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-gray-100"></div>
-                  </div>
-                  <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-white px-4 text-gray-400 font-medium tracking-widest">Ou s'inscrire avec</span>
-                  </div>
-                </div>
-
-                <div className="mt-8 grid grid-cols-2 gap-4">
-                  <button 
-                    type="button"
-                    onClick={() => handleOAuthConnect('google')}
-                    className="flex items-center justify-center space-x-2 py-3 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors"
-                  >
-                    <div className="bg-gradient-to-r from-red-500 to-yellow-500 p-0.5 rounded text-white overflow-hidden w-4 h-4 flex items-center justify-center font-bold text-[10px]">G</div>
-                    <span className="text-sm font-bold text-gray-700">Google</span>
-                  </button>
-                  
-                  <button 
-                    type="button"
-                    onClick={() => handleOAuthConnect('linkedin')}
-                    className="flex items-center justify-center space-x-2 py-3 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors"
-                  >
-                    <div className="bg-[#0077b5] p-0.5 rounded text-white">
-                      <ArrowRight className="h-3 w-3 rtl:rotate-180" />
-                    </div>
-                    <span className="text-sm font-bold text-gray-700">LinkedIn</span>
-                  </button>
-                </div>
               </div>
             )}
             

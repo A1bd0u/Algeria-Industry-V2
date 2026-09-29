@@ -30,6 +30,13 @@ RUN npm ci --omit=dev
 # Copier les fichiers construits depuis l'étape de build
 COPY --from=builder /app/dist ./dist
 
+# Templates d'e-mail lus sur disque par emailService.ts : sans eux, aucun code
+# de vérification ni lien de réinitialisation ne part en production.
+COPY --from=builder /app/server/services/emailTemplates ./server/services/emailTemplates
+
+# Ne pas exécuter le serveur en root
+USER node
+
 # Exposer le port
 EXPOSE ${PORT}
 

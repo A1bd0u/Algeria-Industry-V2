@@ -220,7 +220,7 @@ const BlogDetail = () => {
                 {recentPosts.map((p: any, i: number) => (
                   <Link key={i} to={`/blog/${generateSlugUrl(p.title, p.id)}`} className="group block">
                     <div className="aspect-video bg-gray-100 rounded-2xl overflow-hidden mb-4">
-                       <img src={p.image_url || `https://picsum.photos/seed/${p.id}/600/400`} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt="Post" />
+                       <img src={p.image_url || '/placeholder.svg'} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt="Post" />
                     </div>
                     <span className="text-[9px] font-black text-secondary tracking-widest uppercase mb-2 block">{p.tags?.[0] || 'Industrie'}</span>
                     <h4 className="text-xs font-black text-primary uppercase tracking-tight group-hover:text-secondary transition-colors mb-2 line-clamp-2 italic leading-tight">

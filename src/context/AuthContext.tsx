@@ -5,20 +5,25 @@ export interface User {
   name: string;
   email: string;
   company: string;
+  company_id?: string | null;
   role: 'acheteur' | 'fournisseur' | 'admin' | 'exposant';
+  // Vrai uniquement si le dossier KYC est approuvé.
   isVerified: boolean;
   emailVerified?: boolean;
-  companyStatus?: string;
+  kycStatus?: 'none' | 'pending' | 'approved' | 'rejected';
+  companyStatus?: string | null;
 }
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  login: (email: string, password: string, captchaToken: string) => Promise<void>;
+  login: (email: string, password: string, captchaToken: string) => Promise<User>;
   register: (userData: Partial<User> & { password?: string; captchaToken?: string }) => Promise<void>;
   logout: () => Promise<void>;
   verifyCode: (email: string, code: string) => Promise<void>;
-  resendCode: (email: string) => Promise<void>;
+  resendCode: (email: string, captchaToken: string) => Promise<void>;
+  refreshUser: () => Promise<void>;
+  setUser: (user: User | null) => void;
   isAuthenticated: boolean;
 }
 
@@ -72,11 +77,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       const data = await res.json();
       setUser(data.user);
+      return data.user as User;
     } catch (err: any) {
       setLoading(false);
       throw err;
     } finally {
       setLoading(false);
+    }
+  };
+
+  const refreshUser = async () => {
+    try {
+      const res = await fetch('/api/auth/me');
+      if (res.ok) {
+        const data = await res.json();
+        setUser(data.user || null);
+      }
+    } catch (err) {
+      console.warn('Erreur lors du rafraîchissement de la session:', err);
     }
   };
 
@@ -102,9 +120,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const errorData = await res.json().catch(() => ({}));
         throw new Error(errorData.error || 'Erreur lors de la création du compte.');
       }
-
-      const data = await res.json();
-      setUser(data.user);
+      // Pas de session à ce stade : elle s'ouvre après vérification du code e-mail.
     } catch (err: any) {
       setLoading(false);
       throw err;
@@ -123,20 +139,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const errData = await res.json().catch(() => ({}));
       throw new Error(errData.error || 'Code invalide.');
     }
-    // Update local user state immediately
-    if (user && user.email === email) {
-      setUser({ ...user, emailVerified: true });
+    // Le serveur ouvre la session et renvoie le profil à jour.
+    const data = await res.json().catch(() => ({}));
+    if (data?.user) {
+      setUser(data.user);
+    } else {
+      await refreshUser();
     }
   };
 
-  const resendCode = async (email: string) => {
+  const resendCode = async (email: string, captchaToken: string) => {
     const res = await fetch('/api/auth/resend-code', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email })
+      body: JSON.stringify({ email, captchaToken })
     });
     if (!res.ok) {
-      throw new Error("Erreur lors de l'envoi du code.");
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData.error || "Erreur lors de l'envoi du code.");
     }
   };
 
@@ -155,7 +175,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, verifyCode, resendCode, isAuthenticated: !!user }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, verifyCode, resendCode, refreshUser, setUser, isAuthenticated: !!user }}>
       {children}
     </AuthContext.Provider>
   );

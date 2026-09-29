@@ -1,10 +1,9 @@
 import { logger } from '../utils/logger';
+import { escapeHtml } from '../utils/html';
 import { Resend } from 'resend';
 import fs from 'fs';
 import path from 'path';
 
-// Note: If using ESM, process.cwd() can be used to resolve the path correctly.
-// Depending on where this is executed from (dist vs src), we will resolve relative to process.cwd().
 let resendClient: Resend | null = null;
 function getResendClient() {
   if (!resendClient && process.env.RESEND_API_KEY) {
@@ -13,66 +12,92 @@ function getResendClient() {
   return resendClient;
 }
 
-const getSenderEmail = () => process.env.SENDER_EMAIL || 'onboarding@resend.dev';
+// L'expéditeur doit appartenir à un domaine vérifié chez Resend (SPF, DKIM, DMARC).
+// L'adresse de test onboarding@resend.dev n'est tolérée qu'en développement.
+const getSenderEmail = () => {
+  if (process.env.SENDER_EMAIL) return process.env.SENDER_EMAIL;
+  if (process.env.NODE_ENV === 'production') return null;
+  return 'onboarding@resend.dev';
+};
 
-export type TemplateType = 'verificationCode' | 'resetPassword' | 'kycApproved' | 'kycRejected' | 'securityAlert';
+export const getAppUrl = () => process.env.APP_URL || process.env.VITE_APP_URL || 'http://localhost:3000';
+
+export type TemplateType =
+  | 'verificationCode'
+  | 'resetPassword'
+  | 'kycApproved'
+  | 'kycRejected'
+  | 'securityAlert'
+  | 'accountExists'
+  | 'contactMessage';
+
+const SUBJECTS: Record<TemplateType, string> = {
+  verificationCode: 'Votre code de vérification - Algeria Industry',
+  resetPassword: 'Réinitialisation de votre mot de passe - Algeria Industry',
+  kycApproved: 'Votre dossier KYC a été approuvé - Algeria Industry',
+  kycRejected: 'Mise à jour concernant votre dossier KYC - Algeria Industry',
+  securityAlert: 'Alerte de sécurité - Algeria Industry',
+  accountExists: 'Tentative d\'inscription avec votre adresse - Algeria Industry',
+  contactMessage: 'Nouveau message de contact - Algeria Industry',
+};
+
+// Les templates sont copiés dans l'image Docker (voir Dockerfile) :
+// on les cherche à côté du bundle compilé comme à côté des sources.
+const TEMPLATE_DIRS = [
+  path.join(process.cwd(), 'server', 'services', 'emailTemplates'),
+  path.join(process.cwd(), 'dist', 'emailTemplates'),
+];
+
+const templateCache = new Map<TemplateType, string>();
+
+const loadTemplate = (templateType: TemplateType): string => {
+  const cached = templateCache.get(templateType);
+  if (cached) return cached;
+
+  for (const dir of TEMPLATE_DIRS) {
+    const candidate = path.join(dir, `${templateType}.html`);
+    if (fs.existsSync(candidate)) {
+      const content = fs.readFileSync(candidate, 'utf-8');
+      templateCache.set(templateType, content);
+      return content;
+    }
+  }
+  throw new Error(`Template e-mail introuvable : ${templateType}`);
+};
+
+export const renderTemplate = (templateType: TemplateType, variables: Record<string, string>) => {
+  let htmlContent = loadTemplate(templateType);
+  for (const [key, value] of Object.entries(variables)) {
+    // Toutes les variables sont échappées : un nom ou un motif ne doit jamais injecter de HTML.
+    htmlContent = htmlContent.replace(new RegExp(`{{\\s*${key}\\s*}}`, 'g'), () => escapeHtml(value));
+  }
+  return htmlContent;
+};
 
 export async function sendTransactionalEmail(to: string, templateType: TemplateType, variables: Record<string, string>) {
   const resend = getResendClient();
   if (!resend) {
-    console.warn(`[Email Service] RESEND_API_KEY is not set. Simulating email to ${to} (Template: ${templateType})`, variables);
+    if (process.env.NODE_ENV === 'production') {
+      logger.error(`[Email Service] RESEND_API_KEY manquante : e-mail "${templateType}" non envoyé.`);
+      return { success: false, error: 'EMAIL_NOT_CONFIGURED' };
+    }
+    logger.warn(`[Email Service] RESEND_API_KEY absente (dev) : e-mail "${templateType}" non envoyé.`);
     return { success: true, simulated: true };
   }
 
+  const from = getSenderEmail();
+  if (!from) {
+    logger.error('[Email Service] SENDER_EMAIL manquant en production.');
+    return { success: false, error: 'EMAIL_NOT_CONFIGURED' };
+  }
+
   try {
-    let subject = '';
-    switch (templateType) {
-      case 'verificationCode':
-        subject = 'Votre code de vérification - Algeria Industry';
-        break;
-      case 'resetPassword':
-        subject = 'Réinitialisation de votre mot de passe - Algeria Industry';
-        break;
-      case 'kycApproved':
-        subject = 'Votre dossier KYC a été approuvé - Algeria Industry';
-        break;
-      case 'kycRejected':
-        subject = 'Mise à jour concernant votre dossier KYC - Algeria Industry';
-        break;
-      case 'securityAlert':
-        subject = 'Alerte de sécurité - Algeria Industry';
-        break;
-      default:
-        subject = 'Notification - Algeria Industry';
-    }
-
-    // Try to find the template in a few common places depending on if we are running ts-node or compiled
-    const possiblePaths = [
-      path.join(process.cwd(), 'server', 'services', 'emailTemplates', `${templateType}.html`),
-      path.join(process.cwd(), 'src', 'server', 'services', 'emailTemplates', `${templateType}.html`), // if structure changes
-    ];
-    
-    let templatePath = possiblePaths[0];
-    for (const p of possiblePaths) {
-      if (fs.existsSync(p)) {
-        templatePath = p;
-        break;
-      }
-    }
-
-    let htmlContent = fs.readFileSync(templatePath, 'utf-8');
-
-    // Simple template injection {{ key }} -> value
-    for (const [key, value] of Object.entries(variables)) {
-      // Support {{ key }} and {{key}} and {{__key__}} just in case
-      htmlContent = htmlContent.replace(new RegExp(`{{\\s*${key}\\s*}}`, 'g'), value);
-    }
-
+    const html = renderTemplate(templateType, variables);
     const { data, error } = await resend.emails.send({
-      from: getSenderEmail(),
+      from,
       to,
-      subject,
-      html: htmlContent
+      subject: SUBJECTS[templateType],
+      html,
     });
 
     if (error) {

@@ -51,6 +51,6 @@ En cas de mise en production d'une version défectueuse du code (bug bloquant, p
 5. Cliquez sur **Enregistrer**. Le rollback est instantané.
 
 ### Si déployé manuellement avec Docker
-1. Identifiez le tag de l'image précédente qui fonctionnait (ex: `algiers-industry:v1.2.0`).
-2. Arrêtez le conteneur actuel : `docker stop algiers-industry-prod && docker rm algiers-industry-prod`
-3. Relancez l'ancienne image : `docker run -d -p 3000:3000 --name algiers-industry-prod --env-file .env algiers-industry:v1.2.0`
+1. Identifiez le tag de l'image précédente qui fonctionnait (ex: `algeria-industry:v1.2.0`).
+2. Arrêtez le conteneur actuel : `docker stop algeria-industry-prod && docker rm algeria-industry-prod`
+3. Relancez l'ancienne image : `docker run -d -p 3000:3000 --name algeria-industry-prod --env-file .env algeria-industry:v1.2.0`

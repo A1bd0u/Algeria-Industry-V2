@@ -4,72 +4,108 @@ import { getSupabase } from '../db/supabaseClient';
 
 const JWT_SECRET = process.env.JWT_SECRET || '';
 
-export const requireAuth = async (req: Request, res: Response, next: NextFunction) => {
+// Colonnes relues en base à chaque requête authentifiée : le rôle, la
+// suspension et les statuts de vérification ne sont jamais lus dans le JWT,
+// pour qu'un changement côté admin prenne effet immédiatement.
+const SESSION_COLUMNS = 'id, name, email, company, company_id, role, token_version, email_verified, kyc_status';
+
+export interface SessionUser {
+  id: string;
+  name: string;
+  email: string;
+  company: string | null;
+  company_id: string | null;
+  role: string;
+  emailVerified: boolean;
+  kycStatus: string;
+  // Alias conservé pour le front : vrai uniquement si le KYC est approuvé.
+  isVerified: boolean;
+}
+
+type AuthResult =
+  | { ok: true; user: SessionUser }
+  | { ok: false; status: number; error: string };
+
+const authenticate = async (req: Request): Promise<AuthResult> => {
   const token = req.cookies?.token;
   if (!token) {
-    return res.status(401).json({ error: 'Accès refusé. Non authentifié.' });
+    return { ok: false, status: 401, error: 'Accès refusé. Non authentifié.' };
+  }
+
+  let decoded: any;
+  try {
+    decoded = jwt.verify(token, JWT_SECRET);
+  } catch {
+    return { ok: false, status: 401, error: 'Token invalide ou expiré.' };
+  }
+
+  if (!decoded?.id) {
+    return { ok: false, status: 401, error: 'Token invalide ou révoqué.' };
   }
 
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as any;
-    
-    if (decoded.id) {
-      const supabase = getSupabase();
-      const { data: user } = await supabase
-        .from('users')
-        .select('token_version')
-        .eq('id', decoded.id)
-        .maybeSingle();
-        
-      if (!user || user.token_version !== decoded.token_version) {
-        return res.status(401).json({ error: 'Token invalide ou révoqué.' });
-      }
+    const supabase = getSupabase();
+    const { data: row } = await supabase
+      .from('users')
+      .select(SESSION_COLUMNS)
+      .eq('id', decoded.id)
+      .maybeSingle();
+
+    if (!row || (row.token_version ?? 0) !== (decoded.token_version ?? 0)) {
+      return { ok: false, status: 401, error: 'Token invalide ou révoqué.' };
     }
 
-    (req as any).user = decoded; // Attach user to request
-    next();
-  } catch (error) {
-    return res.status(401).json({ error: 'Token invalide ou expiré.' });
+    const role: string = row.role || '';
+    if (role.endsWith('_suspended')) {
+      return { ok: false, status: 403, error: 'Ce compte a été suspendu.' };
+    }
+
+    const kycStatus = row.kyc_status || 'none';
+    return {
+      ok: true,
+      user: {
+        id: row.id,
+        name: row.name,
+        email: row.email,
+        company: row.company ?? null,
+        company_id: row.company_id ?? null,
+        role,
+        emailVerified: Boolean(row.email_verified),
+        kycStatus,
+        isVerified: kycStatus === 'approved',
+      },
+    };
+  } catch {
+    return { ok: false, status: 401, error: 'Token invalide ou expiré.' };
   }
+};
+
+export const requireAuth = async (req: Request, res: Response, next: NextFunction) => {
+  const result = await authenticate(req);
+  if (result.ok === false) {
+    return res.status(result.status).json({ error: result.error });
+  }
+  (req as any).user = result.user;
+  next();
 };
 
 export const verifyRole = (allowedRoles: string[]) => {
   return async (req: Request, res: Response, next: NextFunction) => {
-    const token = req.cookies?.token;
-    if (!token) {
-      return res.status(401).json({ error: 'Accès refusé. Non authentifié.' });
+    const result = await authenticate(req);
+    if (result.ok === false) {
+      return res.status(result.status).json({ error: result.error });
+    }
+    (req as any).user = result.user;
+
+    if (!allowedRoles.includes(result.user.role)) {
+      return res.status(403).json({ error: 'Accès interdit. Rôle insuffisant.' });
     }
 
-    try {
-      const decoded: any = jwt.verify(token, JWT_SECRET);
-      
-      if (decoded.id) {
-        const supabase = getSupabase();
-        const { data: user } = await supabase
-          .from('users')
-          .select('token_version')
-          .eq('id', decoded.id)
-          .maybeSingle();
-          
-        if (!user || user.token_version !== decoded.token_version) {
-          return res.status(401).json({ error: 'Token invalide ou révoqué.' });
-        }
-      }
-
-      (req as any).user = decoded;
-      
-      if (!decoded.role || !allowedRoles.includes(decoded.role)) {
-        return res.status(403).json({ error: 'Accès interdit. Rôle insuffisant.' });
-      }
-      
-      next();
-    } catch (error) {
-      return res.status(401).json({ error: 'Token invalide ou expiré.' });
-    }
+    next();
   };
 };
 
-// Deprecated: use verifyRole instead. Keeping it for backward compatibility or replace it.
+// Deprecated: use verifyRole instead.
 export const requireRole = (roles: string[]) => {
   return (req: Request, res: Response, next: NextFunction) => {
     const user = (req as any).user;
@@ -80,10 +116,32 @@ export const requireRole = (roles: string[]) => {
   };
 };
 
-export const requireVerified = (req: Request, res: Response, next: NextFunction) => {
-  const user = (req as any).user;
-  if (!user || !user.isVerified) {
-    return res.status(403).json({ error: 'Accès interdit. Compte non vérifié.' });
+// Adresse e-mail confirmée par code : suffit pour écrire des messages ou des avis.
+export const requireEmailVerified = (req: Request, res: Response, next: NextFunction) => {
+  const user = (req as any).user as SessionUser | undefined;
+  if (!user || !user.emailVerified) {
+    return res.status(403).json({ error: 'Accès interdit. Adresse e-mail non vérifiée.', code: 'EMAIL_NOT_VERIFIED' });
+  }
+  next();
+};
+
+// Conservé pour compatibilité : même sémantique que requireEmailVerified.
+export const requireVerified = requireEmailVerified;
+
+// Dossier KYC approuvé par un admin : requis pour publier produits et appels d'offres.
+export const requireKyc = (req: Request, res: Response, next: NextFunction) => {
+  const user = (req as any).user as SessionUser | undefined;
+  if (!user) {
+    return res.status(401).json({ error: 'Accès refusé. Non authentifié.' });
+  }
+  if (user.role === 'admin') {
+    return next();
+  }
+  if (!user.emailVerified) {
+    return res.status(403).json({ error: 'Accès interdit. Adresse e-mail non vérifiée.', code: 'EMAIL_NOT_VERIFIED' });
+  }
+  if (user.kycStatus !== 'approved') {
+    return res.status(403).json({ error: 'Accès interdit. Vérification KYC requise.', code: 'KYC_REQUIRED' });
   }
   next();
 };

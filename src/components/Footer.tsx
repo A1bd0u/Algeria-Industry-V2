@@ -1,7 +1,9 @@
-import { Building2, Facebook, Linkedin, Mail, MapPin, Phone, ShieldCheck, Twitter } from 'lucide-react';
+import { Building2, Mail, MapPin, Phone, ShieldCheck } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { cn } from '../lib/utils';
+import { SUPPORT, telHref } from '../config/site';
+import { OPEN_COOKIE_SETTINGS_EVENT } from './CookieBanner';
 
 const Footer = () => {
   const { t, i18n } = useTranslation();
@@ -72,38 +74,34 @@ const Footer = () => {
               <h4 className="text-xs font-black uppercase tracking-[0.3em] text-white">{i18n.language?.startsWith('ar') ? 'مركز الاتصال' : 'Contact Center'}</h4>
             </div>
             <ul className="space-y-5 text-[11px] font-bold uppercase tracking-wider text-gray-400">
-              <li className={cn("flex items-start space-x-4", i18n.language?.startsWith('ar') && "flex-row-reverse space-x-reverse")}>
-                <MapPin className="h-4 w-4 text-secondary mt-0.5" />
-                <span className="leading-relaxed">{i18n.language?.startsWith('ar') ? 'الجزائر العاصمة، الجزائر' : 'ALGER, ALGÉRIE'}<br/>{i18n.language?.startsWith('ar') ? 'المنطقة الصناعية الرويبة' : 'ZONE INDUSTRIELLE ROUIBA'}</span>
-              </li>
+              {SUPPORT.phone && (
+                <li className={cn("flex items-center space-x-4", i18n.language?.startsWith('ar') && "flex-row-reverse space-x-reverse")}>
+                  <Phone className="h-4 w-4 text-secondary" />
+                  <a href={telHref(SUPPORT.phone)} className="font-mono hover:text-secondary">{SUPPORT.phone}</a>
+                </li>
+              )}
+              {SUPPORT.email && (
+                <li className={cn("flex items-center space-x-4", i18n.language?.startsWith('ar') && "flex-row-reverse space-x-reverse")}>
+                  <Mail className="h-4 w-4 text-secondary" />
+                  <a href={`mailto:${SUPPORT.email}`} className="lowercase font-mono hover:text-secondary">{SUPPORT.email}</a>
+                </li>
+              )}
               <li className={cn("flex items-center space-x-4", i18n.language?.startsWith('ar') && "flex-row-reverse space-x-reverse")}>
-                <Phone className="h-4 w-4 text-secondary" />
-                <span className="font-mono">+213 (0) 21 XX XX XX</span>
-              </li>
-              <li className={cn("flex items-center space-x-4", i18n.language?.startsWith('ar') && "flex-row-reverse space-x-reverse")}>
-                <Mail className="h-4 w-4 text-secondary" />
-                <span className="lowercase font-mono">contact@algeria-industry.dz</span>
+                <MapPin className="h-4 w-4 text-secondary" />
+                <Link to="/contact" className="hover:text-secondary">{t('footer.contact')}</Link>
               </li>
             </ul>
-            <div className={cn("flex space-x-3 mt-10", i18n.language?.startsWith('ar') && "space-x-reverse justify-end")}>
-              {[Linkedin, Facebook, Twitter].map((Icon, i) => (
-                <a key={i} href="#" onClick={(e) => e.preventDefault()} className="bg-white/5 p-2.5 border border-white/10 hover:bg-secondary hover:border-secondary transition-all">
-                  <Icon className="h-4 w-4" />
-                </a>
-              ))}
-            </div>
           </div>
         </div>
 
         <div className={cn("border-t border-white/5 pt-10 flex flex-col md:flex-row justify-between items-center text-[10px] font-mono font-bold uppercase tracking-widest text-gray-500", i18n.language?.startsWith('ar') && "md:flex-row-reverse")}>
           <div className={cn("flex items-center space-x-4", i18n.language?.startsWith('ar') && "space-x-reverse")}>
             <p>{t('footer.copyright')}</p>
-            <span className="text-white/10">|</span>
-            <p>BUILD VERSION: 2.5.0-STABLE</p>
           </div>
           <div className={cn("flex space-x-8 mt-6 md:mt-0", i18n.language?.startsWith('ar') && "space-x-reverse")}>
             <Link to="/terms" className="hover:text-white transition-colors">{i18n.language?.startsWith('ar') ? 'إشعارات قانونية' : 'Mentions légales'}</Link>
             <Link to="/privacy" className="hover:text-white transition-colors">{i18n.language?.startsWith('ar') ? 'الخصوصية' : 'Confidentialité'}</Link>
+            <button type="button" onClick={() => window.dispatchEvent(new Event(OPEN_COOKIE_SETTINGS_EVENT))} className="hover:text-white transition-colors uppercase">{i18n.language?.startsWith('ar') ? 'ملفات تعريف الارتباط' : 'Cookies'}</button>
           </div>
         </div>
       </div>

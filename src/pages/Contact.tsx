@@ -2,19 +2,17 @@ import {
   CheckCircle2,
   ChevronDown, ChevronUp,
   Clock,
-  Facebook,
   Globe,
   HelpCircle,
-  Linkedin,
   Mail,
-  MapPin,
   MessageSquare,
   Phone,
-  Send,
-  Twitter
+  Send
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import React, { useState } from 'react';
+import { Turnstile } from '@marsidev/react-turnstile';
+import { SUPPORT, TURNSTILE_SITE_KEY, telHref } from '../config/site';
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -25,6 +23,8 @@ const Contact = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState('');
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
 
   const faqs = [
@@ -42,19 +42,35 @@ const Contact = () => {
     },
     {
       question: "La plateforme est-elle disponible en dehors de l'Algérie ?",
-      answer: "Oui, Algeria Industry a pour vocation de connecter l'industrie algérienne au monde entier. La plateforme est bilingue (Français/Anglais) pour faciliter les échanges internationaux."
+      answer: "Oui, Algeria Industry a pour vocation de connecter l'industrie algérienne au monde entier. La plateforme est disponible en français, en arabe et en anglais."
     }
   ];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
+    if (TURNSTILE_SITE_KEY && !captchaToken) {
+      setError('Veuillez valider le captcha pour envoyer votre message.');
+      return;
+    }
     setIsSubmitting(true);
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...formData, captchaToken })
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "L'envoi a échoué. Veuillez réessayer.");
+      }
       setSubmitted(true);
       setFormData({ name: '', email: '', subject: '', message: '' });
-    }, 1500);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -94,48 +110,35 @@ const Contact = () => {
               </h3>
               
               <div className="space-y-8">
-                <div className="flex items-start space-x-4">
-                  <div className="bg-primary/5 p-3 rounded-xl text-primary">
-                    <MapPin className="h-6 w-6" />
+                {SUPPORT.phone && (
+                  <div className="flex items-start space-x-4">
+                    <div className="bg-primary/5 p-3 rounded-xl text-primary">
+                      <Phone className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Téléphone</p>
+                      <a href={telHref(SUPPORT.phone)} className="text-sm text-gray-700 font-medium hover:text-secondary">{SUPPORT.phone}</a>
+                      <p className="text-xs text-gray-500 mt-1">Dim - Jeu, 08:30 - 16:30</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Adresse</p>
-                    <p className="text-sm text-gray-700 font-medium leading-relaxed">
-                      Cité des Affaires, Bab Ezzouar,<br />Alger, Algérie
-                    </p>
-                  </div>
-                </div>
+                )}
 
-                <div className="flex items-start space-x-4">
-                  <div className="bg-primary/5 p-3 rounded-xl text-primary">
-                    <Phone className="h-6 w-6" />
+                {SUPPORT.email && (
+                  <div className="flex items-start space-x-4">
+                    <div className="bg-primary/5 p-3 rounded-xl text-primary">
+                      <Mail className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Email</p>
+                      <a href={`mailto:${SUPPORT.email}`} className="text-sm text-gray-700 font-medium hover:text-secondary">{SUPPORT.email}</a>
+                      <p className="text-xs text-gray-500 mt-1">Réponse sous 48 h ouvrées</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Téléphone</p>
-                    <p className="text-sm text-gray-700 font-medium">+213 (0) 21 XX XX XX</p>
-                    <p className="text-xs text-gray-400 mt-1">Lun - Jeu, 08:30 - 16:30</p>
-                  </div>
-                </div>
+                )}
 
-                <div className="flex items-start space-x-4">
-                  <div className="bg-primary/5 p-3 rounded-xl text-primary">
-                    <Mail className="h-6 w-6" />
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Email</p>
-                    <p className="text-sm text-gray-700 font-medium">contact@algeria-industry.dz</p>
-                    <p className="text-xs text-gray-400 mt-1">Réponse sous 48h maximum</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-12 pt-8 border-t border-gray-100">
-                <p className="text-sm font-bold text-primary mb-4">Suivez-nous</p>
-                <div className="flex space-x-4">
-                  <a href="#" onClick={(e) => e.preventDefault()} className="bg-gray-50 p-3 rounded-xl text-gray-400 hover:bg-primary hover:text-white transition-all"><Linkedin className="h-5 w-5" /></a>
-                  <a href="#" onClick={(e) => e.preventDefault()} className="bg-gray-50 p-3 rounded-xl text-gray-400 hover:bg-primary hover:text-white transition-all"><Facebook className="h-5 w-5" /></a>
-                  <a href="#" onClick={(e) => e.preventDefault()} className="bg-gray-50 p-3 rounded-xl text-gray-400 hover:bg-primary hover:text-white transition-all"><Twitter className="h-5 w-5" /></a>
-                </div>
+                <p className="text-sm text-gray-600 leading-relaxed">
+                  Le moyen le plus rapide de nous joindre reste le formulaire ci-contre.
+                </p>
               </div>
             </div>
 
@@ -146,7 +149,7 @@ const Contact = () => {
               </div>
               <h3 className="text-xl font-bold mb-4">Support Premium</h3>
               <p className="text-white/80 text-sm mb-6 leading-relaxed">
-                Les abonnés Premium bénéficient d'un support dédié avec une garantie de réponse en moins de 24 heures ouvrées.
+                Les abonnés Premium bénéficient d'un support dédié avec une réponse sous 24 heures ouvrées.
               </p>
               <div className="flex items-center space-x-2 text-xs font-bold bg-white/10 p-3 rounded-xl">
                 <Globe className="h-4 w-4" />
@@ -182,6 +185,9 @@ const Contact = () => {
                 <>
                   <h3 className="text-2xl font-bold text-primary mb-8">Envoyez-nous un message</h3>
                   <form onSubmit={handleSubmit} className="space-y-6">
+                    {error && (
+                      <div role="alert" className="p-3 bg-red-50 border border-red-200 text-red-600 text-xs font-bold rounded-xl">{error}</div>
+                    )}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
                         <label htmlFor="name" className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Nom complet</label>
@@ -211,6 +217,7 @@ const Contact = () => {
                     <div>
                       <label htmlFor="subject" className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Sujet</label>
                       <select 
+                        id="subject"
                         required
                         className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all"
                         value={formData.subject}
@@ -226,7 +233,9 @@ const Contact = () => {
                     <div>
                       <label htmlFor="message" className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Message</label>
                       <textarea 
+                        id="message"
                         required
+                        minLength={10}
                         rows={6}
                         className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all resize-none"
                         placeholder="Comment pouvons-nous vous aider ?"
@@ -234,6 +243,16 @@ const Contact = () => {
                         onChange={(e) => setFormData({...formData, message: e.target.value})}
                       ></textarea>
                     </div>
+                    {TURNSTILE_SITE_KEY && (
+                      <div className="flex justify-center">
+                        <Turnstile
+                          siteKey={TURNSTILE_SITE_KEY}
+                          onSuccess={(token) => setCaptchaToken(token)}
+                          onError={() => setCaptchaToken(null)}
+                          onExpire={() => setCaptchaToken(null)}
+                        />
+                      </div>
+                    )}
                     <button 
                       type="submit" 
                       disabled={isSubmitting}

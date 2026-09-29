@@ -40,7 +40,7 @@ export default function VerifyAccountModal() {
     setResendLoading(true);
     try {
       await resendCode(user.email, captchaToken);
-      setResendMessage('Un nouveau code a été envoyé ! (Vérifiez la console ou simulez la réception)');
+      setResendMessage('Un nouveau code a été envoyé. Vérifiez votre boîte de réception.');
     } catch (err: any) {
       setError(err.message || "Erreur lors de l'envoi.");
     } finally {

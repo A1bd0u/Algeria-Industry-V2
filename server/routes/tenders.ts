@@ -1,7 +1,9 @@
 import { logger } from '../utils/logger';
 import express from 'express';
 import { getSupabase } from '../db/supabaseClient';
-import { requireAuth, verifyRole, requireVerified } from '../middlewares/authMiddleware';
+import { requireAuth, verifyRole, requireKyc } from '../middlewares/authMiddleware';
+import { requireUuidParams } from '../middlewares/validateParams';
+import { createReport, reportSchema } from '../utils/reports';
 import { generateReferenceId } from '../utils/reference';
 import { z } from 'zod';
 import { validate } from '../middlewares/validateMiddleware';
@@ -10,29 +12,26 @@ import { validate } from '../middlewares/validateMiddleware';
 const router = express.Router();
 
 const tenderSchema = z.object({
-  title: z.string().min(2, 'Titre requis'),
-  description: z.string().min(5, 'Description trop courte'),
-  budget: z.number().optional().or(z.string().optional()),
-  deadline: z.string().optional(),
-  category: z.string().optional(),
-  file_url: z.string().optional()
+  title: z.string().trim().min(2, 'Titre requis').max(300),
+  description: z.string().trim().min(5, 'Description trop courte').max(20000),
+  budget: z.coerce.number().nonnegative().optional().or(z.literal('')),
+  deadline: z.string().max(40).optional(),
+  category: z.string().max(100).optional(),
+  file_url: z.string().url().max(1000).optional().or(z.literal(''))
 });
 
 const statusSchema = z.object({
-  status: z.string().min(1, 'Statut requis')
+  status: z.enum(['open', 'closed', 'signalé', 'rejeté'])
 });
 
-const reportSchema = z.object({
-  reason: z.string().min(5, 'Raison trop courte')
-});
+const escapeLike = (value: string) => value.replace(/[%_,()]/g, ' ').slice(0, 100);
 
 
 // GET /api/tenders - Liste tous les appels d'offres
 router.get('/', async (req, res) => {
   try {
-    const page = parseInt(req.query.page as string) || 1;
-    let limit = parseInt(req.query.limit as string) || 12;
-    if (limit > 50) limit = 50;
+    const page = Math.max(parseInt(req.query.page as string) || 1, 1);
+    const limit = Math.min(Math.max(parseInt(req.query.limit as string) || 12, 1), 50);
     const from = (page - 1) * limit;
     const to = from + limit - 1;
 
@@ -41,8 +40,8 @@ router.get('/', async (req, res) => {
       .from('tenders')
       .select('*, author:users(name, company)', { count: 'exact' });
 
-    if (req.query.search) {
-      query = query.ilike('title', `%${req.query.search}%`);
+    if (typeof req.query.search === 'string' && req.query.search) {
+      query = query.ilike('title', `%${escapeLike(req.query.search)}%`);
     }
 
     if (req.query.status && req.query.status !== 'Tous') {
@@ -64,7 +63,7 @@ router.get('/', async (req, res) => {
     });
   } catch (err: any) {
     logger.error("Supabase Error GET /tenders:", err);
-    return res.status(500).json({ error: err.message });
+    return res.status(500).json({ error: 'Une erreur interne est survenue.' });
   }
 });
 
@@ -81,12 +80,12 @@ router.get('/my', requireAuth, async (req, res) => {
     return res.json(tenders);
   } catch (err: any) {
     logger.error("Supabase Error GET /tenders/my:", err);
-    return res.status(500).json({ error: err.message });
+    return res.status(500).json({ error: 'Une erreur interne est survenue.' });
   }
 });
 
 // POST /api/tenders - Créer un appel d'offres
-router.post('/', verifyRole(['acheteur', 'admin']), requireVerified, validate(tenderSchema), async (req, res) => {
+router.post('/', verifyRole(['acheteur', 'fournisseur', 'exposant', 'admin']), requireKyc, validate(tenderSchema), async (req, res) => {
   const { title, description, budget, deadline, category, file_url } = req.body;
   const user = (req as any).user;
 
@@ -96,7 +95,7 @@ router.post('/', verifyRole(['acheteur', 'admin']), requireVerified, validate(te
 
   try {
     const supabase = getSupabase();
-    const finalDescription = file_url ? `${description}\n\n[ATTACHMENT]: ${file_url}` : description;
+    const finalDescription = file_url ? `${description}\n\nPièce jointe : ${file_url}` : description;
     const reference_id = generateReferenceId('TND');
     
     const { data, error } = await supabase
@@ -106,7 +105,8 @@ router.post('/', verifyRole(['acheteur', 'admin']), requireVerified, validate(te
           reference_id,
           title,
           description: finalDescription,
-          budget: budget || null,
+          budget: budget === '' || budget === undefined ? null : budget,
+          company_id: user.company_id || null,
           deadline: deadline || null,
           category,
           author_id: user.id,
@@ -123,41 +123,38 @@ router.post('/', verifyRole(['acheteur', 'admin']), requireVerified, validate(te
     return res.status(201).json(data);
   } catch (err: any) {
     logger.error("Supabase Error POST /tenders:", err);
-    return res.status(500).json({ error: err.message });
+    return res.status(500).json({ error: 'Une erreur interne est survenue.' });
   }
 });
 
 // GET /api/tenders/:id - Obtenir un appel d'offres spécifique
-router.get('/:id', async (req, res) => {
+router.get('/:id', requireUuidParams('id'), async (req, res) => {
   try {
     const supabase = getSupabase();
-    
-    // Validate UUID format before querying
-    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-    if (!uuidRegex.test(req.params.id)) {
-      return res.status(404).json({ error: "Appel d'offres non trouvé (ID invalide)" });
-    }
 
     const { data: tender, error } = await supabase
       .from('tenders')
       .select('*, author:users(name, company)')
       .eq('id', req.params.id)
-      .single();
+      .maybeSingle();
 
     if (error) {
       throw error;
+    }
+    if (!tender) {
+      return res.status(404).json({ error: "Appel d'offres introuvable" });
     }
 
     return res.json(tender);
   } catch (err: any) {
     logger.error("Supabase Error GET /tenders/:id:", err);
-    return res.status(500).json({ error: err.message });
+    return res.status(500).json({ error: 'Une erreur interne est survenue.' });
   }
 });
 
 
 // PUT /api/tenders/:id/status - Changer le statut d'un appel d'offres (Admin)
-router.put('/:id/status', verifyRole(['admin']), validate(statusSchema), async (req, res) => {
+router.put('/:id/status', verifyRole(['admin']), requireUuidParams('id'), validate(statusSchema), async (req, res) => {
   const { status } = req.body;
   try {
     const supabase = getSupabase();
@@ -171,43 +168,26 @@ router.put('/:id/status', verifyRole(['admin']), validate(statusSchema), async (
     return res.json(data);
   } catch (err: any) {
     logger.error("Error PUT /tenders/:id/status:", err);
-    return res.status(500).json({ error: err.message });
+    return res.status(500).json({ error: 'Une erreur interne est survenue.' });
   }
 });
 
 // POST /api/tenders/:id/report - Signaler un appel d'offres (Users)
-router.post('/:id/report', requireAuth, validate(reportSchema), async (req, res) => {
-  const { reason } = req.body;
+router.post('/:id/report', requireAuth, requireUuidParams('id'), validate(reportSchema), async (req, res) => {
   try {
-    const supabase = getSupabase();
-    const { data: existing, error: checkErr } = await supabase
-      .from('tenders')
-      .select('description')
-      .eq('id', req.params.id)
-      .single();
-    
-    if (checkErr) throw checkErr;
-    const newDescription = existing.description + `
-
-[SIGNALEMENT]: ${reason || 'Contenu inapproprié'}`;
-    
-    const { data, error } = await supabase
-      .from('tenders')
-      .update({ status: 'signalé', description: newDescription })
-      .eq('id', req.params.id)
-      .select()
-      .single();
-      
-    if (error) throw error;
-    return res.json({ success: true, message: "Appel d'offres signalé" });
+    const result = await createReport('tender', req.params.id, (req as any).user.id, req.body.reason);
+    if (!result.found) {
+      return res.status(404).json({ error: "Appel d'offres introuvable" });
+    }
+    return res.json({ success: true, message: 'Signalement transmis à la modération' });
   } catch (err: any) {
     logger.error("Error POST /tenders/:id/report:", err);
-    return res.status(500).json({ error: err.message });
+    return res.status(500).json({ error: 'Erreur lors du signalement' });
   }
 });
 
 // DELETE /api/tenders/:id - Supprimer un appel d'offres (Admin)
-router.delete('/:id', verifyRole(['admin']), async (req, res) => {
+router.delete('/:id', verifyRole(['admin']), requireUuidParams('id'), async (req, res) => {
   try {
     const supabase = getSupabase();
     const { error } = await supabase
@@ -218,7 +198,7 @@ router.delete('/:id', verifyRole(['admin']), async (req, res) => {
     return res.json({ success: true, message: "Appel d'offres supprimé" });
   } catch (err: any) {
     logger.error("Error DELETE /tenders/:id:", err);
-    return res.status(500).json({ error: err.message });
+    return res.status(500).json({ error: 'Une erreur interne est survenue.' });
   }
 });
 
