@@ -7,15 +7,17 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Turnstile } from '@marsidev/react-turnstile';
+import { useTranslation } from 'react-i18next';
 
 const loginSchema = z.object({
-  email: z.string().email('Adresse email invalide'),
-  password: z.string().min(6, 'Le mot de passe doit contenir au moins 6 caractères'),
+  email: z.string().email('auth.validation.emailInvalid'),
+  password: z.string().min(1, 'auth.validation.passwordRequired'),
 });
 
 type LoginForm = z.infer<typeof loginSchema>;
 
 const Login = () => {
+  const { t } = useTranslation();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [authError, setAuthError] = useState('');
@@ -54,7 +56,7 @@ const Login = () => {
         setMfaStep(false);
         setMfaCode('');
       }
-      setAuthError(err.message || 'Code incorrect.');
+      setAuthError(err.message || t('auth.mfa.invalid'));
     } finally {
       setIsLoading(false);
     }
@@ -62,7 +64,7 @@ const Login = () => {
 
   const onSubmit = async (data: LoginForm) => {
     if (!captchaToken) {
-      setAuthError('Veuillez valider le captcha pour continuer.');
+      setAuthError(t('auth.captchaRequired'));
       return;
     }
     setIsLoading(true);
@@ -76,7 +78,7 @@ const Login = () => {
       }
       goToSpace(loggedUser);
     } catch (err: any) {
-      setAuthError(err.message || 'Identifiants invalides. Veuillez réessayer.');
+      setAuthError(err.message || t('auth.login.invalid'));
     } finally {
       setIsLoading(false);
     }
@@ -96,8 +98,8 @@ const Login = () => {
             <div className="inline-flex items-center justify-center p-3 bg-primary/10 rounded-2xl mb-4">
               <Building2 className="h-8 w-8 text-primary" />
             </div>
-            <h2 className="text-3xl font-bold text-primary">Bon retour !</h2>
-            <p className="text-gray-500 mt-2">Connectez-vous à votre espace Algeria Industry</p>
+            <h2 className="text-3xl font-bold text-primary">{t('auth.login.title')}</h2>
+            <p className="text-gray-500 mt-2">{t('auth.login.subtitle')}</p>
           </div>
 
           {mfaStep ? (
@@ -110,14 +112,12 @@ const Login = () => {
               <div className="flex items-start gap-3 p-4 bg-primary/5 rounded-2xl">
                 <ShieldCheck className="h-6 w-6 text-primary shrink-0" />
                 <p className="text-sm text-gray-600">
-                  {useRecovery
-                    ? 'Saisissez l\'un de vos codes de secours (format xxxx-xxxx). Chaque code ne sert qu\'une fois.'
-                    : 'Saisissez le code à 6 chiffres affiché par votre application d\'authentification.'}
+                  {useRecovery ? t('auth.mfa.introRecovery') : t('auth.mfa.intro')}
                 </p>
               </div>
               <div>
                 <label htmlFor="mfa-code" className="block text-sm font-semibold text-gray-700 mb-2">
-                  {useRecovery ? 'Code de secours' : 'Code de vérification'}
+                  {useRecovery ? t('auth.mfa.recoveryCode') : t('auth.mfa.code')}
                 </label>
                 <input
                   id="mfa-code"
@@ -136,14 +136,14 @@ const Login = () => {
                 disabled={isLoading || mfaCode.trim().length < 6}
                 className="w-full btn-primary py-4 rounded-xl flex items-center justify-center space-x-2 shadow-lg disabled:opacity-70 disabled:cursor-not-allowed"
               >
-                {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : <span>Vérifier et se connecter</span>}
+                {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : <span>{t('auth.mfa.submit')}</span>}
               </button>
               <div className="flex justify-between text-xs font-bold">
                 <button type="button" className="text-secondary hover:underline" onClick={() => { setUseRecovery(!useRecovery); setMfaCode(''); setAuthError(''); }}>
-                  {useRecovery ? 'Utiliser l\'application' : 'Téléphone perdu ? Code de secours'}
+                  {useRecovery ? t('auth.mfa.useApp') : t('auth.mfa.useRecovery')}
                 </button>
                 <button type="button" className="text-gray-500 hover:underline" onClick={() => { setMfaStep(false); setMfaCode(''); setAuthError(''); }}>
-                  Retour
+                  {t('auth.mfa.back')}
                 </button>
               </div>
             </form>
@@ -156,7 +156,7 @@ const Login = () => {
             )}
 
             <div>
-              <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">Adresse Email</label>
+              <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">{t('auth.email')}</label>
               <div className="relative">
                 <Mail className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5" />
                 <input 
@@ -164,17 +164,17 @@ const Login = () => {
                   type="text"
                   {...register('email')}
                   className={`w-full ps-10 pe-4 py-3 bg-gray-50 border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all ${errors.email ? 'border-red-400' : 'border-gray-200'}`}
-                  placeholder="nom@entreprise.dz"
+                  placeholder={t('auth.emailPlaceholder')}
                 />
               </div>
-              {errors.email && <p className="text-red-500 text-xs mt-1 font-medium">{errors.email.message}</p>}
+              {errors.email && <p className="text-red-500 text-xs mt-1 font-medium">{t(errors.email.message || '')}</p>}
             </div>
 
             <div>
               <div className="flex items-center justify-between mb-2">
-                <label className="text-sm font-semibold text-gray-700">Mot de passe</label>
-                <Link to="/forgot-password" size="sm" className="text-xs font-bold text-secondary hover:underline">
-                  Oublié ?
+                <label htmlFor="password" className="text-sm font-semibold text-gray-700">{t('auth.password')}</label>
+                <Link to="/forgot-password" className="text-xs font-bold text-secondary hover:underline">
+                  {t('auth.login.forgot')}
                 </Link>
               </div>
               <div className="relative">
@@ -189,17 +189,18 @@ const Login = () => {
                 <button 
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? t('auth.hidePassword') : t('auth.showPassword')}
                   className="absolute end-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary transition-colors"
                 >
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
               </div>
-              {errors.password && <p className="text-red-500 text-xs mt-1 font-medium">{errors.password.message}</p>}
+              {errors.password && <p className="text-red-500 text-xs mt-1 font-medium">{t(errors.password.message || '')}</p>}
             </div>
 
             <div className="flex items-center">
               <input type="checkbox" id="remember" className="rounded border-gray-300 text-primary focus:ring-primary" />
-              <label htmlFor="remember" className="ms-2 text-sm text-gray-600">Se souvenir de moi</label>
+              <label htmlFor="remember" className="ms-2 text-sm text-gray-600">{t('auth.login.remember')}</label>
             </div>
 
             <div className="flex justify-center my-4">
@@ -211,7 +212,7 @@ const Login = () => {
                   onExpire={() => setCaptchaToken(null)}
                 />
               ) : (
-                <p className="text-red-500 text-sm font-bold">Erreur de configuration : VITE_TURNSTILE_SITE_KEY manquant</p>
+                <p className="text-red-500 text-sm font-bold">{t('auth.captchaMissingConfig')}</p>
               )}
             </div>
 
@@ -223,11 +224,11 @@ const Login = () => {
               {isLoading ? (
                 <>
                   <Loader2 className="h-5 w-5 animate-spin" />
-                  <span>Connexion en cours...</span>
+                  <span>{t('auth.login.submitting')}</span>
                 </>
               ) : (
                 <>
-                  <span>Se connecter</span>
+                  <span>{t('auth.login.submit')}</span>
                   <ArrowRight className="h-5 w-5 rtl:rotate-180" />
                 </>
               )}
@@ -239,14 +240,14 @@ const Login = () => {
         
         <div className="bg-gray-50 p-6 text-center border-t border-gray-100 space-y-4">
           <p className="text-sm text-gray-600">
-            Pas encore de compte ?{' '}
+            {t('auth.login.noAccount')}{' '}
             <Link to="/register" className="font-bold text-secondary hover:underline">
-              Inscrivez-vous gratuitement
+              {t('auth.login.registerFree')}
             </Link>
           </p>
           <div className="pt-4 border-t border-gray-200">
              <Link to="/extranet" className="text-[10px] font-black text-gray-400 uppercase tracking-widest hover:text-primary transition-all">
-                Console Professionnelle
+                {t('auth.login.proConsole')}
              </Link>
           </div>
         </div>

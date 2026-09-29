@@ -8,7 +8,6 @@ import Footer from './components/Footer';
 import HelpWidget from './components/HelpWidget';
 import HeroSlider from './components/HeroSlider';
 import Navbar from './components/Navbar';
-import VerificationBanner from './components/VerificationBanner';
 import PageTransition from './components/PageTransition';
 import ErrorBoundary from './components/ErrorBoundary';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -105,7 +104,6 @@ export default function App() {
               <VerifyAccountModal />
               <ScrollToTop />
               <div className="flex flex-col min-h-screen">
-              <VerificationBanner />
               {!isExtranet && <Navbar />}
               {!hideHeroSlider && <HeroSlider slides={currentSlides} />}
               <main className="flex-grow">

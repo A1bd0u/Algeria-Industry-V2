@@ -2,6 +2,7 @@ import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import TwoFactorSettings from './TwoFactorSettings';
+import { useTranslation } from 'react-i18next';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -9,6 +10,7 @@ interface ProtectedRouteProps {
 }
 
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles }) => {
+  const { t } = useTranslation();
   const { user, loading, refreshUser } = useAuth();
   const location = useLocation();
 
@@ -38,9 +40,9 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowe
       <div className="min-h-screen bg-neutral-bg py-16 px-4">
         <div className="max-w-3xl mx-auto space-y-6">
           <div>
-            <h1 className="text-2xl font-black text-primary uppercase italic">Sécurisez votre compte administrateur</h1>
+            <h1 className="text-2xl font-black text-primary uppercase italic">{t('mfa.gateTitle')}</h1>
             <p className="text-sm text-gray-500 mt-2">
-              La console donne accès aux données des entreprises et aux paiements : la double authentification est obligatoire.
+              {t('mfa.gateText')}
             </p>
           </div>
           <TwoFactorSettings onChange={refreshUser} />

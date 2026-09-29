@@ -9,21 +9,24 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Turnstile } from '@marsidev/react-turnstile';
 import { PasswordStrengthIndicator } from '../components/PasswordStrengthIndicator';
+import { useTranslation } from 'react-i18next';
 
 const registerSchema = z.object({
-  firstName: z.string().min(2, 'Prénom trop court'),
-  lastName: z.string().min(2, 'Nom trop court'),
-  companyName: z.string().min(2, "Nom de l'entreprise requis"),
-  email: z.string().email('Adresse email invalide'),
+  // Les messages sont des clés de traduction, résolues à l'affichage.
+  firstName: z.string().min(2, 'auth.validation.firstNameShort'),
+  lastName: z.string().min(2, 'auth.validation.lastNameShort'),
+  companyName: z.string().min(2, 'auth.validation.companyRequired'),
+  email: z.string().email('auth.validation.emailInvalid'),
   password: z.string()
-    .min(10, 'Le mot de passe doit contenir au moins 10 caractères')
-    .regex(/[a-zA-Z]/, 'Le mot de passe doit contenir au moins une lettre')
-    .regex(/[0-9]/, 'Le mot de passe doit contenir au moins un chiffre'),
+    .min(10, 'auth.validation.passwordMin')
+    .regex(/[a-zA-Z]/, 'auth.validation.passwordLetter')
+    .regex(/[0-9]/, 'auth.validation.passwordDigit'),
 });
 
 type RegisterForm = z.infer<typeof registerSchema>;
 
 const Register = () => {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const initialRole = searchParams.get('role');
   const validInitialRole = (initialRole === 'acheteur' || initialRole === 'fournisseur') ? initialRole : null;
@@ -44,7 +47,7 @@ const Register = () => {
 
   const onSubmit = async (data: RegisterForm) => {
     if (!captchaToken) {
-      setAuthError('Veuillez valider le captcha pour continuer.');
+      setAuthError(t('auth.captchaRequired'));
       return;
     }
     setIsLoading(true);
@@ -61,7 +64,7 @@ const Register = () => {
       });
       navigate('/register-success', { state: { email: data.email.trim().toLowerCase() } });
     } catch (err: any) {
-      setAuthError(err.message || 'Une erreur est survenue');
+      setAuthError(err.message || t('auth.genericError'));
     } finally {
       setIsLoading(false);
     }
@@ -82,15 +85,15 @@ const Register = () => {
           </div>
           
           <div className="relative z-10">
-            <h2 className="text-3xl font-bold mb-6">Rejoignez le réseau industriel leader</h2>
+            <h2 className="text-3xl font-bold mb-6">{t('auth.register.asideTitle')}</h2>
             <div className="space-y-6 mt-12">
               <div className="flex items-start space-x-4">
                 <div className="bg-white/20 p-2 rounded-lg">
                   <Briefcase className="h-6 w-6" />
                 </div>
                 <div>
-                  <h4 className="font-bold text-lg">Appels d'offres exclusifs</h4>
-                  <p className="text-primary-100 text-sm mt-1">Accédez à des centaines d'opportunités B2B qualifiées.</p>
+                  <h4 className="font-bold text-lg">{t('auth.register.benefitTendersTitle')}</h4>
+                  <p className="text-primary-100 text-sm mt-1">{t('auth.register.benefitTendersText')}</p>
                 </div>
               </div>
               <div className="flex items-start space-x-4">
@@ -98,8 +101,8 @@ const Register = () => {
                   <Building2 className="h-6 w-6" />
                 </div>
                 <div>
-                  <h4 className="font-bold text-lg">Visibilité accrue</h4>
-                  <p className="text-primary-100 text-sm mt-1">Présentez vos produits à des milliers d'acheteurs professionnels.</p>
+                  <h4 className="font-bold text-lg">{t('auth.register.benefitVisibilityTitle')}</h4>
+                  <p className="text-primary-100 text-sm mt-1">{t('auth.register.benefitVisibilityText')}</p>
                 </div>
               </div>
               <div className="flex items-start space-x-4">
@@ -107,8 +110,8 @@ const Register = () => {
                   <User className="h-6 w-6" />
                 </div>
                 <div>
-                  <h4 className="font-bold text-lg">Réseautage qualifié</h4>
-                  <p className="text-primary-100 text-sm mt-1">Entrez en contact direct avec les décideurs de l'industrie.</p>
+                  <h4 className="font-bold text-lg">{t('auth.register.benefitNetworkTitle')}</h4>
+                  <p className="text-primary-100 text-sm mt-1">{t('auth.register.benefitNetworkText')}</p>
                 </div>
               </div>
             </div>
@@ -120,7 +123,7 @@ const Register = () => {
                 <ShieldCheck className="h-5 w-5" />
               </div>
             </div>
-            <p className="text-sm text-primary-100 mt-3 font-medium">Fiches fournisseurs vérifiées par KYC</p>
+            <p className="text-sm text-primary-100 mt-3 font-medium">{t('auth.register.kycBadge')}</p>
           </div>
         </div>
 
@@ -128,8 +131,8 @@ const Register = () => {
           <div className="max-w-md mx-auto">
             {step === 1 ? (
               <div className="animate-in slide-in-from-right duration-500">
-                <h3 className="text-2xl font-bold text-primary mb-2">Comment souhaitez-vous utiliser la plateforme ?</h3>
-                <p className="text-gray-500 mb-8">Choisissez votre profil principal. Vous pourrez toujours accéder aux autres fonctionnalités plus tard.</p>
+                <h3 className="text-2xl font-bold text-primary mb-2">{t('auth.register.chooseTitle')}</h3>
+                <p className="text-gray-500 mb-8">{t('auth.register.chooseText')}</p>
 
                 <div className="space-y-4">
                   <button
@@ -150,8 +153,8 @@ const Register = () => {
                           <Briefcase className="h-6 w-6" />
                         </div>
                         <div>
-                          <h4 className="font-bold text-gray-900 text-lg">Je suis un Acheteur</h4>
-                          <p className="text-sm text-gray-500 mt-1">Je cherche des fournisseurs et je publie des appels d'offres.</p>
+                          <h4 className="font-bold text-gray-900 text-lg">{t('auth.register.buyerTitle')}</h4>
+                          <p className="text-sm text-gray-500 mt-1">{t('auth.register.buyerText')}</p>
                         </div>
                       </div>
                       <div className={cn(
@@ -181,8 +184,8 @@ const Register = () => {
                           <Building2 className="h-6 w-6" />
                         </div>
                         <div>
-                          <h4 className="font-bold text-gray-900 text-lg">Je suis un Fournisseur</h4>
-                          <p className="text-sm text-gray-500 mt-1">Je propose mes produits/services et réponds aux offres.</p>
+                          <h4 className="font-bold text-gray-900 text-lg">{t('auth.register.supplierTitle')}</h4>
+                          <p className="text-sm text-gray-500 mt-1">{t('auth.register.supplierText')}</p>
                         </div>
                       </div>
                       <div className={cn(
@@ -200,7 +203,7 @@ const Register = () => {
                   disabled={!role}
                   className="w-full btn-primary mt-8 py-4 rounded-xl flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <span>Continuer</span>
+                  <span>{t('auth.register.continue')}</span>
                   <ArrowRight className="h-5 w-5 rtl:rotate-180" />
                 </button>
               </div>
@@ -208,9 +211,9 @@ const Register = () => {
               <div className="animate-in slide-in-from-right duration-500">
                 <button onClick={() => setStep(1)} className="text-xs font-bold text-gray-400 hover:text-primary mb-4 flex items-center space-x-1">
                   <ArrowRight className="h-3 w-3 rotate-180 rtl:rotate-180" />
-                  <span>Retour au choix du profil</span>
+                  <span>{t('auth.register.backToProfile')}</span>
                 </button>
-                <h3 className="text-2xl font-bold text-primary mb-6">Créer votre compte</h3>
+                <h3 className="text-2xl font-bold text-primary mb-6">{t('auth.register.formTitle')}</h3>
                 
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                   {authError && (
@@ -221,31 +224,31 @@ const Register = () => {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label htmlFor="lastName" className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Nom</label>
+                      <label htmlFor="lastName" className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">{t('auth.register.lastName')}</label>
                       <input 
                         id="lastName"
                         type="text"
                         {...register('lastName')}
                         className={`w-full px-4 py-3 bg-gray-50 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary/20 ${errors.lastName ? 'border-red-400' : 'border-gray-200'}`}
-                        placeholder="Nom"
+                        placeholder={t('auth.register.lastName')}
                       />
-                      {errors.lastName && <p className="text-red-500 text-[10px] mt-1 font-medium">{errors.lastName.message}</p>}
+                      {errors.lastName && <p className="text-red-500 text-[10px] mt-1 font-medium">{t(errors.lastName.message || '')}</p>}
                     </div>
                     <div>
-                      <label htmlFor="firstName" className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Prénom</label>
+                      <label htmlFor="firstName" className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">{t('auth.register.firstName')}</label>
                       <input 
                         id="firstName"
                         type="text" 
                         {...register('firstName')}
                         className={`w-full px-4 py-3 bg-gray-50 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary/20 ${errors.firstName ? 'border-red-400' : 'border-gray-200'}`}
-                        placeholder="Prénom"
+                        placeholder={t('auth.register.firstName')}
                       />
-                      {errors.firstName && <p className="text-red-500 text-[10px] mt-1 font-medium">{errors.firstName.message}</p>}
+                      {errors.firstName && <p className="text-red-500 text-[10px] mt-1 font-medium">{t(errors.firstName.message || '')}</p>}
                     </div>
                   </div>
 
                   <div>
-                    <label htmlFor="companyName" className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Nom de l'entreprise</label>
+                    <label htmlFor="companyName" className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">{t('auth.register.company')}</label>
                     <div className="relative">
                       <Building2 className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
                       <input 
@@ -253,14 +256,14 @@ const Register = () => {
                         type="text" 
                         {...register('companyName')}
                         className={`w-full ps-10 pe-4 py-3 bg-gray-50 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary/20 ${errors.companyName ? 'border-red-400' : 'border-gray-200'}`}
-                        placeholder="Ex: SARL Industrie"
+                        placeholder={t('auth.register.companyPlaceholder')}
                       />
                     </div>
-                    {errors.companyName && <p className="text-red-500 text-[10px] mt-1 font-medium">{errors.companyName.message}</p>}
+                    {errors.companyName && <p className="text-red-500 text-[10px] mt-1 font-medium">{t(errors.companyName.message || '')}</p>}
                   </div>
 
                   <div>
-                    <label htmlFor="email" className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Email professionnel</label>
+                    <label htmlFor="email" className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">{t('auth.register.proEmail')}</label>
                     <div className="relative">
                       <Mail className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
                       <input 
@@ -268,14 +271,14 @@ const Register = () => {
                         type="email" 
                         {...register('email')}
                         className={`w-full ps-10 pe-4 py-3 bg-gray-50 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary/20 ${errors.email ? 'border-red-400' : 'border-gray-200'}`}
-                        placeholder="email@entreprise.dz"
+                        placeholder={t('auth.emailPlaceholder')}
                       />
                     </div>
-                    {errors.email && <p className="text-red-500 text-[10px] mt-1 font-medium">{errors.email.message}</p>}
+                    {errors.email && <p className="text-red-500 text-[10px] mt-1 font-medium">{t(errors.email.message || '')}</p>}
                   </div>
 
                   <div>
-                    <label htmlFor="password" className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Mot de passe</label>
+                    <label htmlFor="password" className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">{t('auth.password')}</label>
                     <div className="relative">
                       <Lock className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
                       <input 
@@ -286,7 +289,7 @@ const Register = () => {
                         placeholder="••••••••"
                       />
                     </div>
-                    {errors.password && <p className="text-red-500 text-[10px] mt-1 font-medium">{errors.password.message}</p>}
+                    {errors.password && <p className="text-red-500 text-[10px] mt-1 font-medium">{t(errors.password.message || '')}</p>}
                     <PasswordStrengthIndicator password={passwordValue} />
                   </div>
 
@@ -299,13 +302,13 @@ const Register = () => {
                         onExpire={() => setCaptchaToken(null)}
                       />
                     ) : (
-                      <p className="text-red-500 text-sm font-bold">Erreur de configuration : VITE_TURNSTILE_SITE_KEY manquant</p>
+                      <p className="text-red-500 text-sm font-bold">{t('auth.captchaMissingConfig')}</p>
                     )}
                   </div>
 
                   <div className="pt-2">
                     <p className="text-[10px] text-gray-400 mb-4">
-                      En vous inscrivant, vous acceptez nos <Link to="/terms" className="text-primary font-bold hover:underline">Conditions Générales</Link> et notre <Link to="/privacy" className="text-primary font-bold hover:underline">Politique de Confidentialité</Link>.
+                      {t('auth.register.consentPrefix')} <Link to="/terms" className="text-primary font-bold hover:underline">{t('auth.register.terms')}</Link> {t('auth.register.and')} <Link to="/privacy" className="text-primary font-bold hover:underline">{t('auth.register.privacy')}</Link>.
                     </p>
                     <button 
                       type="submit" 
@@ -315,10 +318,10 @@ const Register = () => {
                       {isLoading ? (
                         <>
                           <Loader2 className="h-5 w-5 animate-spin" />
-                          <span>Création en cours...</span>
+                          <span>{t('auth.register.submitting')}</span>
                         </>
                       ) : (
-                        <span>Créer mon compte {role}</span>
+                        <span>{role === 'fournisseur' ? t('auth.register.submitSupplier') : t('auth.register.submitBuyer')}</span>
                       )}
                     </button>
                   </div>
@@ -329,8 +332,8 @@ const Register = () => {
             
             <div className="mt-8 text-center">
               <p className="text-sm text-gray-500">
-                Déjà membre ?{' '}
-                <Link to="/login" className="font-bold text-primary hover:underline">Connectez-vous</Link>
+                {t('auth.register.alreadyMember')}{' '}
+                <Link to="/login" className="font-bold text-primary hover:underline">{t('auth.register.signIn')}</Link>
               </p>
             </div>
           </div>
