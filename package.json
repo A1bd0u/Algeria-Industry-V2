@@ -17,9 +17,13 @@
     "db:seed:demo": "tsx scripts/seed.ts --demo",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "db:check": "node scripts/check-migrations.js",
+    "audit": "npm audit --audit-level=high"
   },
   "dependencies": {
+    "@fontsource-variable/cairo": "^5.3.0",
+    "@fontsource-variable/inter": "^5.3.0",
     "@google/genai": "^1.29.0",
     "@hookform/resolvers": "^5.4.0",
     "@marsidev/react-turnstile": "^1.5.3",

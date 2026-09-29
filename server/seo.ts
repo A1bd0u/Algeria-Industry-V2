@@ -213,7 +213,18 @@ const defaultMeta = (path: string): PageMeta => {
   };
 };
 
+const META_TIMEOUT_MS = 1500;
+
+const withTimeout = <T,>(promise: Promise<T>, ms: number): Promise<T | null> =>
+  Promise.race([promise, new Promise<null>((resolve) => setTimeout(() => resolve(null), ms))]);
+
+// La page ne doit jamais attendre la base plus de 1,5 s : au-delà, balises par défaut.
 export const resolveMeta = async (path: string): Promise<PageMeta> => {
+  const meta = await withTimeout(resolveMetaFromDb(path), META_TIMEOUT_MS);
+  return meta || defaultMeta(path);
+};
+
+const resolveMetaFromDb = async (path: string): Promise<PageMeta> => {
   try {
     const match = path.match(/^\/(directory|products|blog)\/([^/?#]+)\/?$/);
     if (match) {

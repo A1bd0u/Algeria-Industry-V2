@@ -99,8 +99,8 @@ export async function createApp() {
         connectSrc: ["'self'", supabaseDomain, ...sentryOrigins, 'https://challenges.cloudflare.com', ...(isDev ? ['ws:', 'wss:'] : [])].filter(Boolean),
         imgSrc: ["'self'", 'data:', 'blob:', supabaseDomain, 'https:'].filter(Boolean),
         scriptSrc: ["'self'", "'unsafe-inline'", 'https://challenges.cloudflare.com', ...(isDev ? ["'unsafe-eval'"] : [])],
-        styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
-        fontSrc: ["'self'", 'data:', 'https://fonts.gstatic.com'],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        fontSrc: ["'self'", 'data:'],
         frameSrc: ["'self'", 'https://challenges.cloudflare.com'],
         workerSrc: ["'self'", 'blob:'],
         objectSrc: ["'none'"],
@@ -110,6 +110,7 @@ export async function createApp() {
       }
     },
     crossOriginEmbedderPolicy: false,
+    frameguard: { action: 'deny' },
     referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
   }));
 

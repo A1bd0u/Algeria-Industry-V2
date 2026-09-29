@@ -176,15 +176,28 @@ ALTER TABLE public.reviews ADD COLUMN IF NOT EXISTS company_id UUID REFERENCES p
 CREATE INDEX IF NOT EXISTS idx_reviews_company_id ON public.reviews(company_id);
 
 -- Reprise des avis stockés en JSON dans comment : {"company_id": "...", "text": "..."}
-UPDATE public.reviews
-SET company_id = (comment::jsonb ->> 'company_id')::uuid,
-    comment = comment::jsonb ->> 'text'
-WHERE company_id IS NULL
-  AND product_id IS NULL
-  AND comment LIKE '{%'
-  AND comment::jsonb ? 'company_id'
-  AND (comment::jsonb ->> 'company_id') ~* '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
-  AND EXISTS (SELECT 1 FROM public.companies c WHERE c.id = (comment::jsonb ->> 'company_id')::uuid);
+-- Conversion tolérante : un commentaire en texte libre ne fait pas échouer la migration.
+CREATE OR REPLACE FUNCTION pg_temp.try_jsonb(value TEXT)
+RETURNS JSONB AS $$
+BEGIN
+  RETURN value::jsonb;
+EXCEPTION WHEN others THEN
+  RETURN NULL;
+END;
+$$ LANGUAGE plpgsql IMMUTABLE;
+
+WITH parsed AS (
+  SELECT r.id, pg_temp.try_jsonb(r.comment) AS doc
+  FROM public.reviews r
+  WHERE r.company_id IS NULL AND r.product_id IS NULL
+)
+UPDATE public.reviews r
+SET company_id = c.id,
+    comment = p.doc ->> 'text'
+FROM parsed p
+JOIN public.companies c
+  ON c.id::text = p.doc ->> 'company_id'
+WHERE r.id = p.id;
 
 -- ------------------------------------------------------------------
 -- 7. Annuaire : wilaya indexée
