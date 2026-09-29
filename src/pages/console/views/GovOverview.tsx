@@ -35,6 +35,7 @@ const ACTION_LABELS: Record<string, string> = {
   support_message_update: 'Demande de support traitée',
   kyc_document_view: 'Document KYC consulté',
   mfa_reset: 'Double authentification réinitialisée',
+  event_change: 'Événement modifié',
 };
 
 export default function GovOverview({ state }: { state: any }) {
