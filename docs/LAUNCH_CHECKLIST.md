@@ -94,12 +94,12 @@ Balises `title`, description, Open Graph, `canonical` et JSON-LD (`Organization`
 - **Audience** : Plausible sans cookie, activé par `VITE_PLAUSIBLE_DOMAIN`.
 - **Déploiement** : variables `VITE_*` passées au build Docker ; guide `docs/DEPLOYMENT.md`.
 - Migration `20261003090000_search_and_whatsapp.sql`.
+- **Événements** : création, modification et suppression depuis la console admin (journalisées).
 
-## Reste à faire (code)
+## Reste à faire (code, non bloquant pour le lancement)
 
-1. URL lisibles `/entreprises/{slug}-{id}` et préfixes de langue `/fr`, `/ar`, `/en` avec `hreflang`.
-2. Client Supabase `anon` + JWT pour les lectures utilisateur (défense en profondeur).
-3. Écran admin de gestion des événements.
+1. **Préfixes de langue** `/fr`, `/ar`, `/en` avec `hreflang` : l'interface est traduite côté client, mais les contenus (fiches, produits, articles) n'existent qu'en français. À envisager quand des contenus traduits existeront ; les URL lisibles `{slug}-{id}` sont déjà en place.
+2. **Client Supabase `anon` + JWT** pour les lectures utilisateur (défense en profondeur) : aujourd'hui toutes les requêtes passent par le backend avec la clé service_role, et chaque route vérifie l'accès (couvert par les tests). Chantier transverse à planifier après le lancement.
 
 ## Décisions ouvertes (hors code)
 
