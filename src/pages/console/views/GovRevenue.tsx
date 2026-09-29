@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'motion/react';
-import { CheckCircle, CreditCard, FileText, Loader2, Plus, Search, X, XCircle } from 'lucide-react';
+import { CheckCircle, CreditCard, FileText, Loader2, Paperclip, Plus, Search, X, XCircle } from 'lucide-react';
 import { cn } from '../../../lib/utils';
 import { adminFetch, formatDate, formatDzd } from '../adminApi';
 
@@ -9,6 +9,13 @@ const PLAN_LABELS: Record<string, string> = {
   basic: 'Basic — 18 000 DA/an',
   pro: 'Pro — 29 900 DA/an',
   founder: 'Membre fondateur — offert 12 mois',
+};
+
+const METHOD_LABELS: Record<string, string> = {
+  virement: 'Virement',
+  cheque: 'Chèque',
+  gratuit: 'Offert',
+  cib_edahabia: 'CIB / Edahabia en ligne',
 };
 
 const STATUS_LABELS: Record<string, { label: string; className: string }> = {
@@ -155,6 +162,20 @@ export default function GovRevenue({ state }: { state: any }) {
     setPaymentReference('');
   };
 
+  // Le justificatif est dans le stockage privé : on demande une URL signée.
+  const openProof = async (sub: any) => {
+    const proofWindow = window.open('', '_blank');
+    if (proofWindow) proofWindow.opener = null;
+    try {
+      const { url } = await adminFetch(`/api/admin/billing/${sub.id}/proof`);
+      if (proofWindow) proofWindow.location.href = url;
+      else window.location.assign(url);
+    } catch (err: any) {
+      proofWindow?.close();
+      showNotify(err.message || 'Justificatif indisponible', 'error');
+    }
+  };
+
   const askCancel = (sub: any) => {
     const reason = window.prompt(`Motif d'annulation de ${sub.invoice_number} :`);
     if (reason && reason.trim().length >= 3) {
@@ -265,12 +286,12 @@ export default function GovRevenue({ state }: { state: any }) {
                 const status = STATUS_LABELS[sub.status] || { label: sub.status, className: 'bg-gray-100' };
                 return (
                   <tr key={sub.id} className="hover:bg-gray-50/50">
-                    <td className="px-6 py-4 font-mono font-bold text-primary">{sub.invoice_number}<span className="block font-sans font-normal text-gray-500">{formatDate(sub.created_at)}</span></td>
+                    <td className="px-6 py-4 font-mono font-bold text-primary">{sub.invoice_number}<span className="block font-sans font-normal text-gray-500">{formatDate(sub.created_at)}</span>{sub.source === 'self_service' && <span className="inline-block mt-1 px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 font-sans text-[10px] font-black">Souscrite par le client</span>}</td>
                     <td className="px-6 py-4"><span className="font-bold text-primary">{sub.company?.name || '—'}</span><span className="block text-gray-500">{sub.user?.email}</span></td>
                     <td className="px-6 py-4 capitalize">{sub.plan === 'founder' ? 'Fondateur' : sub.plan}</td>
                     <td className="px-6 py-4 font-bold">{formatDzd(sub.amount_dzd)}</td>
                     <td className="px-6 py-4 text-gray-600">{sub.starts_at ? `${formatDate(sub.starts_at)} → ${formatDate(sub.ends_at)}` : '—'}</td>
-                    <td className="px-6 py-4"><span className={cn('px-2.5 py-1 rounded-full text-[10px] font-black', status.className)}>{status.label}</span></td>
+                    <td className="px-6 py-4"><span className={cn('px-2.5 py-1 rounded-full text-[10px] font-black', status.className)}>{status.label}</span>{sub.payment_method && sub.status !== 'pending' && <span className="block mt-1 text-gray-500">{METHOD_LABELS[sub.payment_method] || sub.payment_method}</span>}{sub.status === 'pending' && sub.transfer_proof_uploaded_at && <span className="block mt-1 text-amber-700 font-bold">Justificatif reçu</span>}</td>
                     <td className="px-6 py-4">
                       <div className="flex justify-end gap-2">
                         <a
@@ -282,6 +303,11 @@ export default function GovRevenue({ state }: { state: any }) {
                         >
                           <FileText className="h-4 w-4" />
                         </a>
+                        {sub.transfer_proof_path && (
+                          <button onClick={() => openProof(sub)} className="p-2 rounded-lg bg-amber-50 text-amber-700 hover:bg-amber-100" title="Voir le justificatif de virement">
+                            <Paperclip className="h-4 w-4" />
+                          </button>
+                        )}
                         {sub.status === 'pending' && (
                           <button onClick={() => openActivate(sub)} className="p-2 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100" title="Enregistrer le paiement et activer">
                             <CheckCircle className="h-4 w-4" />

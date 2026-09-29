@@ -4,6 +4,7 @@ import { getSupabase } from '../db/supabaseClient';
 import { requireAuth, verifyRole, requireKyc } from '../middlewares/authMiddleware';
 import { requireUuidParams } from '../middlewares/validateParams';
 import { createReport, reportSchema } from '../utils/reports';
+import { PLAN_LIMITS, getCompanyPlan } from '../services/billingService';
 import { generateReferenceId } from '../utils/reference';
 import { z } from 'zod';
 import { validate } from '../middlewares/validateMiddleware';
@@ -195,6 +196,26 @@ router.post('/', verifyRole(['fournisseur', 'exposant', 'admin']), requireKyc, v
   try {
     const supabase = getSupabase();
     
+    // Limite de produits selon l'offre (Free 5, Basic 15, Pro illimité).
+    if (user.role !== 'admin') {
+      const plan = await getCompanyPlan(user.company_id);
+      const limit = PLAN_LIMITS[plan].products;
+      if (limit !== null) {
+        const { count } = await supabase
+          .from('products')
+          .select('*', { count: 'exact', head: true })
+          .eq('owner_id', user.id);
+        if ((count || 0) >= limit) {
+          return res.status(403).json({
+            error: `Votre offre permet ${limit} produits. Passez à une offre supérieure pour en publier davantage.`,
+            code: 'PLAN_LIMIT_REACHED',
+            plan,
+            limit,
+          });
+        }
+      }
+    }
+
     const reference_id = generateReferenceId('PRD');
     // owner_id ET company_id sont renseignés : statistiques, suppression et
     // fiche entreprise s'appuient sur l'un ou l'autre.

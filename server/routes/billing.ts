@@ -5,29 +5,16 @@ import { verifyRole } from '../middlewares/authMiddleware';
 import { validate } from '../middlewares/validateMiddleware';
 import { requireUuidParams } from '../middlewares/validateParams';
 import { logAdminAction } from '../utils/auditLogger';
-import { escapeHtml } from '../utils/html';
 import { logger } from '../utils/logger';
+import {
+  PLANS, PlanId, SUBSCRIPTION_COLUMNS, expireSubscriptions, activateSubscription, renderInvoiceHtml,
+} from '../services/billingService';
+import { KYC_BUCKET } from './upload';
 
 // Facturation des abonnements (console admin). Au lancement : facture +
 // virement bancaire, activation manuelle après réception du paiement.
 const router = express.Router();
 router.use(verifyRole(['admin']));
-
-// Prix annuels TTC (TVA 19 % incluse), identiques à la page /tarifs.
-export const PLANS = {
-  basic: { label: 'Basic', amount: 18000 },
-  pro: { label: 'Pro', amount: 29900 },
-  // Offre membre fondateur : Premium offert 12 mois.
-  founder: { label: 'Membre fondateur (Premium offert)', amount: 0 },
-} as const;
-
-export type PlanId = keyof typeof PLANS;
-
-const DURATION_MONTHS = 12;
-const VAT_RATE = 0.19;
-
-const SUBSCRIPTION_COLUMNS =
-  'id, invoice_number, user_id, company_id, plan, amount_dzd, status, starts_at, ends_at, paid_at, payment_method, payment_reference, notes, created_at, company:companies(id, name, wilaya, nif, rc), user:users!subscriptions_user_id_fkey(id, name, email)';
 
 const createSchema = z.object({
   company_id: z.string().uuid('Entreprise invalide'),
@@ -43,33 +30,6 @@ const activateSchema = z.object({
 const cancelSchema = z.object({
   reason: z.string().trim().min(3, 'Motif requis').max(500),
 });
-
-const addMonths = (date: Date, months: number) => {
-  const d = new Date(date);
-  d.setMonth(d.getMonth() + months);
-  return d;
-};
-
-// Passe en « expired » les abonnements échus et repasse l'entreprise en gratuit.
-export const expireSubscriptions = async () => {
-  const supabase = getSupabase();
-  const nowIso = new Date().toISOString();
-  const { data: expired } = await supabase
-    .from('subscriptions')
-    .update({ status: 'expired', updated_at: nowIso })
-    .eq('status', 'active')
-    .lt('ends_at', nowIso)
-    .select('company_id');
-
-  const companyIds = Array.from(new Set((expired || []).map((s: any) => s.company_id).filter(Boolean)));
-  if (companyIds.length > 0) {
-    await supabase
-      .from('companies')
-      .update({ plan: 'free', plan_ends_at: null })
-      .in('id', companyIds)
-      .lt('plan_ends_at', nowIso);
-  }
-};
 
 // GET /api/admin/billing/summary - Chiffres réels issus des transactions
 router.get('/summary', async (req, res, next) => {
@@ -156,6 +116,17 @@ router.post('/', validate(createSchema), async (req, res, next) => {
       return res.status(400).json({ error: "Cette fiche n'est pas revendiquée : aucun titulaire à facturer.", code: 'COMPANY_UNCLAIMED' });
     }
 
+    const { data: existingPending } = await supabase
+      .from('subscriptions')
+      .select(SUBSCRIPTION_COLUMNS)
+      .eq('company_id', company_id)
+      .eq('plan', plan)
+      .eq('status', 'pending')
+      .maybeSingle();
+    if (existingPending) {
+      return res.status(409).json({ error: `Une facture ${existingPending.invoice_number} est déjà en attente pour cette offre.`, code: 'INVOICE_ALREADY_PENDING' });
+    }
+
     const { data, error } = await supabase
       .from('subscriptions')
       .insert([{
@@ -191,74 +162,11 @@ router.post('/', validate(createSchema), async (req, res, next) => {
 router.post('/:id/activate', requireUuidParams('id'), validate(activateSchema), async (req, res, next) => {
   const { payment_method, payment_reference } = req.body;
   try {
-    const supabase = getSupabase();
-    const { data: sub } = await supabase
-      .from('subscriptions')
-      .select('id, invoice_number, status, plan, amount_dzd, company_id, user_id')
-      .eq('id', req.params.id)
-      .maybeSingle();
-
-    if (!sub) return res.status(404).json({ error: 'Abonnement introuvable' });
-    if (sub.status !== 'pending') {
-      return res.status(409).json({ error: 'Seule une facture en attente peut être activée.', code: 'SUBSCRIPTION_NOT_PENDING' });
+    const result = await activateSubscription(req.params.id, { method: payment_method, reference: payment_reference });
+    if (result.ok === false) {
+      return res.status(result.status).json({ error: result.error, code: result.code });
     }
-    if (Number(sub.amount_dzd) > 0 && payment_method === 'gratuit') {
-      return res.status(400).json({ error: 'Une facture payante ne peut pas être activée gratuitement.', code: 'PAYMENT_REQUIRED' });
-    }
-    if (Number(sub.amount_dzd) > 0 && !payment_reference) {
-      return res.status(400).json({ error: 'Indiquez la référence du virement ou du chèque.', code: 'PAYMENT_REFERENCE_REQUIRED' });
-    }
-
-    // Si un abonnement est déjà actif, le nouveau prend le relais à son échéance.
-    const { data: current } = await supabase
-      .from('subscriptions')
-      .select('ends_at')
-      .eq('company_id', sub.company_id)
-      .eq('status', 'active')
-      .order('ends_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    const now = new Date();
-    const startsAt = current?.ends_at && new Date(current.ends_at) > now ? new Date(current.ends_at) : now;
-    const endsAt = addMonths(startsAt, DURATION_MONTHS);
-
-    const { data: updated, error } = await supabase
-      .from('subscriptions')
-      .update({
-        status: 'active',
-        paid_at: now.toISOString(),
-        starts_at: startsAt.toISOString(),
-        ends_at: endsAt.toISOString(),
-        payment_method,
-        payment_reference: payment_reference || null,
-        updated_at: now.toISOString(),
-      })
-      .eq('id', sub.id)
-      .eq('status', 'pending')
-      .select(SUBSCRIPTION_COLUMNS)
-      .single();
-
-    if (error) throw error;
-
-    if (sub.company_id) {
-      await supabase
-        .from('companies')
-        .update({ plan: sub.plan, plan_ends_at: endsAt.toISOString() })
-        .eq('id', sub.company_id);
-    }
-
-    if (Number(sub.amount_dzd) > 0) {
-      await supabase.from('transactions').insert([{
-        user_id: sub.user_id,
-        subscription_id: sub.id,
-        amount: sub.amount_dzd,
-        status: 'completed',
-        payment_method,
-        reference: payment_reference,
-      }]);
-    }
-
+    const sub = result.subscription;
     await logAdminAction(req, 'subscription_activate', {
       subscriptionId: sub.id,
       invoiceNumber: sub.invoice_number,
@@ -268,10 +176,29 @@ router.post('/:id/activate', requireUuidParams('id'), validate(activateSchema), 
       paymentMethod: payment_method,
       paymentReference: payment_reference,
     });
-
-    return res.json(updated);
+    return res.json(sub);
   } catch (err) {
     logger.error('Billing activate error', err);
+    next(err);
+  }
+});
+
+// GET /api/admin/billing/:id/proof - Justificatif de virement (URL signée 5 min)
+router.get('/:id/proof', requireUuidParams('id'), async (req, res, next) => {
+  try {
+    const supabase = getSupabase();
+    const { data: sub } = await supabase
+      .from('subscriptions')
+      .select('id, invoice_number, transfer_proof_path')
+      .eq('id', req.params.id)
+      .maybeSingle();
+    if (!sub?.transfer_proof_path) {
+      return res.status(404).json({ error: 'Aucun justificatif pour cette facture' });
+    }
+    const { data, error } = await supabase.storage.from(KYC_BUCKET).createSignedUrl(sub.transfer_proof_path, 300);
+    if (error || !data) return res.status(404).json({ error: 'Fichier introuvable dans le stockage' });
+    return res.json({ url: data.signedUrl });
+  } catch (err) {
     next(err);
   }
 });
@@ -332,14 +259,6 @@ router.post('/:id/cancel', requireUuidParams('id'), validate(cancelSchema), asyn
   }
 });
 
-const formatDzd = (value: number) =>
-  new Intl.NumberFormat('fr-DZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value) + ' DA';
-
-const formatDate = (iso?: string | null) =>
-  iso ? new Date(iso).toLocaleDateString('fr-DZ', { day: '2-digit', month: 'long', year: 'numeric' }) : '—';
-
-const legal = (key: string) => process.env[`LEGAL_${key}`] || process.env[`VITE_LEGAL_${key}`] || '';
-
 // GET /api/admin/billing/:id/invoice - Facture imprimable (Imprimer → PDF)
 router.get('/:id/invoice', requireUuidParams('id'), async (req, res, next) => {
   try {
@@ -352,53 +271,7 @@ router.get('/:id/invoice', requireUuidParams('id'), async (req, res, next) => {
 
     if (!sub) return res.status(404).type('text/plain').send('Facture introuvable');
 
-    const plan = PLANS[sub.plan as PlanId];
-    const totalTtc = Number(sub.amount_dzd);
-    const totalHt = Math.round((totalTtc / (1 + VAT_RATE)) * 100) / 100;
-    const vat = Math.round((totalTtc - totalHt) * 100) / 100;
-    const company: any = sub.company || {};
-    const user: any = sub.user || {};
-    const pending = (value: string) => escapeHtml(value || 'à compléter');
-
-    const html = `<!doctype html>
-<html lang="fr"><head><meta charset="utf-8"><title>Facture ${escapeHtml(sub.invoice_number)}</title>
-<style>
-body{font-family:Arial,sans-serif;color:#1a1a1a;max-width:800px;margin:40px auto;padding:0 24px;font-size:14px}
-header{display:flex;justify-content:space-between;border-bottom:4px solid #ff6b00;padding-bottom:16px;margin-bottom:24px}
-h1{font-size:22px;margin:0} .muted{color:#6b7280} table{width:100%;border-collapse:collapse;margin:24px 0}
-th,td{border-bottom:1px solid #e5e7eb;padding:10px;text-align:left} th{background:#f8f9fa}
-.right{text-align:right} .total td{font-weight:bold;font-size:16px} .status{display:inline-block;padding:4px 10px;border-radius:6px;background:#f3f4f6;font-weight:bold}
-.no-print{margin:24px 0} @media print{.no-print{display:none}}
-</style></head><body>
-<div class="no-print"><button id="print">Imprimer / enregistrer en PDF</button></div>
-<script>document.getElementById('print').addEventListener('click', function () { window.print(); });</script>
-<header>
-  <div><h1>Algeria Industry</h1>
-    <div class="muted">${pending(legal('COMPANY_NAME'))}<br>${pending(legal('ADDRESS'))}<br>
-    RC : ${pending(legal('RC'))} — NIF : ${pending(legal('NIF'))}</div></div>
-  <div class="right"><h1>Facture</h1><div>${escapeHtml(sub.invoice_number)}</div>
-    <div class="muted">Émise le ${formatDate(sub.created_at)}</div>
-    <div class="status">${escapeHtml({ pending: 'En attente de paiement', active: 'Payée', expired: 'Payée (échue)', cancelled: 'Annulée' }[sub.status as string] || sub.status)}</div></div>
-</header>
-<p><strong>Facturé à :</strong><br>${escapeHtml(company.name || '—')}<br>
-${company.wilaya ? `${escapeHtml(company.wilaya)}<br>` : ''}${company.rc ? `RC : ${escapeHtml(company.rc)}<br>` : ''}${company.nif ? `NIF : ${escapeHtml(company.nif)}<br>` : ''}
-${escapeHtml(user.name || '')} — ${escapeHtml(user.email || '')}</p>
-<table>
-  <thead><tr><th>Désignation</th><th>Période</th><th class="right">Montant HT</th></tr></thead>
-  <tbody><tr><td>Abonnement ${escapeHtml(plan?.label || sub.plan)} — ${DURATION_MONTHS} mois</td>
-    <td>${sub.starts_at ? `${formatDate(sub.starts_at)} → ${formatDate(sub.ends_at)}` : `${DURATION_MONTHS} mois à compter de l'activation`}</td>
-    <td class="right">${formatDzd(totalHt)}</td></tr></tbody>
-  <tfoot>
-    <tr><td colspan="2" class="right">TVA 19 %</td><td class="right">${formatDzd(vat)}</td></tr>
-    <tr class="total"><td colspan="2" class="right">Total TTC</td><td class="right">${formatDzd(totalTtc)}</td></tr>
-  </tfoot>
-</table>
-${sub.status === 'pending' && totalTtc > 0 ? `<p><strong>Règlement par virement bancaire</strong> en indiquant la référence <strong>${escapeHtml(sub.invoice_number)}</strong>.<br>
-RIB : ${pending(legal('RIB'))}<br>L'abonnement est activé dès réception du paiement.</p>` : ''}
-${sub.paid_at ? `<p>Payée le ${formatDate(sub.paid_at)} par ${escapeHtml(sub.payment_method || '')}${sub.payment_reference ? ` (réf. ${escapeHtml(sub.payment_reference)})` : ''}.</p>` : ''}
-<p class="muted">Conditions générales de vente : ${escapeHtml((process.env.APP_URL || '').replace(/\/+$/, ''))}/terms</p>
-</body></html>`;
-
+    const html = renderInvoiceHtml(sub);
     res.set('Cache-Control', 'no-store');
     return res.type('html').send(html);
   } catch (err) {

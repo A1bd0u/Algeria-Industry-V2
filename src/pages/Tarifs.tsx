@@ -3,9 +3,13 @@ import { motion } from 'motion/react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { cn } from '../lib/utils';
+import { useAuth } from '../context/AuthContext';
 
 const Tarifs = () => {
   const { t, i18n } = useTranslation();
+  const { user } = useAuth();
+  // Les offres payantes se souscrivent depuis l'espace abonnement du tableau de bord.
+  const subscribeLink = user ? '/dashboard?tab=subscription' : '/register?role=fournisseur';
 
   const exhibitorPlans = [
     {
@@ -46,7 +50,7 @@ const Tarifs = () => {
       badge: 'POPULAIRE',
       bgClass: 'bg-[#F8F9FA] text-primary border-[#E86A17] shadow-lg',
       buttonText: 'Choisir Basic',
-      buttonAction: '/contact',
+      buttonAction: subscribeLink,
       buttonClass: 'bg-[#E86A17] text-white border-transparent hover:bg-[#c8530b]'
     },
     {
@@ -68,7 +72,7 @@ const Tarifs = () => {
       badge: 'RECOMMANDÉ',
       bgClass: 'bg-[#1A1A1A] text-white border-[#E86A17] shadow-xl',
       buttonText: 'Choisir Pro',
-      buttonAction: '/contact',
+      buttonAction: subscribeLink,
       buttonClass: 'bg-[#E86A17] text-white border-transparent hover:bg-[#c8530b]'
     }
   ];

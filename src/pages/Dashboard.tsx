@@ -43,7 +43,9 @@ import {
   Tooltip,
   XAxis, YAxis
 } from 'recharts';
+import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '../context/AuthContext';
+import SubscriptionPanel from '../components/SubscriptionPanel';
 import { cn, generateSlugUrl } from '../lib/utils';
 
 
@@ -66,11 +68,29 @@ const productCategories = [
   }
 ];
 
+const PLAN_BADGES: Record<string, string> = {
+  free: 'Offre gratuite',
+  basic: 'Abonnement Basic actif',
+  pro: 'Abonnement Pro actif',
+  founder: 'Membre fondateur',
+};
+
 const Dashboard = () => {
   const { user, logout, isAuthenticated, setUser } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'overview');
+  // Offre réelle de l'entreprise (même cache que l'onglet Abonnement).
+  const { data: subscriptionInfo } = useQuery({
+    queryKey: ['my-subscription'],
+    queryFn: async () => {
+      const res = await fetch('/api/subscriptions/me');
+      if (!res.ok) throw new Error('Abonnement indisponible');
+      return res.json();
+    },
+    enabled: user?.role === 'fournisseur',
+  });
+  const currentPlan: string | undefined = subscriptionInfo?.plan;
   const [showProductForm, setShowProductForm] = useState(false);
   const [showAdForm, setShowAdForm] = useState(false);
 
@@ -620,20 +640,8 @@ const Dashboard = () => {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="space-y-8"
           >
-            <div className="bg-primary p-12 rounded-[48px] text-white overflow-hidden relative">
-               <span className="text-[10px] font-black uppercase tracking-widest opacity-60">Plan actuel</span>
-               <h3 className="text-4xl font-black uppercase italic tracking-tighter mt-4 mb-2">Gratuit — beta</h3>
-               <p className="text-white/70 font-medium max-w-xl">
-                 Pendant la beta, toutes les fonctionnalités sont gratuites. Les abonnements payants seront réglés
-                 par facture et virement bancaire, avec activation par notre équipe.
-               </p>
-               <div className="mt-10 flex flex-wrap gap-4">
-                  <Link to="/tarifs" className="bg-white text-primary px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-secondary hover:text-white transition-all">Voir les offres</Link>
-                  <Link to="/contact" className="bg-white/10 text-white px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-white/20 transition-all border border-white/20">Demander un devis</Link>
-               </div>
-            </div>
+            <SubscriptionPanel notify={showNotify} />
           </motion.div>
         );
       case 'stats':
@@ -885,9 +893,16 @@ const Dashboard = () => {
 
             <div className="flex items-center space-x-3">
               {user?.role === 'fournisseur' && (
-                <Link to="/subscriptions" className="bg-success/10 text-success px-3 py-1 rounded-full text-xs font-bold flex items-center space-x-1 hover:bg-success/20 transition-all">
-                  <div className="w-1.5 h-1.5 bg-success rounded-full animate-pulse" />
-                  <span>Abonnement Premium Actif</span>
+                <Link
+                  to="/dashboard?tab=subscription"
+                  onClick={() => setActiveTab('subscription')}
+                  className={cn(
+                    "px-3 py-1 rounded-full text-xs font-bold flex items-center space-x-1 transition-all",
+                    currentPlan && currentPlan !== 'free' ? "bg-success/10 text-success hover:bg-success/20" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  )}
+                >
+                  <div className={cn("w-1.5 h-1.5 rounded-full", currentPlan && currentPlan !== 'free' ? "bg-success animate-pulse" : "bg-gray-400")} />
+                  <span>{PLAN_BADGES[currentPlan || 'free'] || 'Offre gratuite'}</span>
                 </Link>
               )}
               {user?.role === 'fournisseur' && (

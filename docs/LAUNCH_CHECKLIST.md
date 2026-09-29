@@ -65,6 +65,15 @@ Balises `title`, description, Open Graph, `canonical` et JSON-LD (`Organization`
 - **Menu** : badges des tâches en attente ; écrans sans données réelles retirés (rôles, exposants, catégories, configuration, télémétrie) ; vrai nom de l'admin connecté ; menu mobile.
 - 🧾 Renseigner `LEGAL_RIB` (ou `VITE_LEGAL_RIB`) pour afficher le RIB sur les factures.
 
+## Paiement client (mise à jour du 1er octobre)
+
+- **Souscription en libre-service** : depuis `/tarifs` ou l'onglet « Abonnement » du tableau de bord, le titulaire de la fiche entreprise choisit Basic ou Pro ; la facture en attente est émise au prix officiel (le montant n'est jamais lu depuis le client). Une seule facture en attente par offre.
+- **Virement** : RIB et référence de facture copiables, envoi du justificatif (stockage privé), visible par l'admin via une URL signée de 5 minutes. L'admin active ensuite depuis la console.
+- **Paiement en ligne CIB / Edahabia** (Chargily Pay v2) : activé dès que `CHARGILY_SECRET_KEY` est renseignée. Le webhook signé HMAC active l'abonnement automatiquement après contrôle du montant ; les événements sont journalisés (`payment_events`) et jamais traités deux fois.
+- **Limites des offres appliquées** : 5 produits en gratuit, 15 en Basic, illimité en Pro / fondateur (erreur `PLAN_LIMIT_REACHED`). Une offre échue repasse aux limites gratuites.
+- Migration `20261001090000_online_payments.sql`.
+- 💳 Ouvrir un compte marchand Chargily, déclarer le webhook `https://<domaine>/api/payments/chargily/webhook`, tester avec une clé `test_sk_…` puis passer `CHARGILY_MODE=live`.
+
 ## Reste à faire (code)
 
 1. Store de rate limiting partagé (Redis/Upstash) : plusieurs instances Cloud Run.
