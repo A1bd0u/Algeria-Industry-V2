@@ -91,6 +91,15 @@ export async function createApp() {
 
   const isDev = process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'test';
   const sentryOrigins = ['https://*.ingest.sentry.io', 'https://*.ingest.de.sentry.io', 'https://*.ingest.us.sentry.io'];
+  // Mesure d'audience sans cookie (Plausible) : origine du script, si activée.
+  let analyticsOrigin = '';
+  if (process.env.VITE_PLAUSIBLE_DOMAIN) {
+    try {
+      analyticsOrigin = new URL(process.env.VITE_PLAUSIBLE_SRC || 'https://plausible.io/js/script.js').origin;
+    } catch {
+      logger.error('VITE_PLAUSIBLE_SRC invalide');
+    }
+  }
 
   // Security HTTP Headers
   // - frame-ancestors 'none' : pas de clickjacking de la console admin.
@@ -100,9 +109,9 @@ export async function createApp() {
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
-        connectSrc: ["'self'", supabaseDomain, ...sentryOrigins, 'https://challenges.cloudflare.com', ...(isDev ? ['ws:', 'wss:'] : [])].filter(Boolean),
+        connectSrc: ["'self'", supabaseDomain, ...sentryOrigins, 'https://challenges.cloudflare.com', analyticsOrigin, ...(isDev ? ['ws:', 'wss:'] : [])].filter(Boolean),
         imgSrc: ["'self'", 'data:', 'blob:', supabaseDomain, 'https:'].filter(Boolean),
-        scriptSrc: ["'self'", "'unsafe-inline'", 'https://challenges.cloudflare.com', ...(isDev ? ["'unsafe-eval'"] : [])],
+        scriptSrc: ["'self'", "'unsafe-inline'", 'https://challenges.cloudflare.com', analyticsOrigin, ...(isDev ? ["'unsafe-eval'"] : [])].filter(Boolean),
         styleSrc: ["'self'", "'unsafe-inline'"],
         fontSrc: ["'self'", 'data:'],
         frameSrc: ["'self'", 'https://challenges.cloudflare.com'],

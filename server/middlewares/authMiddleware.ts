@@ -97,6 +97,13 @@ const authenticate = async (req: Request): Promise<AuthResult> => {
   }
 };
 
+// Utilisateur connecté s'il y en a un, sans exiger de session (routes publiques).
+export const getOptionalUser = async (req: Request): Promise<SessionUser | null> => {
+  if (!req.cookies?.token) return null;
+  const result = await authenticate(req);
+  return result.ok ? result.user : null;
+};
+
 export const requireAuth = async (req: Request, res: Response, next: NextFunction) => {
   const result = await authenticate(req);
   if (result.ok === false) {

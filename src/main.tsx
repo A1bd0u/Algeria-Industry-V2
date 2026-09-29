@@ -7,6 +7,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import './i18n';
 import './index.css';
 import { getConsent, onConsentChange } from './lib/consent';
+import { initAnalytics } from './lib/analytics';
 
 // Initialisation Sentry (Client)
 if (import.meta.env.VITE_SENTRY_DSN && import.meta.env.VITE_SENTRY_DSN.startsWith('http')) {
@@ -48,6 +49,8 @@ if (import.meta.env.VITE_SENTRY_DSN && import.meta.env.VITE_SENTRY_DSN.startsWit
     if (value === 'accepted') enableReplay();
   });
 }
+
+initAnalytics();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
