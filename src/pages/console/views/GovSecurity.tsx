@@ -143,6 +143,8 @@ export default function GovSecurity({ state }: { state: any }) {
         return { label: 'Publicité Mise à Jour', color: 'text-gray-600 bg-gray-50 border-gray-100', icon: CheckCircle };
       case 'support_message_update':
         return { label: 'Support Traité', color: 'text-gray-600 bg-gray-50 border-gray-100', icon: CheckCircle };
+      case 'mfa_reset':
+        return { label: '2FA Réinitialisée', color: 'text-amber-700 bg-amber-50 border-amber-100', icon: AlertTriangle };
       case 'kyc_document_view':
         return { label: 'Document KYC Consulté', color: 'text-gray-600 bg-gray-50 border-gray-100', icon: FileText };
       default:

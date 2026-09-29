@@ -98,6 +98,23 @@ export default function GovUsers({ state }: { state: any }) {
     }
   };
 
+  const handleResetMfa = async (u: any) => {
+    if (!window.confirm(`Réinitialiser la double authentification de ${u.email} ? Ses sessions seront fermées ; à confirmer uniquement après vérification de son identité.`)) return;
+    try {
+      const res = await fetch(`/api/users/${u.id}/reset-mfa`, { method: 'POST' });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) {
+        showNotify("Double authentification réinitialisée", "success");
+        fetchUsers();
+        setActiveMenuId(null);
+      } else {
+        showNotify(data.error || "Erreur lors de l'opération", "error");
+      }
+    } catch (e) {
+      showNotify("Erreur serveur", "error");
+    }
+  };
+
   const handleDeleteUser = async (userId: string) => {
     try {
       const res = await fetch(`/api/users/${userId}`, { method: 'DELETE' });
@@ -353,6 +370,15 @@ export default function GovUsers({ state }: { state: any }) {
                                   </button>
                                 )}
                                 
+                                {u.mfa_enabled && (
+                                  <button
+                                    onClick={() => handleResetMfa(u)}
+                                    className="mt-1 w-full flex items-center space-x-2 text-start px-3 py-2 text-[10px] font-bold uppercase tracking-wide text-amber-700 rounded-lg hover:bg-amber-50 transition-colors"
+                                  >
+                                    <ShieldCheck className="h-3 w-3" />
+                                    <span>Réinitialiser la 2FA</span>
+                                  </button>
+                                )}
                                 <button
                                   onClick={(e) => {
                                     e.stopPropagation();

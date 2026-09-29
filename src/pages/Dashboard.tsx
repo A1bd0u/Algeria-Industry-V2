@@ -46,6 +46,7 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '../context/AuthContext';
 import SubscriptionPanel from '../components/SubscriptionPanel';
+import TwoFactorSettings from '../components/TwoFactorSettings';
 import { cn, generateSlugUrl } from '../lib/utils';
 
 
@@ -76,7 +77,7 @@ const PLAN_BADGES: Record<string, string> = {
 };
 
 const Dashboard = () => {
-  const { user, logout, isAuthenticated, setUser } = useAuth();
+  const { user, logout, isAuthenticated, setUser, refreshUser } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'overview');
@@ -504,6 +505,9 @@ const Dashboard = () => {
                   </button>
                 )}
               </div>
+            </div>
+            <div className="mt-8">
+              <TwoFactorSettings onChange={refreshUser} />
             </div>
           </motion.div>
         );

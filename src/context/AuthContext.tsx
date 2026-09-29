@@ -12,12 +12,17 @@ export interface User {
   emailVerified?: boolean;
   kycStatus?: 'none' | 'pending' | 'approved' | 'rejected';
   companyStatus?: string | null;
+  mfaEnabled?: boolean;
+  // Admin sans double authentification : console bloquée jusqu'à l'activation.
+  mfaSetupRequired?: boolean;
 }
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  login: (email: string, password: string, captchaToken: string) => Promise<User>;
+  // Renvoie null quand un code de double authentification est attendu.
+  login: (email: string, password: string, captchaToken: string) => Promise<User | null>;
+  verifyMfa: (code: string) => Promise<User>;
   register: (userData: Partial<User> & { password?: string; captchaToken?: string }) => Promise<void>;
   logout: () => Promise<void>;
   verifyCode: (email: string, code: string) => Promise<void>;
@@ -76,6 +81,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       const data = await res.json();
+      if (data.mfaRequired) {
+        return null;
+      }
       setUser(data.user);
       return data.user as User;
     } catch (err: any) {
@@ -129,6 +137,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const verifyMfa = async (code: string) => {
+    const res = await fetch('/api/auth/2fa/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code })
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      const error: any = new Error(data.error || 'Code incorrect.');
+      error.code = data.code;
+      throw error;
+    }
+    setUser(data.user);
+    return data.user as User;
+  };
+
   const verifyCode = async (email: string, code: string) => {
     const res = await fetch('/api/auth/verify-code', {
       method: 'POST',
@@ -175,7 +199,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, verifyCode, resendCode, refreshUser, setUser, isAuthenticated: !!user }}>
+    <AuthContext.Provider value={{ user, loading, login, verifyMfa, register, logout, verifyCode, resendCode, refreshUser, setUser, isAuthenticated: !!user }}>
       {children}
     </AuthContext.Provider>
   );

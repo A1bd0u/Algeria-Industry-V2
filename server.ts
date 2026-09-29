@@ -54,6 +54,7 @@ import uploadRoutes from './server/routes/upload';
 import statsRoutes from './server/routes/stats';
 import aiRoutes from './server/routes/ai';
 import adminRoutes from './server/routes/admin';
+import mfaRoutes from './server/routes/mfa';
 import searchRoutes from './server/routes/search';
 import contactRoutes from './server/routes/contact';
 import billingRoutes from './server/routes/billing';
@@ -147,6 +148,7 @@ export async function createApp() {
   });
 
   // Mount API Routes
+  app.use('/api/auth/2fa', mfaRoutes);
   app.use('/api/auth', authRoutes);
   app.use('/api/tenders', tenderRoutes);
   app.use('/api/companies', companyRoutes);

@@ -1,8 +1,10 @@
+import { mustSetupMfa } from '../middlewares/authMiddleware';
+
 // Colonnes de la table users qui peuvent quitter le serveur.
 // Ne jamais utiliser select('*') sur users dans une réponse API :
 // la table contient le hash du mot de passe et des compteurs de sécurité.
 export const PUBLIC_USER_COLUMNS =
-  'id, reference_id, name, email, company, company_id, role, email_verified, kyc_status, created_at';
+  'id, reference_id, name, email, company, company_id, role, email_verified, kyc_status, mfa_enabled, created_at';
 
 export const toPublicUser = (row: any, companyStatus: string | null = null) => {
   if (!row) return row;
@@ -19,6 +21,8 @@ export const toPublicUser = (row: any, companyStatus: string | null = null) => {
     kycStatus,
     isVerified: kycStatus === 'approved',
     companyStatus,
+    mfaEnabled: Boolean(row.mfa_enabled),
+    mfaSetupRequired: mustSetupMfa(row.role || '', Boolean(row.mfa_enabled)),
     created_at: row.created_at ?? null,
   };
 };

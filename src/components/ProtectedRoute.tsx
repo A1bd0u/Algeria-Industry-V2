@@ -1,6 +1,7 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import TwoFactorSettings from './TwoFactorSettings';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -8,7 +9,7 @@ interface ProtectedRouteProps {
 }
 
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles }) => {
-  const { user, loading } = useAuth();
+  const { user, loading, refreshUser } = useAuth();
   const location = useLocation();
 
   // Polished loading screen during session recovery
@@ -29,6 +30,23 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowe
   // Not authenticated? Redirect to login page
   if (!user) {
     return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  // Console admin : la double authentification doit être activée avant tout accès.
+  if (allowedRoles?.includes('admin') && user.role === 'admin' && user.mfaSetupRequired) {
+    return (
+      <div className="min-h-screen bg-neutral-bg py-16 px-4">
+        <div className="max-w-3xl mx-auto space-y-6">
+          <div>
+            <h1 className="text-2xl font-black text-primary uppercase italic">Sécurisez votre compte administrateur</h1>
+            <p className="text-sm text-gray-500 mt-2">
+              La console donne accès aux données des entreprises et aux paiements : la double authentification est obligatoire.
+            </p>
+          </div>
+          <TwoFactorSettings onChange={refreshUser} />
+        </div>
+      </div>
+    );
   }
 
   // Role verification (if requested)

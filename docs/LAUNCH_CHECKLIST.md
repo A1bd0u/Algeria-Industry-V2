@@ -74,17 +74,25 @@ Balises `title`, description, Open Graph, `canonical` et JSON-LD (`Organization`
 - Migration `20261001090000_online_payments.sql`.
 - 💳 Ouvrir un compte marchand Chargily, déclarer le webhook `https://<domaine>/api/payments/chargily/webhook`, tester avec une clé `test_sk_…` puis passer `CHARGILY_MODE=live`.
 
+## Sécurité des comptes (mise à jour du 2 octobre)
+
+- **Double authentification TOTP** (Google Authenticator, Microsoft Authenticator, Aegis…) : activation par QR code depuis « Mon profil », 10 codes de secours à usage unique, régénération, désactivation (mot de passe + code). Secrets chiffrés AES-256-GCM dans `user_mfa` (inaccessible hors backend), anti-rejeu, verrouillage 15 min après 5 codes faux, alerte e-mail à l'usage d'un code de secours.
+- **Obligatoire pour les admins** : sans 2FA, un compte admin perd tous ses droits admin côté API (`MFA_SETUP_REQUIRED`) et la console affiche l'écran d'activation. Un admin peut réinitialiser la 2FA d'un autre utilisateur (journalisé) ; jamais la sienne.
+- La connexion par code e-mail (`/verify-code`) n'ouvre plus de session pour un compte protégé par 2FA.
+- **Rate limiting partagé** : store Upstash Redis (API REST) pour tous les limiteurs, repli automatique sur la mémoire si Redis ne répond pas.
+- Migration `20261002090000_two_factor_auth.sql`.
+- 🔐 Générer `MFA_ENCRYPTION_KEY` (`openssl rand -hex 32`) avant la première activation, puis activer la 2FA de chaque admin.
+- ☁️ Créer une base Upstash Redis (région Europe) et renseigner `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` avant de passer à plusieurs instances.
+
 ## Reste à faire (code)
 
-1. Store de rate limiting partagé (Redis/Upstash) : plusieurs instances Cloud Run.
-2. 2FA TOTP pour les admins.
-3. i18n : 35 vues sans `useTranslation` (priorité : authentification et KYC, puis annuaire et fiches). Traduire côté client les codes d'erreur API (`AUTH_INVALID`, `KYC_REQUIRED`…).
-4. URL lisibles `/entreprises/{slug}-{id}` et préfixes de langue `/fr`, `/ar`, `/en` avec `hreflang`.
-5. Bouton « contacter sur WhatsApp » sur les fiches fournisseurs (nécessite un champ téléphone vérifié).
-6. Recherche plein texte : configurations `french` + `unaccent` et `simple` pour l'arabe.
-7. Tuiles cartographiques via un fournisseur (MapTiler, Stadia) plutôt que les serveurs OSM publics.
-8. Mesure d'audience sans cookie (Plausible ou Umami).
-9. Client Supabase `anon` + JWT pour les lectures utilisateur (défense en profondeur).
+1. i18n : 35 vues sans `useTranslation` (priorité : authentification et KYC, puis annuaire et fiches). Traduire côté client les codes d'erreur API (`AUTH_INVALID`, `KYC_REQUIRED`…).
+2. URL lisibles `/entreprises/{slug}-{id}` et préfixes de langue `/fr`, `/ar`, `/en` avec `hreflang`.
+3. Bouton « contacter sur WhatsApp » sur les fiches fournisseurs (nécessite un champ téléphone vérifié).
+4. Recherche plein texte : configurations `french` + `unaccent` et `simple` pour l'arabe.
+5. Tuiles cartographiques via un fournisseur (MapTiler, Stadia) plutôt que les serveurs OSM publics.
+6. Mesure d'audience sans cookie (Plausible ou Umami).
+7. Client Supabase `anon` + JWT pour les lectures utilisateur (défense en profondeur).
 
 ## Décisions ouvertes (hors code)
 

@@ -7,7 +7,14 @@ const JWT_SECRET = process.env.JWT_SECRET || '';
 // Colonnes relues en base à chaque requête authentifiée : le rôle, la
 // suspension et les statuts de vérification ne sont jamais lus dans le JWT,
 // pour qu'un changement côté admin prenne effet immédiatement.
-const SESSION_COLUMNS = 'id, name, email, company, company_id, role, token_version, email_verified, kyc_status';
+const SESSION_COLUMNS = 'id, name, email, company, company_id, role, token_version, email_verified, kyc_status, mfa_enabled';
+
+// La double authentification est obligatoire pour les admins, sauf
+// désactivation explicite (ADMIN_MFA_REQUIRED=false, déconseillé).
+export const adminMfaRequired = () => process.env.ADMIN_MFA_REQUIRED !== 'false';
+
+export const mustSetupMfa = (role: string, mfaEnabled: boolean) =>
+  role === 'admin' && !mfaEnabled && adminMfaRequired();
 
 export interface SessionUser {
   id: string;
@@ -20,6 +27,10 @@ export interface SessionUser {
   kycStatus: string;
   // Alias conservé pour le front : vrai uniquement si le KYC est approuvé.
   isVerified: boolean;
+  mfaEnabled: boolean;
+  // Admin sans double authentification : ses droits admin sont suspendus
+  // (rôle ramené à « admin_mfa_pending ») jusqu'à l'activation.
+  mfaSetupRequired: boolean;
 }
 
 type AuthResult =
@@ -61,6 +72,8 @@ const authenticate = async (req: Request): Promise<AuthResult> => {
     }
 
     const kycStatus = row.kyc_status || 'none';
+    const mfaEnabled = Boolean(row.mfa_enabled);
+    const mfaSetupRequired = mustSetupMfa(role, mfaEnabled);
     return {
       ok: true,
       user: {
@@ -69,10 +82,14 @@ const authenticate = async (req: Request): Promise<AuthResult> => {
         email: row.email,
         company: row.company ?? null,
         company_id: row.company_id ?? null,
-        role,
+        // Toutes les vérifications « role === 'admin' » échouent tant que la
+        // double authentification n'est pas activée.
+        role: mfaSetupRequired ? 'admin_mfa_pending' : role,
         emailVerified: Boolean(row.email_verified),
         kycStatus,
         isVerified: kycStatus === 'approved',
+        mfaEnabled,
+        mfaSetupRequired,
       },
     };
   } catch {
@@ -96,6 +113,13 @@ export const verifyRole = (allowedRoles: string[]) => {
       return res.status(result.status).json({ error: result.error });
     }
     (req as any).user = result.user;
+
+    if (result.user.mfaSetupRequired && allowedRoles.includes('admin')) {
+      return res.status(403).json({
+        error: 'Activez la double authentification pour accéder à la console admin.',
+        code: 'MFA_SETUP_REQUIRED',
+      });
+    }
 
     if (!allowedRoles.includes(result.user.role)) {
       return res.status(403).json({ error: 'Accès interdit. Rôle insuffisant.' });
