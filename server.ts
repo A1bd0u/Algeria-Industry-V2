@@ -57,6 +57,8 @@ import adminRoutes from './server/routes/admin';
 import searchRoutes from './server/routes/search';
 import contactRoutes from './server/routes/contact';
 import billingRoutes from './server/routes/billing';
+import subscriptionRoutes from './server/routes/subscriptions';
+import paymentRoutes from './server/routes/payments';
 import { seoRouter, resolveMeta, injectMeta } from './server/seo';
 
 export async function createApp() {
@@ -119,6 +121,10 @@ export async function createApp() {
   app.use('/api', apiLimiter);
 
   // Limiter la taille du payload JSON pour prévenir les attaques d'épuisement de mémoire (ex: 2mb)
+  // Webhooks de paiement : corps brut requis pour vérifier la signature,
+  // donc montés avant le parseur JSON.
+  app.use('/api/payments', paymentRoutes);
+
   app.use(express.json({ limit: '2mb' }));
   app.use(cookieParser());
 
@@ -158,6 +164,7 @@ export async function createApp() {
   app.use('/api/stats', statsRoutes);
   app.use('/api/ai', aiRoutes);
   app.use('/api/admin/billing', billingRoutes);
+  app.use('/api/subscriptions', subscriptionRoutes);
   app.use('/api/admin', adminRoutes);
   app.use('/api/search', searchRoutes);
   app.use('/api/contact', contactRoutes);
