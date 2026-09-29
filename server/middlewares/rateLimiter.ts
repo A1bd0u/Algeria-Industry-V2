@@ -1,9 +1,10 @@
 import rateLimit, { ipKeyGenerator } from 'express-rate-limit';
 import { Request } from 'express';
 import { getClientIp } from '../utils/clientIp';
+import { sharedStore } from '../utils/rateLimitStore';
 
-// NB : le store par défaut est en mémoire. Cloud Run pouvant lancer plusieurs
-// instances, brancher un store partagé (Redis/Upstash) avant le lancement public.
+// Compteurs partagés entre instances Cloud Run via Upstash Redis quand
+// UPSTASH_REDIS_REST_URL / UPSTASH_REDIS_REST_TOKEN sont définis (sinon mémoire).
 
 const ipKey = (req: Request) => ipKeyGenerator(getClientIp(req));
 
@@ -17,6 +18,7 @@ const ipEmailKey = (req: Request) => {
 
 // Global API limiter
 export const apiLimiter = rateLimit({
+  store: sharedStore('api'),
   windowMs: 60 * 1000,
   max: 100,
   keyGenerator: ipKey,
@@ -29,6 +31,7 @@ export const apiLimiter = rateLimit({
 
 // Authentification : connexion, inscription, mot de passe oublié, renvoi de code.
 export const authLimiter = rateLimit({
+  store: sharedStore('auth'),
   windowMs: 15 * 60 * 1000,
   max: 10,
   keyGenerator: ipEmailKey,
@@ -42,6 +45,7 @@ export const authLimiter = rateLimit({
 // Plafond par IP, toutes adresses e-mail confondues, pour limiter
 // l'énumération massive depuis une seule source.
 export const authIpLimiter = rateLimit({
+  store: sharedStore('auth-ip'),
   windowMs: 15 * 60 * 1000,
   max: 60,
   keyGenerator: ipKey,
@@ -54,6 +58,7 @@ export const authIpLimiter = rateLimit({
 
 // Vérification du code e-mail (6 chiffres) : limite stricte par IP + e-mail.
 export const verifyCodeLimiter = rateLimit({
+  store: sharedStore('verify-code'),
   windowMs: 15 * 60 * 1000,
   max: 10,
   keyGenerator: ipEmailKey,
@@ -66,6 +71,7 @@ export const verifyCodeLimiter = rateLimit({
 
 // Formulaires publics (contact, demande de publicité)
 export const formLimiter = rateLimit({
+  store: sharedStore('form'),
   windowMs: 60 * 60 * 1000,
   max: 5,
   keyGenerator: ipKey,
@@ -78,6 +84,7 @@ export const formLimiter = rateLimit({
 
 // AI endpoints limiter (Gemini API)
 export const aiLimiter = rateLimit({
+  store: sharedStore('ai'),
   windowMs: 60 * 1000,
   max: 10,
   keyGenerator: ipKey,

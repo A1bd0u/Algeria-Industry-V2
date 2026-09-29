@@ -34,6 +34,7 @@ const ACTION_LABELS: Record<string, string> = {
   company_delete: 'Entreprise supprimée',
   support_message_update: 'Demande de support traitée',
   kyc_document_view: 'Document KYC consulté',
+  mfa_reset: 'Double authentification réinitialisée',
 };
 
 export default function GovOverview({ state }: { state: any }) {

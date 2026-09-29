@@ -15,6 +15,7 @@ import { getClientIp } from '../utils/clientIp';
 import { PUBLIC_USER_COLUMNS, toPublicUser, extractCompanyStatus } from '../utils/userFields';
 import { isPasswordPwned } from '../utils/pwnedPasswords';
 import { verifyCaptcha } from '../utils/captcha';
+import { issueMfaChallenge } from './mfa';
 
 const router = express.Router();
 
@@ -172,6 +173,12 @@ router.post('/login', authIpLimiter, authLimiter, validate(loginSchema), async (
     }
 
     await supabase.from('login_attempts').delete().eq('email', email);
+
+    // Double authentification : pas de session avant le second facteur.
+    if (dbUser.mfa_enabled) {
+      issueMfaChallenge(res, dbUser);
+      return res.json({ mfaRequired: true });
+    }
 
     issueSession(res, dbUser);
 
@@ -461,11 +468,17 @@ router.post('/verify-code', authIpLimiter, verifyCodeLimiter, validate(verifyCod
       .from('users')
       .update({ email_verified: true })
       .ilike('email', email)
-      .select('id, token_version, role')
+      .select('id, token_version, role, mfa_enabled')
       .maybeSingle();
 
     if (!userRow) {
       return res.status(400).json({ error: 'Code invalide ou expiré', code: 'CODE_INVALID' });
+    }
+
+    // Un code e-mail ne remplace jamais le second facteur : un compte avec
+    // double authentification doit passer par la connexion complète.
+    if (userRow.mfa_enabled) {
+      return res.json({ success: true, message: 'Email vérifié. Connectez-vous pour continuer.', user: null, loginRequired: true });
     }
 
     if (!String(userRow.role || '').endsWith('_suspended')) {

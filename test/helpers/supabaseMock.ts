@@ -85,6 +85,7 @@ export const sessionRow = (overrides: Record<string, any> = {}) => ({
   token_version: 1,
   email_verified: true,
   kyc_status: 'approved',
+  mfa_enabled: true,
   ...overrides,
 });
 

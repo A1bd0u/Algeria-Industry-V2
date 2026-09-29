@@ -1,4 +1,4 @@
-import { Eye, EyeOff, Building2, Lock, Mail, ArrowRight, Loader2 } from 'lucide-react';
+import { Eye, EyeOff, Building2, Lock, Mail, ArrowRight, Loader2, ShieldCheck } from 'lucide-react';
 import { motion } from 'motion/react';
 import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
@@ -20,7 +20,11 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [authError, setAuthError] = useState('');
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
-  const { login } = useAuth();
+  const { login, verifyMfa } = useAuth();
+  // Deuxième étape : code de l'application d'authentification ou code de secours.
+  const [mfaStep, setMfaStep] = useState(false);
+  const [mfaCode, setMfaCode] = useState('');
+  const [useRecovery, setUseRecovery] = useState(false);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   // Redirection interne uniquement (pas d'URL absolue ni protocol-relative).
@@ -30,6 +34,31 @@ const Login = () => {
   const { register, handleSubmit, formState: { errors } } = useForm<LoginForm>({
     resolver: zodResolver(loginSchema)
   });
+
+  const goToSpace = (loggedUser: { role: string }) => {
+    if (loggedUser.role === 'admin') {
+      navigate('/extranet');
+    } else {
+      navigate(redirectUrl || '/dashboard');
+    }
+  };
+
+  const onSubmitMfa = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAuthError('');
+    setIsLoading(true);
+    try {
+      goToSpace(await verifyMfa(mfaCode.trim()));
+    } catch (err: any) {
+      if (err.code === 'MFA_CHALLENGE_EXPIRED') {
+        setMfaStep(false);
+        setMfaCode('');
+      }
+      setAuthError(err.message || 'Code incorrect.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const onSubmit = async (data: LoginForm) => {
     if (!captchaToken) {
@@ -41,11 +70,11 @@ const Login = () => {
     
     try {
       const loggedUser = await login(data.email, data.password, captchaToken);
-      if (loggedUser?.role === 'admin') {
-        navigate('/extranet');
-      } else {
-        navigate(redirectUrl || '/dashboard');
+      if (!loggedUser) {
+        setMfaStep(true);
+        return;
       }
+      goToSpace(loggedUser);
     } catch (err: any) {
       setAuthError(err.message || 'Identifiants invalides. Veuillez réessayer.');
     } finally {
@@ -71,6 +100,54 @@ const Login = () => {
             <p className="text-gray-500 mt-2">Connectez-vous à votre espace Algeria Industry</p>
           </div>
 
+          {mfaStep ? (
+            <form onSubmit={onSubmitMfa} className="space-y-6">
+              {authError && (
+                <div className="p-3 bg-red-50 border border-red-200 text-red-600 text-xs font-bold rounded-xl" role="alert">
+                  {authError}
+                </div>
+              )}
+              <div className="flex items-start gap-3 p-4 bg-primary/5 rounded-2xl">
+                <ShieldCheck className="h-6 w-6 text-primary shrink-0" />
+                <p className="text-sm text-gray-600">
+                  {useRecovery
+                    ? 'Saisissez l\'un de vos codes de secours (format xxxx-xxxx). Chaque code ne sert qu\'une fois.'
+                    : 'Saisissez le code à 6 chiffres affiché par votre application d\'authentification.'}
+                </p>
+              </div>
+              <div>
+                <label htmlFor="mfa-code" className="block text-sm font-semibold text-gray-700 mb-2">
+                  {useRecovery ? 'Code de secours' : 'Code de vérification'}
+                </label>
+                <input
+                  id="mfa-code"
+                  value={mfaCode}
+                  onChange={(e) => setMfaCode(e.target.value)}
+                  inputMode={useRecovery ? 'text' : 'numeric'}
+                  autoComplete="one-time-code"
+                  autoFocus
+                  maxLength={useRecovery ? 9 : 6}
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-center text-2xl font-mono tracking-[0.4em] focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
+                  placeholder={useRecovery ? 'xxxx-xxxx' : '000000'}
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={isLoading || mfaCode.trim().length < 6}
+                className="w-full btn-primary py-4 rounded-xl flex items-center justify-center space-x-2 shadow-lg disabled:opacity-70 disabled:cursor-not-allowed"
+              >
+                {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : <span>Vérifier et se connecter</span>}
+              </button>
+              <div className="flex justify-between text-xs font-bold">
+                <button type="button" className="text-secondary hover:underline" onClick={() => { setUseRecovery(!useRecovery); setMfaCode(''); setAuthError(''); }}>
+                  {useRecovery ? 'Utiliser l\'application' : 'Téléphone perdu ? Code de secours'}
+                </button>
+                <button type="button" className="text-gray-500 hover:underline" onClick={() => { setMfaStep(false); setMfaCode(''); setAuthError(''); }}>
+                  Retour
+                </button>
+              </div>
+            </form>
+          ) : (
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {authError && (
               <div className="p-3 bg-red-50 border border-red-200 text-red-600 text-xs font-bold rounded-xl animate-in fade-in zoom-in duration-300">
@@ -156,6 +233,7 @@ const Login = () => {
               )}
             </button>
           </form>
+          )}
 
         </div>
         

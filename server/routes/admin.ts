@@ -3,6 +3,7 @@ import express from 'express';
 import { verifyRole } from '../middlewares/authMiddleware';
 import { getSupabase } from '../db/supabaseClient';
 import rateLimit from 'express-rate-limit';
+import { sharedStore } from '../utils/rateLimitStore';
 import { logAdminAction } from '../utils/auditLogger';
 import { requireUuidParams } from '../middlewares/validateParams';
 import { PUBLIC_USER_COLUMNS } from '../utils/userFields';
@@ -12,6 +13,7 @@ import { validate } from '../middlewares/validateMiddleware';
 const router = express.Router();
 
 const adminDashboardLimiter = rateLimit({
+  store: sharedStore('admin-dashboard'),
   windowMs: 60 * 1000,
   max: 60,
   message: { error: 'Trop de requêtes, veuillez réessayer plus tard.' },

@@ -8,6 +8,8 @@ import { validate } from '../middlewares/validateMiddleware';
 import { logAdminAction } from '../utils/auditLogger';
 import { PUBLIC_USER_COLUMNS, toPublicUser, extractCompanyStatus } from '../utils/userFields';
 import { clearSession } from '../utils/session';
+import { getClientIp } from '../utils/clientIp';
+import { sendTransactionalEmail } from '../services/emailService';
 
 const router = express.Router();
 
@@ -234,6 +236,36 @@ router.put('/:id/status', verifyRole(['admin']), requireUuidParams('id'), valida
     return res.json({ success: true, message: action === 'suspend' ? 'Compte suspendu' : 'Compte réactivé' });
   } catch (err: any) {
     logger.error("Error PUT /api/users/:id/status:", err);
+    next(err);
+  }
+});
+
+// POST /api/users/:id/reset-mfa - Réinitialiser la 2FA (téléphone et codes de secours perdus)
+// À n'utiliser qu'après vérification de l'identité ; un admin ne peut pas
+// réinitialiser sa propre 2FA (un autre admin doit le faire).
+router.post('/:id/reset-mfa', verifyRole(['admin']), requireUuidParams('id'), async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    if (id === (req as any).user.id) {
+      return res.status(400).json({ error: 'Un autre administrateur doit réinitialiser votre double authentification.', code: 'MFA_SELF_RESET' });
+    }
+    const supabase = getSupabase();
+    const { data: user } = await supabase.from('users').select('id, email').eq('id', id).maybeSingle();
+    if (!user) {
+      return res.status(404).json({ error: 'Utilisateur introuvable' });
+    }
+
+    const { error: deleteError } = await supabase.from('user_mfa').delete().eq('user_id', id);
+    if (deleteError) throw deleteError;
+    const { error: updateError } = await supabase.from('users').update({ mfa_enabled: false }).eq('id', id);
+    if (updateError) throw updateError;
+    await bumpTokenVersion(id);
+    await sendTransactionalEmail(user.email, 'securityAlert', { ip: getClientIp(req) });
+
+    await logAdminAction(req, 'mfa_reset', { targetUserId: id, targetUserEmail: user.email });
+    return res.json({ success: true });
+  } catch (err) {
+    logger.error('Error POST /api/users/:id/reset-mfa:', err);
     next(err);
   }
 });
