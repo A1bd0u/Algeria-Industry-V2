@@ -29,6 +29,8 @@ import SEO from '../components/SEO';
 import { absoluteUrl } from '../config/site';
 import { categoryLabel } from '../data/productCategories';
 import { useTranslation } from 'react-i18next';
+import { ApiError } from '../lib/apiError';
+import { formatDate, currentLocale } from '../lib/format';
 
 const CompanyProfile = () => {
   const { t } = useTranslation();
@@ -43,9 +45,6 @@ const CompanyProfile = () => {
   const [error, setError] = useState('');
   const { user } = useAuth();
   const isOwner = user?.company_id === id;
-  const [kycUploading, setKycUploading] = useState(false);
-  const [uploadError, setUploadError] = useState('');
-  const [uploadSuccess, setUploadSuccess] = useState('');
 
   // Reviews states
   const [reviews, setReviews] = useState<any[]>([]);
@@ -72,59 +71,6 @@ const CompanyProfile = () => {
   const [events, setEvents] = useState<any[]>([]);
   const [eventsLoading, setEventsLoading] = useState(false);
 
-  const handleKycUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: string) => {
-    if (!e.target.files || e.target.files.length === 0) return;
-    const file = e.target.files[0];
-    setKycUploading(true);
-    setUploadError('');
-    setUploadSuccess('');
-
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-      const res = await fetch('/api/upload?bucket=kyc-documents', {
-        method: 'POST',
-        headers: {
-           'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: formData,
-      });
-
-      if (!res.ok) {
-        const d = await res.json();
-        throw new Error(d.error || 'Erreur upload');
-      }
-      const data = await res.json();
-      const fileUrl = data.url;
-
-      // Submit KYC request
-      const kycRes = await fetch('/api/kyc/submit', {
-         method: 'POST',
-         headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-         },
-         body: JSON.stringify({
-            activity: company.activity_sector || 'Non spécifié',
-            files: [{ type, url: fileUrl }]
-         })
-      });
-
-      if (!kycRes.ok) {
-        const d = await kycRes.json();
-        throw new Error(d.error || 'Erreur soumission KYC');
-      }
-
-      setUploadSuccess(`Document ${type} soumis avec succès.`);
-      setCompany(prev => ({...prev, status: 'pending'}));
-    } catch (err: any) {
-      setUploadError(err.message);
-    } finally {
-      setKycUploading(false);
-      if (e.target) e.target.value = '';
-    }
-  };
-
   const fetchReviews = async () => {
     try {
       setReviewsLoading(true);
@@ -140,10 +86,32 @@ const CompanyProfile = () => {
     }
   };
 
+  // « Suivre » enregistre l'entreprise dans les favoris du compte.
+  useEffect(() => {
+    if (!user || !id) return;
+    fetch('/api/favorites')
+      .then((res) => (res.ok ? res.json() : []))
+      .then((favs: any[]) => setIsFavorite(favs.some((f) => f.item_type === 'company' && f.item_id === id)))
+      .catch(() => undefined);
+  }, [user, id]);
+
+  const toggleFollow = async () => {
+    if (!user) {
+      navigate(`/login?redirect=${encodeURIComponent(window.location.pathname)}`);
+      return;
+    }
+    const next = !isFavorite;
+    setIsFavorite(next);
+    const res = await fetch(next ? '/api/favorites' : `/api/favorites/item/${id}`, next
+      ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ item_type: 'company', item_id: id }) }
+      : { method: 'DELETE' }).catch(() => null);
+    if (!res?.ok) setIsFavorite(!next);
+  };
+
   const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) {
-      setReviewError("Vous devez être connecté pour laisser un avis.");
+      setReviewError(t('company.loginToReview'));
       return;
     }
     setReviewError('');
@@ -153,8 +121,7 @@ const CompanyProfile = () => {
       const res = await fetch(`/api/companies/${id}/reviews`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           rating: newRating,
@@ -164,7 +131,7 @@ const CompanyProfile = () => {
 
       if (!res.ok) {
         const data = await res.json();
-        throw new Error(data.error || "Une erreur est survenue.");
+        throw new ApiError(data, 'company.reviewError');
       }
 
       const publishedReview = await res.json();
@@ -285,8 +252,8 @@ const CompanyProfile = () => {
     return (
       <div className="min-h-screen bg-neutral-bg flex flex-col items-center justify-center p-4">
          <AlertCircle className="h-12 w-12 text-red-500 mb-4" />
-         <p className="text-[10px] font-black uppercase text-red-500 tracking-widest mb-6">{error || "Entreprise introuvable"}</p>
-         <button onClick={() => navigate('/directory')} className="btn-primary">Retour à l'annuaire</button>
+         <p className="text-[10px] font-black uppercase text-red-500 tracking-widest mb-6">{t('company.notFound')}</p>
+         <button onClick={() => navigate('/directory')} className="btn-primary">{t('company.backToDirectory')}</button>
       </div>
     );
   }
@@ -326,10 +293,10 @@ const CompanyProfile = () => {
         <div className="bg-white rounded-xl md:rounded-2xl shadow-sm border border-gray-100 p-2 md:p-2.5 mb-1 overflow-x-auto scrollbar-none">
           <div className="flex items-center space-x-2 md:space-x-3 min-w-max">
             {[
-              { id: 'about', label: 'Présentation', icon: Building2 },
-              { id: 'products', label: 'Produits', icon: Package },
-              { id: 'catalogues', label: 'Catalogues', icon: BookOpen },
-              { id: 'news_events', label: 'Actualités & Salons', icon: FileText },
+              { id: 'about', label: t('company.tabs.about'), icon: Building2 },
+              { id: 'products', label: t('company.tabs.products'), icon: Package },
+              { id: 'catalogues', label: t('company.tabs.catalogues'), icon: BookOpen },
+              { id: 'news_events', label: t('company.tabs.news'), icon: FileText },
             ].map((tab) => {
               const Icon = tab.icon;
               const active = activeTab === tab.id;
@@ -383,20 +350,21 @@ const CompanyProfile = () => {
                           <span className="text-sm font-bold ms-1 text-gray-700">{avgRating}</span>
                         </div>
                         <span className="text-gray-300">|</span>
-                        <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">{totalReviews} {totalReviews > 1 ? 'Avis' : 'Avis'}</span>
+                        <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">{t('company.reviewsCount', { count: totalReviews })}</span>
                       </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-3 w-full mt-6">
                       <button 
-                        onClick={() => setIsFavorite(!isFavorite)}
+                        onClick={toggleFollow}
+                        aria-pressed={isFavorite}
                         className={cn(
                           "flex items-center justify-center space-x-2 py-3 rounded-lg border transition-all font-bold text-sm cursor-pointer",
                           isFavorite ? "bg-red-50 border-red-100 text-red-500" : "bg-white border-gray-200 text-gray-600 hover:bg-gray-50"
                         )}
                       >
                         <Heart className={cn("h-4 w-4", isFavorite && "fill-current")} />
-                        <span>{isFavorite ? "Favori" : "Suivre"}</span>
+                        <span>{isFavorite ? t('company.following') : t('company.follow')}</span>
                       </button>
                       <button onClick={(e) => {
                         e.preventDefault();
@@ -407,11 +375,11 @@ const CompanyProfile = () => {
                           }).catch(console.error);
                         } else {
                           navigator.clipboard.writeText(window.location.href);
-                          alert("Lien copié dans le presse-papier !");
+                          alert(t('company.linkCopied'));
                         }
                       }} className="flex items-center justify-center space-x-2 py-3 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 transition-all font-bold text-sm cursor-pointer">
                         <Share2 className="h-4 w-4" />
-                        <span>Partager</span>
+                        <span>{t('company.share')}</span>
                       </button>
                     </div>
                   </div>
@@ -423,7 +391,7 @@ const CompanyProfile = () => {
                         <div className="flex items-start space-x-3">
                           <MapPin className="h-5 w-5 text-secondary mt-0.5 flex-shrink-0" />
                           <div>
-                            <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Wilaya</p>
+                            <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">{t('company.wilaya')}</p>
                             <p className="text-sm text-gray-700 leading-relaxed font-semibold">{company.wilaya}</p>
                           </div>
                         </div>
@@ -432,17 +400,17 @@ const CompanyProfile = () => {
                         <div className="flex items-start space-x-3">
                           <Calendar className="h-5 w-5 text-secondary mt-0.5 flex-shrink-0" />
                           <div>
-                            <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Inscrite depuis</p>
-                            <p className="text-sm text-gray-700 font-bold">{new Date(company.created_at).toLocaleDateString('fr-DZ', { month: 'long', year: 'numeric' })}</p>
+                            <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">{t('company.memberSince')}</p>
+                            <p className="text-sm text-gray-700 font-bold">{new Date(company.created_at).toLocaleDateString(currentLocale(), { month: 'long', year: 'numeric' })}</p>
                           </div>
                         </div>
                       )}
                       <div className="flex items-start space-x-3">
                         <ShieldCheck className={cn("h-5 w-5 mt-0.5 flex-shrink-0", company.status === 'approved' ? 'text-success' : 'text-gray-300')} />
                         <div>
-                          <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Vérification</p>
+                          <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">{t('company.verification')}</p>
                           <p className="text-sm text-gray-700 font-bold">
-                            {company.status === 'approved' ? 'Entreprise vérifiée (RC et NIF contrôlés)' : company.owner_id ? 'Vérification non effectuée' : 'Fiche non revendiquée'}
+                            {company.status === 'approved' ? t('company.verified') : company.owner_id ? t('company.notVerified') : t('company.unclaimed')}
                           </p>
                         </div>
                       </div>
@@ -464,7 +432,7 @@ const CompanyProfile = () => {
                         navigate(user ? target : `/login?redirect=${encodeURIComponent(target)}`);
                       }} className="w-full sm:w-auto btn-primary py-3.5 px-6 rounded-lg flex items-center justify-center space-x-2 shadow-lg text-sm font-black uppercase tracking-wider cursor-pointer">
                         <MessageSquare className="h-5 w-5" />
-                        <span>Contacter l'entreprise</span>
+                        <span>{t('company.contact')}</span>
                       </button>}
                     </div>
                   </div>
@@ -474,32 +442,32 @@ const CompanyProfile = () => {
                 <section>
                   <h2 className="text-2xl font-bold text-primary mb-4 flex items-center gap-2">
                     <Building2 className="h-6 w-6 text-secondary" />
-                    À propos de l'entreprise
+                    {t('company.about')}
                   </h2>
                   <p className="text-gray-600 leading-relaxed text-lg font-medium">
-                    {company.description || "Cette entreprise n'a pas encore rédigé sa présentation."}
+                    {company.description || t('company.noDescription')}
                   </p>
                 </section>
 
                 {/* Informations Légales */}
                 <section>
-                  <h2 className="text-2xl font-bold text-primary mb-6">Informations Légales</h2>
+                  <h2 className="text-2xl font-bold text-primary mb-6">{t('company.legalTitle')}</h2>
                   <div className="bg-white border border-gray-100 rounded-xl overflow-hidden">
                     <table className="w-full text-sm">
                       <tbody>
                         <tr className="border-b border-gray-50">
-                          <td className="px-6 py-4 font-bold text-gray-400 w-1/3">Dénomination</td>
+                          <td className="px-6 py-4 font-bold text-gray-400 w-1/3">{t('company.legalName')}</td>
                           <td className="px-6 py-4 text-gray-700 font-medium">{company.fullName || company.name}</td>
                         </tr>
                         <tr className="border-b border-gray-50">
-                          <td className="px-6 py-4 font-bold text-gray-500">Registre du commerce et NIF</td>
+                          <td className="px-6 py-4 font-bold text-gray-500">{t('company.legalDocs')}</td>
                           <td className="px-6 py-4 text-gray-700 font-medium">
-                            {company.status === 'approved' ? 'Contrôlés par Algeria Industry (KYC)' : 'Non vérifiés'}
+                            {company.status === 'approved' ? t('company.legalChecked') : t('company.legalUnchecked')}
                           </td>
                         </tr>
                         {company.activity_sector && (
                           <tr className="border-b border-gray-50">
-                            <td className="px-6 py-4 font-bold text-gray-500">Secteur d'activité</td>
+                            <td className="px-6 py-4 font-bold text-gray-500">{t('company.sector')}</td>
                             <td className="px-6 py-4 text-gray-700 font-medium">{company.activity_sector}</td>
                           </tr>
                         )}
@@ -519,7 +487,7 @@ const CompanyProfile = () => {
                       <Package className="h-6 w-6 text-secondary" />
                       Catalogue Produits
                     </h2>
-                    <p className="text-gray-500 text-sm mt-1">Découvrez la gamme de produits proposée par {company.name}.</p>
+                    <p className="text-gray-500 text-sm mt-1">{t('company.productsIntro', { name: company.name })}</p>
                   </div>
                 </div>
  
@@ -527,8 +495,8 @@ const CompanyProfile = () => {
                   {!company.products || company.products.length === 0 ? (
                     <div className="py-12 text-center text-gray-400 border border-dashed border-gray-200 rounded-xl bg-gray-50/20 col-span-full">
                       <Package className="h-8 w-8 mx-auto text-gray-300 mb-3" />
-                      <p className="text-sm font-bold uppercase tracking-widest">Aucun produit disponible</p>
-                      <p className="text-xs text-gray-500 mt-1">Cette entreprise n'a pas encore ajouté de produits.</p>
+                      <p className="text-sm font-bold uppercase tracking-widest">{t('company.noProducts')}</p>
+                      <p className="text-xs text-gray-500 mt-1">{t('company.noProductsText')}</p>
                     </div>
                   ) : (
                     company.products.map((product: any) => (
@@ -544,9 +512,9 @@ const CompanyProfile = () => {
                           <h4 className="font-bold text-primary group-hover:text-secondary transition-colors text-base line-clamp-1">{product.name}</h4>
                           <span className="inline-block bg-gray-100 text-gray-500 text-[10px] font-bold px-2 py-0.5 rounded-full mt-1 uppercase tracking-wider">{categoryLabel(t, product.category)}</span>
                           {product.price ? (
-                            <p className="text-sm font-black text-primary mt-2">{product.price} DZD</p>
+                            <p className="text-sm font-black text-primary mt-2">{product.price} {t('common.dzd')}</p>
                           ) : (
-                            <p className="text-xs text-gray-400 font-bold mt-2">Sur devis</p>
+                            <p className="text-xs text-gray-400 font-bold mt-2">{t('company.onQuote')}</p>
                           )}
                         </div>
                         <ChevronRight className="h-5 w-5 text-gray-200 group-hover:text-primary transition-colors absolute end-4 top-1/2 -translate-y-1/2 rtl:rotate-180" />
@@ -564,16 +532,16 @@ const CompanyProfile = () => {
                     <BookOpen className="h-6 w-6 text-secondary" />
                     Catalogues PDF & Brochures
                   </h2>
-                  <p className="text-gray-500 text-sm mt-1">Téléchargez ou visualisez les catalogues officiels de {company.name}.</p>
+                  <p className="text-gray-500 text-sm mt-1">{t('company.cataloguesIntro', { name: company.name })}</p>
                 </div>
  
                 {cataloguesLoading ? (
-                  <div className="py-12 text-center text-gray-400 font-bold uppercase tracking-widest text-xs">Chargement des catalogues...</div>
+                  <div className="py-12 text-center text-gray-400 font-bold uppercase tracking-widest text-xs">{t('company.cataloguesLoading')}</div>
                 ) : catalogues.length === 0 ? (
                   <div className="py-12 text-center text-gray-400 border border-dashed border-gray-200 rounded-xl bg-gray-50/20">
                     <BookOpen className="h-8 w-8 mx-auto text-gray-300 mb-3" />
-                    <p className="text-sm font-bold uppercase tracking-widest">Aucun catalogue disponible</p>
-                    <p className="text-xs text-gray-500 mt-1">Aucun document n'a été publié par cette entreprise.</p>
+                    <p className="text-sm font-bold uppercase tracking-widest">{t('company.noCatalogues')}</p>
+                    <p className="text-xs text-gray-500 mt-1">{t('company.noCataloguesText')}</p>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -593,7 +561,7 @@ const CompanyProfile = () => {
                           className="flex items-center justify-center space-x-2 py-3 px-4 bg-gray-50 border border-gray-100 text-primary font-bold text-xs uppercase tracking-wider rounded-lg hover:bg-secondary hover:text-white hover:border-secondary transition-all"
                         >
                           <Download className="h-4 w-4" />
-                          <span>Télécharger le PDF</span>
+                          <span>{t('company.downloadPdf')}</span>
                         </a>
                       </div>
                     ))}
@@ -609,17 +577,17 @@ const CompanyProfile = () => {
                   <div>
                     <h2 className="text-2xl font-bold text-primary flex items-center gap-2">
                       <FileText className="h-6 w-6 text-secondary" />
-                      Actualités & Communiqués
+                      {t('company.newsTitle')}
                     </h2>
-                    <p className="text-gray-500 text-sm mt-1">Suivez les dernières nouvelles de {company.name}.</p>
+                    <p className="text-gray-500 text-sm mt-1">{t('company.newsIntro', { name: company.name })}</p>
                   </div>
  
                   {articlesLoading ? (
-                    <div className="py-12 text-center text-gray-400 font-bold uppercase tracking-widest text-xs">Chargement...</div>
+                    <div className="py-12 text-center text-gray-400 font-bold uppercase tracking-widest text-xs">{t('company.loading')}</div>
                   ) : articles.length === 0 ? (
                     <div className="py-12 text-center text-gray-400 border border-dashed border-gray-200 rounded-xl bg-gray-50/20">
                       <FileText className="h-8 w-8 mx-auto text-gray-300 mb-3" />
-                      <p className="text-sm font-bold uppercase tracking-widest">Aucune actualité disponible</p>
+                      <p className="text-sm font-bold uppercase tracking-widest">{t('company.noNews')}</p>
                     </div>
                   ) : (
                     <div className="space-y-6">
@@ -641,13 +609,13 @@ const CompanyProfile = () => {
                           <div className="p-5 flex-1 flex flex-col justify-between space-y-3 bg-white">
                             <div>
                               <span className="text-[10px] font-black uppercase text-secondary tracking-widest block mb-1">
-                                {new Date(article.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
+                                {formatDate(article.created_at)}
                               </span>
                               <h4 className="font-bold text-primary text-sm group-hover:text-secondary transition-colors line-clamp-2">{article.title}</h4>
                               <p className="text-xs text-gray-500 font-medium line-clamp-2 mt-1 leading-relaxed">{article.content}</p>
                             </div>
                             <span className="text-[11px] font-bold text-primary group-hover:text-secondary transition-colors inline-flex items-center gap-1">
-                              <span>Lire la suite</span>
+                              <span>{t('company.readMore')}</span>
                               <ChevronRight className="h-3.5 w-3.5 rtl:rotate-180" />
                             </span>
                           </div>
@@ -662,17 +630,17 @@ const CompanyProfile = () => {
                   <div>
                     <h2 className="text-2xl font-bold text-primary flex items-center gap-2">
                       <Calendar className="h-6 w-6 text-secondary" />
-                      Salons & Événements
+                      {t('company.eventsTitle')}
                     </h2>
-                    <p className="text-gray-500 text-sm mt-1">Découvrez les expositions et salons professionnels de {company.name}.</p>
+                    <p className="text-gray-500 text-sm mt-1">{t('company.eventsIntro', { name: company.name })}</p>
                   </div>
 
                   {eventsLoading ? (
-                    <div className="py-12 text-center text-gray-400 font-bold uppercase tracking-widest text-xs">Chargement...</div>
+                    <div className="py-12 text-center text-gray-400 font-bold uppercase tracking-widest text-xs">{t('company.loading')}</div>
                   ) : events.length === 0 ? (
                     <div className="py-12 text-center text-gray-400 border border-dashed border-gray-200 rounded-xl bg-gray-50/20">
                       <Calendar className="h-8 w-8 mx-auto text-gray-300 mb-3" />
-                      <p className="text-sm font-bold uppercase tracking-widest">Aucun salon disponible</p>
+                      <p className="text-sm font-bold uppercase tracking-widest">{t('company.noEvents')}</p>
                     </div>
                   ) : (
                     <div className="space-y-4">
@@ -682,7 +650,7 @@ const CompanyProfile = () => {
                             <div className="w-12 h-12 rounded-lg bg-secondary/10 text-secondary border border-secondary/20 flex flex-col items-center justify-center font-black flex-shrink-0">
                               <span className="text-base leading-none">{new Date(evt.date).getDate()}</span>
                               <span className="text-[9px] uppercase leading-none tracking-wider mt-0.5">
-                                {new Date(evt.date).toLocaleDateString('fr-FR', { month: 'short' })}
+                                {new Date(evt.date).toLocaleDateString(currentLocale(), { month: 'short' })}
                               </span>
                             </div>
                             <div className="space-y-0.5">
@@ -707,9 +675,9 @@ const CompanyProfile = () => {
               <div className="border-b border-gray-100 pb-6">
                 <h2 className="text-2xl font-bold text-primary flex items-center gap-2">
                   <Star className="h-6 w-6 text-yellow-500 fill-current" />
-                  <span>Avis & Évaluations ({totalReviews})</span>
+                  <span>{t('company.reviewsTitle', { count: totalReviews })}</span>
                 </h2>
-                <p className="text-gray-500 text-sm mt-1">Découvrez ce que les autres utilisateurs pensent de {company.name}.</p>
+                <p className="text-gray-500 text-sm mt-1">{t('company.reviewsIntro', { name: company.name })}</p>
               </div>
 
               {/* Note globale et répartition */}
@@ -727,7 +695,7 @@ const CompanyProfile = () => {
                       />
                     ))}
                   </div>
-                  <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Note Moyenne</p>
+                  <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">{t('company.averageRating')}</p>
                 </div>
 
                 <div className="col-span-2 space-y-2 md:ps-4">
@@ -780,16 +748,17 @@ const CompanyProfile = () => {
                     <button 
                       onClick={() => setShowReviewForm(false)}
                       className="absolute top-4 end-4 text-gray-400 hover:text-gray-600 transition-colors"
-                      title="Fermer"
+                      title={t('company.close')}
+                      aria-label={t('company.close')}
                     >
                       <XCircle className="h-5 w-5" />
                     </button>
                     
                     {user ? (
                       <form onSubmit={handleSubmitReview} className="space-y-4">
-                        <h4 className="font-bold text-primary text-sm uppercase tracking-wider mb-2">Laisser mon avis</h4>
+                        <h4 className="font-bold text-primary text-sm uppercase tracking-wider mb-2">{t('company.leaveReview')}</h4>
                         <div>
-                          <label className="block text-xs font-black uppercase tracking-wider text-gray-400 mb-2">Votre note</label>
+                          <label className="block text-xs font-black uppercase tracking-wider text-gray-400 mb-2">{t('company.yourRating')}</label>
                           <div className="flex space-x-2">
                             {[1, 2, 3, 4, 5].map((star) => {
                               const active = hoveredRating !== null ? star <= hoveredRating : star <= newRating;
@@ -815,13 +784,13 @@ const CompanyProfile = () => {
                         </div>
 
                         <div>
-                          <label htmlFor="review-comment" className="block text-xs font-black uppercase tracking-wider text-gray-400 mb-2">Votre commentaire</label>
+                          <label htmlFor="review-comment" className="block text-xs font-black uppercase tracking-wider text-gray-400 mb-2">{t('company.yourComment')}</label>
                           <textarea
                             id="review-comment"
                             rows={4}
                             value={newComment}
                             onChange={(e) => setNewComment(e.target.value)}
-                            placeholder="Qu'avez-vous pensé des services de cette entreprise ? Partagez votre expérience..."
+                            placeholder={t('company.commentPlaceholder')}
                             className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-secondary focus:ring-1 focus:ring-secondary/20 outline-none text-sm transition-all"
                             required
                           ></textarea>
@@ -837,7 +806,7 @@ const CompanyProfile = () => {
                             disabled={submittingReview}
                             className="btn-primary py-3 px-6 rounded-lg flex items-center space-x-2 disabled:opacity-50 text-xs font-black uppercase tracking-widest shadow-md hover:shadow-lg transition-all"
                           >
-                            <span>{submittingReview ? "Publication..." : "Publier l'avis"}</span>
+                            <span>{submittingReview ? t('company.publishing') : t('company.publish')}</span>
                           </button>
                           <button
                             type="button"
@@ -850,8 +819,8 @@ const CompanyProfile = () => {
                       </form>
                     ) : (
                       <div className="text-center py-6">
-                        <p className="text-sm text-gray-500 font-medium mb-4">Vous devez être connecté pour donner votre avis sur cette entreprise.</p>
-                        <Link to={`/login?redirect=${encodeURIComponent(window.location.pathname + '?writeReview=true')}`} className="btn-secondary inline-block px-6 py-3 text-xs font-black uppercase tracking-widest rounded-xl shadow">Laisser mon avis</Link>
+                        <p className="text-sm text-gray-500 font-medium mb-4">{t('company.loginToReview')}</p>
+                        <Link to={`/login?redirect=${encodeURIComponent(window.location.pathname + '?writeReview=true')}`} className="btn-secondary inline-block px-6 py-3 text-xs font-black uppercase tracking-widest rounded-xl shadow">{t('company.leaveReview')}</Link>
                       </div>
                     )}
                   </div>
@@ -859,12 +828,12 @@ const CompanyProfile = () => {
 
                 {/* Liste des avis */}
                 {reviewsLoading ? (
-                  <div className="py-8 text-center text-gray-400 font-bold uppercase tracking-widest text-xs">Chargement des avis...</div>
+                  <div className="py-8 text-center text-gray-400 font-bold uppercase tracking-widest text-xs">{t('company.reviewsLoading')}</div>
                 ) : reviews.length === 0 ? (
                   <div className="py-12 text-center text-gray-400 border border-dashed border-gray-200 rounded-xl bg-gray-50/20">
                     <Star className="h-8 w-8 mx-auto text-gray-300 mb-3" />
-                    <p className="text-sm font-bold uppercase tracking-widest">Aucun avis pour le moment</p>
-                    <p className="text-xs text-gray-500 mt-1">Soyez le premier à partager votre expérience !</p>
+                    <p className="text-sm font-bold uppercase tracking-widest">{t('company.noReviews')}</p>
+                    <p className="text-xs text-gray-500 mt-1">{t('company.beFirst')}</p>
                   </div>
                 ) : (
                   <div className="divide-y divide-gray-100">
@@ -878,7 +847,7 @@ const CompanyProfile = () => {
                         <div className="flex-1 space-y-2">
                           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
                             <div>
-                              <h4 className="font-bold text-primary text-sm uppercase">{review.user?.name || 'Utilisateur'}</h4>
+                              <h4 className="font-bold text-primary text-sm uppercase">{review.user?.name || t('company.anonymousUser')}</h4>
                               <p className="text-[10px] font-bold text-gray-400 tracking-wider">
                                 {new Date(review.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
                               </p>
@@ -910,18 +879,16 @@ const CompanyProfile = () => {
             <div className="bg-primary p-10 rounded-2xl text-white flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden shadow-2xl">
               <div className="absolute top-0 end-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2"></div>
               <div className="relative z-10">
-                <h3 className="text-2xl font-bold mb-2">Brochure Corporate</h3>
-                <p className="text-primary-foreground/80 text-sm">Téléchargez la présentation complète des activités de {company.name}.</p>
+                <h3 className="text-2xl font-bold mb-2">{t('company.cataloguesCtaTitle')}</h3>
+                <p className="text-primary-foreground/80 text-sm">{t('company.cataloguesCtaText', { name: company.name })}</p>
               </div>
-              <button onClick={(e) => {
-      e.preventDefault();
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(new Blob(['Brochure'], {type: 'application/pdf'}));
-      a.download = `brochure_${company.name.toLowerCase().replace(/ /g, '_')}.pdf`;
-      a.click();
-    }} className="bg-secondary text-white px-8 py-4 rounded-xl font-bold flex items-center space-x-2 hover:scale-105 transition-all shadow-xl relative z-10 inline-flex">
-                <Download className="h-5 w-5" />
-                <span>Télécharger (PDF)</span>
+              <button
+                type="button"
+                onClick={() => { setActiveTab('catalogues'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                className="bg-secondary text-white px-8 py-4 rounded-xl font-bold flex items-center space-x-2 hover:scale-105 transition-all shadow-xl relative z-10 inline-flex"
+              >
+                <BookOpen className="h-5 w-5" />
+                <span>{t('company.cataloguesCtaButton')}</span>
               </button>
             </div>
           </div>

@@ -13,8 +13,11 @@ import { AnimatePresence, motion } from 'motion/react';
 import React, { useState } from 'react';
 import { Turnstile } from '@marsidev/react-turnstile';
 import { SUPPORT, TURNSTILE_SITE_KEY, telHref } from '../config/site';
+import { ApiError } from '../lib/apiError';
+import { useTranslation } from 'react-i18next';
 
 const Contact = () => {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -27,30 +30,14 @@ const Contact = () => {
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
 
-  const faqs = [
-    {
-      question: "Comment inscrire mon entreprise sur l'annuaire ?",
-      answer: "C'est très simple ! Cliquez sur 'S'inscrire', choisissez le profil 'Fournisseur' et remplissez les informations de votre entreprise. Après validation par nos modérateurs, votre fiche sera visible publiquement."
-    },
-    {
-      question: "Quels sont les avantages du compte Premium ?",
-      answer: "Le compte Premium vous offre une visibilité prioritaire, l'accès aux appels d'offres privés, des statistiques détaillées sur vos produits et un support prioritaire sous 24h."
-    },
-    {
-      question: "Comment répondre à un appel d'offres ?",
-      answer: "Une fois connecté, rendez-vous sur la page 'Appels d'offres', sélectionnez l'offre qui vous intéresse et cliquez sur 'Répondre'. Vous pourrez alors déposer votre devis au format PDF."
-    },
-    {
-      question: "La plateforme est-elle disponible en dehors de l'Algérie ?",
-      answer: "Oui, Algeria Industry a pour vocation de connecter l'industrie algérienne au monde entier. La plateforme est disponible en français, en arabe et en anglais."
-    }
-  ];
+  // Réponses alignées sur le fonctionnement réel de la plateforme.
+  const faqs = [1, 2, 3, 4].map((n) => ({ question: t(`contact.faq.q${n}`), answer: t(`contact.faq.a${n}`) }));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     if (TURNSTILE_SITE_KEY && !captchaToken) {
-      setError('Veuillez valider le captcha pour envoyer votre message.');
+      setError(t('contact.captcha'));
       return;
     }
     setIsSubmitting(true);
@@ -62,7 +49,7 @@ const Contact = () => {
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.error || "L'envoi a échoué. Veuillez réessayer.");
+        throw new ApiError(data, 'contact.sendError');
       }
       setSubmitted(true);
       setFormData({ name: '', email: '', subject: '', message: '' });
@@ -85,7 +72,7 @@ const Contact = () => {
             animate={{ opacity: 1, y: 0 }}
             className="text-4xl md:text-5xl font-extrabold mb-6"
           >
-            Contactez <span className="text-secondary">l'équipe</span>
+            {t('contact.titleStart')} <span className="text-secondary">{t('contact.titleHighlight')}</span>
           </motion.h1>
           <motion.p 
             initial={{ opacity: 0, y: 20 }}
@@ -93,7 +80,7 @@ const Contact = () => {
             transition={{ delay: 0.1 }}
             className="text-xl text-primary-foreground/80 max-w-2xl mx-auto"
           >
-            Une question ? Un besoin d'accompagnement ? Nous sommes là pour vous aider à développer votre activité industrielle.
+            {t('contact.subtitle')}
           </motion.p>
         </div>
       </section>
@@ -106,7 +93,7 @@ const Contact = () => {
             <div className="bg-white p-8 rounded-3xl shadow-lg border border-gray-100">
               <h3 className="text-xl font-bold text-primary mb-8 flex items-center space-x-2">
                 <MessageSquare className="h-6 w-6 text-secondary" />
-                <span>Nos coordonnées</span>
+                <span>{t('contact.details')}</span>
               </h3>
               
               <div className="space-y-8">
@@ -116,9 +103,9 @@ const Contact = () => {
                       <Phone className="h-6 w-6" />
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Téléphone</p>
+                      <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">{t('contact.phone')}</p>
                       <a href={telHref(SUPPORT.phone)} className="text-sm text-gray-700 font-medium hover:text-secondary">{SUPPORT.phone}</a>
-                      <p className="text-xs text-gray-500 mt-1">Dim - Jeu, 08:30 - 16:30</p>
+                      <p className="text-xs text-gray-500 mt-1">{t('contact.phoneHours')}</p>
                     </div>
                   </div>
                 )}
@@ -129,15 +116,15 @@ const Contact = () => {
                       <Mail className="h-6 w-6" />
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Email</p>
+                      <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">{t('contact.email')}</p>
                       <a href={`mailto:${SUPPORT.email}`} className="text-sm text-gray-700 font-medium hover:text-secondary">{SUPPORT.email}</a>
-                      <p className="text-xs text-gray-500 mt-1">Réponse sous 48 h ouvrées</p>
+                      <p className="text-xs text-gray-500 mt-1">{t('contact.emailDelay')}</p>
                     </div>
                   </div>
                 )}
 
                 <p className="text-sm text-gray-600 leading-relaxed">
-                  Le moyen le plus rapide de nous joindre reste le formulaire ci-contre.
+                  {t('contact.fastest')}
                 </p>
               </div>
             </div>
@@ -147,13 +134,13 @@ const Contact = () => {
               <div className="absolute -end-4 -bottom-4 opacity-10">
                 <Clock className="h-32 w-32" />
               </div>
-              <h3 className="text-xl font-bold mb-4">Support Premium</h3>
+              <h3 className="text-xl font-bold mb-4">{t('contact.priorityTitle')}</h3>
               <p className="text-white/80 text-sm mb-6 leading-relaxed">
-                Les abonnés Premium bénéficient d'un support dédié avec une réponse sous 24 heures ouvrées.
+                {t('contact.priorityText')}
               </p>
               <div className="flex items-center space-x-2 text-xs font-bold bg-white/10 p-3 rounded-xl">
                 <Globe className="h-4 w-4" />
-                <span>Support disponible en FR / EN / AR</span>
+                <span>{t('contact.languages')}</span>
               </div>
             </div>
           </div>
@@ -170,52 +157,52 @@ const Contact = () => {
                   <div className="bg-success/10 p-6 rounded-full text-success mb-6">
                     <CheckCircle2 className="h-16 w-16" />
                   </div>
-                  <h2 className="text-3xl font-bold text-primary mb-4">Message envoyé !</h2>
+                  <h2 className="text-3xl font-bold text-primary mb-4">{t('contact.sentTitle')}</h2>
                   <p className="text-gray-500 max-w-md mb-8">
-                    Merci de nous avoir contactés. Notre équipe reviendra vers vous dans les plus brefs délais.
+                    {t('contact.sentText')}
                   </p>
                   <button 
                     onClick={() => setSubmitted(false)}
                     className="btn-primary py-3 px-8 rounded-xl"
                   >
-                    Envoyer un autre message
+                    {t('contact.sendAnother')}
                   </button>
                 </motion.div>
               ) : (
                 <>
-                  <h3 className="text-2xl font-bold text-primary mb-8">Envoyez-nous un message</h3>
+                  <h3 className="text-2xl font-bold text-primary mb-8">{t('contact.formTitle')}</h3>
                   <form onSubmit={handleSubmit} className="space-y-6">
                     {error && (
                       <div role="alert" className="p-3 bg-red-50 border border-red-200 text-red-600 text-xs font-bold rounded-xl">{error}</div>
                     )}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
-                        <label htmlFor="name" className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Nom complet</label>
+                        <label htmlFor="name" className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">{t('contact.name')}</label>
                         <input 
                           id="name"
                           type="text" 
                           required
                           className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all"
-                          placeholder="Ex: Ahmed Benali"
+                          placeholder={t('contact.namePlaceholder')}
                           value={formData.name}
                           onChange={(e) => setFormData({...formData, name: e.target.value})}
                         />
                       </div>
                       <div>
-                        <label htmlFor="email" className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Email professionnel</label>
+                        <label htmlFor="email" className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">{t('contact.proEmail')}</label>
                         <input 
                           id="email"
                           type="email" 
                           required
                           className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all"
-                          placeholder="email@entreprise.dz"
+                          placeholder={t('auth.emailPlaceholder')}
                           value={formData.email}
                           onChange={(e) => setFormData({...formData, email: e.target.value})}
                         />
                       </div>
                     </div>
                     <div>
-                      <label htmlFor="subject" className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Sujet</label>
+                      <label htmlFor="subject" className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">{t('contact.subject')}</label>
                       <select 
                         id="subject"
                         required
@@ -223,22 +210,22 @@ const Contact = () => {
                         value={formData.subject}
                         onChange={(e) => setFormData({...formData, subject: e.target.value})}
                       >
-                        <option value="">Sélectionnez un sujet</option>
-                        <option value="support">Support technique</option>
-                        <option value="sales">Service commercial / Premium</option>
-                        <option value="partnership">Partenariat</option>
-                        <option value="other">Autre demande</option>
+                        <option value="">{t('contact.subjectSelect')}</option>
+                        <option value="support">{t('contact.subjectSupport')}</option>
+                        <option value="sales">{t('contact.subjectSales')}</option>
+                        <option value="partnership">{t('contact.subjectPartnership')}</option>
+                        <option value="other">{t('contact.subjectOther')}</option>
                       </select>
                     </div>
                     <div>
-                      <label htmlFor="message" className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Message</label>
+                      <label htmlFor="message" className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">{t('contact.message')}</label>
                       <textarea 
                         id="message"
                         required
                         minLength={10}
                         rows={6}
                         className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all resize-none"
-                        placeholder="Comment pouvons-nous vous aider ?"
+                        placeholder={t('contact.messagePlaceholder')}
                         value={formData.message}
                         onChange={(e) => setFormData({...formData, message: e.target.value})}
                       ></textarea>
@@ -262,7 +249,7 @@ const Contact = () => {
                         <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                       ) : (
                         <>
-                          <span>Envoyer le message</span>
+                          <span>{t('contact.submit')}</span>
                           <Send className="h-5 w-5" />
                         </>
                       )}
@@ -279,9 +266,9 @@ const Contact = () => {
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-primary mb-4 flex items-center justify-center space-x-3">
               <HelpCircle className="h-8 w-8 text-secondary" />
-              <span>Foire Aux Questions</span>
+              <span>{t('contact.faqTitle')}</span>
             </h2>
-            <p className="text-gray-500">Trouvez des réponses rapides aux questions les plus fréquentes.</p>
+            <p className="text-gray-500">{t('contact.faqSubtitle')}</p>
           </div>
 
           <div className="space-y-4">

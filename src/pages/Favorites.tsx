@@ -3,9 +3,11 @@ import { Heart, Package, Building2, Trash2 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useAuth } from '../context/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 
 const Favorites = () => {
+  const { t } = useTranslation();
   const { user, isAuthenticated, isLoadingAuth } = useAuth();
   const navigate = useNavigate();
   const [favorites, setFavorites] = useState<any[]>([]);
@@ -41,7 +43,6 @@ const Favorites = () => {
       const res = await fetch(`/api/favorites/${id}`, { method: 'DELETE' });
       if (res.ok) {
         setFavorites(favorites.filter(f => f.id !== id));
-        alert("Retiré des favoris");
       }
     } catch (e) {
       console.error(e);
@@ -62,20 +63,20 @@ const Favorites = () => {
             className="flex items-center space-x-2 text-secondary mb-4"
           >
             <Heart className="h-4 w-4" />
-            <span className="text-[10px] font-black uppercase tracking-widest">Mes Sauvegardes</span>
+            <span className="text-[10px] font-black uppercase tracking-widest">{t('favorites.eyebrow')}</span>
           </motion.div>
-          <h1 className="text-4xl md:text-5xl font-black text-primary uppercase italic mb-6">Mes Favoris</h1>
+          <h1 className="text-4xl md:text-5xl font-black text-primary uppercase italic mb-6">{t('favorites.title')}</h1>
           <p className="text-gray-500 font-medium max-w-2xl">
-            Retrouvez ici tous les produits et entreprises que vous avez sauvegardés.
+            {t('favorites.subtitle')}
           </p>
         </div>
 
         {favorites.length === 0 ? (
           <div className="bg-white rounded-3xl p-16 text-center shadow-sm border border-gray-100 flex flex-col items-center">
             <Heart className="h-16 w-16 text-gray-200 mb-6" />
-            <h2 className="text-xl font-black text-primary uppercase italic mb-2">Aucun favori</h2>
+            <h2 className="text-xl font-black text-primary uppercase italic mb-2">{t('favorites.emptyTitle')}</h2>
             <p className="text-gray-500 mb-8 max-w-md mx-auto">
-              Vous n'avez pas encore ajouté d'éléments à vos favoris. Explorez notre catalogue pour sauvegarder des produits.
+              {t('favorites.emptyText')}
             </p>
             <Link to="/products" className="bg-primary text-white px-8 py-4 rounded-xl font-black uppercase tracking-widest text-xs hover:bg-secondary transition-all">
               Explorer le catalogue
@@ -116,12 +117,13 @@ const Favorites = () => {
                     to={fav.item_type === 'product' ? `/products/${fav.item_id}` : `/directory/${fav.item_id}`}
                     className="flex-1 text-center bg-gray-50 text-primary py-3 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-gray-100 transition-colors"
                   >
-                    Voir Détails
+                    {t('favorites.details')}
                   </Link>
                   <button 
                     onClick={() => removeFavorite(fav.id)}
                     className="p-3 text-red-500 bg-red-50 rounded-xl hover:bg-red-100 transition-colors"
-                    title="Retirer des favoris"
+                    title={t('favorites.remove')}
+                    aria-label={t('favorites.remove')}
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>

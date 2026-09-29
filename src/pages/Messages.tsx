@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Search, Phone, Video, Info, FileText, ArrowUpRight, Paperclip, Send, Loader2, File } from 'lucide-react';
+import { Search, ArrowUpRight, Paperclip, Send, Loader2, File } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useSearchParams } from 'react-router-dom';
 import { cn } from '../lib/utils';
+import { useTranslation } from 'react-i18next';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -18,6 +19,7 @@ interface Message {
 }
 
 export default function Messages() {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [searchParams] = useSearchParams();
   // ?to=<userId> : ouvre directement une conversation (bouton « Contacter » d'une fiche).
@@ -26,6 +28,8 @@ export default function Messages() {
     initialContact && UUID_RE.test(initialContact) ? initialContact : null
   );
   const [inputText, setInputText] = useState('');
+  const [filter, setFilter] = useState('');
+  const [sendError, setSendError] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -52,6 +56,9 @@ export default function Messages() {
   });
 
   const isLoading = isLoadingConvos || isLoadingMessages;
+  const visibleConversations = filter.trim()
+    ? conversations.filter((c: any) => String(c.name || '').toLowerCase().includes(filter.trim().toLowerCase()))
+    : conversations;
 
   useEffect(() => {
     if (!selectedContact && conversations.length > 0) {
@@ -77,7 +84,9 @@ export default function Messages() {
       queryClient.invalidateQueries({ queryKey: ['messages', selectedContact] });
       queryClient.invalidateQueries({ queryKey: ['conversations'] });
       setInputText('');
-    }
+      setSendError('');
+    },
+    onError: () => setSendError(t('messages.sendError')),
   });
 
   const handleSend = (e: React.FormEvent) => {
@@ -117,7 +126,7 @@ export default function Messages() {
       
     } catch (err) {
       console.error(err);
-      alert("Erreur lors de l'upload du fichier");
+      setSendError(t('messages.uploadError'));
     } finally {
       setIsUploading(false);
       if (e.target) e.target.value = '';
@@ -137,6 +146,13 @@ export default function Messages() {
       
       const fileName = match[1];
       const fileUrl = match[2];
+
+      // Le texte vient de l'expéditeur : seuls les liens https sont cliquables.
+      if (!/^https:\/\//i.test(fileUrl)) {
+        parts.push(match[0]);
+        lastIndex = fileRegex.lastIndex;
+        continue;
+      }
       
       parts.push(
         <a 
@@ -175,19 +191,25 @@ export default function Messages() {
           <div className="relative">
             <Search className="absolute start-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <input 
-              type="text" 
-              placeholder="Filtrer messages..."
+              type="search" 
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+              placeholder={t('messages.filter')}
+              aria-label={t('messages.filter')}
               className="w-full bg-white ps-10 pe-4 py-3 rounded-xl border border-gray-100 text-xs font-bold focus:outline-none focus:border-secondary transition-all"
             />
           </div>
         </div>
         
         <div className="flex-1 overflow-y-auto no-scrollbar">
-          {isLoading && <div className="p-8 text-center text-gray-400 text-sm">Chargement...</div>}
+          {isLoading && <div className="p-8 text-center text-gray-400 text-sm">{t('messages.loading')}</div>}
           {conversations.length === 0 && !isLoading && (
-            <div className="p-8 text-center text-gray-400 text-sm">Aucune conversation</div>
+            <div className="p-8 text-center text-gray-400 text-sm">{t('messages.empty')}</div>
           )}
-          {conversations.map((c, i) => (
+          {conversations.length > 0 && visibleConversations.length === 0 && (
+            <div className="p-8 text-center text-gray-400 text-sm">{t('messages.noMatch')}</div>
+          )}
+          {visibleConversations.map((c) => (
             <button 
               key={c.id}
               onClick={() => setSelectedContact(c.id)}
@@ -200,7 +222,6 @@ export default function Messages() {
                 <div className="w-12 h-12 bg-gray-200 rounded-2xl flex items-center justify-center font-black text-primary">
                   {c.name.charAt(0)}
                 </div>
-                <div className="absolute -bottom-1 -end-1 w-4 h-4 bg-success border-2 border-white rounded-full" />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex justify-between items-center mb-1">
@@ -230,15 +251,9 @@ export default function Messages() {
                 </div>
                 <div>
                   <h4 className="text-xs font-black text-primary uppercase tracking-tight">
-                    {conversations.find(c => c.id === selectedContact)?.name || 'Contact'}
+                    {conversations.find(c => c.id === selectedContact)?.name || t('messages.contact')}
                   </h4>
-                  <p className="text-[9px] font-bold text-success uppercase">En ligne maintenant</p>
                 </div>
-              </div>
-              <div className="flex space-x-2">
-                <button className="p-3 bg-gray-50 text-gray-400 rounded-xl hover:text-primary transition-all"><Phone className="h-4 w-4" /></button>
-                <button className="p-3 bg-gray-50 text-gray-400 rounded-xl hover:text-primary transition-all"><Video className="h-4 w-4" /></button>
-                <button className="p-3 bg-gray-50 text-gray-400 rounded-xl hover:text-primary transition-all"><Info className="h-4 w-4" /></button>
               </div>
             </div>
 
@@ -259,6 +274,7 @@ export default function Messages() {
             </div>
 
             <div className="p-6 bg-white border-t border-gray-50">
+              {sendError && <p role="alert" className="mb-3 text-xs font-bold text-red-600">{sendError}</p>}
               <form onSubmit={handleSend} className="flex items-center space-x-4">
                 <div className="relative">
                   <input 
@@ -271,6 +287,8 @@ export default function Messages() {
                   />
                   <label 
                     htmlFor="file-upload" 
+                    aria-label={t('messages.attach')}
+                    title={t('messages.attach')}
                     className={cn("p-4 bg-gray-50 rounded-2xl cursor-pointer hover:bg-gray-100 transition-colors flex items-center justify-center", isUploading && "opacity-50 pointer-events-none")}
                   >
                     {isUploading ? <Loader2 className="h-5 w-5 text-gray-400 animate-spin" /> : <Paperclip className="h-5 w-5 text-gray-400" />}
@@ -280,13 +298,15 @@ export default function Messages() {
                   type="text" 
                   value={inputText}
                   onChange={(e) => setInputText(e.target.value)}
-                  placeholder="Écrivez votre message..." 
+                  placeholder={t('messages.placeholder')}
+                  aria-label={t('messages.placeholder')}
                   className="flex-1 bg-gray-50 border-none px-6 py-4 rounded-2xl text-sm font-medium outline-none focus:ring-2 focus:ring-secondary/20 transition-all"
                   disabled={sendMessageMutation.isPending || isUploading}
                 />
                 <button 
                   type="submit"
                   disabled={sendMessageMutation.isPending || (!inputText.trim() && !isUploading)}
+                  aria-label={t('messages.send')}
                   className="p-4 bg-primary text-white rounded-2xl hover:bg-secondary disabled:opacity-50 transition-colors"
                 >
                   {sendMessageMutation.isPending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
@@ -297,7 +317,7 @@ export default function Messages() {
         ) : (
           <div className="flex-1 flex items-center justify-center flex-col text-gray-400">
             <Search className="h-12 w-12 mb-4 opacity-20" />
-            <p className="text-sm font-bold uppercase tracking-widest">Sélectionnez une conversation</p>
+            <p className="text-sm font-bold uppercase tracking-widest">{t('messages.select')}</p>
           </div>
         )}
       </div>

@@ -2,8 +2,10 @@ import { ChevronUp } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useEffect, useState } from 'react';
 import { cn } from '../lib/utils';
+import { useTranslation } from 'react-i18next';
 
 const BackToTop = () => {
+  const { t } = useTranslation();
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -38,7 +40,7 @@ const BackToTop = () => {
             "fixed bottom-8 end-8 z-50 p-3 rounded-full shadow-2xl transition-all",
             "bg-primary text-white hover:bg-secondary hover:-translate-y-1 active:scale-95"
           )}
-          aria-label="Retour en haut"
+          aria-label={t('common.backToTop')}
         >
           <ChevronUp className="h-6 w-6" />
         </motion.button>

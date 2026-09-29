@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { generateSlugUrl } from '../lib/utils';
+import { useTranslation } from 'react-i18next';
 
 interface SearchResult {
   id: string;
@@ -13,6 +14,7 @@ interface SearchResult {
 }
 
 const SearchModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) => {
+  const { t } = useTranslation();
   const [query, setQuery] = useState('');
   const navigate = useNavigate();
 
@@ -98,7 +100,7 @@ const SearchModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void
             exit={{ opacity: 0, y: -20, scale: 0.95 }}
             role="dialog"
             aria-modal="true"
-            aria-label="Recherche"
+            aria-label={t('searchModal.dialog')}
             className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden relative z-10"
           >
             <form onSubmit={handleSearchSubmit} className="p-6 border-b border-gray-100 flex items-center space-x-4">
@@ -106,8 +108,8 @@ const SearchModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void
               <input 
                 autoFocus
                 type="text" 
-                placeholder="Rechercher un produit ou une entreprise..."
-                aria-label="Rechercher un produit ou une entreprise" 
+                placeholder={t('searchModal.placeholder')}
+                aria-label={t('searchModal.placeholder')}
                 className="flex-1 bg-transparent border-none outline-none text-lg text-primary font-medium"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
@@ -115,7 +117,7 @@ const SearchModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void
               <button 
                 type="button"
                 onClick={onClose}
-                aria-label="Fermer la recherche"
+                aria-label={t('searchModal.close')}
                 className="p-2 hover:bg-gray-100 rounded-full transition-colors"
               >
                 <X className="h-5 w-5 text-gray-400" />
@@ -125,9 +127,9 @@ const SearchModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void
             <div className="p-4 max-h-[60vh] overflow-y-auto no-scrollbar">
               {query.length === 0 ? (
                 <div className="py-8 px-4">
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-6 px-2">Recherches Populaires</p>
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-6 px-2">{t('searchModal.suggestions')}</p>
                   <div className="grid grid-cols-2 gap-3">
-                    {['Pompes Industrielles', 'Solaire Algérie', 'Maintenance', 'Tuyauterie'].map((term) => (
+                    {['Pompes', 'Solaire', 'Maintenance', 'Tuyauterie'].map((term) => (
                       <button 
                         key={term}
                         onClick={() => setQuery(term)}
@@ -141,7 +143,7 @@ const SearchModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void
                 </div>
               ) : results.length > 0 ? (
                 <div className="space-y-2">
-                   <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-4 px-4">Résultats ({results.length})</p>
+                   <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-4 px-4">{t('searchModal.results', { count: results.length })}</p>
                    {results.map((result) => {
                      const Icon = getIcon(result.type);
                      return (
@@ -156,7 +158,7 @@ const SearchModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void
                          </div>
                          <div className="flex-1">
                             <div className="flex items-center space-x-2">
-                               <span className="text-[8px] font-black uppercase tracking-widest text-secondary">{result.type}</span>
+                               <span className="text-[8px] font-black uppercase tracking-widest text-secondary">{t(`searchModal.type.${result.type}`, { defaultValue: result.type })}</span>
                                <span className="text-[8px] font-black uppercase tracking-widest text-gray-400">•</span>
                                <span className="text-[8px] font-black uppercase tracking-widest text-gray-400">{result.category}</span>
                             </div>
@@ -173,7 +175,7 @@ const SearchModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void
                   <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Search className="h-8 w-8 text-gray-300" />
                   </div>
-                  <p className="text-sm font-bold text-gray-400 uppercase tracking-widest">Aucun résultat pour "{query}"</p>
+                  <p className="text-sm font-bold text-gray-400 uppercase tracking-widest">{t('searchModal.noResults', { query })}</p>
                 </div>
               )}
             </div>
@@ -182,11 +184,11 @@ const SearchModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void
               <div className="flex items-center space-x-4">
                 <div className="flex items-center space-x-1">
                    <kbd className="bg-white border border-gray-200 rounded px-1.5 py-0.5 text-[10px] font-bold text-gray-400">ESC</kbd>
-                   <span className="text-[10px] text-gray-400 font-bold uppercase">Quitter</span>
+                   <span className="text-[10px] text-gray-400 font-bold uppercase">{t('searchModal.quit')}</span>
                 </div>
                 <div className="flex items-center space-x-1">
                    <kbd className="bg-white border border-gray-200 rounded px-1.5 py-0.5 text-[10px] font-bold text-gray-400">↵</kbd>
-                   <span className="text-[10px] text-gray-400 font-bold uppercase">Sélectionner</span>
+                   <span className="text-[10px] text-gray-400 font-bold uppercase">{t('searchModal.select')}</span>
                 </div>
               </div>
               <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Algeria Industry Search v2.0</p>
