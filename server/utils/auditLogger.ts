@@ -17,7 +17,7 @@ export interface AuditLogDetails {
  */
 export async function logAdminAction(
   req: Request,
-  action: 'suspension' | 'reactivation' | 'user_delete' | 'role_change' | 'kyc_approve' | 'kyc_reject' | 'dashboard_consultation' | 'product_delete' | 'company_delete' | 'content_approve' | 'content_reject' | 'kyc_document_view' | 'report_resolve',
+  action: 'suspension' | 'reactivation' | 'user_delete' | 'role_change' | 'kyc_approve' | 'kyc_reject' | 'dashboard_consultation' | 'product_delete' | 'company_delete' | 'content_approve' | 'content_reject' | 'kyc_document_view' | 'report_resolve' | 'subscription_create' | 'subscription_activate' | 'subscription_cancel' | 'ad_status_change' | 'product_status_change' | 'support_message_update',
   details: AuditLogDetails
 ): Promise<void> {
   const adminUser = (req as any).user;

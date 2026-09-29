@@ -1,165 +1,164 @@
-/* eslint-disable */
-import React from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { motion, AnimatePresence } from 'motion/react';
-import { cn } from '../../../lib/utils';
-import { 
-  Activity, AlertTriangle, ArrowRight, ArrowUpRight, BarChart3, Bell, 
-  Building2, CheckCircle, ChevronRight, Clock, CreditCard, Edit2, Eye, 
-  FileText, Filter, Globe, History, LayoutDashboard, LayoutList, Lock, 
-  MessageSquare, Monitor, MoreVertical, MousePointer, Newspaper, 
-  PackagePlus, Plus, Search, SlidersHorizontal, ArrowUpDown, Settings, 
-  ShieldCheck, Trash, Trash2, TrendingUp, Users, X, Zap, Store
-} from 'lucide-react';
-import { 
-  LineChart, Line, AreaChart, Area, BarChart, CartesianGrid, 
-  ResponsiveContainer, Tooltip, XAxis, YAxis 
-} from 'recharts';
+import React, { useMemo, useState } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { motion } from 'motion/react';
+import { Eye, EyeOff, Loader2, RotateCcw, Search, Trash2 } from 'lucide-react';
+import { cn, generateSlugUrl } from '../../../lib/utils';
+import { adminFetch, formatDate, formatDzd } from '../adminApi';
+
+// Statuts réellement utilisés en base (voir server/routes/products.ts).
+const STATUS: Record<string, { label: string; className: string }> = {
+  Actif: { label: 'En ligne', className: 'bg-emerald-50 text-emerald-600' },
+  active: { label: 'En ligne', className: 'bg-emerald-50 text-emerald-600' },
+  Brouillon: { label: 'Brouillon', className: 'bg-gray-100 text-gray-500' },
+  Inactif: { label: 'Masqué', className: 'bg-gray-100 text-gray-500' },
+  'signalé': { label: 'Dépublié (signalement)', className: 'bg-orange-50 text-orange-600' },
+  'rejeté': { label: 'Rejeté', className: 'bg-red-50 text-red-500' },
+};
+
+const FILTERS = [
+  { id: '', label: 'Tous' },
+  { id: 'Actif', label: 'En ligne' },
+  { id: 'signalé', label: 'Dépubliés' },
+  { id: 'rejeté', label: 'Rejetés' },
+  { id: 'Brouillon', label: 'Brouillons' },
+];
 
 export default function GovProducts({ state }: { state: any }) {
-  const { data: viewData = [], isLoading } = useQuery({
-          queryKey: ['admin-GovProducts'],
-          queryFn: async () => {
-            const res = await fetch('/api/admin/products', { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }});
-            const json = await res.json();
-            return json.data || [];
-          }
-        });
-  const {
-    activeTab, setActiveTab, chartTimeframe, setChartTimeframe, showArticleForm, setShowArticleForm,
-    exhibitors, setExhibitors, showExhibitorForm, setShowExhibitorForm, pendingKYC, setPendingKYC,
-    approvedKYC, setApprovedKYC, notification, setNotification, products, setProducts, ads, setAds,
-    productSearch, setProductSearch, productRegionFilter, setProductRegionFilter, productStatusFilter,
-    setProductStatusFilter, productSortOrder, setProductSortOrder, filteredProducts, categories,
-    setCategories, selectedCategory, setSelectedCategory, newSubCatName, setNewSubCatName,
-    editingCategoryName, setEditingCategoryName, handleApproveProduct, handleRejectProduct,
-    handleApproveAd, handleRejectAd, handleAddCategory, handleOpenCategorySettings,
-    handleSaveCategorySettings, handleAddSubCategory, handleRemoveSubCategory, showNotify,
-    handleApproveKYC, handleRejectKYC, statsAdmin, revenueData, profile, visits, events,
-    totalTimeSpentSec, clearLogs, logout, navigate
-  } = state;
+  const { showNotify } = state;
+  const queryClient = useQueryClient();
+  const [filter, setFilter] = useState('');
+  const [search, setSearch] = useState('');
 
-        return (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
-             <div className="flex justify-between items-end">
-               <div>
-                  <h3 className="text-2xl font-black text-primary uppercase tracking-tighter italic">Base de Données Produits</h3>
-                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest italic">{filteredProducts.length} Produits référencés sur la plateforme</p>
-               </div>
-             </div>
+  const { data: products = [], isLoading } = useQuery({
+    queryKey: ['admin-products', filter],
+    queryFn: async () => (await adminFetch(`/api/admin/products${filter ? `?status=${encodeURIComponent(filter)}` : ''}`)).data || [],
+  });
 
-             <div className="bg-white p-6 rounded-[32px] border border-gray-100 shadow-sm flex flex-col md:flex-row md:items-center gap-4">
-               <div className="flex-1 relative">
-                 <Search className="absolute start-4 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                 <input 
-                   type="text" 
-                   placeholder="Rechercher par nom, référence ou exposant..." 
-                   value={productSearch}
-                   onChange={(e) => setProductSearch(e.target.value)}
-                   className="w-full bg-gray-50 border border-gray-100 rounded-xl ps-12 pe-4 py-3 text-sm font-bold text-primary focus:border-secondary transition-all outline-none"
-                 />
-               </div>
-               
-               <div className="flex flex-wrap items-center gap-3">
-                 <div className="relative">
-                   <select 
-                     value={productRegionFilter}
-                     onChange={(e) => setProductRegionFilter(e.target.value)}
-                     className="appearance-none bg-gray-50 border border-gray-100 text-gray-600 text-[10px] font-black uppercase tracking-widest rounded-xl ps-4 pe-10 py-3 outline-none focus:border-secondary cursor-pointer"
-                   >
-                     <option value="Tous">Régions: Toutes</option>
-                     <option value="Alger">Alger</option>
-                     <option value="Oran">Oran</option>
-                     <option value="Setif">Setif</option>
-                   </select>
-                   <SlidersHorizontal className="absolute end-4 top-1/2 transform -translate-y-1/2 h-3 w-3 text-gray-400 pointer-events-none" />
-                 </div>
+  const visible = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return products;
+    return products.filter((p: any) =>
+      [p.name, p.reference_id, p.company?.name, p.category].some((v) => v && String(v).toLowerCase().includes(q))
+    );
+  }, [products, search]);
 
-                 <div className="relative">
-                   <select 
-                     value={productStatusFilter}
-                     onChange={(e) => setProductStatusFilter(e.target.value)}
-                     className="appearance-none bg-gray-50 border border-gray-100 text-gray-600 text-[10px] font-black uppercase tracking-widest rounded-xl ps-4 pe-10 py-3 outline-none focus:border-secondary cursor-pointer"
-                   >
-                     <option value="Tous">Status: Tous</option>
-                     <option value="Certifié">Certifié</option>
-                     <option value="En attente">En attente</option>
-                     <option value="Rejeté">Rejeté</option>
-                   </select>
-                   <Filter className="absolute end-4 top-1/2 transform -translate-y-1/2 h-3 w-3 text-gray-400 pointer-events-none" />
-                 </div>
+  const refresh = () => queryClient.invalidateQueries({ queryKey: ['admin-products'] });
 
-                 <div className="relative">
-                   <select 
-                     value={productSortOrder}
-                     onChange={(e) => setProductSortOrder(e.target.value as any)}
-                     className="appearance-none bg-gray-50 border border-gray-100 text-gray-600 text-[10px] font-black uppercase tracking-widest rounded-xl ps-4 pe-10 py-3 outline-none focus:border-secondary cursor-pointer"
-                   >
-                     <option value="date-desc">Tri: Plus récent</option>
-                     <option value="date-asc">Tri: Plus ancien</option>
-                     <option value="status">Tri: Statut</option>
-                   </select>
-                   <ArrowUpDown className="absolute end-4 top-1/2 transform -translate-y-1/2 h-3 w-3 text-gray-400 pointer-events-none" />
-                 </div>
-               </div>
-             </div>
+  const statusMutation = useMutation({
+    mutationFn: ({ id, status }: { id: string; status: string }) =>
+      adminFetch(`/api/products/${id}/status`, { method: 'PUT', body: JSON.stringify({ status }) }),
+    onSuccess: (_d, vars) => {
+      showNotify(vars.status === 'Actif' ? 'Produit remis en ligne.' : 'Produit retiré du catalogue.', 'success');
+      refresh();
+    },
+    onError: (err: Error) => showNotify(err.message, 'error'),
+  });
 
-             <div className="bg-white rounded-[40px] border border-gray-100 shadow-sm overflow-hidden">
-                <table className="w-full">
-                   <thead className="bg-gray-50/50 border-b border-gray-100 font-sans">
-                      <tr>
-                         <th className="p-6 text-start text-[10px] font-black text-gray-400 uppercase">Produit</th>
-                         <th className="p-6 text-start text-[10px] font-black text-gray-400 uppercase">Exposant</th>
-                         <th className="p-6 text-start text-[10px] font-black text-gray-400 uppercase">Région</th>
-                         <th className="p-6 text-start text-[10px] font-black text-gray-400 uppercase">Status</th>
-                         <th className="p-6 text-end text-[10px] font-black text-gray-400 uppercase">Actions</th>
-                      </tr>
-                   </thead>
-                   <tbody className="divide-y divide-gray-50">
-                      {filteredProducts.length === 0 && (
-                        <tr>
-                           <td colSpan={5} className="p-12 text-center text-sm font-bold text-gray-400 italic">
-                             Aucun produit ne correspond à vos critères de recherche.
-                           </td>
-                        </tr>
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => adminFetch(`/api/admin/products/${id}`, { method: 'DELETE' }),
+    onSuccess: () => {
+      showNotify('Produit supprimé définitivement.', 'success');
+      refresh();
+    },
+    onError: (err: Error) => showNotify(err.message, 'error'),
+  });
+
+  const confirmDelete = (p: any) => {
+    if (window.confirm(`Supprimer définitivement « ${p.name} » ? Cette action est irréversible.`)) {
+      deleteMutation.mutate(p.id);
+    }
+  };
+
+  const isOnline = (status: string) => status === 'Actif' || status === 'active';
+
+  return (
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
+      <div>
+        <h3 className="text-2xl font-black text-primary uppercase italic">Catalogue produits</h3>
+        <p className="text-gray-500 mt-2 text-sm">
+          Les produits sont publiés directement par les fournisseurs vérifiés (KYC). Vous pouvez les retirer, les remettre en ligne ou les supprimer.
+        </p>
+      </div>
+
+      <div className="bg-white p-6 rounded-[32px] border border-gray-100 shadow-sm flex flex-col lg:flex-row lg:items-center gap-4">
+        <div className="flex-1 relative">
+          <Search className="absolute start-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <input
+            type="search"
+            aria-label="Rechercher un produit"
+            placeholder="Nom, référence, entreprise ou catégorie…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full bg-gray-50 border border-gray-100 rounded-xl ps-12 pe-4 py-3 text-sm outline-none focus:border-secondary"
+          />
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {FILTERS.map((f) => (
+            <button
+              key={f.id}
+              onClick={() => setFilter(f.id)}
+              className={cn('px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest', filter === f.id ? 'bg-primary text-white' : 'bg-gray-50 text-gray-500 hover:text-primary')}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="bg-white rounded-[32px] border border-gray-100 shadow-sm overflow-x-auto">
+        <table className="w-full text-xs">
+          <thead className="bg-gray-50/50 text-[10px] font-black text-gray-500 uppercase tracking-widest">
+            <tr>
+              <th className="p-5 text-start">Produit</th>
+              <th className="p-5 text-start">Entreprise</th>
+              <th className="p-5 text-start">Prix</th>
+              <th className="p-5 text-start">Statut</th>
+              <th className="p-5 text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-50">
+            {isLoading && (
+              <tr><td colSpan={5} className="p-10 text-center"><Loader2 className="h-5 w-5 animate-spin inline text-gray-400" /></td></tr>
+            )}
+            {!isLoading && visible.length === 0 && (
+              <tr><td colSpan={5} className="p-10 text-center text-gray-500">Aucun produit ne correspond.</td></tr>
+            )}
+            {visible.map((p: any) => {
+              const status = STATUS[p.status] || { label: p.status || '—', className: 'bg-gray-100 text-gray-500' };
+              return (
+                <tr key={p.id} className="hover:bg-gray-50/40">
+                  <td className="p-5">
+                    <p className="font-bold text-primary">{p.name}</p>
+                    <p className="text-[11px] text-gray-500">{[p.reference_id, p.category, `ajouté le ${formatDate(p.created_at)}`].filter(Boolean).join(' · ')}</p>
+                  </td>
+                  <td className="p-5 text-gray-600">{p.company?.name || '—'}{p.company?.wilaya ? <span className="block text-[11px] text-gray-500">{p.company.wilaya}</span> : null}</td>
+                  <td className="p-5">{Number(p.price) > 0 ? formatDzd(p.price) : 'Sur devis'}</td>
+                  <td className="p-5"><span className={cn('px-2.5 py-1 rounded-full text-[10px] font-black', status.className)}>{status.label}</span></td>
+                  <td className="p-5">
+                    <div className="flex justify-end gap-2">
+                      <a href={`/products/${generateSlugUrl(p.name, p.id)}`} target="_blank" rel="noopener" className="p-2 rounded-lg bg-gray-50 text-gray-500 hover:text-primary" title="Voir la fiche">
+                        <Eye className="h-4 w-4" />
+                      </a>
+                      {isOnline(p.status) ? (
+                        <button onClick={() => statusMutation.mutate({ id: p.id, status: 'Inactif' })} className="p-2 rounded-lg bg-orange-50 text-orange-600 hover:bg-orange-100" title="Retirer du catalogue">
+                          <EyeOff className="h-4 w-4" />
+                        </button>
+                      ) : (
+                        <button onClick={() => statusMutation.mutate({ id: p.id, status: 'Actif' })} className="p-2 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100" title="Remettre en ligne">
+                          <RotateCcw className="h-4 w-4" />
+                        </button>
                       )}
-                      {filteredProducts.map((p, i) => (
-                        <tr key={p.id} className="hover:bg-gray-50/30 transition-colors">
-                           <td className="p-6">
-                              <div>
-                                 <p className="text-xs font-black text-primary uppercase">{p.name}</p>
-                                 <p className="text-[9px] font-bold text-gray-400 uppercase">Ref: {p.ref} • Ajouté le {p.dateAdded}</p>
-                              </div>
-                           </td>
-                           <td className="p-6 text-[10px] font-black text-gray-500 uppercase">{p.company}</td>
-                           <td className="p-6 text-[10px] font-black text-gray-500 uppercase">{p.region}</td>
-                           <td className="p-6">
-                              <span className={cn("px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest", 
-                                p.status === 'Certifié' ? "bg-emerald-50 text-emerald-500" : 
-                                p.status === 'Rejeté' ? "bg-red-50 text-red-500" : "bg-orange-50 text-orange-500")}>
-                                 {p.status}
-                              </span>
-                           </td>
-                           <td className="p-6 text-end">
-                              <div className="flex justify-end space-x-2">
-                                 {p.status === 'En attente' && (
-                                   <>
-                                     <button onClick={() => handleApproveProduct(p.id)} className="p-2 bg-emerald-50 text-emerald-500 hover:bg-emerald-100 rounded-lg transition-all" title="Approuver"><CheckCircle className="h-4 w-4" /></button>
-                                     <button onClick={() => handleRejectProduct(p.id)} className="p-2 bg-red-50 text-red-500 hover:bg-red-100 rounded-lg transition-all" title="Rejeter"><X className="h-4 w-4" /></button>
-                                   </>
-                                 )}
-                                 <button onClick={() => showNotify("Redirection vers la page produit...", "success")} className="p-2 bg-gray-50 text-gray-400 hover:text-primary rounded-lg transition-all"><Eye className="h-4 w-4" /></button>
-                                 <button onClick={() => showNotify("Ouverture de l'éditeur de produit...", "success")} className="p-2 bg-gray-50 text-gray-400 hover:text-secondary rounded-lg transition-all"><Edit2 className="h-4 w-4" /></button>
-                              </div>
-                           </td>
-                        </tr>
-                      ))}
-                   </tbody>
-                </table>
-             </div>
-          </motion.div>
-        );
-
-
-      
+                      <button onClick={() => confirmDelete(p)} className="p-2 rounded-lg bg-red-50 text-red-500 hover:bg-red-100" title="Supprimer">
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </motion.div>
+  );
 }

@@ -6,6 +6,8 @@ import rateLimit from 'express-rate-limit';
 import { logAdminAction } from '../utils/auditLogger';
 import { requireUuidParams } from '../middlewares/validateParams';
 import { PUBLIC_USER_COLUMNS } from '../utils/userFields';
+import { z } from 'zod';
+import { validate } from '../middlewares/validateMiddleware';
 
 const router = express.Router();
 
@@ -65,17 +67,17 @@ router.get('/dashboard', verifyRole(['admin']), adminDashboardLimiter, async (re
       supabase.from('users').select('*', { count: 'exact', head: true }),
       supabase.from('companies').select('*', { count: 'exact', head: true }).eq('status', 'approved'),
       supabase.from('products').select('*', { count: 'exact', head: true }), // Assuming all are active for now since status doesn't exist on products
-      supabase.from('ads').select('*', { count: 'exact', head: true }).eq('status', 'published'),
+      supabase.from('tenders').select('*', { count: 'exact', head: true }).eq('status', 'open'),
       // Current month
       supabase.from('users').select('*', { count: 'exact', head: true }).gte('created_at', startOfCurrentMonth),
       supabase.from('companies').select('*', { count: 'exact', head: true }).eq('status', 'approved').gte('created_at', startOfCurrentMonth),
       supabase.from('products').select('*', { count: 'exact', head: true }).gte('created_at', startOfCurrentMonth),
-      supabase.from('ads').select('*', { count: 'exact', head: true }).eq('status', 'published').gte('created_at', startOfCurrentMonth),
+      supabase.from('tenders').select('*', { count: 'exact', head: true }).gte('created_at', startOfCurrentMonth),
       // Previous month
       supabase.from('users').select('*', { count: 'exact', head: true }).gte('created_at', startOfPreviousMonth).lt('created_at', startOfCurrentMonth),
       supabase.from('companies').select('*', { count: 'exact', head: true }).eq('status', 'approved').gte('created_at', startOfPreviousMonth).lt('created_at', startOfCurrentMonth),
       supabase.from('products').select('*', { count: 'exact', head: true }).gte('created_at', startOfPreviousMonth).lt('created_at', startOfCurrentMonth),
-      supabase.from('ads').select('*', { count: 'exact', head: true }).eq('status', 'published').gte('created_at', startOfPreviousMonth).lt('created_at', startOfCurrentMonth),
+      supabase.from('tenders').select('*', { count: 'exact', head: true }).gte('created_at', startOfPreviousMonth).lt('created_at', startOfCurrentMonth),
     ]);
 
     const calculateTrend = (cm: number | null, pm: number | null) => {
@@ -266,34 +268,6 @@ router.get('/companies', verifyRole(['admin']), async (req, res) => {
   }
 });
 
-// GET /api/admin/roles
-router.get('/roles', verifyRole(['admin']), async (req, res) => {
-  try {
-    const supabase = getSupabase();
-    const { data, error } = await supabase.from('roles').select('*');
-    if (error) {
-      return res.json({ success: true, data: [] });
-    }
-    res.json({ success: true, data });
-  } catch (error: any) {
-    res.status(500).json({ error: 'Une erreur interne est survenue.' });
-  }
-});
-
-// GET /api/admin/support/tickets
-router.get('/support/tickets', verifyRole(['admin']), async (req, res) => {
-  try {
-    const supabase = getSupabase();
-    const { data, error } = await supabase.from('support_tickets').select('*');
-    if (error) {
-       return res.json({ success: true, data: [] });
-    }
-    res.json({ success: true, data });
-  } catch (error: any) {
-    res.status(500).json({ error: 'Une erreur interne est survenue.' });
-  }
-});
-
 // GET /api/admin/categories
 router.get('/categories', verifyRole(['admin']), async (req, res) => {
   try {
@@ -311,51 +285,166 @@ router.get('/categories', verifyRole(['admin']), async (req, res) => {
 });
 
 
-// GET /api/admin/products
+// GET /api/admin/products - Catalogue complet avec l'entreprise du vendeur
 router.get('/products', verifyRole(['admin']), async (req, res) => {
   try {
     const supabase = getSupabase();
-    const { data, error } = await supabase.from('products').select('*').order('created_at', { ascending: false });
-    res.json({ success: true, data: error ? [] : data });
-  } catch (error: any) { res.status(500).json({ error: 'Une erreur interne est survenue.' }); }
+    let query = supabase
+      .from('products')
+      .select('id, reference_id, name, category, price, status, created_at, owner_id, company:companies(id, name, wilaya)')
+      .order('created_at', { ascending: false })
+      .limit(500);
+    if (typeof req.query.status === 'string' && req.query.status) {
+      query = query.eq('status', req.query.status);
+    }
+    const { data, error } = await query;
+    if (error) throw error;
+    res.json({ success: true, data: data || [] });
+  } catch (error: any) {
+    logger.error('Error GET /api/admin/products', error);
+    res.status(500).json({ error: 'Une erreur interne est survenue.' });
+  }
 });
 
-// GET /api/admin/ads
+// GET /api/admin/ads - Toutes les demandes de publicité (y compris en attente)
 router.get('/ads', verifyRole(['admin']), async (req, res) => {
   try {
     const supabase = getSupabase();
-    const { data, error } = await supabase.from('ads').select('*').order('created_at', { ascending: false });
-    res.json({ success: true, data: error ? [] : data });
-  } catch (error: any) { res.status(500).json({ error: 'Une erreur interne est survenue.' }); }
+    const { data, error } = await supabase
+      .from('ads')
+      .select('id, title, type, objective, url, duration, status, company, contact_email, contact_phone, message, rejection_reason, created_at, user:users(name, email)')
+      .order('created_at', { ascending: false })
+      .limit(200);
+    if (error) throw error;
+    res.json({ success: true, data: data || [] });
+  } catch (error: any) {
+    logger.error('Error GET /api/admin/ads', error);
+    res.status(500).json({ error: 'Une erreur interne est survenue.' });
+  }
 });
 
-// GET /api/admin/exhibitors
-router.get('/exhibitors', verifyRole(['admin']), async (req, res) => {
+const adStatusSchema = z.object({
+  status: z.enum(['published', 'rejected', 'en_attente', 'ended']),
+  reason: z.string().trim().max(500).optional(),
+});
+
+// PATCH /api/admin/ads/:id/status - Publier, refuser ou terminer une campagne
+router.patch('/ads/:id/status', verifyRole(['admin']), requireUuidParams('id'), validate(adStatusSchema), async (req, res) => {
+  const { status, reason } = req.body;
+  if (status === 'rejected' && (!reason || reason.length < 3)) {
+    return res.status(400).json({ error: 'Un motif de refus est obligatoire.', code: 'REASON_REQUIRED' });
+  }
   try {
     const supabase = getSupabase();
-    const { data, error } = await supabase.from('exhibitors').select('*');
-    if (error) {
-       return res.json({ success: true, data: [] });
-    }
+    const { data, error } = await supabase
+      .from('ads')
+      .update({ status, rejection_reason: status === 'rejected' ? reason : null })
+      .eq('id', req.params.id)
+      .select('id, title, status')
+      .maybeSingle();
+    if (error) throw error;
+    if (!data) return res.status(404).json({ error: 'Publicité introuvable' });
+    await logAdminAction(req, 'ad_status_change', { adId: data.id, title: data.title, status, reason });
     res.json({ success: true, data });
-  } catch (error: any) { res.status(500).json({ error: 'Une erreur interne est survenue.' }); }
+  } catch (error: any) {
+    logger.error('Error PATCH /api/admin/ads/:id/status', error);
+    res.status(500).json({ error: 'Une erreur interne est survenue.' });
+  }
 });
 
-// GET /api/admin/telemetry
-router.get('/telemetry', verifyRole(['admin']), async (req, res) => {
-  res.json({ success: true, data: { visits: [], events: [] } });
+// GET /api/admin/support/messages - Boîte de réception du formulaire de contact
+router.get('/support/messages', verifyRole(['admin']), async (req, res) => {
+  try {
+    const supabase = getSupabase();
+    let query = supabase
+      .from('contact_messages')
+      .select('id, name, email, subject, message, status, admin_note, created_at, updated_at')
+      .order('created_at', { ascending: false })
+      .limit(200);
+    const status = req.query.status;
+    if (typeof status === 'string' && ['new', 'in_progress', 'closed'].includes(status)) {
+      query = query.eq('status', status);
+    }
+    const { data, error } = await query;
+    if (error) throw error;
+    res.json({ success: true, data: data || [] });
+  } catch (error: any) {
+    logger.error('Error GET /api/admin/support/messages', error);
+    res.status(500).json({ error: 'Une erreur interne est survenue.' });
+  }
 });
 
-// GET /api/admin/cms
-router.get('/cms', verifyRole(['admin']), async (req, res) => {
-  res.json({ success: true, data: [] });
+const supportUpdateSchema = z.object({
+  status: z.enum(['new', 'in_progress', 'closed']).optional(),
+  admin_note: z.string().trim().max(2000).optional(),
 });
 
-// GET /api/admin/settings
-router.get('/settings', verifyRole(['admin']), async (req, res) => {
-  res.json({ success: true, data: {} });
+// PATCH /api/admin/support/messages/:id - Suivi du traitement
+router.patch('/support/messages/:id', verifyRole(['admin']), requireUuidParams('id'), validate(supportUpdateSchema), async (req, res) => {
+  const admin = (req as any).user;
+  const { status, admin_note } = req.body;
+  if (status === undefined && admin_note === undefined) {
+    return res.status(400).json({ error: 'Rien à mettre à jour' });
+  }
+  try {
+    const supabase = getSupabase();
+    const update: Record<string, any> = { handled_by: admin.id, updated_at: new Date().toISOString() };
+    if (status !== undefined) update.status = status;
+    if (admin_note !== undefined) update.admin_note = admin_note;
+    const { data, error } = await supabase
+      .from('contact_messages')
+      .update(update)
+      .eq('id', req.params.id)
+      .select('id, status, admin_note, updated_at')
+      .maybeSingle();
+    if (error) throw error;
+    if (!data) return res.status(404).json({ error: 'Message introuvable' });
+    await logAdminAction(req, 'support_message_update', { messageId: data.id, status });
+    res.json({ success: true, data });
+  } catch (error: any) {
+    logger.error('Error PATCH /api/admin/support/messages/:id', error);
+    res.status(500).json({ error: 'Une erreur interne est survenue.' });
+  }
 });
 
+// GET /api/admin/companies/search?q= - Recherche d'entreprises (facturation)
+router.get('/companies/search', verifyRole(['admin']), async (req, res) => {
+  try {
+    const q = typeof req.query.q === 'string' ? req.query.q.replace(/[%_,()]/g, ' ').trim().slice(0, 100) : '';
+    if (q.length < 2) return res.json({ success: true, data: [] });
+    const supabase = getSupabase();
+    const { data, error } = await supabase
+      .from('companies')
+      .select('id, name, wilaya, status, plan, plan_ends_at, owner_id')
+      .ilike('name', `%${q}%`)
+      .order('name')
+      .limit(10);
+    if (error) throw error;
+    res.json({ success: true, data: data || [] });
+  } catch (error: any) {
+    logger.error('Error GET /api/admin/companies/search', error);
+    res.status(500).json({ error: 'Une erreur interne est survenue.' });
+  }
+});
+
+// GET /api/admin/pending-counts - Tâches en attente (badges du menu de la console)
+router.get('/pending-counts', verifyRole(['admin']), async (req, res) => {
+  try {
+    const supabase = getSupabase();
+    const count = (q: any) => q.then((r: any) => r.count || 0);
+    const [kyc, support, ads, reports, invoices] = await Promise.all([
+      count(supabase.from('kyc_requests').select('*', { count: 'exact', head: true }).eq('status', 'pending')),
+      count(supabase.from('contact_messages').select('*', { count: 'exact', head: true }).eq('status', 'new')),
+      count(supabase.from('ads').select('*', { count: 'exact', head: true }).eq('status', 'en_attente')),
+      count(supabase.from('reports').select('*', { count: 'exact', head: true }).eq('status', 'pending')),
+      count(supabase.from('subscriptions').select('*', { count: 'exact', head: true }).eq('status', 'pending')),
+    ]);
+    res.json({ kyc, support, ads, reports, invoices });
+  } catch (error: any) {
+    logger.error('Error GET /api/admin/pending-counts', error);
+    res.status(500).json({ error: 'Une erreur interne est survenue.' });
+  }
+});
 
 // GET /api/admin/moderation - Signalements en attente
 router.get('/moderation', verifyRole(['admin']), async (req, res) => {

@@ -176,7 +176,7 @@ export default function App() {
                 </Suspense>
               </main>
                 {!isExtranet && <Footer />}
-                <HelpWidget />
+                {!isExtranet && <HelpWidget />}
                 <CookieBanner />
                 <BackToTop />
                 {!isExtranet && <ComparisonBar />}
