@@ -8,7 +8,18 @@ import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 
 // Initialize PDF.js worker
-pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+// Worker servi depuis notre propre origine (la CSP interdit les CDN tiers).
+pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString();
+
+// Les documents KYC sont servis par URL signée (avec paramètres) : on teste le chemin seul.
+const isPdfUrl = (url?: string | null) => {
+  if (!url) return false;
+  try {
+    return new URL(url, window.location.origin).pathname.toLowerCase().endsWith('.pdf');
+  } catch {
+    return url.toLowerCase().split('?')[0].endsWith('.pdf');
+  }
+};
 
 export default function AdminKYCReview() {
   const { t } = useTranslation();
@@ -221,7 +232,7 @@ export default function AdminKYCReview() {
                         <FileText className="h-5 w-5" />
                         <span className="font-bold">{doc.document_type}</span>
                       </div>
-                      <a 
+                      {doc.file_url && <a 
                         href={doc.file_url} 
                         target="_blank" 
                         rel="noopener noreferrer" 
@@ -229,7 +240,7 @@ export default function AdminKYCReview() {
                         className="p-2 hover:bg-gray-100 rounded-lg text-gray-400 hover:text-primary transition-colors"
                       >
                         <Download className="h-4 w-4" />
-                      </a>
+                      </a>}
                     </button>
                   ))
                 ) : (
@@ -242,8 +253,13 @@ export default function AdminKYCReview() {
 
         {/* Right Pane : Document Viewer */}
         <div className="w-1/2 bg-gray-200 relative flex flex-col items-center overflow-auto p-8">
-          {activeDoc ? (
-            activeDoc.file_url.toLowerCase().endsWith('.pdf') ? (
+          {activeDoc && !activeDoc.file_url ? (
+            <div className="flex flex-col items-center justify-center h-full text-gray-500">
+              <FileText className="h-16 w-16 mb-4 opacity-20" />
+              <p className="text-sm font-bold uppercase tracking-widest">Document introuvable dans le stockage</p>
+            </div>
+          ) : activeDoc ? (
+            isPdfUrl(activeDoc.file_url) ? (
               <div className="bg-white p-4 shadow-xl rounded-xl">
                 <Document
                   file={activeDoc.file_url}
