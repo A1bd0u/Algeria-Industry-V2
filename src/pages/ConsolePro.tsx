@@ -55,7 +55,6 @@ import {
   Tooltip,
   XAxis, YAxis
 } from 'recharts';
-import { useTracking } from '../context/TrackingContext';
 import { cn } from '../lib/utils';
 
 
@@ -63,16 +62,11 @@ import { cn } from '../lib/utils';
 const ConsolePro = () => {
   const { logout } = useAuth();
   const navigate = useNavigate();
-  const { profile, visits, events, totalTimeSpentSec, clearLogs } = useTracking();
   const [activeTab, setActiveTab] = useState('gov-overview');
   const [chartTimeframe, setChartTimeframe] = useState<'7' | '30' | '90' | '365'>('30');
   const [isDashboardLoading, setIsDashboardLoading] = useState(true);
   const [showArticleForm, setShowArticleForm] = useState(false);
-  const [exhibitors, setExhibitors] = useState<any[]>([
-    { id: 1, name: "Sonatrach", category: "Énergie & Mines", type: "Grande Entreprise", region: "Alger", status: "Premium", added: "2023-11-20" },
-    { id: 2, name: "Cevital", category: "Agroalimentaire", type: "Grande Entreprise", region: "Béjaïa", status: "Premium", added: "2023-11-22" },
-    { id: 3, name: "Condor", category: "Électronique & Électroménager", type: "Moyenne Entreprise", region: "Bordj Bou Arreridj", status: "Standard", added: "2023-12-05" }
-  ]);
+  const [exhibitors, setExhibitors] = useState<any[]>([]);
   const [showExhibitorForm, setShowExhibitorForm] = useState(false);
   const [pendingKYC, setPendingKYC] = useState<any[]>([]);
   const [approvedKYC, setApprovedKYC] = useState<string[]>([]);
@@ -331,8 +325,8 @@ const ConsolePro = () => {
     editingCategoryName, setEditingCategoryName, handleApproveProduct, handleRejectProduct,
     handleApproveAd, handleRejectAd, handleAddCategory, handleOpenCategorySettings,
     handleSaveCategorySettings, handleAddSubCategory, handleRemoveSubCategory, showNotify,
-    handleApproveKYC, handleRejectKYC, statsAdmin, revenueData, registrationsData, profile, visits, events,
-    totalTimeSpentSec, clearLogs, logout, navigate, isDashboardLoading
+    handleApproveKYC, handleRejectKYC, statsAdmin, revenueData, registrationsData,
+    logout, navigate, isDashboardLoading
   };
 
   return <ConsoleLayout state={consoleState} />;

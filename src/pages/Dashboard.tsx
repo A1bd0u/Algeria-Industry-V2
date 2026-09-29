@@ -67,7 +67,7 @@ const productCategories = [
 ];
 
 const Dashboard = () => {
-  const { user, logout, isAuthenticated } = useAuth();
+  const { user, logout, isAuthenticated, setUser } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'overview');
@@ -84,7 +84,6 @@ const Dashboard = () => {
   const [notification, setNotification] = useState<{message: string, type: 'success' | 'error'} | null>(null);
 
   const [products, setProducts] = useState<any[]>([]);
-  const [messages, setMessages] = useState<any[]>([]);
   const [favorites, setFavorites] = useState<any[]>([]);
   const [showAddProduct, setShowAddProduct] = useState(false);
   const [editProduct, setEditProduct] = useState<any>(null);
@@ -92,18 +91,13 @@ const Dashboard = () => {
   useEffect(() => {
      const fetchData = async () => {
         try {
-           const [prodRes, msgRes, favRes] = await Promise.all([
+           const [prodRes, favRes] = await Promise.all([
              fetch('/api/products/my'),
-             fetch('/api/messages'),
              fetch('/api/favorites')
            ]);
            if (prodRes.ok) {
               const data = await prodRes.json();
               setProducts(data);
-           }
-           if (msgRes.ok) {
-              const data = await msgRes.json();
-              setMessages(data);
            }
            if (favRes.ok) {
               const data = await favRes.json();
@@ -116,47 +110,7 @@ const Dashboard = () => {
      if (isAuthenticated) fetchData();
   }, [isAuthenticated]);
 
-  const [newMessage, setNewMessage] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
   const [globalSearch, setGlobalSearch] = useState('');
-
-  const handleSendMessage = async () => {
-    if (!newMessage.trim()) return;
-    
-    try {
-      const res = await fetch('/api/messages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: newMessage })
-      });
-      
-      if (res.ok) {
-         const msg = await res.json();
-         setMessages(prev => [...prev, msg]);
-         setNewMessage('');
-         
-         // Simulate auto-response
-         setIsTyping(true);
-         setTimeout(() => {
-           setIsTyping(false);
-           const response = {
-             id: Date.now() + 1,
-             sender: 'them',
-             text: 'C\'est entendu. Souhaitez-vous que je vous envoie le bon de commande pour signature ?',
-             time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-           };
-           setMessages(prev => [...prev, response]);
-         }, 2000);
-      }
-    } catch (e) {
-       console.error("Erreur envoi message", e);
-    }
-  };
-
-  const deleteProduct = (id: string) => {
-    setProducts(prev => prev.filter(p => p.id !== id));
-    showNotify("Le produit a été supprimé.");
-  };
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -182,24 +136,48 @@ const Dashboard = () => {
     setTimeout(() => setNotification(null), 3000);
   };
 
-  const [companyInfo, setCompanyInfo] = useState({
-    name: user?.company || '',
-    bio: 'Leader national dans la fourniture de solutions industrielles et équipements de pointe.',
-    address: 'Zone Industrielle, Rouiba, Alger',
-    phone: '021 00 00 00',
-    website: 'wwww.entreprise.dz'
-  });
+  const [companyInfo, setCompanyInfo] = useState({ name: '', bio: '', wilaya: '' });
 
-  const handleUpdateCompany = (e: React.FormEvent) => {
+  useEffect(() => {
+    const loadCompany = async () => {
+      if (!user?.company_id) return;
+      try {
+        const res = await fetch(`/api/companies/${user.company_id}`);
+        if (res.ok) {
+          const c = await res.json();
+          setCompanyInfo({ name: c.name || '', bio: c.description || '', wilaya: c.wilaya || '' });
+        }
+      } catch (e) {
+        console.error('Erreur chargement entreprise', e);
+      }
+    };
+    loadCompany();
+  }, [user?.company_id]);
+
+  const handleUpdateCompany = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user?.company_id) {
+      showNotify("Aucune entreprise n'est rattachée à votre compte.", "error");
+      return;
+    }
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      const res = await fetch(`/api/companies/${user.company_id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: companyInfo.name, description: companyInfo.bio, wilaya: companyInfo.wilaya || undefined })
+      });
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        throw new Error(d.error || 'Erreur lors de la mise à jour.');
+      }
       showNotify("Informations entreprise mises à jour.", "success");
-    }, 1000);
+    } catch (err: any) {
+      showNotify(err.message, "error");
+    } finally {
+      setIsLoading(false);
+    }
   };
-
-
 
   const submitAd = async () => {
     setIsLoading(true);
@@ -234,10 +212,9 @@ const Dashboard = () => {
   };
 
   const [profileInfo, setProfileInfo] = useState({
-    name: user?.name || 'Ahmed Saada',
-    email: user?.email || 'contact@sonatrach.dz',
-    role: 'Directeur des Achats Industriels',
-    phone: '+213 21 00 00 00'
+    name: user?.name || '',
+    email: user?.email || '',
+    company: user?.company || ''
   });
   const [chartTimeframe, setChartTimeframe] = useState<'6m' | '1y'>('6m');
   const [apiStats, setApiStats] = useState<any>(null);
@@ -260,11 +237,49 @@ const Dashboard = () => {
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      const res = await fetch('/api/users/me', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: profileInfo.name, company: profileInfo.company })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || 'Erreur lors de la mise à jour du profil.');
+      if (data.user) setUser(data.user);
       showNotify("Profil mis à jour avec succès.", "success");
-    }, 1000);
+    } catch (err: any) {
+      showNotify(err.message, "error");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleExportData = async () => {
+    try {
+      const res = await fetch('/api/users/me/export');
+      if (!res.ok) throw new Error();
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'mes-donnees-algeria-industry.json';
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      showNotify("L'export a échoué. Veuillez réessayer.", "error");
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!window.confirm('Supprimer définitivement votre compte et toutes vos données ? Cette action est irréversible.')) return;
+    try {
+      const res = await fetch('/api/users/me', { method: 'DELETE' });
+      if (!res.ok) throw new Error();
+      setUser(null);
+      navigate('/');
+    } catch {
+      showNotify("La suppression a échoué. Contactez le support.", "error");
+    }
   };
 
   const filteredProducts = products.filter(p => 
@@ -276,13 +291,14 @@ const Dashboard = () => {
     if (!user) return null;
     switch(activeTab) {
       case 'overview':
-        const stats = user.role === 'fournisseur' ? [
-          { label: 'Publicités', value: apiStats?.metrics?.ads || 0, trend: '+12%', icon: Users, color: 'text-blue-600', bg: 'bg-blue-50' },
-          { label: 'Produits actifs', value: apiStats?.metrics?.items || 0, trend: 'Stable', icon: Package, color: 'text-emerald-600', bg: 'bg-emerald-50' },
-          { label: 'Score visibilité', value: '92%', trend: '+2%', icon: TrendingUp, color: 'text-orange-600', bg: 'bg-orange-50' },
+        const kycLabels: Record<string, string> = { none: 'À faire', pending: 'En cours', approved: 'Approuvé', rejected: 'Refusé' };
+        const stats = (user.role === 'fournisseur' || user.role === 'exposant') ? [
+          { label: 'Produits publiés', value: apiStats?.metrics?.items || 0, icon: Package, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+          { label: 'Messages', value: apiStats?.metrics?.messages || 0, icon: MessageSquare, color: 'text-blue-600', bg: 'bg-blue-50' },
+          { label: 'Vérification KYC', value: kycLabels[user.kycStatus || 'none'], icon: ShieldCheck, color: 'text-orange-600', bg: 'bg-orange-50' },
         ] : [
-          { label: 'Économies est.', value: '1.2M DZD', trend: '8%', icon: TrendingUp, color: 'text-emerald-600', bg: 'bg-emerald-50' },
-          { label: 'Messages', value: apiStats?.metrics?.messages || 0, trend: 'Stable', icon: Users, color: 'text-orange-600', bg: 'bg-orange-50' },
+          { label: 'Messages', value: apiStats?.metrics?.messages || 0, icon: MessageSquare, color: 'text-orange-600', bg: 'bg-orange-50' },
+          { label: 'Favoris', value: favorites.length, icon: Heart, color: 'text-emerald-600', bg: 'bg-emerald-50' },
         ];
 
         return (
@@ -303,9 +319,6 @@ const Dashboard = () => {
                     <div className={cn("p-2 rounded-lg", stat.bg, stat.color)}>
                       <stat.icon className="h-6 w-6" />
                     </div>
-                    <span className="text-xs font-bold text-success bg-success/10 px-2 py-0.5 rounded">
-                      {stat.trend}
-                    </span>
                   </div>
                   <p className="text-sm text-gray-500 font-medium">{stat.label}</p>
                   <h3 className="text-2xl font-bold text-primary mt-1">{stat.value}</h3>
@@ -319,7 +332,7 @@ const Dashboard = () => {
               <div className="lg:col-span-2 bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
                 <div className="flex items-center justify-between mb-8">
                   <h3 className="font-bold text-primary text-lg">
-                    {user.role === 'fournisseur' ? 'Performance Visibilité' : 'Engagement Appels d\'Offres'}
+                    {user.role === 'fournisseur' ? 'Contacts reçus' : 'Messages échangés'}
                   </h3>
                   <div className="flex bg-gray-50 p-1 rounded-lg">
                     <button 
@@ -353,7 +366,7 @@ const Dashboard = () => {
                       />
                       <Area 
                         type="monotone" 
-                        dataKey={user.role === 'fournisseur' ? "views" : "messages"} 
+                        dataKey={user.role === 'fournisseur' ? "contacts" : "messages"} 
                         stroke={user.role === 'fournisseur' ? "#1B4D2E" : "#d97706"} 
                         strokeWidth={3} 
                         fillOpacity={1} 
@@ -364,32 +377,31 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              {/* Recent Activity */}
+              {/* Prochaines actions */}
               <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
-                <h3 className="font-bold text-primary text-lg mb-6">Activités récentes</h3>
-                <div className="space-y-6">
-                  {[
-                    { title: 'Nouvelle réponse', desc: 'Sarl Mecanique a répondu à votre AO', time: 'Il y a 2h', icon: MessageSquare, color: 'text-blue-600' },
-                    { title: 'Paiement reçu', desc: 'Abonnement Premium renouvelé', time: 'Il y a 5h', icon: CreditCard, color: 'text-success' },
-                    { title: 'Alerte Produit', desc: 'Votre produit "Pompe X" est en rupture', time: 'Hier', icon: Bell, color: 'text-orange-600' },
-                    { title: 'Profil mis à jour', desc: 'Informations de contact modifiées', time: 'Il y a 2 jours', icon: User, color: 'text-purple-600' },
-                  ].map((activity, i) => (
-                    <div key={i} className="flex items-start space-x-4">
-                      <div className={cn("p-2 rounded-lg bg-gray-50", activity.color)}>
-                        <activity.icon className="h-4 w-4" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-bold text-primary truncate">{activity.title}</p>
-                        <p className="text-xs text-gray-500 truncate">{activity.desc}</p>
-                        <p className="text-[10px] text-gray-400 mt-1 uppercase font-bold">{activity.time}</p>
-                      </div>
-                    </div>
-                  ))}
+                <h3 className="font-bold text-primary text-lg mb-6">Prochaines actions</h3>
+                <div className="space-y-3">
+                  {(user.role === 'fournisseur' || user.role === 'exposant') && user.kycStatus !== 'approved' && user.kycStatus !== 'pending' && (
+                    <Link to="/kyc-upload" className="flex items-center justify-between p-4 rounded-2xl border border-orange-100 bg-orange-50 text-orange-700 text-sm font-bold">
+                      <span>Faire vérifier mon entreprise (KYC)</span>
+                      <ChevronRight className="h-4 w-4 rtl:rotate-180" />
+                    </Link>
+                  )}
+                  {(user.role === 'fournisseur' || user.role === 'exposant') && user.kycStatus === 'approved' && products.length === 0 && (
+                    <button onClick={() => setActiveTab('products')} className="w-full flex items-center justify-between p-4 rounded-2xl border border-gray-100 text-sm font-bold text-primary hover:border-secondary">
+                      <span>Publier mon premier produit</span>
+                      <ChevronRight className="h-4 w-4 rtl:rotate-180" />
+                    </button>
+                  )}
+                  <button onClick={() => setActiveTab('messages')} className="w-full flex items-center justify-between p-4 rounded-2xl border border-gray-100 text-sm font-bold text-primary hover:border-secondary">
+                    <span>Ouvrir la messagerie</span>
+                    <ChevronRight className="h-4 w-4 rtl:rotate-180" />
+                  </button>
+                  <Link to="/directory" className="flex items-center justify-between p-4 rounded-2xl border border-gray-100 text-sm font-bold text-primary hover:border-secondary">
+                    <span>Parcourir l'annuaire</span>
+                    <ChevronRight className="h-4 w-4 rtl:rotate-180" />
+                  </Link>
                 </div>
-                <button onClick={() => showNotify("Redirection vers l'historique complet...", "success")} className="w-full mt-8 py-3 text-sm font-bold text-primary hover:bg-gray-50 rounded-xl transition-all flex items-center justify-center space-x-2">
-                  <span>Voir tout</span>
-                  <ArrowUpRight className="h-4 w-4" />
-                </button>
               </div>
             </div>
           </motion.div>
@@ -402,81 +414,77 @@ const Dashboard = () => {
             exit={{ opacity: 0, y: -10 }}
             className="bg-white p-8 rounded-[40px] border border-gray-100 shadow-sm max-w-4xl"
           >
-            <div className="flex items-center space-x-6 mb-12">
-               <div className="relative group">
-                  <div className="w-24 h-24 bg-gray-100 rounded-3xl flex items-center justify-center text-primary font-black text-3xl shrink-0 group-hover:bg-primary group-hover:text-white transition-all relative overflow-hidden">
-                     {profileInfo.name.charAt(0)}
-                     <input 
-                       type="file" 
-                       accept="image/*"
-                       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                       onChange={(e) => {
-                         if (e.target.files && e.target.files.length > 0) {
-                           showNotify(`Image ${e.target.files[0].name} sélectionnée pour l'avatar`, 'success');
-                         }
-                       }}
-                     />
-                  </div>
-                  <button className="absolute -bottom-2 -end-2 p-2 bg-secondary text-white rounded-xl shadow-lg border-2 border-white hover:scale-110 transition-all" onClick={(e) => { e.preventDefault(); alert("Fonctionnalité en cours de développement"); }}>
-                     <Edit2 className="h-3 w-3" />
-                  </button>
+            <div className="flex items-center space-x-6 rtl:space-x-reverse mb-12">
+               <div className="w-24 h-24 bg-gray-100 rounded-3xl flex items-center justify-center text-primary font-black text-3xl shrink-0">
+                  {(profileInfo.name || '?').charAt(0)}
                </div>
                <div>
                   <h3 className="text-xl font-black text-primary uppercase italic">{profileInfo.name}</h3>
-                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">{profileInfo.role}</p>
+                  <p className="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em]">{user.role}</p>
                </div>
             </div>
 
             <form onSubmit={handleUpdateProfile} className="space-y-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-primary uppercase tracking-widest italic">Nom Complet</label>
-                  <input 
-                    type="text" 
+                  <label htmlFor="profile_name" className="text-[10px] font-black text-primary uppercase tracking-widest italic">Nom complet</label>
+                  <input
+                    id="profile_name"
+                    type="text"
+                    required
+                    minLength={2}
                     value={profileInfo.name}
                     onChange={(e) => setProfileInfo({...profileInfo, name: e.target.value})}
-                    className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl outline-none font-bold text-sm" 
+                    className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl outline-none font-bold text-sm"
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-primary uppercase tracking-widest italic">Email Professionnel</label>
-                  <input 
-                    type="email" 
+                  <label htmlFor="profile_email" className="text-[10px] font-black text-primary uppercase tracking-widest italic">Email professionnel</label>
+                  <input
+                    id="profile_email"
+                    type="email"
                     value={profileInfo.email}
-                    onChange={(e) => setProfileInfo({...profileInfo, email: e.target.value})}
-                    className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl outline-none font-bold text-sm" 
+                    readOnly
+                    className="w-full px-6 py-4 bg-gray-100 border-none rounded-2xl outline-none font-bold text-sm text-gray-500"
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-primary uppercase tracking-widest italic">Poste Occupé</label>
-                  <input 
-                    type="text" 
-                    value={profileInfo.role}
-                    onChange={(e) => setProfileInfo({...profileInfo, role: e.target.value})}
-                    className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl outline-none font-bold text-sm" 
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black text-primary uppercase tracking-widest italic">Téléphone</label>
-                  <input 
-                    type="tel" 
-                    value={profileInfo.phone}
-                    onChange={(e) => setProfileInfo({...profileInfo, phone: e.target.value})}
-                    className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl outline-none font-bold text-sm" 
+                  <label htmlFor="profile_company" className="text-[10px] font-black text-primary uppercase tracking-widest italic">Entreprise</label>
+                  <input
+                    id="profile_company"
+                    type="text"
+                    value={profileInfo.company}
+                    onChange={(e) => setProfileInfo({...profileInfo, company: e.target.value})}
+                    className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl outline-none font-bold text-sm"
                   />
                 </div>
               </div>
-              
-              <div className="pt-8 border-t border-gray-50 flex items-center justify-between">
+
+              <div className="pt-8 border-t border-gray-50 flex flex-wrap gap-4 items-center justify-between">
                 <div>
                    <h4 className="text-[10px] font-black text-primary uppercase italic mb-1">Sécurité</h4>
-                   <button type="button" onClick={() => showNotify("Un email de réinitialisation a été envoyé.", "success")} className="text-[9px] font-black text-secondary hover:underline uppercase tracking-widest">Changer mon mot de passe</button>
+                   <Link to="/forgot-password" className="text-[9px] font-black text-secondary hover:underline uppercase tracking-widest">Changer mon mot de passe</Link>
                 </div>
                 <button type="submit" disabled={isLoading} className="bg-primary text-white px-10 py-5 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl hover:bg-secondary transition-all flex items-center space-x-2">
                   {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <span>Sauvegarder les changements</span>}
                 </button>
               </div>
             </form>
+
+            <div className="mt-12 pt-8 border-t border-gray-100">
+              <h4 className="text-[10px] font-black text-primary uppercase italic mb-2">Mes données personnelles</h4>
+              <p className="text-xs text-gray-500 mb-4">Conformément à la loi 18-07, vous pouvez exporter ou supprimer vos données à tout moment.</p>
+              <div className="flex flex-wrap gap-4">
+                <button type="button" onClick={handleExportData} className="px-6 py-3 rounded-2xl border border-gray-200 text-[10px] font-black uppercase tracking-widest text-primary hover:border-secondary">
+                  Exporter mes données
+                </button>
+                {user.role !== 'admin' && (
+                  <button type="button" onClick={handleDeleteAccount} className="px-6 py-3 rounded-2xl border border-red-200 bg-red-50 text-[10px] font-black uppercase tracking-widest text-red-600 hover:bg-red-100">
+                    Supprimer mon compte
+                  </button>
+                )}
+              </div>
+            </div>
           </motion.div>
         );
       case 'messages':
@@ -519,7 +527,7 @@ const Dashboard = () => {
                 </div>
                 <div className="mt-auto flex items-center justify-between pt-6 border-t border-gray-50">
                    <div className="flex items-center space-x-2 text-gray-500">
-                      <span className="text-[10px] font-bold uppercase">{fav.location || 'Alger'}</span>
+                      <span className="text-[10px] font-bold uppercase">{fav.location || ''}</span>
                    </div>
                    <Link 
                     to={fav.item_type === 'product' ? `/products/${generateSlugUrl(fav.name, String(fav.item_id))}` : `/directory/${generateSlugUrl(fav.name, String(fav.item_id))}`}
@@ -578,7 +586,7 @@ const Dashboard = () => {
                 <div className="bg-primary/5 border border-primary/10 p-6 rounded-3xl mt-4">
                    <h5 className="font-bold text-primary mb-2">Pourquoi annoncer ici ?</h5>
                    <ul className="space-y-2 text-sm text-gray-700">
-                      <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" /> Atteignez plus de 10 000 professionnels ciblés</li>
+                      <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" /> Touchez des acheteurs industriels ciblés</li>
                       <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" /> Augmentez vos chances de remporter des AO</li>
                       <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" /> Bannières affichées en page d'accueil et annuaire</li>
                    </ul>
@@ -608,111 +616,40 @@ const Dashboard = () => {
 
       case 'subscription':
         return (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             className="space-y-8"
           >
             <div className="bg-primary p-12 rounded-[48px] text-white overflow-hidden relative">
-               <div className="relative z-10">
-                  <span className="text-[10px] font-black uppercase tracking-widest opacity-40">Plan Actuel</span>
-                  <h3 className="text-4xl font-black uppercase italic tracking-tighter mt-4 mb-2">Fournisseur Premium</h3>
-                  <p className="text-white/60 font-medium">Valide jusqu'au 16 Mai 2027</p>
-                  <div className="mt-10 flex space-x-4">
-                     <button onClick={() => showNotify("Redirection vers Stripe Checkout...", "success")} className="bg-white text-primary px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-secondary hover:text-white transition-all">Gérer l'abonnement</button>
-                     <button onClick={() => showNotify("Téléchargement de la facture...", "success")} className="bg-white/10 text-white px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-white/20 transition-all border border-white/20">Voir facture</button>
-                  </div>
+               <span className="text-[10px] font-black uppercase tracking-widest opacity-60">Plan actuel</span>
+               <h3 className="text-4xl font-black uppercase italic tracking-tighter mt-4 mb-2">Gratuit — beta</h3>
+               <p className="text-white/70 font-medium max-w-xl">
+                 Pendant la beta, toutes les fonctionnalités sont gratuites. Les abonnements payants seront réglés
+                 par facture et virement bancaire, avec activation par notre équipe.
+               </p>
+               <div className="mt-10 flex flex-wrap gap-4">
+                  <Link to="/tarifs" className="bg-white text-primary px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-secondary hover:text-white transition-all">Voir les offres</Link>
+                  <Link to="/contact" className="bg-white/10 text-white px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-white/20 transition-all border border-white/20">Demander un devis</Link>
                </div>
-               <div className="absolute top-0 end-0 w-96 h-96 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/3" />
-               <div className="absolute bottom-0 end-20 w-40 h-40 bg-secondary/20 rounded-full translate-y-1/2" />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-               {[
-                 { 
-                   name: 'Gratuit', 
-                   price: '0 DZD', 
-                   features: ['Visibilité de base', '3 RFQ par mois', 'Messagerie limitée', 'Support standard'],
-                   active: false
-                 },
-                 { 
-                   name: 'Premium', 
-                   price: '4,500 DZD', 
-                   period: '/mois',
-                   features: ['Badge "Vérifié"', 'RFQ illimités', 'Mise en avant catalogue', 'Conseiller dédié', 'Statistiques avancées'],
-                   active: true
-                 }
-               ].map((plan) => (
-                 <div key={plan.name} className={cn(
-                   "p-10 rounded-[40px] border transition-all",
-                   plan.active ? "border-secondary bg-white shadow-xl scale-[1.02]" : "border-gray-100 bg-white"
-                 )}>
-                    <div className="flex justify-between items-start mb-8">
-                       <div>
-                          <h4 className="text-xl font-black text-primary uppercase italic">{plan.name}</h4>
-                          <div className="flex items-baseline mt-2">
-                             <span className="text-2xl font-black text-primary">{plan.price}</span>
-                             <span className="text-xs font-bold text-gray-400 ms-1">{plan.period}</span>
-                          </div>
-                       </div>
-                       {plan.active && <div className="p-2 bg-secondary text-white rounded-xl shadow-lg"><CheckCircle className="h-5 w-5" /></div>}
-                    </div>
-                    <ul className="space-y-4 mb-10">
-                       {plan.features.map(f => (
-                         <li key={f} className="flex items-center space-x-3 text-[11px] font-bold text-gray-600 uppercase tracking-tight">
-                            <CheckCircle className={cn("h-4 w-4", plan.active ? "text-secondary" : "text-gray-300")} />
-                            <span>{f}</span>
-                         </li>
-                       ))}
-                    </ul>
-                    {!plan.active && (
-                       <button className="w-full py-4 bg-gray-50 text-gray-400 rounded-2xl text-[10px] font-black uppercase tracking-widest cursor-not-allowed" onClick={(e) => { e.preventDefault(); alert("Fonctionnalité en cours de développement"); }}>Plan actuel</button>
-                    )}
-                 </div>
-               ))}
             </div>
           </motion.div>
         );
       case 'stats':
         return (
-           <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="space-y-8"
+            className="bg-white p-12 rounded-[40px] border border-gray-100 shadow-sm text-center"
           >
-             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div className="bg-white p-10 rounded-[40px] border border-gray-100 shadow-sm">
-                   <h4 className="text-[11px] font-black text-primary uppercase tracking-[0.2em] mb-8 italic">Répartition des clics</h4>
-                   <div className="aspect-square flex items-center justify-center bg-gray-50 rounded-full border border-gray-100 max-w-[300px] mx-auto relative group">
-                      <div className="text-center">
-                         <p className="text-4xl font-black text-primary">562</p>
-                         <p className="text-[10px] font-black text-gray-400 uppercase mt-1">Total clics</p>
-                      </div>
-                      <div className="absolute inset-0 border-[20px] border-secondary border-t-transparent border-r-transparent rounded-full" />
-                   </div>
-                </div>
-                <div className="bg-white p-10 rounded-[40px] border border-gray-100 shadow-sm flex flex-col justify-center">
-                   <h4 className="text-[11px] font-black text-primary uppercase tracking-[0.2em] mb-8 italic">Top Catégories consultées</h4>
-                   {['Hydraulique', 'Mécanique', 'Énergie', 'BTP'].map((cat, i) => (
-                      <div key={cat} className="mb-6 last:mb-0">
-                         <div className="flex justify-between items-center mb-2">
-                           <span className="text-[10px] font-black text-primary uppercase italic">{cat}</span>
-                           <span className="text-[10px] font-bold text-gray-400">{80 - (i*15)}%</span>
-                         </div>
-                         <div className="h-2 bg-gray-50 rounded-full overflow-hidden">
-                            <motion.div 
-                              initial={{ width: 0 }}
-                              animate={{ width: `${80 - (i*15)}%` }}
-                              transition={{ duration: 1, delay: i * 0.1 }}
-                              className="h-full bg-secondary"
-                            />
-                         </div>
-                      </div>
-                   ))}
-                </div>
-             </div>
+            <BarChart3 className="h-12 w-12 text-gray-300 mx-auto mb-6" />
+            <h3 className="text-xl font-black text-primary uppercase italic mb-2">Statistiques bientôt disponibles</h3>
+            <p className="text-sm text-gray-500 max-w-md mx-auto">
+              La mesure des visites et des clics sur vos fiches est en cours de mise en place.
+              En attendant, la vue d'ensemble affiche vos produits et vos messages réels.
+            </p>
           </motion.div>
         );
       case 'products':
@@ -801,72 +738,45 @@ const Dashboard = () => {
           >
             <div className="bg-white rounded-[40px] border border-gray-100 shadow-sm overflow-hidden">
                <div className="h-32 bg-primary relative">
-                  <div className="absolute -bottom-10 start-10 w-24 h-24 bg-white rounded-[24px] border-4 border-white shadow-xl flex items-center justify-center group overflow-hidden">
-                     <Building2 className="h-10 w-10 text-primary group-hover:opacity-0 transition-opacity" />
-                     <div className="absolute inset-0 bg-secondary/80 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Edit2 className="h-6 w-6 text-white" />
-                     </div>
-                     <input 
-                       type="file" 
-                       accept="image/*"
-                       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                       onChange={(e) => {
-                         if (e.target.files && e.target.files.length > 0) {
-                           showNotify(`Image ${e.target.files[0].name} sélectionnée pour le logo Mettre à jour la fiche.`, 'success');
-                         }
-                       }}
-                     />
+                  <div className="absolute -bottom-10 start-10 w-24 h-24 bg-white rounded-[24px] border-4 border-white shadow-xl flex items-center justify-center">
+                     <Building2 className="h-10 w-10 text-primary" />
                   </div>
                </div>
                <form onSubmit={handleUpdateCompany} className="p-12 pt-20 space-y-8">
-                  <div className="grid grid-cols-2 gap-8">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                      <div className="space-y-2">
-                        <label className="text-[10px] font-black text-primary uppercase tracking-widest italic">Nom de l'entreprise</label>
-                        <input 
-                          type="text" 
+                        <label htmlFor="company_name" className="text-[10px] font-black text-primary uppercase tracking-widest italic">Nom de l'entreprise</label>
+                        <input
+                          id="company_name"
+                          type="text"
+                          required
+                          minLength={2}
                           value={companyInfo.name}
                           onChange={(e) => setCompanyInfo({...companyInfo, name: e.target.value})}
-                          className="w-full bg-gray-50 border-none px-6 py-4 rounded-2xl text-sm font-bold outline-none" 
+                          className="w-full bg-gray-50 border-none px-6 py-4 rounded-2xl text-sm font-bold outline-none"
                         />
                      </div>
                      <div className="space-y-2">
-                        <label className="text-[10px] font-black text-primary uppercase tracking-widest italic">Site Web</label>
-                        <input 
-                          type="text" 
-                          value={companyInfo.website}
-                          onChange={(e) => setCompanyInfo({...companyInfo, website: e.target.value})}
-                          className="w-full bg-gray-50 border-none px-6 py-4 rounded-2xl text-sm font-bold outline-none" 
+                        <label htmlFor="company_wilaya" className="text-[10px] font-black text-primary uppercase tracking-widest italic">Wilaya</label>
+                        <input
+                          id="company_wilaya"
+                          type="text"
+                          placeholder="Ex : Sétif"
+                          value={companyInfo.wilaya}
+                          onChange={(e) => setCompanyInfo({...companyInfo, wilaya: e.target.value})}
+                          className="w-full bg-gray-50 border-none px-6 py-4 rounded-2xl text-sm font-bold outline-none"
                         />
                      </div>
                   </div>
                   <div className="space-y-2">
-                     <label className="text-[10px] font-black text-primary uppercase tracking-widest italic">Biographie / Description</label>
-                     <textarea 
+                     <label htmlFor="company_bio" className="text-[10px] font-black text-primary uppercase tracking-widest italic">Description de l'activité</label>
+                     <textarea
+                        id="company_bio"
                         rows={4}
                         value={companyInfo.bio}
                         onChange={(e) => setCompanyInfo({...companyInfo, bio: e.target.value})}
-                        className="w-full bg-gray-50 border-none px-8 py-6 rounded-3xl text-sm font-medium outline-none resize-none" 
+                        className="w-full bg-gray-50 border-none px-8 py-6 rounded-3xl text-sm font-medium outline-none resize-none"
                      />
-                  </div>
-                  <div className="grid grid-cols-2 gap-8">
-                     <div className="space-y-2">
-                        <label className="text-[10px] font-black text-primary uppercase tracking-widest italic">Adresse Siège</label>
-                        <input 
-                          type="text" 
-                          value={companyInfo.address}
-                          onChange={(e) => setCompanyInfo({...companyInfo, address: e.target.value})}
-                          className="w-full bg-gray-50 border-none px-6 py-4 rounded-2xl text-sm font-bold outline-none" 
-                        />
-                     </div>
-                     <div className="space-y-2">
-                        <label className="text-[10px] font-black text-primary uppercase tracking-widest italic">Téléphone Professionnel</label>
-                        <input 
-                          type="text" 
-                          value={companyInfo.phone}
-                          onChange={(e) => setCompanyInfo({...companyInfo, phone: e.target.value})}
-                          className="w-full bg-gray-50 border-none px-6 py-4 rounded-2xl text-sm font-bold outline-none" 
-                        />
-                     </div>
                   </div>
                   <div className="pt-4">
                      <button type="submit" disabled={isLoading} className="bg-primary text-white px-10 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl hover:bg-secondary transition-all flex items-center space-x-2">
@@ -885,9 +795,8 @@ const Dashboard = () => {
     { id: 'overview', name: 'Vue d\'ensemble', icon: LayoutDashboard },
     { id: 'profile', name: 'Mon Profil', icon: User },
     { id: 'messages', name: 'Messagerie', icon: MessageSquare },
-    { id: 'notifications', name: 'Notifications', icon: Bell },
-    { id: 'products', name: 'Mes Produits', icon: Package, roles: ['fournisseur'] },
-    { id: 'company', name: 'Ma Fiche Entreprise', icon: Building2, roles: ['fournisseur'] },
+    { id: 'products', name: 'Mes Produits', icon: Package, roles: ['fournisseur', 'exposant'] },
+    { id: 'company', name: 'Ma Fiche Entreprise', icon: Building2, roles: ['fournisseur', 'exposant'] },
     { id: 'favorites', name: 'Favoris', icon: Heart, roles: ['acheteur'] },
     { id: 'ads', name: 'Publicité', icon: Zap },
     { id: 'subscription', name: 'Abonnement', icon: CreditCard },

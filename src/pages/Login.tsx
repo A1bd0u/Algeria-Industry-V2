@@ -1,6 +1,6 @@
-import { Eye, EyeOff, Building2, Lock, Mail, Globe, ArrowRight, Loader2 } from 'lucide-react';
+import { Eye, EyeOff, Building2, Lock, Mail, ArrowRight, Loader2 } from 'lucide-react';
 import { motion } from 'motion/react';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useForm } from 'react-hook-form';
@@ -23,46 +23,13 @@ const Login = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const redirectUrl = searchParams.get('redirect');
+  // Redirection interne uniquement (pas d'URL absolue ni protocol-relative).
+  const rawRedirect = searchParams.get('redirect');
+  const redirectUrl = rawRedirect && rawRedirect.startsWith('/') && !rawRedirect.startsWith('//') && !rawRedirect.startsWith('/\\') ? rawRedirect : null;
 
   const { register, handleSubmit, formState: { errors } } = useForm<LoginForm>({
     resolver: zodResolver(loginSchema)
   });
-
-  useEffect(() => {
-    const handleMessage = (event: MessageEvent) => {
-      const origin = event.origin;
-      if (!origin.endsWith('.run.app') && !origin.includes('localhost')) {
-        return;
-      }
-      if (event.data?.type === 'OAUTH_AUTH_SUCCESS') {
-        window.location.href = '/dashboard';
-      }
-    };
-    window.addEventListener('message', handleMessage);
-    return () => window.removeEventListener('message', handleMessage);
-  }, []);
-
-  const handleOAuthConnect = async (provider: 'google' | 'linkedin') => {
-    try {
-      const response = await fetch(`/api/auth/oauth/url?provider=${provider}`);
-      if (!response.ok) {
-        throw new Error('Failed to get auth URL');
-      }
-      const { url } = await response.json();
-      const authWindow = window.open(
-        url,
-        'oauth_popup',
-        'width=600,height=700'
-      );
-      if (!authWindow) {
-        setAuthError('Veuillez autoriser les popups pour vous connecter.');
-      }
-    } catch (err: any) {
-      console.error('OAuth error:', err);
-      setAuthError('Impossible d\'initier la connexion avec ' + provider);
-    }
-  };
 
   const onSubmit = async (data: LoginForm) => {
     if (!captchaToken) {
@@ -73,8 +40,8 @@ const Login = () => {
     setAuthError('');
     
     try {
-      await login(data.email, data.password, captchaToken);
-      if (data.email.toLowerCase().includes('admin')) {
+      const loggedUser = await login(data.email, data.password, captchaToken);
+      if (loggedUser?.role === 'admin') {
         navigate('/extranet');
       } else {
         navigate(redirectUrl || '/dashboard');
@@ -190,36 +157,6 @@ const Login = () => {
             </button>
           </form>
 
-          <div className="mt-8 relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-100"></div>
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-4 text-gray-400 font-medium tracking-widest">Ou continuer avec</span>
-            </div>
-          </div>
-
-          <div className="mt-8 grid grid-cols-2 gap-4">
-            <button 
-              type="button"
-              onClick={() => handleOAuthConnect('google')}
-              className="flex items-center justify-center space-x-2 py-3 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors"
-            >
-              <Globe className="h-5 w-5 text-blue-600" />
-              <span className="text-sm font-bold text-gray-700">Google</span>
-            </button>
-
-            <button 
-              type="button"
-              onClick={() => handleOAuthConnect('linkedin')}
-              className="flex items-center justify-center space-x-2 py-3 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors"
-            >
-              <div className="bg-[#0077b5] p-0.5 rounded text-white">
-                <ArrowRight className="h-3 w-3 rtl:rotate-180" />
-              </div>
-              <span className="text-sm font-bold text-gray-700">LinkedIn</span>
-            </button>
-          </div>
         </div>
         
         <div className="bg-gray-50 p-6 text-center border-t border-gray-100 space-y-4">

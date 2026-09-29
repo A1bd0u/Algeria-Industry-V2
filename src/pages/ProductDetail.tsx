@@ -21,7 +21,7 @@ import { ProductDetailSkeleton } from '../components/Skeleton';
 import { Product as IProduct, useComparison } from '../context/ComparisonContext';
 import { useCurrency } from '../context/CurrencyContext';
 import { useAuth } from '../context/AuthContext';
-import { cn, extractIdFromSlug } from '../lib/utils';
+import { cn, extractIdFromSlug, generateSlugUrl } from '../lib/utils';
 import axios from 'axios';
 
 const ProductDetail = () => {
@@ -34,7 +34,7 @@ const ProductDetail = () => {
   const { comparedProducts, addToCompare, removeFromCompare } = useComparison();
   const [activeImage, setActiveImage] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const [product, setProduct] = useState<any>(null);
   const [similarProducts, setSimilarProducts] = useState<any[]>([]);
   const [favoriteId, setFavoriteId] = useState<string | null>(null);
@@ -170,15 +170,22 @@ const ProductDetail = () => {
           {/* Gallery Section */}
           <div className="space-y-6">
             <div className="aspect-square bg-white rounded-3xl border border-gray-100 overflow-hidden shadow-sm relative group">
-              <motion.img 
-                key={activeImage}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                src={product.images[activeImage]} 
-                alt={product.name} 
-                className="w-full h-full object-contain p-12"
-                referrerPolicy="no-referrer"
-              />
+              {product.images.length > 0 ? (
+                <motion.img 
+                  key={activeImage}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  src={product.images[activeImage]} 
+                  alt={product.name} 
+                  className="w-full h-full object-contain p-12"
+                  referrerPolicy="no-referrer"
+                />
+              ) : (
+                <div className="w-full h-full flex flex-col items-center justify-center text-gray-300">
+                  <img src="/favicon.svg" alt="" className="h-20 w-20 opacity-30 mb-4" />
+                  <span className="text-xs font-black uppercase tracking-widest">Visuel non fourni</span>
+                </div>
+              )}
               <div className="absolute top-6 end-6 flex flex-col space-y-3">
                 <button 
                   className={cn(
@@ -208,7 +215,7 @@ const ProductDetail = () => {
               </div>
             </div>
             
-            <div className="grid grid-cols-3 gap-4">
+            {product.images.length > 1 && <div className="grid grid-cols-3 gap-4">
               {product.images.map((img, i) => (
                 <button 
                   key={i}
@@ -221,7 +228,7 @@ const ProductDetail = () => {
                   <img src={img} alt="" className="w-full h-full object-cover p-2" referrerPolicy="no-referrer" />
                 </button>
               ))}
-            </div>
+            </div>}
           </div>
 
           {/* Info Section */}
@@ -229,35 +236,41 @@ const ProductDetail = () => {
             <div className="mb-8">
               <div className="flex items-center justify-between mb-4">
                 <span className="tech-label">{product.category}</span>
-                <div className="flex items-center space-x-1 text-yellow-500">
-                  <Star className="h-4 w-4 fill-current" />
-                  <span className="text-sm font-bold text-primary">{product.rating}</span>
-                  <span className="text-gray-400 text-xs">({product.reviews} avis)</span>
-                </div>
+                {product.companyVerified && (
+                  <span className="flex items-center space-x-1 text-success text-[10px] font-black uppercase tracking-widest">
+                    <ShieldCheck className="h-4 w-4" />
+                    <span>Entreprise vérifiée</span>
+                  </span>
+                )}
               </div>
               <h1 className="text-4xl font-black text-primary uppercase tracking-tighter leading-tight mb-2">
                 {product.name}
               </h1>
-              <p className="text-sm font-bold text-secondary uppercase tracking-widest flex items-center space-x-2">
-                <Globe className="h-4 w-4" />
-                <span>Fabricant : {product.company}</span>
-              </p>
+              {product.companyName && (
+                <p className="text-sm font-bold text-secondary uppercase tracking-widest flex items-center space-x-2">
+                  <Globe className="h-4 w-4" />
+                  {product.companyId ? (
+                    <a href={`/directory/${generateSlugUrl(product.companyName, product.companyId)}`} className="hover:underline">Fournisseur : {product.companyName}</a>
+                  ) : (
+                    <span>Fournisseur : {product.companyName}</span>
+                  )}
+                </p>
+              )}
             </div>
 
             <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm mb-8">
               <div className="flex items-end justify-between mb-8">
                 <div>
-                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Cotation actuelle</p>
+                  <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Prix indicatif</p>
                   <p className="text-4xl font-mono font-black text-primary tracking-tighter">
-                    {formatPrice(product.price)}
+                    {product.priceValue ? formatPrice(product.priceValue) : 'Sur devis'}
                   </p>
                 </div>
-                <div className="text-end">
-                  <span className="bg-success/10 text-success text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">
-                    {product.stock}
-                  </span>
-                  <p className="text-[10px] text-gray-400 mt-2 font-bold uppercase tracking-widest">Référence : XP-2026-DZ</p>
-                </div>
+                {product.reference_id && (
+                  <div className="text-end">
+                    <p className="text-[10px] text-gray-500 mt-2 font-bold uppercase tracking-widest">Référence : {product.reference_id}</p>
+                  </div>
+                )}
               </div>
 
               <div className="space-y-4">
@@ -282,47 +295,19 @@ const ProductDetail = () => {
                     <GitCompare className="h-5 w-5" />
                     <span>{isCompared ? "Comparé" : "Comparer"}</span>
                   </button>
-                  <button className="bg-neutral-bg text-primary py-4 rounded-2xl font-bold text-sm uppercase tracking-widest flex items-center justify-center space-x-2 hover:bg-gray-100 transition-all border border-gray-100" onClick={(e) => { 
-                    e.preventDefault(); 
-                    window.location.href = `mailto:contact@${product.company.toLowerCase().replace(/ /g, '')}.com?subject=Contact à propos de ${product.name}`;
-                  }}>
-                    <MessageSquare className="h-5 w-5" />
-                    <span>Contact Direct</span>
-                  </button>
-                  <button 
-                    onClick={toggleCompare}
-                    className={cn(
-                      "py-4 rounded-2xl font-bold text-sm uppercase tracking-widest flex items-center justify-center space-x-2 transition-all border",
-                      isCompared 
-                        ? "bg-secondary text-white border-secondary shadow-lg" 
-                        : "bg-neutral-bg text-primary border-gray-100 hover:bg-gray-100"
-                    )}
-                  >
-                    <Layers className="h-5 w-5" />
-                    <span>{isCompared ? "Comparé" : "Comparer"}</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Quick Specs */}
-            <div className="grid grid-cols-2 gap-6 mb-8">
-              <div className="flex items-center space-x-4 p-4 bg-white rounded-2xl border border-gray-50 shadow-sm">
-                <div className="bg-blue-50 p-3 rounded-xl text-blue-600">
-                  <ShieldCheck className="h-6 w-6" />
-                </div>
-                <div>
-                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Garantie</p>
-                  <p className="text-sm font-bold text-primary">5 Ans Constructeur</p>
-                </div>
-              </div>
-              <div className="flex items-center space-x-4 p-4 bg-white rounded-2xl border border-gray-50 shadow-sm">
-                <div className="bg-orange-50 p-3 rounded-xl text-orange-600">
-                  <Truck className="h-6 w-6" />
-                </div>
-                <div>
-                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Livraison</p>
-                  <p className="text-sm font-bold text-primary">Sur toute l'Algérie</p>
+                  {product.sellerId && product.sellerId !== user?.id && (
+                    <button className="bg-neutral-bg text-primary py-4 rounded-2xl font-bold text-sm uppercase tracking-widest flex items-center justify-center space-x-2 hover:bg-gray-100 transition-all border border-gray-100" onClick={(e) => {
+                      e.preventDefault();
+                      if (!isAuthenticated) {
+                        navigate(`/login?redirect=${encodeURIComponent(`/dashboard?tab=messages&to=${product.sellerId}`)}`);
+                        return;
+                      }
+                      navigate(`/dashboard?tab=messages&to=${product.sellerId}`);
+                    }}>
+                      <MessageSquare className="h-5 w-5" />
+                      <span>Contacter le fournisseur</span>
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
@@ -332,12 +317,18 @@ const ProductDetail = () => {
               <div className="flex space-x-8 border-b border-gray-200">
                 <button className={`pb-4 border-b-2 ${activeTab === 'description' ? 'border-secondary text-primary' : 'border-transparent text-gray-400 hover:text-primary'} text-sm font-black uppercase tracking-widest transition-all`} onClick={() => setActiveTab('description')}>Description</button>
                 <button className={`pb-4 border-b-2 ${activeTab === 'specs' ? 'border-secondary text-primary' : 'border-transparent text-gray-400 hover:text-primary'} text-sm font-black uppercase tracking-widest transition-all`} onClick={() => setActiveTab('specs')}>Spécifications</button>
-                <button className={`pb-4 border-b-2 ${activeTab === 'downloads' ? 'border-secondary text-primary' : 'border-transparent text-gray-400 hover:text-primary'} text-sm font-black uppercase tracking-widest transition-all`} onClick={() => setActiveTab('downloads')}>Téléchargements</button>
               </div>
               
               {activeTab === 'description' && (
                 <div className="prose prose-sm max-w-none text-gray-600">
-                  <p>Description détaillée du produit {product.name} par {product.company}. Conçu pour les professionnels exigeants, ce produit offre une fiabilité exceptionnelle et des performances de pointe dans son domaine d'application.</p>
+                  {product.description
+                    ? <p className="whitespace-pre-line">{product.description}</p>
+                    : <p className="text-gray-400">Le fournisseur n'a pas encore ajouté de description.</p>}
+                  {product.features?.length > 0 && (
+                    <ul className="mt-4 list-disc ps-5">
+                      {product.features.map((f: string) => <li key={f}>{f}</li>)}
+                    </ul>
+                  )}
                 </div>
               )}
               {activeTab === 'specs' && (
@@ -348,22 +339,6 @@ const ProductDetail = () => {
                       <span className="text-sm font-bold text-primary">{val as string}</span>
                     </div>
                   ))}
-                </div>
-              )}
-              {activeTab === 'downloads' && (
-                <div className="space-y-3">
-                  <button onClick={() => {
-                     const a = document.createElement('a');
-                     a.href = URL.createObjectURL(new Blob(['Fiche PDF'], {type: 'application/pdf'}));
-                     a.download = `fiche_${product.name.toLowerCase().replace(/ /g, '_')}.pdf`;
-                     a.click();
-                  }} className="flex items-center space-x-3 p-4 border border-gray-100 rounded-xl hover:bg-gray-50 transition-all text-start w-full">
-                     <span className="bg-primary/5 p-2 rounded-lg text-primary">📄</span>
-                     <div>
-                       <p className="text-sm font-bold text-primary">Manuel d'utilisation</p>
-                       <p className="text-[10px] text-gray-400 uppercase tracking-widest">PDF - 2.4 MB</p>
-                     </div>
-                  </button>
                 </div>
               )}
             </div>
@@ -378,15 +353,17 @@ const ProductDetail = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {similarProducts.map((p, idx) => (
                 <div key={idx} className="bg-white rounded-3xl p-4 border border-gray-100 shadow-sm hover:shadow-lg transition-all flex flex-col group cursor-pointer" onClick={() => {
-                  navigate(`/product/${p.id}`);
+                  navigate(`/products/${generateSlugUrl(p.name, p.id)}`);
                   window.scrollTo(0, 0);
                 }}>
                   <div className="aspect-square bg-gray-50 rounded-2xl mb-4 overflow-hidden relative">
-                    <img src={p.file_url} alt={p.name} className="w-full h-full object-cover transition-transform group-hover:scale-105" />
+                    {p.file_url
+                      ? <img src={p.file_url} alt={p.name} loading="lazy" className="w-full h-full object-cover transition-transform group-hover:scale-105" />
+                      : <div className="w-full h-full flex items-center justify-center"><img src="/favicon.svg" alt="" className="h-12 w-12 opacity-20" /></div>}
                   </div>
-                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{p.companyName}</p>
+                  {p.companyName && <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">{p.companyName}</p>}
                   <h3 className="text-lg font-bold text-primary leading-tight mb-2 flex-1">{p.name}</h3>
-                  <p className="text-xl font-black text-secondary">{formatPrice(typeof p.price === 'string' ? parseFloat(p.price.replace(/[^0-9.]/g, '') || '0') : (p.price || 850000))}</p>
+                  <p className="text-xl font-black text-secondary">{Number(p.price) > 0 ? formatPrice(Number(p.price)) : 'Sur devis'}</p>
                 </div>
               ))}
             </div>

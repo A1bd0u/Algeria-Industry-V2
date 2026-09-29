@@ -1,5 +1,6 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
+import { SITE_NAME, absoluteUrl } from '../config/site';
 
 interface SEOProps {
   title: string;
@@ -11,9 +12,9 @@ interface SEOProps {
 }
 
 export default function SEO({ title, description, url, image, type = 'website', structuredData }: SEOProps) {
-  const siteName = "Algiers Industry";
+  const siteName = SITE_NAME;
   const fullTitle = `${title} | ${siteName}`;
-  const defaultImage = "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=1200&auto=format&fit=crop"; // Industrial placeholder
+  const defaultImage = absoluteUrl('/og-image.png');
 
   return (
     <Helmet>
@@ -25,6 +26,7 @@ export default function SEO({ title, description, url, image, type = 'website', 
       <meta property="og:description" content={description} />
       <meta property="og:type" content={type} />
       {url && <meta property="og:url" content={url} />}
+      {url && <link rel="canonical" href={url} />}
       <meta property="og:image" content={image || defaultImage} />
       <meta property="og:site_name" content={siteName} />
 

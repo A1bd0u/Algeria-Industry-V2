@@ -15,6 +15,7 @@ import PageTransition from '../components/PageTransition';
 import { BlogCardSkeleton } from '../components/Skeleton';
 import { cn, generateSlugUrl } from '../lib/utils';
 import SEO from '../components/SEO';
+import { absoluteUrl } from '../config/site';
 
 const Blog = () => {
   const { t, i18n } = useTranslation();
@@ -58,7 +59,7 @@ const Blog = () => {
       <SEO 
         title={t('nav.news', 'Actualités')} 
         description="Les dernières actualités et tendances de l'industrie en Algérie."
-        url="https://votre-domaine.dz/blog"
+        url={absoluteUrl('/blog')}
       />
       <div className={cn("bg-neutral-bg min-h-screen pb-20", i18n.language?.startsWith('ar') && "font-arabic")}>
         {/* Header */}

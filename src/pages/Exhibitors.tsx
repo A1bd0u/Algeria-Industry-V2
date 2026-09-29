@@ -92,7 +92,7 @@ const Exhibitors = () => {
           sector: c.activity_sector || 'Non spécifié',
           location: c.wilaya || c.region || 'Alger',
           description: c.description || 'Aucune description',
-          logo: c.logo_url || `https://picsum.photos/seed/${c.id}/200/200`,
+          logo: c.logo_url || '/placeholder.svg',
           stats: {
             products: 0, // À remplacer par un vrai compteur si disponible
             views: '0',

@@ -26,6 +26,7 @@ import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { ProfileSkeleton } from '../components/Skeleton';
 import { cn, generateSlugUrl, extractIdFromSlug } from '../lib/utils';
 import SEO from '../components/SEO';
+import { absoluteUrl } from '../config/site';
 
 const CompanyProfile = () => {
   const { id: slugId } = useParams();
@@ -249,8 +250,8 @@ const CompanyProfile = () => {
         // Use real data, provide safe fallback for images
         const data = {
           ...companyData,
-          logo: `https://picsum.photos/seed/${companyData.id}/200/200`,
-          banner: `https://picsum.photos/seed/${companyData.id}-banner/1200/400`,
+          logo: '/placeholder.svg',
+          banner: '/placeholder.svg',
           // ensure arrays and properties exist to avoid UI crash
           certifications: companyData.certifications || [],
           products: companyData.products || []
@@ -290,7 +291,7 @@ const CompanyProfile = () => {
   const totalReviews = reviews.length;
   const avgRating = totalReviews > 0 
     ? (reviews.reduce((sum, r) => sum + r.rating, 0) / totalReviews).toFixed(1) 
-    : (company?.rating || '4.5');
+    : '—';
 
   return (
     <>
@@ -298,7 +299,7 @@ const CompanyProfile = () => {
         <SEO 
           title={company.name} 
           description={company.description}
-          url={`https://votre-domaine.dz/directory/${generateSlugUrl(company.name, company.id)}`}
+          url={absoluteUrl(`/directory/${generateSlugUrl(company.name, company.id)}`)}
           image={company.logo}
           structuredData={{
             "@context": "https://schema.org",
@@ -306,7 +307,7 @@ const CompanyProfile = () => {
             "name": company.name,
             "description": company.description,
             "logo": company.logo,
-            "url": `https://votre-domaine.dz/directory/${generateSlugUrl(company.name, company.id)}`,
+            "url": absoluteUrl(`/directory/${generateSlugUrl(company.name, company.id)}`),
             "address": {
               "@type": "PostalAddress",
               "addressLocality": company.region || company.address?.split(',')[1] || "Algérie",
@@ -415,38 +416,31 @@ const CompanyProfile = () => {
                   {/* Middle & Right block: Contact Info and Contact CTA */}
                   <div className="lg:col-span-2 flex flex-col justify-between space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="flex items-start space-x-3">
-                        <MapPin className="h-5 w-5 text-secondary mt-0.5 flex-shrink-0" />
-                        <div>
-                          <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Localisation</p>
-                          <p className="text-sm text-gray-700 leading-relaxed font-semibold">{company.address}</p>
+                      {company.wilaya && (
+                        <div className="flex items-start space-x-3">
+                          <MapPin className="h-5 w-5 text-secondary mt-0.5 flex-shrink-0" />
+                          <div>
+                            <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Wilaya</p>
+                            <p className="text-sm text-gray-700 leading-relaxed font-semibold">{company.wilaya}</p>
+                          </div>
                         </div>
-                      </div>
-
-                      <div className="flex items-start space-x-3">
-                        <Globe className="h-5 w-5 text-secondary mt-0.5 flex-shrink-0" />
-                        <div>
-                          <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Site Web</p>
-                          <a href={`https://${company.website}`} target="_blank" rel="noopener noreferrer" className="text-sm text-primary font-bold hover:underline flex items-center space-x-1">
-                            <span>{company.website}</span>
-                            <ExternalLink className="h-3 w-3" />
-                          </a>
+                      )}
+                      {company.created_at && (
+                        <div className="flex items-start space-x-3">
+                          <Calendar className="h-5 w-5 text-secondary mt-0.5 flex-shrink-0" />
+                          <div>
+                            <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Inscrite depuis</p>
+                            <p className="text-sm text-gray-700 font-bold">{new Date(company.created_at).toLocaleDateString('fr-DZ', { month: 'long', year: 'numeric' })}</p>
+                          </div>
                         </div>
-                      </div>
-
+                      )}
                       <div className="flex items-start space-x-3">
-                        <Phone className="h-5 w-5 text-secondary mt-0.5 flex-shrink-0" />
+                        <ShieldCheck className={cn("h-5 w-5 mt-0.5 flex-shrink-0", company.status === 'approved' ? 'text-success' : 'text-gray-300')} />
                         <div>
-                          <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Téléphone</p>
-                          <p className="text-sm text-gray-700 font-bold">{company.phone}</p>
-                        </div>
-                      </div>
-
-                      <div className="flex items-start space-x-3">
-                        <Mail className="h-5 w-5 text-secondary mt-0.5 flex-shrink-0" />
-                        <div>
-                          <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Email</p>
-                          <p className="text-sm text-gray-700 font-bold">{company.email}</p>
+                          <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Vérification</p>
+                          <p className="text-sm text-gray-700 font-bold">
+                            {company.status === 'approved' ? 'Entreprise vérifiée (RC et NIF contrôlés)' : company.owner_id ? 'Vérification non effectuée' : 'Fiche non revendiquée'}
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -461,13 +455,14 @@ const CompanyProfile = () => {
                         ))}
                       </div>
 
-                      <button onClick={(e) => {
+                      {company.owner_id && company.owner_id !== user?.id && <button onClick={(e) => {
                         e.preventDefault();
-                        window.location.href = `mailto:${company.email}?subject=Demande de contact`;
+                        const target = `/dashboard?tab=messages&to=${company.owner_id}`;
+                        navigate(user ? target : `/login?redirect=${encodeURIComponent(target)}`);
                       }} className="w-full sm:w-auto btn-primary py-3.5 px-6 rounded-lg flex items-center justify-center space-x-2 shadow-lg text-sm font-black uppercase tracking-wider cursor-pointer">
                         <MessageSquare className="h-5 w-5" />
                         <span>Contacter l'entreprise</span>
-                      </button>
+                      </button>}
                     </div>
                   </div>
                 </div>
@@ -479,29 +474,9 @@ const CompanyProfile = () => {
                     À propos de l'entreprise
                   </h2>
                   <p className="text-gray-600 leading-relaxed text-lg font-medium">
-                    {company.description}
+                    {company.description || "Cette entreprise n'a pas encore rédigé sa présentation."}
                   </p>
                 </section>
-
-                {/* Stats / Effectif & Fondation */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <div className="bg-neutral-bg p-6 rounded-xl border border-gray-100">
-                    <div className="flex items-center space-x-3 mb-4 text-primary">
-                      <Users className="h-6 w-6" />
-                      <h4 className="font-bold">Effectif</h4>
-                    </div>
-                    <p className="text-2xl font-black text-primary">{company.employees || "Non spécifié"}</p>
-                    <p className="text-xs text-gray-400 mt-1 uppercase font-bold">Collaborateurs en Algérie</p>
-                  </div>
-                  <div className="bg-neutral-bg p-6 rounded-xl border border-gray-100">
-                    <div className="flex items-center space-x-3 mb-4 text-primary">
-                      <Calendar className="h-6 w-6" />
-                      <h4 className="font-bold">Fondation</h4>
-                    </div>
-                    <p className="text-2xl font-black text-primary">{company.founded || "Non spécifiée"}</p>
-                    <p className="text-xs text-gray-400 mt-1 uppercase font-bold">Année de création</p>
-                  </div>
-                </div>
 
                 {/* Informations Légales */}
                 <section>
@@ -514,13 +489,17 @@ const CompanyProfile = () => {
                           <td className="px-6 py-4 text-gray-700 font-medium">{company.fullName || company.name}</td>
                         </tr>
                         <tr className="border-b border-gray-50">
-                          <td className="px-6 py-4 font-bold text-gray-400">R.C</td>
-                          <td className="px-6 py-4 text-gray-700 font-medium">{company.rc || "Non renseigné"}</td>
+                          <td className="px-6 py-4 font-bold text-gray-500">Registre du commerce et NIF</td>
+                          <td className="px-6 py-4 text-gray-700 font-medium">
+                            {company.status === 'approved' ? 'Contrôlés par Algeria Industry (KYC)' : 'Non vérifiés'}
+                          </td>
                         </tr>
-                        <tr className="border-b border-gray-50">
-                          <td className="px-6 py-4 font-bold text-gray-400">N.I.F</td>
-                          <td className="px-6 py-4 text-gray-700 font-medium">{company.nif || "Non renseigné"}</td>
-                        </tr>
+                        {company.activity_sector && (
+                          <tr className="border-b border-gray-50">
+                            <td className="px-6 py-4 font-bold text-gray-500">Secteur d'activité</td>
+                            <td className="px-6 py-4 text-gray-700 font-medium">{company.activity_sector}</td>
+                          </tr>
+                        )}
                       </tbody>
                     </table>
                   </div>

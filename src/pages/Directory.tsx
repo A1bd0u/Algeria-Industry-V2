@@ -14,6 +14,7 @@ import SEO from '../components/SEO';
 import AdSpace from '../components/AdSpace';
 import { generateSlugUrl } from '../lib/utils';
 import { CompanySkeleton } from '../components/Skeleton';
+import { absoluteUrl } from '../config/site';
 
 const Directory = () => {
   const { t, i18n } = useTranslation();
@@ -29,7 +30,7 @@ const Directory = () => {
     queryKey: ['companies', isCertifiedOnly, selectedRegion, selectedSectors],
     queryFn: async () => {
       const params = new URLSearchParams();
-      params.append('limit', '1000');
+      params.append('limit', '50');
       if (isCertifiedOnly) params.append('certified', 'true');
       if (selectedRegion !== t('common.all') && selectedRegion) params.append('region', selectedRegion);
       if (selectedSectors.length > 0) params.append('sectors', selectedSectors.join(','));
@@ -44,13 +45,11 @@ const Directory = () => {
         id: c.id,
         name: c.name,
         sector: c.activity_sector || "Non spécifié",
-        region: c.region || "Alger",
-        coordinates: { x: Math.floor(Math.random() * 40) + 30, y: Math.floor(Math.random() * 40) + 10 },
-        description: c.description || "Aucune description",
-        certified: c.certified || false,
-        logo: `https://picsum.photos/seed/${c.id}/100/100`,
-        employees: "50-100",
-        founded: "2020"
+        region: c.wilaya || "",
+        coordinates: { x: 50, y: 30 },
+        description: c.description || "",
+        certified: c.status === 'approved' || Boolean(c.certified),
+        logo: '/placeholder.svg'
       }));
     }
   });
@@ -94,7 +93,7 @@ const Directory = () => {
       <SEO 
         title={t('directory.title')} 
         description={t('directory.subtitle')}
-        url="https://votre-domaine.dz/directory"
+        url={absoluteUrl('/directory')}
       />
     <div className={cn("bg-neutral-bg min-h-screen pb-20", i18n.language?.startsWith('ar') && "font-arabic")}>
       {/* Header Section */}
@@ -231,9 +230,10 @@ const Directory = () => {
             {/* Ad Slot */}
             <AdSpace 
               type="vertical" 
-              title={i18n.language?.startsWith('ar') ? "تأمين المخاطر الصناعية" : "Assurance Risques Industriels"}
-              description={i18n.language?.startsWith('ar') ? "احمِ أصولك من خلال حلولنا المخصصة للشركات الصغيرة والمتوسطة." : "Protégez vos actifs avec nos solutions sur mesure pour les PME."}
-              imageUrl="https://picsum.photos/seed/insurance/400/600"
+              title={i18n.language?.startsWith('ar') ? "عضو مؤسس" : "Membre fondateur"}
+              description={i18n.language?.startsWith('ar') ? "بريميوم مجاني لمدة 12 شهرًا لأول 100 مورد موثق." : "Premium offert 12 mois aux 100 premiers fournisseurs vérifiés."}
+              imageUrl="/placeholder.svg"
+              link="/tarifs"
             />
           </aside>
 

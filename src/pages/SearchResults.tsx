@@ -156,7 +156,7 @@ const SearchResults = () => {
                               className="bg-white group border border-gray-100 hover:border-secondary transition-all flex flex-col sm:flex-row"
                             >
                               <div className="w-full sm:w-48 aspect-[4/3] sm:aspect-square overflow-hidden bg-gray-50 shrink-0">
-                                <img src={product.file_url || `https://picsum.photos/seed/${product.id}/400/300`} alt={product.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                                <img src={product.file_url || '/placeholder.svg'} alt={product.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                               </div>
                               <div className="p-6 flex flex-col justify-between flex-1">
                                 <div>

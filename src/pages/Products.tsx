@@ -23,6 +23,7 @@ import { useAuth } from '../context/AuthContext';
 import { cn, generateSlugUrl } from '../lib/utils';
 import AddProduct from './AddProduct';
 import SEO from '../components/SEO';
+import { absoluteUrl } from '../config/site';
 
 const Products = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -129,7 +130,7 @@ const Products = () => {
           price: p.price,
           category: p.category || 'Non catégorisé',
           region: p.region || 'Alger',
-          image: p.file_url || p.image_url || `https://picsum.photos/seed/${p.id}/600/400`,
+          image: p.file_url || p.image_url || '/placeholder.svg',
           features: p.features || ['Produit de qualité'],
           verified: p.verified || false,
           owner_id: p.owner_id || p.company_id
@@ -210,7 +211,7 @@ const Products = () => {
       <SEO 
         title={companyNameParam ? `Produits de ${companyNameParam}` : t('products.equipment_catalog')} 
         description={t('products.hero_desc')}
-        url="https://votre-domaine.dz/products"
+        url={absoluteUrl('/products')}
       />
             <AddProduct 
          isOpen={showAddModal} 
@@ -240,7 +241,7 @@ const Products = () => {
                 }} 
                 className="text-xs font-black text-secondary hover:underline uppercase tracking-wider block mb-4"
               >
-                ← Voir tout le catalogue de Algiers Industry
+                ← Voir tout le catalogue Algeria Industry
               </button>
             )}
             <h1 className="text-4xl md:text-5xl font-black text-primary uppercase tracking-tighter leading-none mb-6">

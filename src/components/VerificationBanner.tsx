@@ -6,7 +6,7 @@ export default function VerificationBanner() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
 
-  if (!user || user.isVerified || user.emailVerified) {
+  if (!user || user.emailVerified) {
     return null;
   }
 

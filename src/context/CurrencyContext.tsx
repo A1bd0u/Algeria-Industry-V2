@@ -1,50 +1,36 @@
-import React, { createContext, ReactNode, useContext, useState } from 'react';
+import React, { createContext, ReactNode, useContext } from 'react';
 
-type Currency = 'DZD' | 'EUR' | 'USD';
+// Au lancement, les prix sont affichés uniquement en dinars (DZD) :
+// aucune conversion à partir de taux figés dans le code.
+type Currency = 'DZD';
 
 interface CurrencyContextType {
   currency: Currency;
-  setCurrency: (currency: Currency) => void;
-  formatPrice: (price: number | string) => string;
+  formatPrice: (price: number | string | null | undefined) => string;
 }
 
 const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined);
 
-export const CurrencyProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [currency, setCurrency] = useState<Currency>('DZD');
+const formatter = new Intl.NumberFormat('fr-DZ', {
+  style: 'currency',
+  currency: 'DZD',
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 2,
+});
 
-  const formatPrice = (price: number | string) => {
-    if (typeof price === 'string' && price.toLowerCase().includes('devis')) {
-      return price;
-    }
-    
-    const numericPrice = typeof price === 'string' ? parseFloat(price.replace(/[^0-9.]/g, '')) : price;
-    
-    if (isNaN(numericPrice)) return price.toString();
-
-    // Mock conversion rates
-    const rates = {
-      DZD: 1,
-      EUR: 0.0068,
-      USD: 0.0074
-    };
-
-    const convertedPrice = numericPrice * rates[currency];
-    
-    return new Intl.NumberFormat(currency === 'DZD' ? 'fr-DZ' : 'en-US', {
-      style: 'currency',
-      currency: currency,
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2,
-    }).format(convertedPrice);
-  };
-
-  return (
-    <CurrencyContext.Provider value={{ currency, setCurrency, formatPrice }}>
-      {children}
-    </CurrencyContext.Provider>
-  );
+export const formatDzd = (price: number | string | null | undefined) => {
+  if (price === null || price === undefined || price === '') return 'Sur devis';
+  if (typeof price === 'string' && price.toLowerCase().includes('devis')) return 'Sur devis';
+  const numericPrice = typeof price === 'string' ? parseFloat(price.replace(/[^0-9.]/g, '')) : price;
+  if (!Number.isFinite(numericPrice) || numericPrice <= 0) return 'Sur devis';
+  return formatter.format(numericPrice);
 };
+
+export const CurrencyProvider: React.FC<{ children: ReactNode }> = ({ children }) => (
+  <CurrencyContext.Provider value={{ currency: 'DZD', formatPrice: formatDzd }}>
+    {children}
+  </CurrencyContext.Provider>
+);
 
 export const useCurrency = () => {
   const context = useContext(CurrencyContext);

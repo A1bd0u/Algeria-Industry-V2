@@ -2,7 +2,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Search, Phone, Video, Info, FileText, ArrowUpRight, Paperclip, Send, Loader2, File } from 'lucide-react';
 import { motion } from 'motion/react';
+import { useSearchParams } from 'react-router-dom';
 import { cn } from '../lib/utils';
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 interface Message {
   id: string;
@@ -16,7 +19,12 @@ interface Message {
 
 export default function Messages() {
   const queryClient = useQueryClient();
-  const [selectedContact, setSelectedContact] = useState<string | null>(null);
+  const [searchParams] = useSearchParams();
+  // ?to=<userId> : ouvre directement une conversation (bouton « Contacter » d'une fiche).
+  const initialContact = searchParams.get('to');
+  const [selectedContact, setSelectedContact] = useState<string | null>(
+    initialContact && UUID_RE.test(initialContact) ? initialContact : null
+  );
   const [inputText, setInputText] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);

@@ -272,7 +272,7 @@ case 'gov-support': return <GovSupport state={state} />;
                 
                 <div className="space-y-2">
                   <label className="text-[10px] font-black text-primary uppercase tracking-widest">Nom de l'entreprise</label>
-                  <input name="name" type="text" required className="w-full bg-gray-50 border-none px-6 py-4 rounded-2xl text-sm font-bold focus:ring-2 focus:ring-secondary/20 transition-all outline-none" placeholder="Ex: Sonatrach" />
+                  <input name="name" type="text" required className="w-full bg-gray-50 border-none px-6 py-4 rounded-2xl text-sm font-bold focus:ring-2 focus:ring-secondary/20 transition-all outline-none" placeholder="Nom de l’entreprise" />
                 </div>
                 
                 <div className="grid grid-cols-2 gap-6">

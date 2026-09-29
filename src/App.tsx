@@ -46,14 +46,16 @@ const SearchResults = lazy(() => import('./pages/SearchResults'));
 const Subscriptions = lazy(() => import('./pages/Subscriptions'));
 const Tarifs = lazy(() => import('./pages/Tarifs'));
 const Terms = lazy(() => import('./pages/Terms'));
+const Catalogues = lazy(() => import('./pages/Catalogues'));
 
 import { useTranslation } from 'react-i18next';
 import ComparisonBar from './components/ComparisonBar';
 import { AuthProvider } from './context/AuthContext';
 import { ComparisonProvider } from './context/ComparisonContext';
 import { CurrencyProvider } from './context/CurrencyContext';
-import { TrackingProvider } from './context/TrackingContext';
 import VerifyAccountModal from './components/VerifyAccountModal';
+import CookieBanner from './components/CookieBanner';
+import { Navigate } from 'react-router-dom';
 
 // Create a client for React Query (API data management)
 const queryClient = new QueryClient();
@@ -68,7 +70,8 @@ export default function App() {
   const location = useLocation();
   const currentSlides = SLIDES_BY_PATH[location.pathname] || DEFAULT_SLIDES;
   const isExtranet = location.pathname.startsWith('/extranet');
-  const hideHeroSlider = isExtranet || location.pathname === '/become-exhibitor';
+  // Carrousel limité à l'accueil (LCP mobile).
+  const hideHeroSlider = isExtranet || location.pathname !== '/';
 
   useEffect(() => {
     const handleLanguageChange = (lng: string) => {
@@ -97,7 +100,6 @@ export default function App() {
       <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <TrackingProvider>
           <CurrencyProvider>
             <ComparisonProvider>
               <VerifyAccountModal />
@@ -166,6 +168,8 @@ export default function App() {
                       <Route path="/terms" element={<PageTransition><Terms /></PageTransition>} />
                       <Route path="/privacy" element={<PageTransition><Privacy /></PageTransition>} />
                       <Route path="/compare" element={<PageTransition><Compare /></PageTransition>} />
+                      <Route path="/catalogues" element={<PageTransition><Catalogues /></PageTransition>} />
+                      <Route path="/messages" element={<Navigate to="/dashboard?tab=messages" replace />} />
                       <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
                     </Routes>
                   </AnimatePresence>
@@ -173,12 +177,12 @@ export default function App() {
               </main>
                 {!isExtranet && <Footer />}
                 <HelpWidget />
+                <CookieBanner />
                 <BackToTop />
                 {!isExtranet && <ComparisonBar />}
               </div>
             </ComparisonProvider>
           </CurrencyProvider>
-        </TrackingProvider>
       </AuthProvider>
     </QueryClientProvider>
     </ErrorBoundary>
