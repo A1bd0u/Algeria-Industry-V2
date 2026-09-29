@@ -163,7 +163,7 @@ const BlogDetail = () => {
                    <Bookmark className="h-8 w-8 text-secondary mb-4" />
                    <h4 className="text-sm font-black text-primary uppercase tracking-tight mb-2">Sauvegarder cet article</h4>
                    <p className="text-[9px] font-medium text-gray-500 uppercase tracking-widest leading-relaxed mb-6">Retrouvez-le plus tard dans votre dashboard professionnel.</p>
-                   <Link to="/subscriptions" className="w-full bg-white border border-gray-100 py-3 rounded-xl text-[10px] font-black uppercase text-primary hover:border-secondary transition-all flex items-center justify-center">Abonnez-vous</Link>
+                   <Link to="/tarifs" className="w-full bg-white border border-gray-100 py-3 rounded-xl text-[10px] font-black uppercase text-primary hover:border-secondary transition-all flex items-center justify-center">Abonnez-vous</Link>
                 </div>
              </div>
           </aside>

@@ -27,8 +27,11 @@ import { ProfileSkeleton } from '../components/Skeleton';
 import { cn, generateSlugUrl, extractIdFromSlug } from '../lib/utils';
 import SEO from '../components/SEO';
 import { absoluteUrl } from '../config/site';
+import { categoryLabel } from '../data/productCategories';
+import { useTranslation } from 'react-i18next';
 
 const CompanyProfile = () => {
+  const { t } = useTranslation();
   const { id: slugId } = useParams();
   const id = extractIdFromSlug(slugId);
   const navigate = useNavigate();
@@ -539,7 +542,7 @@ const CompanyProfile = () => {
                         </div>
                         <div className="ms-5 flex-1 pr-6">
                           <h4 className="font-bold text-primary group-hover:text-secondary transition-colors text-base line-clamp-1">{product.name}</h4>
-                          <span className="inline-block bg-gray-100 text-gray-500 text-[10px] font-bold px-2 py-0.5 rounded-full mt-1 uppercase tracking-wider">{product.category}</span>
+                          <span className="inline-block bg-gray-100 text-gray-500 text-[10px] font-bold px-2 py-0.5 rounded-full mt-1 uppercase tracking-wider">{categoryLabel(t, product.category)}</span>
                           {product.price ? (
                             <p className="text-sm font-black text-primary mt-2">{product.price} DZD</p>
                           ) : (

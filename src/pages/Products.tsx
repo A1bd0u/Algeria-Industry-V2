@@ -12,7 +12,7 @@ import {
   Check
 } from 'lucide-react';
 import { motion } from 'motion/react';
-import { productCategories } from '../data/productCategories';
+import { categoryLabel, productCategories } from '../data/productCategories';
 import React, { useEffect, useState, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { RefreshCw } from 'lucide-react';
@@ -293,7 +293,7 @@ const Products = () => {
                     onClick={() => setIsCategoryOpen(!isCategoryOpen)}
                     className="w-full flex items-center justify-between bg-gray-50 px-5 py-3 rounded-xl border border-transparent focus:ring-2 focus:ring-primary/20 focus:border-primary focus:bg-white transition-all cursor-pointer text-gray-800 hover:bg-gray-100 text-start"
                   >
-                    <span className="text-xs font-black uppercase tracking-widest truncate">{activeCategory === 'Tous' ? 'Toutes les catégories' : activeCategory}</span>
+                    <span className="text-xs font-black uppercase tracking-widest truncate">{activeCategory === 'Tous' ? t('products.all_categories') : categoryLabel(t, activeCategory)}</span>
                     <ChevronDown className={cn("w-4 h-4 text-gray-400 transition-transform ms-4 shrink-0", isCategoryOpen && "rotate-180")} />
                   </button>
                   
@@ -315,7 +315,7 @@ const Products = () => {
                       
                       {productCategories.map(group => (
                         <div key={group.id} className="py-2">
-                          <div className="px-4 py-2 text-[10px] font-black text-gray-400 uppercase tracking-widest bg-gray-50/50">{group.name}</div>
+                          <div className="px-4 py-2 text-[10px] font-black text-gray-400 uppercase tracking-widest bg-gray-50/50">{t(`productCategories.${group.id}`)}</div>
                           {group.subCategories.map(sub => (
                             <button
                               key={sub.id}
@@ -328,7 +328,7 @@ const Products = () => {
                                 setIsCategoryOpen(false);
                               }}
                             >
-                              <span className={cn(activeCategory === sub.name ? "" : "group-hover:translate-x-1 transition-transform", "line-clamp-2 leading-tight pe-2")}>{sub.name}</span>
+                              <span className={cn(activeCategory === sub.name ? "" : "group-hover:translate-x-1 transition-transform", "line-clamp-2 leading-tight pe-2")}>{t(`productCategories.${sub.id}`)}</span>
                               {activeCategory === sub.name && <Check className="w-3 h-3 text-primary shrink-0" />}
                             </button>
                           ))}
@@ -453,7 +453,7 @@ const Products = () => {
                     />
                     <div className="absolute top-4 start-4 flex gap-2">
                       <span className="bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-[9px] font-black uppercase text-primary border border-white/20">
-                        {product.category}
+                        {categoryLabel(t, product.category)}
                       </span>
                       {product.verified && (
                         <div className="bg-secondary p-1.5 rounded-full text-white shadow-lg">
