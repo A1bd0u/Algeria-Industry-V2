@@ -4,24 +4,19 @@
     "directory": "Directory",
     "products": "Products",
     "catalogues": "Catalogues",
-    "rfq": "Tenders",
     "news": "News",
-    "emagazine": "E-Magazine",
-    "tenders": "Tenders",
     "events": "Events",
-    "virtual_show": "Virtual Shows",
     "resources": "Resources",
     "login": "Login",
     "register": "Register",
     "browse_industries": "Browse Industries",
-    "become_exposant": "Become Exhibitor",
+    "become_exposant": "Become a supplier",
     "my_profile": "My profile",
     "subscription": "My subscription",
     "favorites": "My favorites",
     "requests": "My requests",
     "logout": "Logout",
     "settings": "Settings",
-    "exhibitors": "Exhibitors",
     "pricing": "Pricing",
     "searchShort": "Search...",
     "workspace": "Industrial space",
@@ -29,6 +24,8 @@
     "memberSpace": "Member area",
     "openMenu": "Open menu",
     "closeMenu": "Close menu",
+    "suppliers": "Suppliers",
+    "adminConsole": "Admin console",
     "console_pro": "Admin area"
   },
   "hero": {
@@ -36,10 +33,6 @@
     "subtitle": "The leading B2B platform dedicated to industrial suppliers and buyers in Algeria.",
     "search_placeholder": "Search for a company, a product...",
     "search_btn": "Search"
-  },
-  "topbar": {
-    "become_exhibitor": "BECOME EXHIBITOR",
-    "my_account": "MY ACCOUNT"
   },
   "categories": {
     "title": "Browse by Category",
@@ -57,8 +50,8 @@
     "renewable": "Renewable Energies"
   },
   "home": {
-    "trends": "INDUSTRIAL TRENDS",
-    "trends_subtitle": "SUSTAINABILITY AND INNOVATION IN INDUSTRY",
+    "trends": "Latest products",
+    "trends_subtitle": "From suppliers registered on the platform",
     "featured_products": "Featured Products",
     "featured_subtitle": "A selection of the best equipment currently available.",
     "sectors": "Activity Sectors",
@@ -110,6 +103,16 @@
       "title": "Ready to start?",
       "text": "Create your account for free",
       "button": "Create my supplier profile"
+    },
+    "hero": {
+      "eyebrow": "Verified industrial suppliers",
+      "title": "Find the right industrial supplier in Algeria",
+      "subtitle": "Companies with checked trade register and tax ID, a product catalogue and direct contact by messaging or WhatsApp.",
+      "searchLabel": "Search a product or a company",
+      "searchPlaceholder": "Product, machine, company…",
+      "browseSuppliers": "Browse suppliers",
+      "listCompany": "List my company for free",
+      "founder": "Premium free for 12 months for the first 100 verified suppliers."
     }
   },
   "directory": {
@@ -178,32 +181,8 @@
       "reportSent": "Report sent. Thank you, our team will review it.",
       "reportError": "The report could not be sent.",
       "favoriteError": "Unable to update your favourites."
-    }
-  },
-  "rfq": {
-    "title": "Request for Quote (RFQ)",
-    "subtitle": "OPTIMIZE YOUR INDUSTRIAL PURCHASES BY SUBMITTING YOUR REQUEST FOR QUOTATION TO OUR NETWORK OF QUALIFIED SUPPLIERS.",
-    "label": "Industrial Sourcing",
-    "company_info": "Company Information",
-    "company_name": "Company Name",
-    "industry_sector": "Industry Sector",
-    "select": "SELECT",
-    "contact_info": "Contact Information",
-    "full_name": "Full Name",
-    "pro_email": "Professional Email",
-    "equipment_details": "Equipment Details",
-    "product_name": "Product / Machine Name",
-    "quantity": "Estimated Quantity",
-    "tech_desc": "Detailed Technical Description",
-    "tech_desc_placeholder": "TECHNICAL SPECIFICATIONS, STANDARDS, REQUIRED CERTIFICATIONS...",
-    "submit": "SUBMIT REQUEST FOR QUOTATION",
-    "success_title": "Request Sent",
-    "success_text": "YOUR REQUEST FOR QUOTATION (RFQ) HAS BEEN REGISTERED IN OUR TECHNICAL SYSTEM. A COUNSELOR WILL CONTACT YOU WITHIN 24H.",
-    "ref_label": "REQUEST REFERENCE",
-    "new_request": "NEW REQUEST",
-    "process_title": "Quotation Process",
-    "help": "Need Help?",
-    "garantees": "B2B Guarantees"
+    },
+    "searchPlaceholder": "Search a machine, a brand…"
   },
   "blog": {
     "title": "Industrial News",
@@ -240,12 +219,17 @@
     "noFile": "Document not available"
   },
   "footer": {
-    "about": "About Us",
-    "about_text": "TECHNICAL REFERENCE PORTAL FOR THE ALGERIAN INDUSTRIAL ECOSYSTEM. CONNECT, INNOVATE AND DEVELOP.",
-    "links": "Quick Links",
+    "about_text": "The B2B marketplace of verified Algerian industrial suppliers.",
     "support": "Support & Accompaniment",
     "contact": "Contact us",
-    "copyright": "© 2026 ALGERIA INDUSTRY"
+    "platform": "Platform",
+    "compare": "Compare products",
+    "advertise": "Advertise with us",
+    "resourceCenter": "Resource centre",
+    "contactTitle": "Contact",
+    "legal": "Legal notice",
+    "privacy": "Privacy",
+    "cookies": "Cookies"
   },
   "common": {
     "compare": "Compare",
@@ -269,9 +253,6 @@
     "no_results_desc": "Change your filters or search.",
     "retry": "Try again",
     "search": "Search"
-  },
-  "hero_slider": {
-    "tech_spec": "Technical Specification"
   },
   "search": {
     "results_for": "Results for",
@@ -301,23 +282,31 @@
     "contact_support": "contact our team"
   },
   "faq": {
-    "title": "Frequently Asked Questions",
-    "subtitle": "Industrial Support",
-    "need_help": "Need personalized help?",
-    "help_desc": "Our industrial experts are at your disposal.",
-    "call_expert": "Call an Expert",
-    "send_ticket": "Send Ticket",
+    "title": "Frequently asked questions",
+    "subtitle": "Help",
+    "need_help": "Can't find your answer?",
+    "help_desc": "Our team replies by email within 2 business days.",
+    "call_expert": "Call support",
+    "send_ticket": "Write to us",
     "search_placeholder": "Search for a question...",
-    "q1": "How does the virtual exhibition work?",
-    "a1": "Our virtual exhibition uses an immersive 2.5D interface allowing you to navigate between different thematic halls. You can click on a stand to see machines in detail, download catalogs and chat live with exhibitors.",
-    "q2": "Is the site free for visitors?",
-    "a2": "Yes, access to the catalog and the virtual exhibition is completely free for all professionals. Registration is required to contact exhibitors or save favorites.",
-    "q3": "How to add my products to the catalog?",
-    "a3": "Once your Premium or Business subscription is activated, go to your Dashboard 'My Products' section. You can import your technical sheets and photos there.",
-    "q4": "What are the payment options?",
-    "a4": "We accept bank transfers, CIB/Edahabia payments, and bank checks for local companies.",
+    "q1": "What is Algeria Industry?",
+    "a1": "An online directory and catalogue of Algerian industrial suppliers. Buyers find verified companies and their products there and contact them directly.",
+    "q2": "Is the site free for buyers?",
+    "a2": "Yes. Browsing the catalogue, comparing products and contacting a supplier is free. An account is required for messaging and favourites.",
+    "q3": "What does “verified company” mean?",
+    "a3": "The company provided its trade register and tax ID and our team checked them. The badge confirms it legally exists; it does not guarantee product quality, so always check the quote and terms of sale.",
+    "q4": "How do I contact a supplier?",
+    "a4": "From a product or company page: through the platform's messaging, or by WhatsApp if the supplier provided it. From the comparison page you can also send a quote request to several suppliers at once.",
     "cat_general": "General",
-    "cat_exhibitor": "Exhibitors"
+    "cat_exhibitor": "Suppliers",
+    "q5": "How do I register my company?",
+    "a5": "Create a “Supplier” account, confirm your email address, then upload your trade register and tax ID from your dashboard. Once the file is approved, you can publish your products.",
+    "q6": "How many products can I publish?",
+    "a6": "5 with the free plan, 15 with Basic and unlimited with Pro. Details are on the Pricing page.",
+    "q7": "What payment methods are available?",
+    "a7": "Subscriptions are invoiced in dinars, VAT included. You pay by bank transfer or cheque against the invoice, or online with a CIB / Edahabia card when available.",
+    "q8": "How will I know my file has been reviewed?",
+    "a8": "Our team reviews each file and emails you its decision. If it is rejected, the reason is given so you can correct and resend your documents."
   },
   "kyc": {
     "status_pending": "Pending",
@@ -372,7 +361,7 @@
   },
   "auth": {
     "captchaRequired": "Please complete the captcha to continue.",
-    "captchaMissingConfig": "Configuration error: VITE_TURNSTILE_SITE_KEY is missing",
+    "captchaMissingConfig": "Anti-bot check unavailable. Please try again later or contact us.",
     "genericError": "Something went wrong. Please try again.",
     "networkError": "Network error. Check your connection.",
     "email": "Email address",
@@ -421,20 +410,18 @@
       "invalid": "Incorrect code."
     },
     "register": {
-      "asideTitle": "Join the leading industrial network",
-      "benefitTendersTitle": "Exclusive tenders",
-      "benefitTendersText": "Access hundreds of qualified B2B opportunities.",
+      "asideTitle": "Join Algerian industry",
       "benefitVisibilityTitle": "Greater visibility",
-      "benefitVisibilityText": "Showcase your products to thousands of professional buyers.",
+      "benefitVisibilityText": "Show your products to the professional buyers who use the platform.",
       "benefitNetworkTitle": "Qualified networking",
       "benefitNetworkText": "Connect directly with industry decision-makers.",
       "kycBadge": "KYC-verified supplier profiles",
       "chooseTitle": "How do you want to use the platform?",
       "chooseText": "Choose your main profile. You can still access the other features later.",
       "buyerTitle": "I am a Buyer",
-      "buyerText": "I look for suppliers and publish tenders.",
+      "buyerText": "I am looking for suppliers and requesting quotes.",
       "supplierTitle": "I am a Supplier",
-      "supplierText": "I offer my products/services and respond to tenders.",
+      "supplierText": "I offer my products or services and answer buyers' requests.",
       "continue": "Continue",
       "backToProfile": "Back to profile choice",
       "formTitle": "Create your account",
@@ -451,7 +438,9 @@
       "submitBuyer": "Create my buyer account",
       "submitSupplier": "Create my supplier account",
       "alreadyMember": "Already a member?",
-      "signIn": "Sign in"
+      "signIn": "Sign in",
+      "benefitVerifiedTitle": "Verified companies",
+      "benefitVerifiedText": "Every company shown as verified has provided its trade register and tax ID."
     },
     "forgot": {
       "back": "Back to sign in",
@@ -765,12 +754,7 @@
       "noneText": "You have no active ads at the moment.",
       "whyTitle": "Why advertise here?",
       "why1": "Reach targeted industrial buyers",
-      "why2": "Increase your chances of winning tenders",
-      "why3": "Banners shown on the home page and in the directory",
-      "stats": "Statistics",
-      "views": "Views (30 d)",
-      "clicks": "Clicks (30 d)",
-      "ctr": "Click-through rate"
+      "why3": "Banner shown on the home page"
     },
     "statsSoon": {
       "title": "Statistics coming soon",
@@ -1053,8 +1037,8 @@
     "start": "Get started",
     "comparePlans": "Compare plans in detail",
     "list": {
-      "label": "Company directory",
-      "title": "Exhibitors and partners",
+      "label": "Registered companies",
+      "title": "Supplier directory",
       "subtitle": "Discover the industrial companies registered on Algeria Industry and contact them directly.",
       "loadError": "Unable to load companies.",
       "searchPlaceholder": "Search a company by name or activity…",

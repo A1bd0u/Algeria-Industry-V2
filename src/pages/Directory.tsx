@@ -1,417 +1,449 @@
-import { Award, Building2, ChevronRight, ExternalLink, Filter, List, Map as MapIcon, MapPin, Search } from 'lucide-react';
+import {
+  Factory,
+  Layout,
+  MapPin,
+  MessageSquare,
+  Search, ShieldCheck, Star, ChevronDown, Check, ArrowRight,
+  ChevronLeft, ChevronRight
+} from 'lucide-react';
 import { motion } from 'motion/react';
-import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { AlertTriangle, RefreshCw } from 'lucide-react';
-
+import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { cn } from '../lib/utils';
-import SEO from '../components/SEO';
-
-// No mock data needed anymore, using API
-
-import AdSpace from '../components/AdSpace';
-import { generateSlugUrl } from '../lib/utils';
+import { cn, generateSlugUrl } from '../lib/utils';
 import { CompanySkeleton } from '../components/Skeleton';
+import SEO from '../components/SEO';
 import { absoluteUrl } from '../config/site';
+import { formatNumber } from '../lib/format';
 
 const Directory = () => {
   const { t, i18n } = useTranslation();
-  const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
-  const [isCertifiedOnly, setIsCertifiedOnly] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedSectors, setSelectedSectors] = useState<string[]>([]);
-  const [selectedRegion, setSelectedRegion] = useState<string>(t('common.all'));
+  const [searchTerm, setSearchTerm] = useState('');
+  // '' = tous les secteurs / toutes les wilayas.
+  const [activeSector, setActiveSector] = useState('');
+  const [isSectorOpen, setIsSectorOpen] = useState(false);
+  const [activeRegion, setActiveRegion] = useState('');
+  const [stats, setStats] = useState<{ verifiedCompanies: number; publishedProducts: number } | null>(null);
+  const [isRegionOpen, setIsRegionOpen] = useState(false);
+  const [showVerifiedOnly, setShowVerifiedOnly] = useState(false);
+  const [exhibitors, setExhibitors] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 12;
 
+  // Reset page when search or filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, activeSector, activeRegion, showVerifiedOnly]);
 
+  const sectorRef = useRef<HTMLDivElement>(null);
+  const regionRef = useRef<HTMLDivElement>(null);
 
-  const { data: companies = [], isLoading, isError, refetch } = useQuery({
-    queryKey: ['companies', isCertifiedOnly, selectedRegion, selectedSectors],
-    queryFn: async () => {
-      const params = new URLSearchParams();
-      params.append('limit', '50');
-      if (isCertifiedOnly) params.append('certified', 'true');
-      if (selectedRegion !== t('common.all') && selectedRegion) params.append('region', selectedRegion);
-      if (selectedSectors.length > 0) params.append('sectors', selectedSectors.join(','));
-      
-      const res = await fetch(`/api/companies?${params.toString()}`);
-      if (!res.ok) throw new Error('Failed to fetch companies');
-      const result = await res.json();
-      const data = result.data || result;
-      
-      return data.map((c: any) => ({
-        ...c,
-        id: c.id,
-        name: c.name,
-        sector: c.activity_sector || "Non spécifié",
-        region: c.wilaya || "",
-        coordinates: { x: 50, y: 30 },
-        description: c.description || "",
-        certified: c.status === 'approved' || Boolean(c.certified),
-        logo: '/placeholder.svg'
-      }));
-    }
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (sectorRef.current && !sectorRef.current.contains(event.target as Node)) {
+        setIsSectorOpen(false);
+      }
+      if (regionRef.current && !regionRef.current.contains(event.target as Node)) {
+        setIsRegionOpen(false);
+      }
+    };
+
+    const handleScroll = () => {
+      setIsSectorOpen(false);
+      setIsRegionOpen(false);
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.intersectionRatio < 1) {
+          if (entry.target === sectorRef.current) setIsSectorOpen(false);
+          if (entry.target === regionRef.current) setIsRegionOpen(false);
+        }
+      });
+    }, { threshold: 1 });
+
+    const currentSectorRef = sectorRef.current;
+    const currentRegionRef = regionRef.current;
+
+    if (currentSectorRef) observer.observe(currentSectorRef);
+    if (currentRegionRef) observer.observe(currentRegionRef);
+
+    document.addEventListener('mousedown', handleClickOutside);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      window.removeEventListener('scroll', handleScroll);
+      observer.disconnect();
+    };
+  }, []);
+
+  // Récupération des entreprises depuis l'API
+  useEffect(() => {
+    const fetchExhibitors = async () => {
+      try {
+        setIsLoading(true);
+        fetch('/api/stats/public')
+          .then((r) => (r.ok ? r.json() : null))
+          .then((value) => value && setStats(value))
+          .catch(() => {});
+        const res = await fetch('/api/companies?limit=50');
+        if (!res.ok) throw new Error('load');
+        let data = await res.json();
+        if (data && data.data) data = data.data;
+        
+        // Formatage des données pour correspondre à l'affichage attendu
+        const formatted = data.map((c: any) => ({
+          id: c.id,
+          name: c.name,
+          sector: c.activity_sector || '',
+          location: c.wilaya || '',
+          description: c.description || '',
+          logo: c.logo_url || '/favicon.svg',
+          verified: c.status === 'approved',
+          status: c.status
+        }));
+        
+        setExhibitors(formatted);
+      } catch (err: any) {
+        setError(t('exhibitor.list.loadError'));
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchExhibitors();
+  }, []);
+
+  // Filtrage des entreprises
+  const filteredExhibitors = exhibitors.filter((exhibitor: any) => {
+    const matchesSearch = exhibitor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          exhibitor.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSector = !activeSector || exhibitor.sector === activeSector;
+    const matchesRegion = !activeRegion || exhibitor.location === activeRegion;
+    const matchesVerified = !showVerifiedOnly || exhibitor.verified;
+    return matchesSearch && matchesSector && matchesRegion && matchesVerified;
   });
 
-  const sectors = [t('categories.agrifood'), t('categories.btph'), t('categories.chemistry'), t('categories.energy'), t('categories.pharma'), t('categories.metallurgy'), t('categories.plastics'), t('categories.textile'), t('categories.electronics'), t('categories.auto'), t('categories.renewable')];
-  const regions = ["Alger", "Oran", "Constantine", "Béjaïa", "Sétif", "Bordj Bou Arreridj"];
+  const totalItems = filteredExhibitors.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedExhibitors = filteredExhibitors.slice(startIndex, endIndex);
 
-  const toggleSector = (sector: string) => {
-    setSelectedSectors(prev => 
-      prev.includes(sector) ? prev.filter(s => s !== sector) : [...prev, sector]
-    );
-  };
-
-  const filteredCompanies = companies.filter(company => {
-    // Certified filter
-    if (isCertifiedOnly && !company.certified) return false;
-    
-    // Region filter
-    if (selectedRegion !== t('common.all') && company.region !== selectedRegion) return false;
-    
-    // Sector filter
-    if (selectedSectors.length > 0 && !selectedSectors.some(s => company.sector.toLowerCase().includes(s.toLowerCase()))) return false;
-    
-    // Search query filter
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      return (
-        company.name.toLowerCase().includes(query) ||
-        company.description.toLowerCase().includes(query) ||
-        company.sector.toLowerCase().includes(query) ||
-        company.id?.toString().toLowerCase().includes(query) ||
-        company.reference_id?.toLowerCase().includes(query)
-      );
-    }
-    
-    return true;
-  });
+  // Filtres construits à partir des entreprises réellement inscrites.
+  const uniqueSorted = (values: string[]) => Array.from(new Set(values.filter(Boolean))).sort((a, b) => a.localeCompare(b));
+  const sectors = ['', ...uniqueSorted(exhibitors.map((e: any) => e.sector))];
+  const regions = ['', ...uniqueSorted(exhibitors.map((e: any) => e.location))];
 
   return (
     <>
-      <SEO 
-        title={t('directory.title')} 
-        description={t('directory.subtitle')}
-        url={absoluteUrl('/directory')}
-      />
-    <div className={cn("bg-neutral-bg min-h-screen pb-20", i18n.language?.startsWith('ar') && "font-arabic")}>
-      {/* Header Section */}
-      <div className="bg-white border-b border-border-tech py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className={cn("flex flex-col md:flex-row md:items-end md:justify-between gap-6", i18n.language?.startsWith('ar') && "md:flex-row-reverse")}>
-            <div className={i18n.language?.startsWith('ar') ? "text-end" : ""}>
-              <div className={cn("flex items-center space-x-2 text-secondary mb-4", i18n.language?.startsWith('ar') && "space-x-reverse justify-end")}>
-                <div className="w-8 h-[2px] bg-secondary" />
-                <span className="text-xs font-black uppercase tracking-[0.3em] font-sans">{t('directory.db_label')}</span>
-              </div>
-              <h1 className="text-4xl font-black text-primary uppercase tracking-tighter leading-none">{t('directory.title')}</h1>
-              <p className="text-sm text-gray-500 mt-4 font-medium uppercase tracking-wider">{t('directory.subtitle')}</p>
-            </div>
-            <div className={cn("flex bg-neutral-bg p-1 border border-border-tech self-start", i18n.language?.startsWith('ar') && "flex-row-reverse")}>
-              <button 
-                onClick={() => setViewMode('list')}
-                className={cn(
-                  "flex items-center space-x-2 px-6 py-2 text-[11px] font-black uppercase tracking-widest transition-all",
-                  i18n.language?.startsWith('ar') && "space-x-reverse",
-                  viewMode === 'list' ? "bg-white text-primary shadow-sm border border-border-tech" : "text-gray-400 hover:text-primary"
-                )}
-              >
-                <List className="h-4 w-4" />
-                <span>{t('directory.list_view')}</span>
-              </button>
-              <button 
-                onClick={() => setViewMode('map')}
-                className={cn(
-                  "flex items-center space-x-2 px-6 py-2 text-[11px] font-black uppercase tracking-widest transition-all",
-                  i18n.language?.startsWith('ar') && "space-x-reverse",
-                  viewMode === 'map' ? "bg-white text-primary shadow-sm border border-border-tech" : "text-gray-400 hover:text-primary"
-                )}
-              >
-                <MapIcon className="h-4 w-4" />
-                <span>{t('directory.map_view')}</span>
-              </button>
-            </div>
+    <SEO
+      title={t('exhibitor.list.title')}
+      description={t('exhibitor.list.subtitle')}
+      url={absoluteUrl('/directory')}
+    />
+    <div className={cn("min-h-screen bg-neutral-bg pt-8 pb-20", i18n.language?.startsWith('ar') && "font-arabic")}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-2">
+          <div className="max-w-3xl">
+            <motion.div 
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="flex items-center space-x-2 text-secondary mb-4"
+            >
+              <Factory className="h-4 w-4" />
+              <span className="text-[10px] font-black uppercase tracking-[0.4em]">{t('exhibitor.list.label')}</span>
+            </motion.div>
+            <h1 className="text-4xl md:text-5xl font-black text-primary uppercase tracking-tighter leading-none mb-6">
+              {t('exhibitor.list.title')}
+            </h1>
+            <p className="text-gray-500 font-medium text-lg leading-relaxed">
+              {t('exhibitor.list.subtitle')}
+            </p>
           </div>
-        </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
-        <div className={cn("flex flex-col lg:flex-row gap-12", i18n.language?.startsWith('ar') && "lg:flex-row-reverse")}>
           
-          {/* Sidebar Filters */}
-          <aside className="w-full lg:w-80 space-y-8">
-            <div className="bg-white p-8 border border-border-tech">
-              <div className={cn("flex items-center space-x-3 mb-8", i18n.language?.startsWith('ar') && "space-x-reverse justify-end")}>
-                <Filter className="h-5 w-5 text-secondary" />
-                <h3 className="text-sm font-black text-primary uppercase tracking-widest">{t('directory.search_params')}</h3>
+          {stats && (
+            <div className="flex items-center gap-4 bg-white p-3 rounded-2xl border border-gray-100 shadow-sm">
+              <div className="text-end">
+                <p className="text-[10px] font-black text-primary uppercase tracking-widest">{t('home.stats.verifiedCompanies')}</p>
+                <p className="text-2xl font-black text-secondary tracking-tighter">{formatNumber(stats.verifiedCompanies)}</p>
               </div>
-
-              <div className={cn("mb-8", i18n.language?.startsWith('ar') && "text-end")}>
-                <span className="text-[10px] font-black text-primary uppercase tracking-widest">{t('common.search')}</span>
-                <div className="mt-4 flex items-center bg-white p-2 rounded-2xl border border-gray-100 shadow-sm focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary transition-all">
-                  <Search className="h-4 w-4 text-gray-400 ms-2" />
-                  <input 
-                    type="text" 
-                    placeholder="Filtrer par nom..."
-                    className="flex-1 bg-transparent px-3 py-2 text-xs font-medium focus:outline-none w-full"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                  />
-                </div>
+              <div className="w-px h-8 bg-gray-100" />
+              <div className="text-end">
+                <p className="text-[10px] font-black text-primary uppercase tracking-widest">{t('home.stats.publishedProducts')}</p>
+                <p className="text-2xl font-black text-secondary tracking-tighter">{formatNumber(stats.publishedProducts)}</p>
               </div>
+            </div>
+          )}
+        </div>
 
-              {/* Sector Filter */}
-              <div className={cn("mb-8 pt-8 border-t border-gray-100", i18n.language?.startsWith('ar') && "text-end")}>
-                <span className="text-[10px] font-black text-primary uppercase tracking-widest">{t('directory.sector')}</span>
-                <div className="space-y-3 mt-4">
-                  {sectors.map((sector) => (
-                    <label key={sector} className={cn("flex items-center space-x-3 cursor-pointer group", i18n.language?.startsWith('ar') && "flex-row-reverse space-x-reverse")}>
-                      <input 
-                        type="checkbox" 
-                        checked={selectedSectors.includes(sector)}
-                        onChange={() => toggleSector(sector)}
-                        className="w-4 h-4 rounded-md border-gray-200 text-primary focus:ring-primary/20" 
-                      />
-                      <span className={cn(
-                        "text-[11px] font-bold transition-colors uppercase tracking-wider",
-                        selectedSectors.includes(sector) ? "text-primary" : "text-gray-500 group-hover:text-primary"
-                      )}>{sector}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              {/* Region Filter */}
-              <div className={cn("mb-8 pt-8 border-t border-gray-100", i18n.language?.startsWith('ar') && "text-end")}>
-                <span className="text-[10px] font-black text-primary uppercase tracking-widest">{t('directory.region')}</span>
-                <select 
-                  value={selectedRegion}
-                  onChange={(e) => setSelectedRegion(e.target.value)}
-                  className="w-full mt-4 bg-white border border-gray-100 rounded-xl shadow-sm text-xs font-medium p-4 outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all cursor-pointer"
+        {/* Search & Filters */}
+        <div className="sticky top-[96px] z-30 bg-transparent py-4 -mt-4 mb-12">
+          <div className="flex flex-col lg:flex-row gap-4">
+            <div className="flex-1 flex items-center bg-white p-2 rounded-2xl border border-gray-100 shadow-sm focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary transition-all">
+              <Search className="h-5 w-5 text-gray-400 ms-3" />
+              <input 
+                type="text" 
+                placeholder={t('exhibitor.list.searchPlaceholder')}
+                aria-label={t('exhibitor.list.searchPlaceholder')}
+                className="flex-1 bg-transparent px-4 py-3 text-sm font-medium focus:outline-none"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            
+            <div className="flex flex-col sm:flex-row gap-4 shrink-0">
+              <div className="relative" ref={sectorRef}>
+                <button
+                  onClick={() => setIsSectorOpen(!isSectorOpen)}
+                  className="w-full sm:w-auto flex items-center justify-between bg-white px-5 py-3 rounded-xl border border-gray-100 shadow-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all cursor-pointer text-gray-800 hover:border-gray-300 min-w-[260px] text-start"
                 >
-                   <option value={t('common.all')}>{t('common.all')}</option>
-                   {regions.map(r => <option key={r} value={r}>{r}</option>)}
-                </select>
-              </div>
-
-              {/* Certification Toggle */}
-              <div className="pt-8 border-t border-gray-100">
-                <button 
-                  onClick={() => setIsCertifiedOnly(!isCertifiedOnly)}
-                  className={cn("flex items-center justify-between w-full cursor-pointer group", i18n.language?.startsWith('ar') && "flex-row-reverse")}
-                >
-                  <span className="text-[11px] font-black text-primary uppercase tracking-widest">{t('directory.iso_only')}</span>
-                  <div className={cn(
-                    "relative inline-flex h-6 w-11 items-center rounded-full transition-colors",
-                    isCertifiedOnly ? "bg-primary" : "bg-gray-200 group-hover:bg-primary/20"
-                  )}>
-                    <span className={cn(
-                      "inline-block h-4 w-4 transform rounded-full bg-white transition shadow-sm",
-                      isCertifiedOnly ? "translate-x-6" : "translate-x-1"
-                    )} />
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{t('exhibitor.list.sector')}</span>
+                    <span className="text-xs font-black uppercase tracking-widest truncate">{activeSector || t('exhibitor.list.allSectors')}</span>
                   </div>
+                  <ChevronDown className={cn("w-4 h-4 text-gray-400 transition-transform ms-4 shrink-0", isSectorOpen && "rotate-180")} />
                 </button>
-              </div>
-            </div>
-
-            {/* Ad Slot */}
-            <AdSpace 
-              type="vertical" 
-              title={i18n.language?.startsWith('ar') ? "عضو مؤسس" : "Membre fondateur"}
-              description={i18n.language?.startsWith('ar') ? "بريميوم مجاني لمدة 12 شهرًا لأول 100 مورد موثق." : "Premium offert 12 mois aux 100 premiers fournisseurs vérifiés."}
-              imageUrl="/placeholder.svg"
-              link="/tarifs"
-            />
-          </aside>
-
-          {/* Main Content */}
-          <div className="flex-1">
-            <div className={cn("flex justify-between items-center mb-8", i18n.language?.startsWith('ar') && "flex-row-reverse")}>
-               <div className={cn("flex items-center space-x-3", i18n.language?.startsWith('ar') && "space-x-reverse")}>
-                 <span className="text-[10px] font-black text-primary uppercase tracking-widest bg-white border border-border-tech px-3 py-1">
-                   {filteredCompanies.length} resultats
-                 </span>
-                 {(searchQuery || selectedSectors.length > 0 || selectedRegion !== t('common.all') || isCertifiedOnly) && (
-                   <button 
-                     onClick={() => {
-                       setSearchQuery('');
-                       setSelectedSectors([]);
-                       setSelectedRegion(t('common.all'));
-                       setIsCertifiedOnly(false);
-                     }}
-                     className="text-[10px] font-black text-secondary uppercase tracking-widest hover:underline"
-                   >
-                     Effacer les filtres
-                   </button>
-                 )}
-               </div>
-            </div>
-
-            {/* Results Grid */}
-            {isLoading ? (
-              <div className="grid grid-cols-1 gap-6">
-                {[...Array(5)].map((_, i) => <CompanySkeleton key={i} />)}
-              </div>
-            ) : isError ? (
-              <div className="bg-red-50 p-8 border border-red-100 max-w-md float-left text-center flex flex-col items-center justify-center">
-                <AlertTriangle className="w-8 h-8 text-red-500 mb-4" />
-                <h3 className="text-red-700 font-bold mb-2">{t('common.error')}</h3>
-                <p className="text-red-500 mb-4 text-sm">{t('common.error_desc')}</p>
-                <button onClick={() => refetch()} className="btn-primary py-2 px-4 flex items-center justify-center space-x-2"><RefreshCw className="w-4 h-4" /><span>{t('common.retry')}</span></button>
-              </div>
-            ) : filteredCompanies.length > 0 ? (
-              viewMode === 'list' ? (
-                <div className="grid grid-cols-1 gap-6">
-                  {filteredCompanies.map((company, index) => (
-                    <motion.div 
-                      key={company.id}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: index * 0.05 }}
-                      className="bg-white p-8 border border-border-tech hover:bg-neutral-bg transition-all group relative overflow-hidden"
-                    >
-                      {/* Technical ID Watermark */}
-                      <div className={cn("absolute text-[80px] font-black text-gray-50/50 pointer-events-none tech-mono leading-none", i18n.language?.startsWith('ar') ? "-start-4 -top-4" : "-end-4 -top-4")}>
-                        {company.id.toString().padStart(3, '0')}
-                      </div>
-
-                      <div className={cn("flex flex-col md:flex-row gap-8 relative z-10", i18n.language?.startsWith('ar') && "md:flex-row-reverse")}>
-                        <div className="w-24 h-24 bg-white border border-border-tech p-2 flex-shrink-0">
-                          <img src={company.logo} alt={company.name} className="w-full h-full object-contain grayscale group-hover:grayscale-0 transition-all" referrerPolicy="no-referrer" />
-                        </div>
-                        <div className="flex-1">
-                          <div className={cn("flex flex-col md:flex-row items-start justify-between gap-4", i18n.language?.startsWith('ar') && "md:flex-row-reverse")}>
-                            <div className={i18n.language?.startsWith('ar') ? "text-end" : ""}>
-                              <div className={cn("flex items-center space-x-3", i18n.language?.startsWith('ar') && "flex-row-reverse space-x-reverse justify-end")}>
-                                <h3 className="text-xl font-black text-primary uppercase tracking-tighter group-hover:text-secondary transition-colors">{company.name}</h3>
-                                {company.certified && (
-                                  <div className="bg-secondary/10 text-secondary px-2 py-0.5 border border-secondary/20 flex items-center space-x-1" title={t('compare.verified')}>
-                                    <Award className="h-3 w-3" />
-                                    <span className="text-[9px] font-black uppercase tracking-widest">{t('compare.verified')}</span>
-                                  </div>
-                                )}
-                              </div>
-                              <div className={cn("flex items-center space-x-6 mt-2", i18n.language?.startsWith('ar') && "flex-row-reverse space-x-reverse justify-end")}>
-                                <div className={cn("flex items-center space-x-2", i18n.language?.startsWith('ar') && "space-x-reverse")}>
-                                  <Building2 className="h-3 w-3 text-gray-400" />
-                                  <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">{company.sector}</span>
-                                </div>
-                                <div className={cn("flex items-center space-x-2", i18n.language?.startsWith('ar') && "space-x-reverse")}>
-                                  <MapPin className="h-3 w-3 text-gray-400" />
-                                  <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">{company.region}</span>
-                                </div>
-                              </div>
-                            </div>
-                            <Link to={`/directory/${generateSlugUrl(company.name, company.id)}`} aria-label={company.name} className="text-gray-300 hover:text-secondary transition-colors">
-                              <ExternalLink className="h-5 w-5" />
-                            </Link>
-                          </div>
-                          <p className={cn("text-gray-500 text-[13px] mt-4 leading-relaxed font-medium uppercase tracking-tight", i18n.language?.startsWith('ar') && "text-end")}>{company.description}</p>
-                          
-                          <div className={cn("mt-8 pt-6 border-t border-border-tech grid grid-cols-2 md:grid-cols-4 gap-6", i18n.language?.startsWith('ar') && "md:flex md:flex-row-reverse md:justify-between")}>
-                            <div className={i18n.language?.startsWith('ar') ? "text-end" : ""}>
-                              <span className="tech-label">{t('directory.id_reg')}</span>
-                              <span className="text-[11px] font-mono font-bold text-primary">{company.reference_id || '—'}</span>
-                            </div>
-                            <div className={i18n.language?.startsWith('ar') ? "text-end" : ""}>
-                              <span className="tech-label">{t('directory.workforce')}</span>
-                              <span className="text-[11px] font-mono font-bold text-primary">{company.employees}</span>
-                            </div>
-                            <div className={i18n.language?.startsWith('ar') ? "text-end" : ""}>
-                              <span className="tech-label">{t('directory.founded')}</span>
-                              <span className="text-[11px] font-mono font-bold text-primary">{company.founded}</span>
-                            </div>
-                            <div className={cn("flex items-end justify-end", i18n.language?.startsWith('ar') && "justify-start")}>
-                              <Link 
-                                to={`/directory/${generateSlugUrl(company.name, company.id)}`}
-                                className={cn("btn-primary py-2 px-4 flex items-center space-x-2", i18n.language?.startsWith('ar') && "flex-row-reverse space-x-reverse")}
-                              >
-                                <span>{t('directory.tech_sheet')}</span>
-                                <ChevronRight className={cn("h-4 w-4", i18n.language?.startsWith('ar') && "rotate-180")} />
-                              </Link>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              ) : (
-                <div className="bg-white border border-border-tech h-[700px] relative overflow-hidden group">
-                  <div className="absolute inset-0 bg-neutral-bg/50 grid grid-cols-12 grid-rows-12 pointer-events-none opacity-20">
-                    {[...Array(144)].map((_, i) => (
-                      <div key={i} className="border-[0.5px] border-gray-300" />
+                
+                {isSectorOpen && (
+                  <div className="absolute top-full start-0 z-50 w-full mt-2 bg-white rounded-xl shadow-xl border border-gray-100 py-2 overflow-hidden transform origin-top animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div className="px-4 py-2">
+                       <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{t('exhibitor.list.sectors')}</span>
+                    </div>
+                    {sectors.map(s => (
+                      <button
+                        key={s}
+                        className={cn(
+                          "w-full text-start px-4 py-3 text-xs font-bold uppercase tracking-widest hover:bg-gray-50 transition-colors flex items-center justify-between group",
+                          activeSector === s ? "text-primary bg-primary/5" : "text-gray-600"
+                        )}
+                        onClick={() => {
+                          setActiveSector(s);
+                          setIsSectorOpen(false);
+                        }}
+                      >
+                        <span className={cn(activeSector === s ? "" : "group-hover:translate-x-1 transition-transform")}>{s || t('exhibitor.list.allSectors')}</span>
+                        {activeSector === s && <Check className="w-4 h-4 text-primary" />}
+                      </button>
                     ))}
                   </div>
-
-                  {/* Algerian Map Stylized Shape (Approximation) */}
-                  <div className="absolute inset-0 flex items-center justify-center p-12">
-                  </div>
-
-                  <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                    <div className="w-64 h-[1px] bg-secondary/20 mb-8" />
-                    <h3 className="text-sm font-black text-primary uppercase tracking-[0.4em] mb-2">{t('directory.map_title')}</h3>
-                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest bg-white px-4">{t('directory.map_subtitle')}</p>
-                  </div>
-
-                  {/* Interactive Points */}
-                  {filteredCompanies.map((company, i) => (
-                    <motion.div
-                      key={company.id}
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ delay: i * 0.1 }}
-                      className="absolute group/pin cursor-pointer"
-                      style={{ left: `${company.coordinates.x}%`, top: `${company.coordinates.y}%` }}
-                    >
-                      <div className="relative">
-                        <div className="w-4 h-4 bg-secondary rounded-full animate-ping absolute -inset-0 opacity-20" />
-                        <div className="w-4 h-4 bg-primary border-2 border-white rounded-full shadow-xl relative z-10 group-hover/pin:bg-secondary transition-colors" />
-                        
-                        {/* Tooltip */}
-                        <div className="absolute bottom-full start-1/2 -translate-x-1/2 mb-4 w-48 opacity-0 group-hover/pin:opacity-100 transition-all scale-95 group-hover/pin:scale-100 pointer-events-none z-50">
-                          <div className="bg-white p-4 shadow-2xl border border-border-tech relative">
-                            <p className="text-[10px] font-black text-secondary tracking-widest uppercase mb-1">{company.region}</p>
-                            <p className="text-xs font-black text-primary uppercase truncate">{company.name}</p>
-                            <div className={cn("mt-2 flex items-center justify-between text-[8px] font-bold text-gray-400 uppercase", i18n.language?.startsWith('ar') && "flex-row-reverse")}>
-                               <span>{company.sector}</span>
-                               <ChevronRight className={cn("h-3 w-3", i18n.language?.startsWith('ar') && "rotate-180")} />
-                            </div>
-                            <div className="absolute -bottom-2 start-1/2 -translate-x-1/2 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[8px] border-t-white" />
-                          </div>
-                        </div>
-                      </div>
-                    </motion.div>
-                  ))}
-
-                  <div className={cn("absolute bottom-12", i18n.language?.startsWith('ar') ? "end-12" : "start-12")}>
-                     <div className={cn("flex items-center space-x-2 bg-white/80 backdrop-blur-md px-4 py-2 border border-border-tech", i18n.language?.startsWith('ar') && "flex-row-reverse space-x-reverse")}>
-                        <div className="w-2 h-2 bg-primary rounded-full" />
-                        <span className="text-[8px] font-black uppercase tracking-widest text-primary">{t('directory.headquarters')}</span>
-                     </div>
-                  </div>
-                  
-                  <div className={cn("absolute top-12", i18n.language?.startsWith('ar') ? "start-12 text-start" : "end-12 text-end")}>
-                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Coordonnées : 36.7538° N, 3.0588° E</p>
-                    <p className="text-[8px] text-gray-300 font-mono">MAP ENGINE V1.0 - SYNCED</p>
-                  </div>
-                </div>
-              )
-            ) : (
-              <div className="bg-gray-50 border border-gray-100 p-12 text-center rounded-2xl flex flex-col items-center">
-                <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mb-4">
-                  <Search className="w-8 h-8 text-gray-400" />
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">{t("common.no_results", "Aucun résultat trouvé")}</h3>
-                <p className="text-gray-500 mb-6">{t("common.no_results_desc", "Veuillez modifier vos critères de recherche.")}</p>
-                <button onClick={() => { setSearchQuery(""); setSelectedSectors([]); setSelectedRegion(t("common.all")); setIsCertifiedOnly(false); }} className="btn-primary py-2 px-6">
-                  {t("common.clear_filters", "Effacer les filtres")}
-                </button>
+                )}
               </div>
-            )}
+
+              <div className="relative" ref={regionRef}>
+                <button
+                  onClick={() => setIsRegionOpen(!isRegionOpen)}
+                  className="w-full sm:w-auto flex items-center justify-between bg-white px-5 py-3 rounded-xl border border-gray-100 shadow-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all cursor-pointer text-gray-800 hover:border-gray-300 min-w-[200px] text-start"
+                >
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{t('exhibitor.list.wilaya')}</span>
+                    <span className="text-xs font-black uppercase tracking-widest truncate">{activeRegion || t('exhibitor.list.allWilayas')}</span>
+                  </div>
+                  <ChevronDown className={cn("w-4 h-4 text-gray-400 transition-transform ms-4 shrink-0", isRegionOpen && "rotate-180")} />
+                </button>
+                
+                {isRegionOpen && (
+                  <div className="absolute top-full start-0 z-50 w-full mt-2 bg-white rounded-xl shadow-xl border border-gray-100 py-2 overflow-hidden transform origin-top animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div className="px-4 py-2">
+                       <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{t('exhibitor.list.wilayas')}</span>
+                    </div>
+                    {regions.map(r => (
+                      <button
+                        key={r}
+                        className={cn(
+                          "w-full text-start px-4 py-3 text-xs font-bold uppercase tracking-widest hover:bg-gray-50 transition-colors flex items-center justify-between group",
+                          activeRegion === r ? "text-primary bg-primary/5" : "text-gray-600"
+                        )}
+                        onClick={() => {
+                          setActiveRegion(r);
+                          setIsRegionOpen(false);
+                        }}
+                      >
+                        <span className={cn(activeRegion === r ? "" : "group-hover:translate-x-1 transition-transform")}>{r || t('exhibitor.list.allWilayas')}</span>
+                        {activeRegion === r && <Check className="w-4 h-4 text-primary" />}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+
+            </div>
           </div>
         </div>
+
+        {/* Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+          {isLoading ? (
+            Array.from({ length: 8 }).map((_, i) => (
+              <CompanySkeleton key={i} />
+            ))
+          ) : error ? (
+            <div className="col-span-full text-center py-12">
+              <p className="text-red-500 font-bold">{error}</p>
+            </div>
+          ) : filteredExhibitors.length === 0 ? (
+            <div className="col-span-full text-center py-12 bg-white rounded-2xl p-8 border border-gray-100">
+              <p className="text-gray-400 font-bold">{t('exhibitor.list.none')}</p>
+            </div>
+          ) : (
+            paginatedExhibitors.map((exhibitor: any, idx) => (
+              <motion.div 
+                key={exhibitor.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: idx * 0.1 }}
+                className="bg-white rounded-2xl p-6 border border-gray-100 hover:shadow-2xl hover:border-secondary/20 transition-all group flex flex-col justify-between"
+              >
+                <div>
+                  <div className="flex items-start justify-between mb-5">
+                    <div className="w-16 h-16 rounded-xl bg-gray-50 border border-gray-100 p-2 overflow-hidden group-hover:scale-105 transition-transform">
+                      <img src={exhibitor.logo} alt={exhibitor.name} className="w-full h-full object-contain" />
+                    </div>
+                    {exhibitor.verified && (
+                      <span className="flex items-center gap-1 text-success text-[9px] font-black uppercase tracking-widest">
+                        <ShieldCheck className="h-4 w-4" />
+                        {t('compare.verified')}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="mb-5">
+                    {exhibitor.sector && <p className="text-[10px] font-black text-secondary uppercase tracking-[0.2em] mb-1">{exhibitor.sector}</p>}
+                    <h3 className="text-lg font-black text-primary uppercase tracking-tight group-hover:text-secondary transition-colors mb-2 line-clamp-1">
+                      {exhibitor.name}
+                    </h3>
+                    {exhibitor.location && (
+                      <div className="flex items-center text-gray-400 mb-1">
+                        <MapPin className="h-3.5 w-3.5 me-2 shrink-0 text-secondary" />
+                        <span className="text-[10px] font-bold uppercase tracking-widest truncate">{exhibitor.location}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div>
+                  {exhibitor.description && (
+                    <p className="mb-5 pt-4 border-t border-gray-50 text-xs text-gray-500 line-clamp-3">{exhibitor.description}</p>
+                  )}
+
+                  <div className="flex gap-3">
+                    <Link to={`/directory/${generateSlugUrl(exhibitor.name, String(exhibitor.id))}`} className="flex-1 py-3 bg-primary text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-secondary transition-all flex items-center justify-center space-x-2 shadow-lg group">
+                      <span>{t('exhibitor.list.visit')}</span>
+                      <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform rtl:rotate-180" />
+                    </Link>
+                    <Link to={`/directory/${generateSlugUrl(exhibitor.name, String(exhibitor.id))}`} aria-label={t('common.contact_supplier')} className="w-12 h-12 bg-gray-50 text-gray-400 rounded-xl flex items-center justify-center hover:text-secondary hover:bg-secondary/5 transition-all shrink-0">
+                      <MessageSquare className="h-4 w-4" />
+                    </Link>
+                  </div>
+                </div>
+              </motion.div>
+            ))
+          )}
+        </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="mt-12 flex justify-center items-center space-x-2">
+            <button
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className="p-3 bg-white text-primary border border-gray-100 rounded-xl hover:text-secondary hover:border-secondary/20 hover:shadow-md disabled:opacity-40 disabled:hover:text-primary disabled:hover:border-gray-100 disabled:hover:shadow-none transition-all cursor-pointer disabled:cursor-not-allowed"
+            >
+              <ChevronLeft className="h-4 w-4 rtl:rotate-180" />
+            </button>
+
+            {(() => {
+              const range = [];
+              const rangeWithDots = [];
+              let l;
+
+              for (let i = 1; i <= totalPages; i++) {
+                if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+                  range.push(i);
+                }
+              }
+
+              for (const i of range) {
+                if (l) {
+                  if (i - l === 2) {
+                    rangeWithDots.push(l + 1);
+                  } else if (i - l > 2) {
+                    rangeWithDots.push('...');
+                  }
+                }
+                rangeWithDots.push(i);
+                l = i;
+              }
+
+              return rangeWithDots.map((page, index) => {
+                if (page === '...') {
+                  return (
+                    <span key={`dots-${index}`} className="px-3 py-2 text-gray-400 font-bold select-none">
+                      .....
+                    </span>
+                  );
+                }
+
+                return (
+                  <button
+                    key={page}
+                    onClick={() => {
+                      setCurrentPage(page as number);
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                    className={cn(
+                      "px-4 py-2.5 rounded-xl text-xs font-black transition-all cursor-pointer",
+                      currentPage === page
+                        ? "bg-secondary text-white"
+                        : "bg-white text-primary border border-gray-100 hover:text-secondary hover:border-secondary/20 hover:shadow-md"
+                    )}
+                  >
+                    {page}
+                  </button>
+                );
+              });
+            })()}
+
+            <button
+              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+              className="p-3 bg-white text-primary border border-gray-100 rounded-xl hover:text-secondary hover:border-secondary/20 hover:shadow-md disabled:opacity-40 disabled:hover:text-primary disabled:hover:border-gray-100 disabled:hover:shadow-none transition-all cursor-pointer disabled:cursor-not-allowed"
+            >
+              <ChevronRight className="h-4 w-4 rtl:rotate-180" />
+            </button>
+          </div>
+        )}
+
+        {/* CTA Section */}
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          className="mt-20 bg-primary rounded-2xl p-12 text-white relative overflow-hidden text-center"
+        >
+          <div className="absolute inset-0 opacity-5" 
+               style={{ backgroundImage: 'radial-gradient(#fff 1.5px, transparent 1.5px)', backgroundSize: '32px 32px' }} />
+          
+          <div className="relative z-10 max-w-2xl mx-auto">
+            <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tighter mb-6">
+              {t('exhibitor.list.ctaTitle')}
+            </h2>
+            <p className="text-white/60 font-medium mb-10 text-lg">
+              {t('exhibitor.list.ctaText')}
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Link to="/register?role=fournisseur" className="btn-secondary px-12 py-5 rounded-2xl text-sm font-black uppercase tracking-widest shadow-2xl">
+                {t('exhibitor.list.ctaButton')}
+              </Link>
+              <Link to="/tarifs" className="bg-white/10 border border-white/20 px-12 py-5 rounded-2xl text-sm font-black uppercase tracking-widest hover:bg-white/20 transition-all flex items-center justify-center">
+                {t('exhibitor.list.ctaPricing')}
+              </Link>
+            </div>
+          </div>
+        </motion.div>
       </div>
     </div>
     </>

@@ -580,8 +580,8 @@ const Dashboard = () => {
               </button>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              <div className="lg:col-span-2 space-y-6">
+            <div className="max-w-4xl">
+              <div className="space-y-6">
                 <h4 className="font-bold text-primary text-lg">{t('dashboard.ads.activeTitle')}</h4>
                 <div className="bg-white p-12 text-center rounded-3xl border border-dashed border-gray-200">
                    <div className="bg-gray-50 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4">
@@ -595,29 +595,11 @@ const Dashboard = () => {
                    <h5 className="font-bold text-primary mb-2">{t('dashboard.ads.whyTitle')}</h5>
                    <ul className="space-y-2 text-sm text-gray-700">
                       <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" /> {t('dashboard.ads.why1')}</li>
-                      <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" /> {t('dashboard.ads.why2')}</li>
                       <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" /> {t('dashboard.ads.why3')}</li>
                    </ul>
                 </div>
               </div>
               
-              <div className="space-y-6">
-                 <h4 className="font-bold text-primary text-lg">{t('dashboard.ads.stats')}</h4>
-                 <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm space-y-4">
-                    <div className="flex items-center justify-between pb-4 border-b border-gray-50">
-                       <span className="text-sm text-gray-500 font-bold">{t('dashboard.ads.views')}</span>
-                       <span className="font-black text-primary">0</span>
-                    </div>
-                    <div className="flex items-center justify-between pb-4 border-b border-gray-50">
-                       <span className="text-sm text-gray-500 font-bold">{t('dashboard.ads.clicks')}</span>
-                       <span className="font-black text-primary">0</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                       <span className="text-sm text-gray-500 font-bold">{t('dashboard.ads.ctr')}</span>
-                       <span className="font-black text-primary">0.0%</span>
-                    </div>
-                 </div>
-              </div>
             </div>
           </motion.div>
         );

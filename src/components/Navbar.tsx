@@ -6,6 +6,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { cn } from '../lib/utils';
 import SearchModal from './SearchModal';
+import { productCategories } from '../data/productCategories';
 
 const Navbar = () => {
   const { t, i18n } = useTranslation();
@@ -54,49 +55,45 @@ const Navbar = () => {
     { label: t('nav.my_profile'), path: '/dashboard', icon: UserCircle },
     { label: t('nav.subscription'), path: '/dashboard?tab=subscription', icon: Award },
     { label: t('nav.favorites'), path: '/favorites', icon: Zap },
+    // La console n'est plus liée depuis le pied de page public.
+    ...(user?.role === 'admin' ? [{ label: t('nav.adminConsole'), path: '/extranet', icon: ShieldCheck }] : []),
   ];
 
   const languages = [
-    { code: 'fr', name: 'Français', flag: 'https://flagcdn.com/w20/fr.png' },
-    { code: 'en', name: 'English', flag: 'https://flagcdn.com/w20/gb.png' },
-    { code: 'ar', name: 'العربية', flag: 'https://flagcdn.com/w20/dz.png' }
+    { code: 'fr', name: 'Français', short: 'FR' },
+    { code: 'en', name: 'English', short: 'EN' },
+    { code: 'ar', name: 'العربية', short: 'ع' }
   ];
 
   const currentLang = languages.find(l => i18n.language?.startsWith(l.code)) || languages[0];
 
   const navItems = [
     { name: t('nav.products'), path: '/products', hasMega: true, icon: Package },
-    { name: t('nav.exhibitors'), path: '/exhibitors', icon: BookOpen },
+    { name: t('nav.suppliers'), path: '/directory', icon: BookOpen },
     { name: t('nav.news'), path: '/blog', icon: Newspaper },
     { name: t('nav.resources'), path: '/resources', icon: Library },
     { name: t('nav.pricing'), path: '/tarifs', icon: Award },
   ];
 
-  const categories = [
-    { name: t('categories.agrifood'), val: 'Agroalimentaire', icon: Package },
-    { name: t('categories.btph'), val: 'BTPH', icon: HardHat },
-    { name: t('categories.chemistry'), val: 'Chimie & Pétrochimie', icon: Beaker },
-    { name: t('categories.energy'), val: 'Énergie & Mines', icon: Zap },
-    { name: t('categories.pharma'), val: 'Industrie Pharmaceutique', icon: Pill },
-    { name: t('categories.metallurgy'), val: 'Métallurgie & Mécanique', icon: Wrench },
-    { name: t('categories.plastics'), val: 'Plasturgie & Caoutchouc', icon: Recycle },
-    { name: t('categories.textile'), val: 'Textile & Cuir', icon: Shirt },
-    { name: t('categories.electronics'), val: 'Électronique & Électroménager', icon: Cpu },
-    { name: t('categories.auto'), val: 'Automobile & Transport', icon: Car },
-    { name: t('categories.renewable'), val: 'Énergies Renouvelables', icon: Leaf },
-  ];
+  // Groupes de la nomenclature des produits (même libellé que le filtre du catalogue).
+  const groupIcons: Record<string, React.ElementType> = { A: Package, B: Wrench, C: Cpu, D: Truck, E: HardHat };
+  const categories = productCategories.map((group) => ({
+    name: t(`productCategories.${group.id}`),
+    val: group.name,
+    icon: groupIcons[group.id] || Package,
+  }));
 
   return (
     <nav className={cn("bg-[#1a1a1a] text-white sticky top-0 z-50 border-b border-white/[0.05] shadow-2xl", i18n.language?.startsWith('ar') && "font-arabic")}>
       <div className="max-w-[1780px] mx-auto px-4 sm:px-6 lg:px-8">
-        <div className={cn("flex justify-between h-24 items-center gap-4 lg:gap-6", i18n.language?.startsWith('ar') && "flex-row-reverse")}>
-          <div className={cn("flex items-center space-x-4 lg:space-x-6", i18n.language?.startsWith('ar') && "space-x-reverse")}>
+        <div className={cn("flex justify-between h-24 items-center gap-4 lg:gap-6")}>
+          <div className={cn("flex items-center space-x-4 lg:space-x-6")}>
             {/* Logo */}
             <Link to="/" onClick={handleLogoClick} className="flex items-center space-x-3 group min-w-max">
               <div className="w-11 h-11 bg-gradient-to-br from-secondary to-secondary/80 rounded-xl flex items-center justify-center group-hover:rotate-12 transition-all duration-500 shadow-lg">
                 <Globe className="h-7 w-7 text-white" />
               </div>
-              <div className={cn("hidden lg:block", i18n.language?.startsWith('ar') && "text-end")}>
+              <div className={cn("hidden lg:block")}>
                 <span className="text-[11px] font-black uppercase tracking-[0.2em] text-white/20 leading-none">ALGERIA</span>
                 <p className="text-base font-black uppercase tracking-tight text-white leading-none mt-0.5 group-hover:text-secondary transition-colors">INDUSTRY</p>
               </div>
@@ -106,8 +103,7 @@ const Navbar = () => {
             <div 
               onClick={() => setIsSearchOpen(true)}
               className={cn(
-                "hidden xl:flex items-center space-x-3 px-4 py-2.5 bg-white/[0.03] border border-white/5 rounded-2xl cursor-pointer hover:bg-white/[0.08] hover:border-white/20 transition-all w-48 2xl:w-[280px] group/search shrink-0",
-                i18n.language?.startsWith('ar') && "flex-row-reverse space-x-reverse"
+                "hidden xl:flex items-center space-x-3 px-4 py-2.5 bg-white/[0.03] border border-white/5 rounded-2xl cursor-pointer hover:bg-white/[0.08] hover:border-white/20 transition-all w-48 2xl:w-[280px] group/search shrink-0"
               )}
             >
               <Search className="h-3.5 w-3.5 text-white/20 group-hover/search:text-secondary transition-colors" />
@@ -116,7 +112,7 @@ const Navbar = () => {
           </div>
 
           {/* Desktop Menu */}
-          <div className={cn("hidden lg:flex items-center space-x-0.5", i18n.language?.startsWith('ar') && "space-x-reverse")}>
+          <div className={cn("hidden lg:flex items-center space-x-0.5")}>
             {navItems.map((item) => (
               <div 
                 key={item.path}
@@ -134,7 +130,7 @@ const Navbar = () => {
                     i18n.language?.startsWith('ar') && "font-bold tracking-normal text-xs"
                   )}
                 >
-                  <item.icon className={cn("h-4 w-4 transition-all duration-500 group-hover:scale-125", location.pathname === item.path ? "text-[#1a1a1a] scale-110" : "text-secondary/60 group-hover:text-secondary")} />
+                  <item.icon className={cn("hidden 2xl:block h-4 w-4 transition-all duration-500 group-hover:scale-125", location.pathname === item.path ? "text-[#1a1a1a] scale-110" : "text-secondary/60 group-hover:text-secondary")} />
                   <span className="relative z-10 uppercase">{item.name}</span>
                   {item.hasMega && <ChevronDown className={cn("h-3 w-3 transition-transform duration-300 ms-1", location.pathname === item.path ? "text-[#1a1a1a]" : "group-hover:text-secondary", showMegaMenu && "rotate-180")} />}
                 </Link>
@@ -149,11 +145,11 @@ const Navbar = () => {
                       exit={{ opacity: 0, y: 10 }}
                       className={cn(
                         "absolute top-full w-[400px] bg-[#222] text-white shadow-2xl border border-white/10 overflow-hidden rounded-2xl mt-2",
-                        i18n.language?.startsWith('ar') ? "end-0" : "start-0"
+                        "start-0"
                       )}
                     >
                       <div className="p-2">
-                        <div className={cn("px-4 py-2 mb-1", i18n.language?.startsWith('ar') && "text-end")}>
+                        <div className={cn("px-4 py-2 mb-1")}>
                            <p className="text-[8px] font-black text-white/30 uppercase tracking-[0.2em]">{t('nav.browse_industries')}</p>
                         </div>
                         <div className="grid grid-cols-1">
@@ -163,11 +159,10 @@ const Navbar = () => {
                                 to={`/products?category=${encodeURIComponent(cat.val)}`}
                                 onClick={() => setShowMegaMenu(false)}
                                 className={cn(
-                                  "flex items-center justify-between px-5 py-3 hover:bg-white/5 rounded-xl transition-colors group",
-                                  i18n.language?.startsWith('ar') && "flex-row-reverse"
+                                  "flex items-center justify-between px-5 py-3 hover:bg-white/5 rounded-xl transition-colors group"
                                 )}
                               >
-                                <div className={cn("flex items-center space-x-3", i18n.language?.startsWith('ar') && "space-x-reverse")}>
+                                <div className={cn("flex items-center space-x-3")}>
                                   <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center group-hover:bg-secondary/20 transition-colors">
                                     <cat.icon className="h-4 w-4 text-white/20 group-hover:text-secondary" />
                                   </div>
@@ -178,7 +173,7 @@ const Navbar = () => {
                                 </div>
                                 <ChevronRight className={cn(
                                   "h-3 w-3 text-white/10 group-hover:text-secondary transition-transform",
-                                  i18n.language?.startsWith('ar') ? "rotate-180 group-hover:-translate-x-1" : "group-hover:translate-x-1"
+                                  "rtl:rotate-180 group-hover:translate-x-1 rtl:group-hover:-translate-x-1"
                                 )} />
                               </Link>
                             ))}
@@ -212,8 +207,7 @@ const Navbar = () => {
                   onClick={() => setShowLang(!showLang)}
                   className="flex items-center space-x-2 transition-all text-[9px] font-black uppercase tracking-widest text-white/40 hover:text-white cursor-pointer"
                 >
-                  <img src={currentLang.flag} alt={currentLang.code} className="w-4 h-auto rounded-[2px] opacity-60 group-hover/lang:opacity-100 transition-opacity" />
-                  <span className="text-[9px] hidden xl:inline">{currentLang.name.substring(0, 3)}</span>
+                  <span className="text-[10px] font-black text-white/70" aria-label={currentLang.name}>{currentLang.short}</span>
                   <ChevronDown className={cn("h-3 w-3 text-secondary/40 group-hover/lang:text-secondary transition-all", showLang && "rotate-180")} />
                 </button>
                 
@@ -237,7 +231,7 @@ const Navbar = () => {
                             i18n.language?.startsWith(lang.code) ? "text-secondary bg-white/5" : "text-white/60"
                           )}
                         >
-                          <img src={lang.flag} alt={lang.code} className="w-4 h-auto rounded-sm" />
+                          <span className="w-5 text-center text-[10px] font-black">{lang.short}</span>
                           <span>{lang.name}</span>
                         </button>
                       ))}
@@ -264,7 +258,7 @@ const Navbar = () => {
                       exit={{ opacity: 0, y: 10, scale: 0.95 }}
                       className={cn(
                         "absolute top-full mt-4 w-72 bg-[#1a1a1a] border border-white/10 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] p-2 z-50",
-                        i18n.language?.startsWith('ar') ? "start-0" : "end-0"
+                        "end-0"
                       )}
                     >
                       <div className="p-4 mb-2 bg-white/5 rounded-xl border border-white/5">

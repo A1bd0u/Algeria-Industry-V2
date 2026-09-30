@@ -4,24 +4,19 @@
     "directory": "Annuaire",
     "products": "Produits",
     "catalogues": "Catalogues",
-    "rfq": "Appels d'offres",
     "news": "Actualités",
-    "emagazine": "E-Magazine",
-    "tenders": "Appels d'offres",
     "events": "Événements",
-    "virtual_show": "Salons virtuels",
     "resources": "Ressources",
     "login": "Connexion",
     "register": "S'inscrire",
     "browse_industries": "Parcourir les Industries",
-    "become_exposant": "Devenir Exposant",
+    "become_exposant": "Devenir fournisseur",
     "my_profile": "Mon profil",
     "subscription": "Mon abonnement",
     "favorites": "Mes favoris",
     "requests": "Mes demandes",
     "logout": "Déconnexion",
     "settings": "Paramètres",
-    "exhibitors": "Exposants",
     "pricing": "Tarifs",
     "searchShort": "Rechercher...",
     "workspace": "Espace industriel",
@@ -29,6 +24,8 @@
     "memberSpace": "Espace membre",
     "openMenu": "Ouvrir le menu",
     "closeMenu": "Fermer le menu",
+    "suppliers": "Fournisseurs",
+    "adminConsole": "Console d'administration",
     "console_pro": "Espace administrateur"
   },
   "hero": {
@@ -36,10 +33,6 @@
     "subtitle": "La première plateforme B2B dédiée aux fournisseurs et acheteurs industriels en Algérie.",
     "search_placeholder": "Rechercher une entreprise, un produit...",
     "search_btn": "Rechercher"
-  },
-  "topbar": {
-    "become_exhibitor": "DEVENIR EXPOSANT",
-    "my_account": "MON COMPTE"
   },
   "categories": {
     "title": "Parcourir par catégorie",
@@ -57,8 +50,8 @@
     "renewable": "Énergies Renouvelables"
   },
   "home": {
-    "trends": "TENDANCES INDUSTRIELLES",
-    "trends_subtitle": "DURABILITÉ ET INNOVATION DANS L'INDUSTRIE",
+    "trends": "Derniers produits publiés",
+    "trends_subtitle": "Par les fournisseurs inscrits sur la plateforme",
     "featured_products": "Produits à la Une",
     "featured_subtitle": "Une sélection des meilleurs équipements disponibles actuellement.",
     "sectors": "Secteurs d'activité",
@@ -110,6 +103,16 @@
       "title": "Prêt à démarrer ?",
       "text": "Créez votre compte gratuitement",
       "button": "Créer mon profil fournisseur"
+    },
+    "hero": {
+      "eyebrow": "Fournisseurs industriels vérifiés",
+      "title": "Trouvez le bon fournisseur industriel en Algérie",
+      "subtitle": "Entreprises dont le registre du commerce et le NIF sont contrôlés, catalogue de produits et contact direct par messagerie ou WhatsApp.",
+      "searchLabel": "Rechercher un produit ou une entreprise",
+      "searchPlaceholder": "Produit, machine, entreprise…",
+      "browseSuppliers": "Parcourir les fournisseurs",
+      "listCompany": "Référencer mon entreprise gratuitement",
+      "founder": "Premium offert 12 mois aux 100 premiers fournisseurs vérifiés."
     }
   },
   "directory": {
@@ -178,32 +181,8 @@
       "reportSent": "Signalement envoyé. Merci, notre équipe va l'examiner.",
       "reportError": "Le signalement n'a pas pu être envoyé.",
       "favoriteError": "Impossible de mettre à jour vos favoris."
-    }
-  },
-  "rfq": {
-    "title": "Demande de Devis (RFQ)",
-    "subtitle": "OPTIMISEZ VOS ACHATS INDUSTRIELS EN SOUMETTANT VOTRE DEMANDE DE COTATION À NOTRE RÉSEAU DE FOURNISSEURS QUALIFIÉS.",
-    "label": "Sourcing Industriel",
-    "company_info": "Informations Entreprise",
-    "company_name": "Nom de l'entreprise",
-    "industry_sector": "Secteur d'activité",
-    "select": "SÉLECTIONNER",
-    "contact_info": "Coordonnées du Responsable",
-    "full_name": "Nom complet",
-    "pro_email": "Email professionnel",
-    "equipment_details": "Détails de l'Équipement",
-    "product_name": "Nom du produit / machine",
-    "quantity": "Quantité estimée",
-    "tech_desc": "Description technique détaillée",
-    "tech_desc_placeholder": "SPÉCIFICATIONS TECHNIQUES, NORMES, CERTIFICATIONS REQUISES...",
-    "submit": "SOUMETTRE LA DEMANDE DE COTATION",
-    "success_title": "Demande Envoyée",
-    "success_text": "VOTRE DEMANDE DE DEVIS (RFQ) A ÉTÉ ENREGISTRÉE DANS NOTRE SYSTÈME TECHNIQUE. UN CONSEILLER PRENDRA CONTACT AVEC VOUS SOUS 24H.",
-    "ref_label": "RÉFÉRENCE DE LA DEMANDE",
-    "new_request": "NOUVELLE DEMANDE",
-    "process_title": "Processus de Cotation",
-    "help": "Besoin d'aide ?",
-    "garantees": "Garanties B2B"
+    },
+    "searchPlaceholder": "Rechercher une machine, une marque…"
   },
   "blog": {
     "title": "Actualités Industrielles",
@@ -240,12 +219,17 @@
     "noFile": "Document non disponible"
   },
   "footer": {
-    "about": "À Propos",
-    "about_text": "PORTAIL TECHNIQUE DE RÉFÉRENCE POUR L'ÉCOSYSTÈME INDUSTRIEL ALGÉRIEN. CONNECTER, INNOVER ET DÉVELOPPER.",
-    "links": "Liens Utiles",
+    "about_text": "La place de marché B2B des fournisseurs industriels algériens vérifiés.",
     "support": "Support & Accompagnement",
     "contact": "Contactez-nous",
-    "copyright": "© 2026 ALGERIA INDUSTRY"
+    "platform": "Plateforme",
+    "compare": "Comparer des produits",
+    "advertise": "Annoncer sur le site",
+    "resourceCenter": "Centre de ressources",
+    "contactTitle": "Contact",
+    "legal": "Mentions légales",
+    "privacy": "Confidentialité",
+    "cookies": "Cookies"
   },
   "common": {
     "compare": "Comparer",
@@ -269,9 +253,6 @@
     "no_results_desc": "Modifiez vos filtres ou votre recherche.",
     "retry": "Réessayer",
     "search": "Rechercher"
-  },
-  "hero_slider": {
-    "tech_spec": "Spécification Technique"
   },
   "search": {
     "results_for": "Résultats pour",
@@ -301,23 +282,31 @@
     "contact_support": "contactez notre équipe"
   },
   "faq": {
-    "title": "Questions Fréquentes",
-    "subtitle": "Support Industriel",
-    "need_help": "Besoin d'aide personnalisée ?",
-    "help_desc": "Nos experts industriels sont à votre disposition.",
-    "call_expert": "Appel Expert",
-    "send_ticket": "Envoyer Ticket",
+    "title": "Questions fréquentes",
+    "subtitle": "Aide",
+    "need_help": "Vous ne trouvez pas votre réponse ?",
+    "help_desc": "Notre équipe vous répond par e-mail sous 48 h ouvrées.",
+    "call_expert": "Appeler le support",
+    "send_ticket": "Nous écrire",
     "search_placeholder": "Rechercher une question...",
-    "q1": "Comment fonctionne le salon virtuel ?",
-    "a1": "Notre salon virtuel utilise une interface immersive 2.5D qui vous permet de naviguer entre différents halls thématiques. Vous pouvez cliquer sur un stand pour voir les machines en détail, télécharger des catalogues et discuter en direct avec les exposants.",
-    "q2": "Le site est-il gratuit pour les visiteurs ?",
-    "a2": "Oui, l'accès au catalogue et la visite du salon virtuel sont totalement gratuits pour tous les professionnels. Une inscription est toutefois nécessaire pour contacter les exposants ou sauvegarder des favoris.",
-    "q3": "Comment ajouter mes produits au catalogue ?",
-    "a3": "Une fois votre abonnement Premium ou Business activé, rendez-vous dans votre Dashboard section 'Mes Produits'. Vous pourrez y importer vos fiches techniques et photos.",
-    "q4": "Quelles sont les options de paiement ?",
-    "a4": "Nous acceptons les virements bancaires (RIB), le paiement par CIB/Edahabia, et les chèques de banque pour les entreprises locales.",
+    "q1": "Qu'est-ce qu'Algeria Industry ?",
+    "a1": "Un annuaire et un catalogue en ligne des fournisseurs industriels algériens. Les acheteurs y trouvent des entreprises vérifiées et leurs produits, et les contactent directement.",
+    "q2": "Le site est-il gratuit pour les acheteurs ?",
+    "a2": "Oui. Consulter le catalogue, comparer des produits et contacter un fournisseur est gratuit. Un compte est nécessaire pour la messagerie et les favoris.",
+    "q3": "Que signifie « entreprise vérifiée » ?",
+    "a3": "L'entreprise a transmis son registre du commerce et son NIF, et notre équipe les a contrôlés. Ce badge confirme son existence légale ; il ne garantit pas la qualité des produits : vérifiez toujours le devis et les conditions de vente.",
+    "q4": "Comment contacter un fournisseur ?",
+    "a4": "Depuis la fiche d'un produit ou d'une entreprise : par la messagerie de la plateforme, ou par WhatsApp si le fournisseur l'a renseigné. Depuis le comparateur, vous pouvez aussi envoyer une demande de devis à plusieurs fournisseurs à la fois.",
     "cat_general": "Général",
-    "cat_exhibitor": "Exposants"
+    "cat_exhibitor": "Fournisseurs",
+    "q5": "Comment inscrire mon entreprise ?",
+    "a5": "Créez un compte « Fournisseur », confirmez votre adresse e-mail, puis déposez votre registre du commerce et votre NIF depuis votre tableau de bord. Une fois le dossier validé, vous pouvez publier vos produits.",
+    "q6": "Combien de produits puis-je publier ?",
+    "a6": "5 avec l'offre gratuite, 15 avec l'offre Basic et sans limite avec l'offre Pro. Le détail est sur la page Tarifs.",
+    "q7": "Quels sont les moyens de paiement ?",
+    "a7": "Les abonnements sont facturés en dinars, TVA comprise. Vous payez par virement bancaire ou par chèque sur facture, ou en ligne par carte CIB / Edahabia lorsque ce moyen est proposé.",
+    "q8": "Comment suis-je informé de la validation de mon dossier ?",
+    "a8": "Notre équipe examine chaque dossier et vous prévient par e-mail de sa décision. En cas de refus, le motif est indiqué pour que vous puissiez corriger et renvoyer vos documents."
   },
   "kyc": {
     "status_pending": "En attente",
@@ -372,7 +361,7 @@
   },
   "auth": {
     "captchaRequired": "Veuillez valider le captcha pour continuer.",
-    "captchaMissingConfig": "Erreur de configuration : VITE_TURNSTILE_SITE_KEY manquant",
+    "captchaMissingConfig": "Vérification anti-robot indisponible. Réessayez plus tard ou contactez-nous.",
     "genericError": "Une erreur est survenue. Veuillez réessayer.",
     "networkError": "Erreur réseau. Vérifiez votre connexion.",
     "email": "Adresse e-mail",
@@ -421,20 +410,18 @@
       "invalid": "Code incorrect."
     },
     "register": {
-      "asideTitle": "Rejoignez le réseau industriel leader",
-      "benefitTendersTitle": "Appels d'offres exclusifs",
-      "benefitTendersText": "Accédez à des centaines d'opportunités B2B qualifiées.",
+      "asideTitle": "Rejoignez les industriels algériens",
       "benefitVisibilityTitle": "Visibilité accrue",
-      "benefitVisibilityText": "Présentez vos produits à des milliers d'acheteurs professionnels.",
+      "benefitVisibilityText": "Présentez vos produits aux acheteurs professionnels qui consultent la plateforme.",
       "benefitNetworkTitle": "Réseautage qualifié",
       "benefitNetworkText": "Entrez en contact direct avec les décideurs de l'industrie.",
       "kycBadge": "Fiches fournisseurs vérifiées par KYC",
       "chooseTitle": "Comment souhaitez-vous utiliser la plateforme ?",
       "chooseText": "Choisissez votre profil principal. Vous pourrez toujours accéder aux autres fonctionnalités plus tard.",
       "buyerTitle": "Je suis un Acheteur",
-      "buyerText": "Je cherche des fournisseurs et je publie des appels d'offres.",
+      "buyerText": "Je cherche des fournisseurs et je demande des devis.",
       "supplierTitle": "Je suis un Fournisseur",
-      "supplierText": "Je propose mes produits/services et réponds aux offres.",
+      "supplierText": "Je propose mes produits ou services et je réponds aux demandes des acheteurs.",
       "continue": "Continuer",
       "backToProfile": "Retour au choix du profil",
       "formTitle": "Créer votre compte",
@@ -451,7 +438,9 @@
       "submitBuyer": "Créer mon compte acheteur",
       "submitSupplier": "Créer mon compte fournisseur",
       "alreadyMember": "Déjà membre ?",
-      "signIn": "Connectez-vous"
+      "signIn": "Connectez-vous",
+      "benefitVerifiedTitle": "Entreprises vérifiées",
+      "benefitVerifiedText": "Chaque entreprise signalée comme vérifiée a transmis son registre du commerce et son NIF."
     },
     "forgot": {
       "back": "Retour à la connexion",
@@ -765,12 +754,7 @@
       "noneText": "Vous n'avez pas de publicité active actuellement.",
       "whyTitle": "Pourquoi annoncer ici ?",
       "why1": "Touchez des acheteurs industriels ciblés",
-      "why2": "Augmentez vos chances de remporter des appels d'offres",
-      "why3": "Bannières affichées en page d'accueil et dans l'annuaire",
-      "stats": "Statistiques",
-      "views": "Vues (30 j)",
-      "clicks": "Clics (30 j)",
-      "ctr": "Taux de clic"
+      "why3": "Bannière affichée sur la page d'accueil"
     },
     "statsSoon": {
       "title": "Statistiques bientôt disponibles",
@@ -1053,8 +1037,8 @@
     "start": "Commencer",
     "comparePlans": "Comparer les offres en détail",
     "list": {
-      "label": "Annuaire des entreprises",
-      "title": "Exposants et partenaires",
+      "label": "Entreprises inscrites",
+      "title": "Annuaire des fournisseurs",
       "subtitle": "Découvrez les entreprises industrielles inscrites sur Algeria Industry et contactez-les directement.",
       "loadError": "Impossible de charger les entreprises.",
       "searchPlaceholder": "Rechercher une entreprise par nom ou activité…",

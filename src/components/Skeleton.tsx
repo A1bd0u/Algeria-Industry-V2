@@ -31,23 +31,6 @@ export const CompanySkeleton = () => (
   </div>
 );
 
-export const TenderSkeleton = () => (
-  <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-4 animate-pulse">
-    <div className="flex justify-between items-start">
-      <div className="space-y-2 flex-1">
-        <Skeleton className="h-6 w-3/4" />
-        <Skeleton className="h-4 w-1/4" />
-      </div>
-      <Skeleton className="h-6 w-24 rounded-full" />
-    </div>
-    <Skeleton className="h-4 w-full" />
-    <div className="flex justify-between items-center pt-4 border-t border-gray-50">
-      <Skeleton className="h-4 w-32" />
-      <Skeleton className="h-5 w-24" />
-    </div>
-  </div>
-);
-
 export const EventSkeleton = () => (
   <div className="bg-white rounded-[32px] overflow-hidden shadow-sm border border-gray-100 flex flex-col md:flex-row animate-pulse">
     <div className="md:w-2/5 h-48 md:h-auto bg-gray-50 relative">
@@ -231,39 +214,6 @@ export const ProductDetailSkeleton = () => (
             <Skeleton className="h-6 w-full" />
             <Skeleton className="h-32 w-full" />
           </div>
-        </div>
-      </div>
-    </div>
-  </div>
-);
-
-export const TenderDetailSkeleton = () => (
-  <div className="bg-neutral-bg min-h-screen pb-20 animate-pulse">
-    <div className="bg-white border-b border-gray-200 py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <Skeleton className="h-4 w-32 mb-8" />
-        <div className="flex flex-col md:flex-row justify-between items-start gap-8">
-          <div className="space-y-4 flex-1">
-            <Skeleton className="h-6 w-32" />
-            <Skeleton className="h-10 w-full max-w-2xl" />
-            <div className="flex space-x-4">
-              <Skeleton className="h-4 w-24" />
-              <Skeleton className="h-4 w-24" />
-              <Skeleton className="h-4 w-24" />
-            </div>
-          </div>
-          <Skeleton className="h-16 w-32 rounded-xl" />
-        </div>
-      </div>
-    </div>
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-        <div className="lg:col-span-2 space-y-8">
-          <Skeleton className="h-64 w-full rounded-3xl" />
-          <Skeleton className="h-40 w-full rounded-3xl" />
-        </div>
-        <div className="space-y-8">
-          <Skeleton className="h-80 w-full rounded-3xl" />
         </div>
       </div>
     </div>

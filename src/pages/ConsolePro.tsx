@@ -140,7 +140,7 @@ const ConsolePro = () => {
             { label: 'Utilisateurs Plateforme', value: data.kpis.total_users || 0, trend: data.trends?.users || '0%', icon: Users, color: 'text-blue-600', bg: 'bg-blue-50', link: 'gov-users', tooltip: 'Nombre total d\'inscrits' },
             { label: 'Entreprises Validées', value: data.kpis.approved_companies || 0, trend: data.trends?.companies || '0%', icon: Building2, color: 'text-emerald-600', bg: 'bg-emerald-50', link: 'gov-companies', tooltip: 'Sociétés vérifiées et actives' },
             { label: 'Produits au Catalogue', value: data.kpis.active_products || 0, trend: data.trends?.products || '0%', icon: PackagePlus, color: 'text-orange-600', bg: 'bg-orange-50', link: 'gov-products', tooltip: 'Produits en ligne dans le catalogue' },
-            { label: 'Appels d\'Offres', value: data.kpis.published_tenders || 0, trend: data.trends?.tenders || '0%', icon: FileText, color: 'text-indigo-600', bg: 'bg-indigo-50', link: 'gov-overview', tooltip: 'Appels d\'offres ouverts' },
+            { label: 'Dossiers KYC en attente', value: data.kpis.pending_kyc || 0, trend: '', icon: FileText, color: 'text-indigo-600', bg: 'bg-indigo-50', link: 'gov-companies', tooltip: 'Dossiers à vérifier' },
             { label: 'Revenus Mensuels', value: (data.kpis.total_revenue || 0).toLocaleString() + ' DZD', trend: '', icon: TrendingUp, color: 'text-purple-600', bg: 'bg-purple-50', link: 'gov-revenue', tooltip: 'Revenus générés sur la période' },
           ]);
           

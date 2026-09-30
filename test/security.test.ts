@@ -145,20 +145,6 @@ describe('Régressions de sécurité P0', () => {
     expect(res.status).toBe(400);
   });
 
-  // P0-6 : e-mail vérifié ≠ KYC (couvert aussi dans products.test.ts)
-  it('P0-6 : un appel d\'offres exige un KYC approuvé', async () => {
-    const mock = createSupabaseMock({ users: usersHandler(sessionRow({ role: 'acheteur', kyc_status: 'none' })) });
-    vi.mocked(getSupabase).mockReturnValue(mock.client as any);
-
-    const res = await request(app)
-      .post('/api/tenders')
-      .set('Cookie', ['token=t'])
-      .send({ title: 'Achat acier', description: 'Profilés acier, 20 tonnes' });
-
-    expect(res.status).toBe(403);
-    expect(res.body.code).toBe('KYC_REQUIRED');
-  });
-
   // P0-8 : pas d'e-mail des auteurs d'avis, pas de kyc_requests public
   it('P0-8 : les avis n\'exposent que le nom de l\'auteur', async () => {
     const mock = createSupabaseMock({
@@ -266,8 +252,10 @@ describe('Régressions de sécurité P0', () => {
     expect(filterValue(select!, 'in', 'status')).toBeDefined();
   });
 
-  it('les RFQ ne sont plus publiques', async () => {
-    const res = await request(app).get('/api/rfqs');
-    expect(res.status).toBe(401);
+  it('les anciennes API d\'appels d\'offres et de RFQ n\'existent plus', async () => {
+    for (const path of ['/api/rfqs', '/api/tenders']) {
+      const res = await request(app).get(path);
+      expect(res.status).toBe(404);
+    }
   });
 });

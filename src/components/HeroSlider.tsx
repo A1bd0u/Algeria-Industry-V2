@@ -45,15 +45,7 @@ const HeroSlider: React.FC<HeroSliderProps> = ({ slides }) => {
     fetchAds();
   }, []);
 
-  // Les slides éditoriaux sont traduits ; les annonces gardent leur texte.
-  const localize = (slide: Slide): Slide => slide.i18nKey ? {
-    ...slide,
-    title: t(`slides.${slide.i18nKey}.title`),
-    subtitle: t(`slides.${slide.i18nKey}.subtitle`),
-    description: t(`slides.${slide.i18nKey}.description`),
-    brandTagline: t(`slides.${slide.i18nKey}.tagline`),
-  } : slide;
-  const displaySlides = (dynamicSlides.length > 0 ? [...dynamicSlides, ...slides] : slides).map(localize);
+  const displaySlides = dynamicSlides.length > 0 ? [...dynamicSlides, ...slides] : slides;
 
   useEffect(() => {
     setCurrent(0); // Reset current slide when slides change
@@ -91,13 +83,12 @@ const HeroSlider: React.FC<HeroSliderProps> = ({ slides }) => {
           )}
         >
           <div className={cn(
-            "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full grid grid-cols-1 lg:grid-cols-2 gap-8 items-center relative z-20",
-            i18n.language?.startsWith('ar') && "lg:flex lg:flex-row-reverse"
+            "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full grid grid-cols-1 lg:grid-cols-2 gap-8 items-center relative z-20"
           )}>
             
             {/* Left Content: Product */}
-            <div className={cn("flex items-center space-x-12", i18n.language?.startsWith('ar') && "flex-row-reverse space-x-reverse text-end")}>
-              <motion.div 
+            <div className={cn("flex items-center space-x-12")}>
+              {activeSlide.productImg !== '/placeholder.svg' && <motion.div
                 initial={{ x: i18n.language?.startsWith('ar') ? 50 : -50, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ delay: 0.2, duration: 0.6 }}
@@ -109,16 +100,16 @@ const HeroSlider: React.FC<HeroSliderProps> = ({ slides }) => {
                   className="w-full h-full object-contain drop-shadow-2xl"
                   referrerPolicy="no-referrer"
                 />
-              </motion.div>
+              </motion.div>}
               <div className="text-white">
                 <motion.div
                   initial={{ opacity: 0, x: i18n.language?.startsWith('ar') ? -20 : 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.2 }}
-                  className={cn("flex items-center space-x-2 mb-2", i18n.language?.startsWith('ar') && "flex-row-reverse space-x-reverse justify-end")}
+                  className={cn("flex items-center space-x-2 mb-2")}
                 >
                   <span className="text-[9px] font-black uppercase tracking-[0.3em] text-secondary">
-                    {t('hero_slider.tech_spec')}
+                    {t('slides.sponsored')}
                   </span>
                   <div className="h-[1px] w-8 bg-secondary" />
                 </motion.div>
@@ -156,7 +147,7 @@ const HeroSlider: React.FC<HeroSliderProps> = ({ slides }) => {
               transition={{ delay: 0.4, duration: 0.6 }}
               className={cn(
                 "hidden lg:flex flex-col items-center text-white border-white/10",
-                i18n.language?.startsWith('ar') ? "lg:items-start border-r pe-12 ps-0" : "lg:items-end border-l ps-12"
+                "lg:items-end border-s ps-12"
               )}
             >
               <div className="bg-white/10 backdrop-blur-sm p-4 border border-white/10 mb-4">
@@ -175,7 +166,7 @@ const HeroSlider: React.FC<HeroSliderProps> = ({ slides }) => {
       </AnimatePresence>
 
       {/* Slide Counter (Technical Style) */}
-      <div className={cn("absolute bottom-6 z-30 flex items-baseline space-x-2 text-white/40 font-mono", i18n.language?.startsWith('ar') ? "start-10 space-x-reverse" : "end-10")}>
+      <div className={cn("absolute bottom-6 z-30 flex items-baseline space-x-2 text-white/40 font-mono", "end-10")}>
         <span className="text-xl font-black text-white">{(current + 1).toString().padStart(2, '0')}</span>
         <span className="text-[10px]">/</span>
         <span className="text-[10px]">{displaySlides.length.toString().padStart(2, '0')}</span>
@@ -183,7 +174,7 @@ const HeroSlider: React.FC<HeroSliderProps> = ({ slides }) => {
 
       {/* Navigation Dots */}
       {displaySlides.length > 1 && (
-        <div className={cn("absolute bottom-6 flex space-x-2 z-30", i18n.language?.startsWith('ar') ? "end-10 space-x-reverse" : "start-10")}>
+        <div className={cn("absolute bottom-6 flex space-x-2 z-30", "start-10")}>
           {displaySlides.map((_, i) => (
             <button
               key={i}
@@ -202,13 +193,13 @@ const HeroSlider: React.FC<HeroSliderProps> = ({ slides }) => {
         <>
           <button 
             onClick={prev}
-            className={cn("absolute top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/10 text-white hover:bg-black/30 transition-all z-20", i18n.language?.startsWith('ar') ? "end-4" : "start-4")}
+            className={cn("absolute top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/10 text-white hover:bg-black/30 transition-all z-20", "start-4")}
           >
             {i18n.language?.startsWith('ar') ? <ChevronRight className="h-6 w-6 rtl:rotate-180" /> : <ChevronLeft className="h-6 w-6 rtl:rotate-180" />}
           </button>
           <button 
             onClick={next}
-            className={cn("absolute top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/10 text-white hover:bg-black/30 transition-all z-20", i18n.language?.startsWith('ar') ? "start-4" : "end-4")}
+            className={cn("absolute top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/10 text-white hover:bg-black/30 transition-all z-20", "end-4")}
           >
             {i18n.language?.startsWith('ar') ? <ChevronLeft className="h-6 w-6 rtl:rotate-180" /> : <ChevronRight className="h-6 w-6 rtl:rotate-180" />}
           </button>
