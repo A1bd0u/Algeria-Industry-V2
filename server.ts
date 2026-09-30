@@ -38,14 +38,12 @@ if (process.env.SENTRY_DSN && process.env.SENTRY_DSN.startsWith('http')) {
 }
 
 import authRoutes from './server/routes/auth';
-import tenderRoutes from './server/routes/tenders';
 import companyRoutes from './server/routes/companies';
 import catalogueRoutes from './server/routes/catalogues';
 import productRoutes from './server/routes/products';
 import messageRoutes from './server/routes/messages';
 import articleRoutes from './server/routes/articles';
 import eventRoutes from './server/routes/events';
-import rfqRoutes from './server/routes/rfqs';
 import kycRoutes from './server/routes/kyc';
 import favoriteRoutes from './server/routes/favorites';
 import adRoutes from './server/routes/ads';
@@ -160,14 +158,12 @@ export async function createApp() {
   // Mount API Routes
   app.use('/api/auth/2fa', mfaRoutes);
   app.use('/api/auth', authRoutes);
-  app.use('/api/tenders', tenderRoutes);
   app.use('/api/companies', companyRoutes);
   app.use('/api/catalogues', catalogueRoutes);
   app.use('/api/products', productRoutes);
   app.use('/api/messages', messageRoutes);
   app.use('/api/articles', articleRoutes);
   app.use('/api/events', eventRoutes);
-  app.use('/api/rfqs', rfqRoutes);
   app.use('/api/kyc', kycRoutes);
   app.use('/api/favorites', favoriteRoutes);
   app.use('/api/campaigns', adRoutes);

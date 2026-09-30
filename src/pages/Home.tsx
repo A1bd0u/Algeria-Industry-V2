@@ -1,8 +1,8 @@
-import { ArrowRight, Building2, CheckCircle2, Clock, FileText, Package } from 'lucide-react';
+import { ArrowRight, Building2, CheckCircle2, Clock, FileText, Package, Search, ShieldCheck } from 'lucide-react';
 import { motion } from 'motion/react';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Skeleton } from '../components/Skeleton';
 import { useCurrency } from '../context/CurrencyContext';
 import { formatNumber } from '../lib/format';
@@ -22,6 +22,14 @@ const Home = () => {
   const [products, setProducts] = useState<any[]>([]);
   const [stats, setStats] = useState<PublicStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [query, setQuery] = useState('');
+  const navigate = useNavigate();
+
+  const submitSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    const q = query.trim();
+    navigate(q ? `/search?q=${encodeURIComponent(q)}` : '/products');
+  };
 
   useEffect(() => {
     const fetchHomeData = async () => {
@@ -80,6 +88,57 @@ const Home = () => {
         }}
       />
     <div className={cn("flex flex-col min-h-screen", i18n.language?.startsWith('ar') && "font-arabic")}>
+      {/* Accueil : proposition de valeur, recherche et deux parcours */}
+      <section className="bg-primary text-white relative overflow-hidden">
+        <div className="absolute inset-0 opacity-[0.04] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#fff 1px, transparent 1px)', backgroundSize: '28px 28px' }} />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 relative">
+          <div className="max-w-3xl">
+            <span className="inline-flex items-center gap-2 text-secondary text-[11px] font-black uppercase tracking-[0.3em] mb-6">
+              <ShieldCheck className="h-4 w-4" />
+              {t('home.hero.eyebrow')}
+            </span>
+            <h1 className="text-4xl md:text-6xl font-black tracking-tighter leading-[1.05] mb-6">
+              {t('home.hero.title')}
+            </h1>
+            <p className="text-lg text-white/70 max-w-2xl mb-10">{t('home.hero.subtitle')}</p>
+
+            <form onSubmit={submitSearch} role="search" className="flex flex-col sm:flex-row gap-3 bg-white/5 border border-white/10 rounded-2xl p-2 max-w-2xl">
+              <label htmlFor="home-search" className="sr-only">{t('home.hero.searchLabel')}</label>
+              <div className="flex items-center gap-3 flex-1 px-3">
+                <Search className="h-5 w-5 text-white/40 shrink-0" aria-hidden="true" />
+                <input
+                  id="home-search"
+                  type="search"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder={t('home.hero.searchPlaceholder')}
+                  className="w-full bg-transparent py-3 text-sm text-white placeholder:text-white/40 outline-none"
+                />
+              </div>
+              <button type="submit" className="bg-secondary text-white px-8 py-3 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-secondary/90 transition-colors">
+                {t('common.search')}
+              </button>
+            </form>
+
+            <div className="flex flex-wrap gap-x-8 gap-y-3 mt-8 text-sm">
+              <Link to="/directory" className="inline-flex items-center gap-2 font-bold hover:text-secondary transition-colors">
+                {t('home.hero.browseSuppliers')}
+                <ArrowRight className="h-4 w-4 rtl:rotate-180" />
+              </Link>
+              <Link to="/register?role=fournisseur" className="inline-flex items-center gap-2 font-bold text-secondary hover:text-white transition-colors">
+                {t('home.hero.listCompany')}
+                <ArrowRight className="h-4 w-4 rtl:rotate-180" />
+              </Link>
+            </div>
+          </div>
+
+          <Link to="/tarifs" className="mt-12 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 max-w-2xl bg-white/5 border border-secondary/30 rounded-2xl px-5 py-4 hover:border-secondary transition-colors">
+            <span className="text-[10px] font-black uppercase tracking-[0.25em] text-secondary shrink-0">{t('pricing.founder.label')}</span>
+            <span className="text-sm text-white/80">{t('home.hero.founder')}</span>
+          </Link>
+        </div>
+      </section>
+
       {/* Promesse */}
       <section className="py-12 bg-white border-b border-border-tech">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

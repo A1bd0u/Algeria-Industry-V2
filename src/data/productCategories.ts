@@ -70,3 +70,12 @@ export const categoryLabel = (t: (key: string, options?: any) => string, value?:
   const id = idByName.get(value);
   return id ? t(`productCategories.${id}`) : value;
 };
+
+// Un filtre peut viser une sous-catégorie ou un groupe entier (menu
+// « Produits ») : un groupe couvre toutes ses sous-catégories.
+export const categoryMatches = (filter: string, value?: string | null) => {
+  if (!value) return false;
+  if (filter === value) return true;
+  const group = productCategories.find((g) => g.name === filter);
+  return Boolean(group && group.subCategories.some((sub) => sub.name === value));
+};

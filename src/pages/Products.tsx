@@ -12,7 +12,7 @@ import {
   Check
 } from 'lucide-react';
 import { motion } from 'motion/react';
-import { categoryLabel, productCategories } from '../data/productCategories';
+import { categoryLabel, categoryMatches, productCategories } from '../data/productCategories';
 import React, { useEffect, useState, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { RefreshCw } from 'lucide-react';
@@ -189,7 +189,7 @@ const Products = () => {
 
   const filteredProducts = products.filter(product => {
      if (companyIdParam && product.owner_id !== companyIdParam && product.company_id !== companyIdParam) return false;
-     if (activeCategory !== 'Tous' && product.category !== activeCategory) return false;
+     if (activeCategory !== 'Tous' && !categoryMatches(activeCategory, product.category)) return false;
      if (selectedRegion && product.region !== selectedRegion) return false;
      if (searchQuery) {
         const query = searchQuery.toLowerCase();
@@ -384,10 +384,11 @@ const Products = () => {
           {/* Product Grid */}
           <main className="flex-1">
             <div className="mb-6 flex items-center bg-white p-2 rounded-2xl border border-gray-100 shadow-sm focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary transition-all">
-              <Search className="h-5 w-5 text-gray-400 ms-3" />
+              <Search className="h-5 w-5 text-gray-400 ms-3 shrink-0" aria-hidden="true" />
               <input 
-                type="text"
-                placeholder="Rechercher une machine, une marque..."
+                type="search"
+                aria-label={t('products.searchPlaceholder')}
+                placeholder={t('products.searchPlaceholder')}
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
                 onKeyDown={(e) => {
@@ -395,10 +396,10 @@ const Products = () => {
                     setSearchQuery(searchInput);
                   }
                 }}
-                className="flex-1 bg-transparent px-4 py-3 text-sm font-medium focus:outline-none"
+                className="flex-1 min-w-0 bg-transparent px-3 sm:px-4 py-3 text-sm font-medium focus:outline-none"
               />
-              <button className="px-6 py-3 bg-primary rounded-xl text-[10px] font-black uppercase tracking-widest text-white hover:bg-secondary transition-all" onClick={(e) => { e.preventDefault(); setSearchQuery(searchInput); }}>
-                Rechercher
+              <button className="shrink-0 px-4 sm:px-6 py-3 bg-primary rounded-xl text-[10px] font-black uppercase tracking-widest text-white hover:bg-secondary transition-all" onClick={(e) => { e.preventDefault(); setSearchQuery(searchInput); }}>
+                {t('common.search')}
               </button>
             </div>
 

@@ -3,6 +3,7 @@ import {
   ArrowRight,
   Calendar,
   Clock,
+  Newspaper,
   Share2,
   TrendingUp,
   User
@@ -22,8 +23,8 @@ import { formatDate } from '../lib/format';
 const Blog = () => {
   const { t, i18n } = useTranslation();
   const toast = useToast();
-  const CATEGORIES = [t('categories.all'), t('categories.energy'), t('categories.electronics'), t('categories.auto'), t('categories.agrifood'), t('categories.btph')];
-  const [activeCategory, setActiveCategory] = useState(t('categories.all'));
+  // '' = toutes les catégories ; les filtres viennent des articles publiés.
+  const [activeCategory, setActiveCategory] = useState('');
 
   const [posts, setPosts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -57,12 +58,13 @@ const Blog = () => {
   const filteredPosts = posts.filter(post => {
     // Note: Mock categories might not match translated ones perfectly, 
     // for a real app we'd use category IDs
-    const matchesCategory = activeCategory === t('categories.all') || post.category === activeCategory;
+    const matchesCategory = !activeCategory || post.category === activeCategory;
     return matchesCategory;
   });
 
   const featuredPost = posts.find(p => p.featured);
-  const regularPosts = filteredPosts.filter(p => !p.featured || activeCategory !== t('categories.all'));
+  const regularPosts = filteredPosts.filter(p => !p.featured || activeCategory);
+  const CATEGORIES = ['', ...Array.from(new Set<string>(posts.map((p) => p.category).filter(Boolean)))];
 
   return (
     <PageTransition>
@@ -77,7 +79,7 @@ const Blog = () => {
           <div className="absolute inset-0 opacity-10">
           </div>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div className={cn("flex flex-col md:flex-row md:items-center justify-between gap-8", i18n.language?.startsWith('ar') && "md:flex-row-reverse text-end")}>
+            <div className={cn("flex flex-col md:flex-row md:items-center justify-between gap-8")}>
               <div>
                 <h1 className="text-4xl font-extrabold mb-4">{t('blog.title').split(' ')[0]} <span className="text-secondary">{t('blog.title').split(' ')[1]}</span></h1>
                 <p className="text-primary-foreground/80 text-lg max-w-xl">
@@ -90,10 +92,10 @@ const Blog = () => {
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
           {/* Categories */}
-          <div className={cn("flex items-center space-x-2 overflow-x-auto pb-4 mb-12 no-scrollbar", i18n.language?.startsWith('ar') && "flex-row-reverse space-x-reverse")}>
-            {CATEGORIES.map(cat => (
+          <div className={cn("flex items-center space-x-2 overflow-x-auto pb-4 mb-12 no-scrollbar")}>
+            {CATEGORIES.length > 1 && CATEGORIES.map(cat => (
               <button
-                key={cat}
+                key={cat || 'all'}
                 onClick={() => setActiveCategory(cat)}
                 className={cn(
                   "px-6 py-2.5 rounded-full text-sm font-bold transition-all whitespace-nowrap",
@@ -102,7 +104,7 @@ const Blog = () => {
                     : "bg-white text-gray-500 border border-gray-100 hover:border-primary/20 hover:text-primary"
                 )}
               >
-                {cat}
+                {cat || t('categories.all')}
               </button>
             ))}
           </div>
@@ -120,23 +122,29 @@ const Blog = () => {
           ) : (
             <>
               {/* Featured Post */}
-              {activeCategory === t('categories.all') && featuredPost && (
+              {!activeCategory && featuredPost && (
             <motion.section 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               className="mb-16"
             >
-              <div className={cn("bg-white rounded-[40px] overflow-hidden shadow-xl border border-gray-100 flex flex-col lg:flex-row group", i18n.language?.startsWith('ar') && "lg:flex-row-reverse text-end")}>
+              <div className={cn("bg-white rounded-[40px] overflow-hidden shadow-xl border border-gray-100 flex flex-col lg:flex-row group")}>
                 <Link to={`/blog/${generateSlugUrl(featuredPost.title, featuredPost.id)}`} className="lg:w-3/5 h-64 lg:h-auto overflow-hidden">
-                  <img 
-                    src={featuredPost.image || '/favicon.svg'}
-                    alt={featuredPost.title} 
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                    referrerPolicy="no-referrer"
-                  />
+                  {featuredPost.image ? (
+                    <img
+                      src={featuredPost.image}
+                      alt={featuredPost.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                      referrerPolicy="no-referrer"
+                    />
+                  ) : (
+                    <div className="w-full h-full min-h-64 bg-primary flex items-center justify-center">
+                      <Newspaper className="h-16 w-16 text-white/20" aria-hidden="true" />
+                    </div>
+                  )}
                 </Link>
                 <div className="lg:w-2/5 p-8 md:p-12 flex flex-col justify-center">
-                  <div className={cn("flex items-center space-x-2 mb-6", i18n.language?.startsWith('ar') && "flex-row-reverse space-x-reverse justify-start")}>
+                  <div className={cn("flex items-center space-x-2 mb-6")}>
                     <span className="bg-secondary/10 text-secondary px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest">
                       {featuredPost.category}
                     </span>
@@ -153,8 +161,8 @@ const Blog = () => {
                   <p className="text-gray-500 text-lg mb-8 leading-relaxed">
                     {featuredPost.excerpt}
                   </p>
-                  <div className={cn("flex items-center justify-between mt-auto", i18n.language?.startsWith('ar') && "flex-row-reverse")}>
-                    <div className={cn("flex items-center space-x-3", i18n.language?.startsWith('ar') && "flex-row-reverse space-x-reverse")}>
+                  <div className={cn("flex items-center justify-between mt-auto")}>
+                    <div className={cn("flex items-center space-x-3")}>
                       <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-primary">
                         <User className="h-5 w-5" />
                       </div>
@@ -163,7 +171,7 @@ const Blog = () => {
                         <p className="text-xs text-gray-400">{featuredPost.date}</p>
                       </div>
                     </div>
-                    <Link to={`/blog/${generateSlugUrl(featuredPost.title, featuredPost.id)}`} className={cn("btn-primary p-3 rounded-xl", i18n.language?.startsWith('ar') && "rotate-180")}>
+                    <Link to={`/blog/${generateSlugUrl(featuredPost.title, featuredPost.id)}`} className="btn-primary p-3 rounded-xl">
                       <ArrowRight className="h-5 w-5 rtl:rotate-180" />
                     </Link>
                   </div>
@@ -180,7 +188,7 @@ const Blog = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1 }}
-                className={cn("bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-xl transition-all group flex flex-col", i18n.language?.startsWith('ar') && "text-end")}
+                className={cn("bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-xl transition-all group flex flex-col")}
               >
                 <Link to={`/blog/${generateSlugUrl(post.title, post.id)}`} className="h-48 overflow-hidden relative block">
                   {post.image ? (
@@ -194,14 +202,14 @@ const Blog = () => {
                   ) : (
                     <div className="w-full h-full bg-gray-50 flex items-center justify-center"><img src="/favicon.svg" alt="" className="h-12 w-12 opacity-20" /></div>
                   )}
-                  <div className={cn("absolute top-4", i18n.language?.startsWith('ar') ? "end-4" : "start-4")}>
+                  <div className={cn("absolute top-4", "start-4")}>
                     <span className="bg-white/90 backdrop-blur-sm text-primary px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">
                       {post.category}
                     </span>
                   </div>
                 </Link>
                 <div className="p-6 flex flex-col flex-1">
-                  <div className={cn("flex items-center space-x-3 text-[10px] font-bold text-gray-400 mb-3 uppercase", i18n.language?.startsWith('ar') && "flex-row-reverse space-x-reverse justify-start")}>
+                  <div className={cn("flex items-center space-x-3 text-[10px] font-bold text-gray-400 mb-3 uppercase")}>
                     <span className="flex items-center space-x-1">
                       <Calendar className="h-3 w-3" />
                       <span>{post.date}</span>
@@ -220,8 +228,8 @@ const Blog = () => {
                   <p className="text-sm text-gray-500 line-clamp-3 mb-6 flex-1">
                     {post.excerpt}
                   </p>
-                  <div className={cn("flex items-center justify-between pt-6 border-t border-gray-50", i18n.language?.startsWith('ar') && "flex-row-reverse")}>
-                    <div className={cn("flex items-center space-x-2", i18n.language?.startsWith('ar') && "flex-row-reverse space-x-reverse")}>
+                  <div className={cn("flex items-center justify-between pt-6 border-t border-gray-50")}>
+                    <div className={cn("flex items-center space-x-2")}>
                       <div className="w-6 h-6 bg-gray-50 rounded-full flex items-center justify-center text-primary">
                         <User className="h-3 w-3" />
                       </div>

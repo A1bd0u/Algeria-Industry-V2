@@ -62,24 +62,22 @@ router.get('/dashboard', verifyRole(['admin']), adminDashboardLimiter, async (re
 
     // Fetch counts from existing tables
     const [
-      { count: total_users }, { count: approved_companies }, { count: active_products }, { count: published_tenders },
-      { count: users_cm }, { count: companies_cm }, { count: products_cm }, { count: tenders_cm },
-      { count: users_pm }, { count: companies_pm }, { count: products_pm }, { count: tenders_pm },
+      { count: total_users }, { count: approved_companies }, { count: active_products }, { count: pending_kyc },
+      { count: users_cm }, { count: companies_cm }, { count: products_cm },
+      { count: users_pm }, { count: companies_pm }, { count: products_pm },
     ] = await Promise.all([
       supabase.from('users').select('*', { count: 'exact', head: true }),
       supabase.from('companies').select('*', { count: 'exact', head: true }).eq('status', 'approved'),
-      supabase.from('products').select('*', { count: 'exact', head: true }), // Assuming all are active for now since status doesn't exist on products
-      supabase.from('tenders').select('*', { count: 'exact', head: true }).eq('status', 'open'),
+      supabase.from('products').select('*', { count: 'exact', head: true }).in('status', ['Actif', 'active']),
+      supabase.from('kyc_requests').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
       // Current month
       supabase.from('users').select('*', { count: 'exact', head: true }).gte('created_at', startOfCurrentMonth),
       supabase.from('companies').select('*', { count: 'exact', head: true }).eq('status', 'approved').gte('created_at', startOfCurrentMonth),
       supabase.from('products').select('*', { count: 'exact', head: true }).gte('created_at', startOfCurrentMonth),
-      supabase.from('tenders').select('*', { count: 'exact', head: true }).gte('created_at', startOfCurrentMonth),
       // Previous month
       supabase.from('users').select('*', { count: 'exact', head: true }).gte('created_at', startOfPreviousMonth).lt('created_at', startOfCurrentMonth),
       supabase.from('companies').select('*', { count: 'exact', head: true }).eq('status', 'approved').gte('created_at', startOfPreviousMonth).lt('created_at', startOfCurrentMonth),
       supabase.from('products').select('*', { count: 'exact', head: true }).gte('created_at', startOfPreviousMonth).lt('created_at', startOfCurrentMonth),
-      supabase.from('tenders').select('*', { count: 'exact', head: true }).gte('created_at', startOfPreviousMonth).lt('created_at', startOfCurrentMonth),
     ]);
 
     const calculateTrend = (cm: number | null, pm: number | null) => {
@@ -92,7 +90,6 @@ router.get('/dashboard', verifyRole(['admin']), adminDashboardLimiter, async (re
       users: calculateTrend(users_cm, users_pm),
       companies: calculateTrend(companies_cm, companies_pm),
       products: calculateTrend(products_cm, products_pm),
-      tenders: calculateTrend(tenders_cm, tenders_pm)
     };
 
     // Fetch users for registration chart
@@ -161,7 +158,7 @@ router.get('/dashboard', verifyRole(['admin']), adminDashboardLimiter, async (re
         total_users: total_users || 0,
         approved_companies: approved_companies || 0,
         active_products: active_products || 0,
-        published_tenders: published_tenders || 0,
+        pending_kyc: pending_kyc || 0,
         total_revenue
       },
       trends,
@@ -466,7 +463,7 @@ router.get('/moderation', verifyRole(['admin']), async (req, res) => {
   }
 });
 
-const REPORT_TABLES: Record<string, string> = { product: 'products', tender: 'tenders' };
+const REPORT_TABLES: Record<string, string> = { product: 'products' };
 
 // POST /api/admin/moderation/:id/approve - Signalement infondé : le contenu reste en ligne
 router.post('/moderation/:id/approve', verifyRole(['admin']), requireUuidParams('id'), async (req, res) => {

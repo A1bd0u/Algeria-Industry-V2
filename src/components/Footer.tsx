@@ -1,24 +1,40 @@
-import { Building2, Mail, MapPin, Phone, ShieldCheck } from 'lucide-react';
+import type React from 'react';
+import { Building2, ChevronRight, Mail, MapPin, Phone } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { cn } from '../lib/utils';
 import { SUPPORT, telHref } from '../config/site';
 import { OPEN_COOKIE_SETTINGS_EVENT } from './CookieBanner';
 
+const FooterLink = ({ to, children, accent = false }: { to: string; children: React.ReactNode; accent?: boolean }) => (
+  <li>
+    <Link to={to} className={cn('flex items-center gap-2 transition-colors', accent ? 'text-secondary hover:text-white' : 'hover:text-secondary')}>
+      <ChevronRight className="h-3 w-3 shrink-0 rtl:rotate-180" aria-hidden="true" />
+      <span>{children}</span>
+    </Link>
+  </li>
+);
+
+const FooterTitle = ({ children }: { children: React.ReactNode }) => (
+  <div className="flex items-center gap-2 mb-8">
+    <div className="w-4 h-[2px] bg-secondary" />
+    <h4 className="text-xs font-black uppercase tracking-[0.3em] text-white">{children}</h4>
+  </div>
+);
+
 const Footer = () => {
   const { t, i18n } = useTranslation();
-  
+  const year = new Date().getFullYear();
+
   return (
     <footer className={cn("bg-[#1a1a1a] text-white pt-20 pb-10 border-t-4 border-secondary relative overflow-hidden", i18n.language?.startsWith('ar') && "font-arabic")}>
-      {/* Technical Background Grid */}
-      <div className="absolute inset-0 opacity-[0.03] pointer-events-none" 
+      <div className="absolute inset-0 opacity-[0.03] pointer-events-none"
            style={{ backgroundImage: 'radial-gradient(#fff 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
-      
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className={cn("grid grid-cols-1 md:grid-cols-4 gap-16 mb-20", i18n.language?.startsWith('ar') && "md:flex md:flex-row-reverse md:justify-between")}>
-          {/* Brand */}
-          <div className={cn("col-span-1 md:col-span-1", i18n.language?.startsWith('ar') && "text-end")}>
-            <div className={cn("flex items-center space-x-3 mb-8", i18n.language?.startsWith('ar') && "flex-row-reverse space-x-reverse justify-end")}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-12 md:gap-16 mb-20">
+          <div>
+            <div className="flex items-center gap-3 mb-8">
               <div className="bg-secondary p-1.5 rounded-sm">
                 <Building2 className="h-6 w-6 text-white" />
               </div>
@@ -27,81 +43,63 @@ const Footer = () => {
                 <span className="text-xl font-black tracking-tighter leading-none text-secondary">INDUSTRY</span>
               </div>
             </div>
-            <p className="text-gray-400 text-[11px] font-bold uppercase tracking-widest leading-relaxed mb-8">
+            <p className="text-gray-400 text-sm leading-relaxed">
               {t('footer.about_text')}
             </p>
-            <div className={cn("flex items-center space-x-2 text-success", i18n.language?.startsWith('ar') && "flex-row-reverse space-x-reverse justify-end")}>
-              <ShieldCheck className="h-4 w-4" />
-              <span className="text-[10px] font-mono font-bold uppercase tracking-widest">CERTIFIED B2B PLATFORM</span>
-            </div>
           </div>
 
-          {/* Links */}
-          <div className={i18n.language?.startsWith('ar') ? "text-end" : ""}>
-            <div className={cn("flex items-center space-x-2 mb-8", i18n.language?.startsWith('ar') && "flex-row-reverse space-x-reverse justify-end")}>
-              <div className="w-4 h-[2px] bg-secondary" />
-              <h4 className="text-xs font-black uppercase tracking-[0.3em] text-white">{i18n.language?.startsWith('ar') ? 'التنقل' : 'Navigation'}</h4>
-            </div>
+          <div>
+            <FooterTitle>{t('footer.platform')}</FooterTitle>
             <ul className="space-y-4 text-[11px] font-bold uppercase tracking-wider text-gray-400">
-              <li><Link to="/exhibitors" className={cn("hover:text-secondary transition-colors flex items-center space-x-2", i18n.language?.startsWith('ar') && "flex-row-reverse space-x-reverse")}><span>{i18n.language?.startsWith('ar') ? '<' : '>'}</span> <span>{i18n.language?.startsWith('ar') ? 'العارضين' : 'Exposants'}</span></Link></li>
-              <li><Link to="/products" className={cn("hover:text-secondary transition-colors flex items-center space-x-2", i18n.language?.startsWith('ar') && "flex-row-reverse space-x-reverse")}><span>{i18n.language?.startsWith('ar') ? '<' : '>'}</span> <span>{t('nav.products')}</span></Link></li>
-              <li><Link to="/tarifs" className={cn("hover:text-secondary transition-colors flex items-center space-x-2", i18n.language?.startsWith('ar') && "flex-row-reverse space-x-reverse")}><span>{i18n.language?.startsWith('ar') ? '<' : '>'}</span> <span>{i18n.language?.startsWith('ar') ? 'الأسعار' : 'Tarifs'}</span></Link></li>
-              <li><Link to="/compare" className={cn("hover:text-secondary transition-colors flex items-center space-x-2", i18n.language?.startsWith('ar') && "flex-row-reverse space-x-reverse")}><span>{i18n.language?.startsWith('ar') ? '<' : '>'}</span> <span>{i18n.language?.startsWith('ar') ? 'مقارنة الحلول' : 'Comparer Solutions'}</span></Link></li>
-              <li><Link to="/register?role=fournisseur" className={cn("text-secondary hover:text-white transition-colors flex items-center space-x-2", i18n.language?.startsWith('ar') && "flex-row-reverse space-x-reverse")}><span>{i18n.language?.startsWith('ar') ? '<' : '>'}</span> <span>{t('topbar.become_exhibitor')}</span></Link></li>
-              <li><Link to="/ads-request" className={cn("text-secondary hover:text-white transition-colors flex items-center space-x-2", i18n.language?.startsWith('ar') && "flex-row-reverse space-x-reverse")}><span>{i18n.language?.startsWith('ar') ? '<' : '>'}</span> <span>{i18n.language?.startsWith('ar') ? 'مساحة إعلانية' : 'Espace Pub'}</span></Link></li>
-              <li className="pt-4 mt-4 border-t border-white/10"><Link to="/extranet" className="text-[10px] text-gray-500 font-bold uppercase tracking-widest hover:text-white transition-all">{t('nav.console_pro')}</Link></li>
+              <FooterLink to="/directory">{t('nav.suppliers')}</FooterLink>
+              <FooterLink to="/products">{t('nav.products')}</FooterLink>
+              <FooterLink to="/catalogues">{t('nav.catalogues')}</FooterLink>
+              <FooterLink to="/compare">{t('footer.compare')}</FooterLink>
+              <FooterLink to="/tarifs">{t('nav.pricing')}</FooterLink>
+              <FooterLink to="/register?role=fournisseur" accent>{t('nav.become_exposant')}</FooterLink>
+              <FooterLink to="/ads-request" accent>{t('footer.advertise')}</FooterLink>
             </ul>
           </div>
 
-          {/* Resources */}
-          <div className={i18n.language?.startsWith('ar') ? "text-end" : ""}>
-            <div className={cn("flex items-center space-x-2 mb-8", i18n.language?.startsWith('ar') && "flex-row-reverse space-x-reverse justify-end")}>
-              <div className="w-4 h-[2px] bg-secondary" />
-              <h4 className="text-xs font-black uppercase tracking-[0.3em] text-white">{t('nav.resources')}</h4>
-            </div>
+          <div>
+            <FooterTitle>{t('nav.resources')}</FooterTitle>
             <ul className="space-y-4 text-[11px] font-bold uppercase tracking-wider text-gray-400">
-              <li><Link to="/resources" className={cn("hover:text-secondary transition-colors flex items-center space-x-2", i18n.language?.startsWith('ar') && "flex-row-reverse space-x-reverse")}><span>{i18n.language?.startsWith('ar') ? '<' : '>'}</span> <span>{i18n.language?.startsWith('ar') ? 'مركز التوثيق' : 'Centre de documentation'}</span></Link></li>
-              <li><Link to="/faq" className={cn("hover:text-secondary transition-colors flex items-center space-x-2", i18n.language?.startsWith('ar') && "flex-row-reverse space-x-reverse")}><span>{i18n.language?.startsWith('ar') ? '<' : '>'}</span> <span>F.A.Q</span></Link></li>
-              <li><Link to="/blog" className={cn("hover:text-secondary transition-colors flex items-center space-x-2", i18n.language?.startsWith('ar') && "flex-row-reverse space-x-reverse")}><span>{i18n.language?.startsWith('ar') ? '<' : '>'}</span> <span>{t('nav.news')}</span></Link></li>
-              <li><Link to="/contact" className={cn("hover:text-secondary transition-colors flex items-center space-x-2", i18n.language?.startsWith('ar') && "flex-row-reverse space-x-reverse")}><span>{i18n.language?.startsWith('ar') ? '<' : '>'}</span> <span>{t('footer.contact')}</span></Link></li>
+              <FooterLink to="/resources">{t('footer.resourceCenter')}</FooterLink>
+              <FooterLink to="/blog">{t('nav.news')}</FooterLink>
+              <FooterLink to="/events">{t('nav.events')}</FooterLink>
+              <FooterLink to="/faq">{t('faq.title')}</FooterLink>
             </ul>
           </div>
 
-          {/* Contact */}
-          <div className={i18n.language?.startsWith('ar') ? "text-end" : ""}>
-            <div className={cn("flex items-center space-x-2 mb-8", i18n.language?.startsWith('ar') && "flex-row-reverse space-x-reverse justify-end")}>
-              <div className="w-4 h-[2px] bg-secondary" />
-              <h4 className="text-xs font-black uppercase tracking-[0.3em] text-white">{i18n.language?.startsWith('ar') ? 'مركز الاتصال' : 'Contact Center'}</h4>
-            </div>
+          <div>
+            <FooterTitle>{t('footer.contactTitle')}</FooterTitle>
             <ul className="space-y-5 text-[11px] font-bold uppercase tracking-wider text-gray-400">
               {SUPPORT.phone && (
-                <li className={cn("flex items-center space-x-4", i18n.language?.startsWith('ar') && "flex-row-reverse space-x-reverse")}>
-                  <Phone className="h-4 w-4 text-secondary" />
-                  <a href={telHref(SUPPORT.phone)} className="font-mono hover:text-secondary">{SUPPORT.phone}</a>
+                <li className="flex items-center gap-4">
+                  <Phone className="h-4 w-4 text-secondary shrink-0" />
+                  <a href={telHref(SUPPORT.phone)} dir="ltr" className="font-mono hover:text-secondary">{SUPPORT.phone}</a>
                 </li>
               )}
               {SUPPORT.email && (
-                <li className={cn("flex items-center space-x-4", i18n.language?.startsWith('ar') && "flex-row-reverse space-x-reverse")}>
-                  <Mail className="h-4 w-4 text-secondary" />
+                <li className="flex items-center gap-4">
+                  <Mail className="h-4 w-4 text-secondary shrink-0" />
                   <a href={`mailto:${SUPPORT.email}`} className="lowercase font-mono hover:text-secondary">{SUPPORT.email}</a>
                 </li>
               )}
-              <li className={cn("flex items-center space-x-4", i18n.language?.startsWith('ar') && "flex-row-reverse space-x-reverse")}>
-                <MapPin className="h-4 w-4 text-secondary" />
+              <li className="flex items-center gap-4">
+                <MapPin className="h-4 w-4 text-secondary shrink-0" />
                 <Link to="/contact" className="hover:text-secondary">{t('footer.contact')}</Link>
               </li>
             </ul>
           </div>
         </div>
 
-        <div className={cn("border-t border-white/5 pt-10 flex flex-col md:flex-row justify-between items-center text-[10px] font-mono font-bold uppercase tracking-widest text-gray-500", i18n.language?.startsWith('ar') && "md:flex-row-reverse")}>
-          <div className={cn("flex items-center space-x-4", i18n.language?.startsWith('ar') && "space-x-reverse")}>
-            <p>{t('footer.copyright')}</p>
-          </div>
-          <div className={cn("flex space-x-8 mt-6 md:mt-0", i18n.language?.startsWith('ar') && "space-x-reverse")}>
-            <Link to="/terms" className="hover:text-white transition-colors">{i18n.language?.startsWith('ar') ? 'إشعارات قانونية' : 'Mentions légales'}</Link>
-            <Link to="/privacy" className="hover:text-white transition-colors">{i18n.language?.startsWith('ar') ? 'الخصوصية' : 'Confidentialité'}</Link>
-            <button type="button" onClick={() => window.dispatchEvent(new Event(OPEN_COOKIE_SETTINGS_EVENT))} className="hover:text-white transition-colors uppercase">{i18n.language?.startsWith('ar') ? 'ملفات تعريف الارتباط' : 'Cookies'}</button>
+        <div className="border-t border-white/5 pt-10 flex flex-col md:flex-row justify-between items-center gap-6 text-[10px] font-bold uppercase tracking-widest text-gray-500">
+          <p>© {year} Algeria Industry</p>
+          <div className="flex flex-wrap justify-center gap-x-8 gap-y-3">
+            <Link to="/terms" className="hover:text-white transition-colors">{t('footer.legal')}</Link>
+            <Link to="/privacy" className="hover:text-white transition-colors">{t('footer.privacy')}</Link>
+            <button type="button" onClick={() => window.dispatchEvent(new Event(OPEN_COOKIE_SETTINGS_EVENT))} className="hover:text-white transition-colors uppercase">{t('footer.cookies')}</button>
           </div>
         </div>
       </div>

@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 
 interface SearchResult {
   id: string;
-  type: 'product' | 'company' | 'tender';
+  type: 'product' | 'company';
   title: string;
   subtitle: string;
   category: string;

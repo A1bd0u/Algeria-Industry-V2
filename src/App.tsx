@@ -12,7 +12,7 @@ import PageTransition from './components/PageTransition';
 import ErrorBoundary from './components/ErrorBoundary';
 import ProtectedRoute from './components/ProtectedRoute';
 import ScrollToTop from './components/ScrollToTop';
-import { DEFAULT_SLIDES, SLIDES_BY_PATH } from './constants/slides';
+import type { Slide } from './constants/slides';
 const BecomeExhibitor = lazy(() => import('./pages/BecomeExhibitor'));
 const AdsRequest = lazy(() => import('./pages/AdsRequest'));
 const Blog = lazy(() => import('./pages/Blog'));
@@ -21,12 +21,10 @@ const CompanyProfile = lazy(() => import('./pages/CompanyProfile'));
 const Compare = lazy(() => import('./pages/Compare'));
 const ConsolePro = lazy(() => import('./pages/ConsolePro'));
 const AdminKYCReview = lazy(() => import('./pages/AdminKYCReview'));
-const AdminContentModeration = lazy(() => import('./pages/AdminContentModeration'));
 const Contact = lazy(() => import('./pages/Contact'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const Directory = lazy(() => import('./pages/Directory'));
 const Events = lazy(() => import('./pages/Events'));
-const Exhibitors = lazy(() => import('./pages/Exhibitors'));
 const FAQ = lazy(() => import('./pages/FAQ'));
 const Home = lazy(() => import('./pages/Home'));
 const KYCUpload = lazy(() => import('./pages/KYCUpload'));
@@ -67,7 +65,8 @@ const queryClient = new QueryClient();
 export default function App() {
   const { i18n } = useTranslation();
   const location = useLocation();
-  const currentSlides = SLIDES_BY_PATH[location.pathname] || DEFAULT_SLIDES;
+  // Plus de slides éditoriaux : le bandeau n'affiche que les annonces réelles.
+  const currentSlides: Slide[] = [];
   const isExtranet = location.pathname.startsWith('/extranet');
   // Carrousel limité à l'accueil (LCP mobile).
   const hideHeroSlider = isExtranet || location.pathname !== '/';
@@ -118,7 +117,8 @@ export default function App() {
                       <Route path="/products" element={<PageTransition><Products /></PageTransition>} />
                       <Route path="/favorites" element={<PageTransition><Favorites /></PageTransition>} />
                       <Route path="/products/:id" element={<PageTransition><ProductDetail /></PageTransition>} />
-                      <Route path="/exhibitors" element={<PageTransition><Exhibitors /></PageTransition>} />
+                      {/* Ancienne page Exposants : l'annuaire unique est /directory. */}
+                      <Route path="/exhibitors" element={<Navigate to="/directory" replace />} />
                       <Route path="/search" element={<PageTransition><SearchResults /></PageTransition>} />
                       <Route path="/dashboard/*" element={
                         <ProtectedRoute>
@@ -157,11 +157,8 @@ export default function App() {
                           <AdminKYCReview />
                         </ProtectedRoute>
                       } />
-                      <Route path="/extranet/moderation" element={
-                        <ProtectedRoute allowedRoles={['admin']}>
-                          <AdminContentModeration />
-                        </ProtectedRoute>
-                      } />
+                      {/* Ancienne page de modération : tout se fait dans la console. */}
+                      <Route path="/extranet/moderation" element={<Navigate to="/extranet" replace />} />
                       <Route path="/become-exhibitor" element={<PageTransition><BecomeExhibitor /></PageTransition>} />
                       <Route path="/ads-request" element={<PageTransition><AdsRequest /></PageTransition>} />
                       <Route path="/resources" element={<PageTransition><Resources /></PageTransition>} />

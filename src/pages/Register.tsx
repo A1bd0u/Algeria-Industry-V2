@@ -92,8 +92,8 @@ const Register = () => {
                   <Briefcase className="h-6 w-6" />
                 </div>
                 <div>
-                  <h4 className="font-bold text-lg">{t('auth.register.benefitTendersTitle')}</h4>
-                  <p className="text-primary-100 text-sm mt-1">{t('auth.register.benefitTendersText')}</p>
+                  <h4 className="font-bold text-lg">{t('auth.register.benefitVerifiedTitle')}</h4>
+                  <p className="text-primary-100 text-sm mt-1">{t('auth.register.benefitVerifiedText')}</p>
                 </div>
               </div>
               <div className="flex items-start space-x-4">

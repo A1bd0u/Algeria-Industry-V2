@@ -7,7 +7,6 @@ export const reportSchema = z.object({
 
 const TARGET_TABLES = {
   product: 'products',
-  tender: 'tenders',
   company: 'companies',
 } as const;
 
