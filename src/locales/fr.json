@@ -1265,5 +1265,20 @@
     "text": "Cette page n'existe pas ou a été déplacée.",
     "home": "Accueil",
     "catalog": "Catalogue"
+  },
+  "slides": {
+    "sponsored": "Annonce",
+    "suppliers": {
+      "title": "Fournisseurs industriels vérifiés",
+      "subtitle": "Trouvez le bon partenaire",
+      "description": "Contactez-les directement et demandez un devis",
+      "tagline": "La place de marché B2B algérienne"
+    },
+    "founder": {
+      "title": "Membre fondateur",
+      "subtitle": "Premium offert 12 mois",
+      "description": "Pour les 100 premiers fournisseurs vérifiés",
+      "tagline": "Offre de lancement"
+    }
   }
 }

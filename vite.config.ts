@@ -20,18 +20,19 @@ export default defineConfig(({mode}) => {
 build: {
       rollupOptions: {
         output: {
+          // Le lecteur PDF et les graphiques ne sont PAS regroupés ici : un
+          // chunk manuel attire aussi leurs dépendances partagées (react-is,
+          // use-sync-external-store…), que l'entrée importe, ce qui forçait
+          // leur préchargement sur toutes les pages. Laissés à Rollup, ils ne
+          // sont chargés qu'avec les pages qui les utilisent (tableau de bord,
+          // console, revue KYC).
           manualChunks(id) {
             if (id.includes('node_modules')) {
-              if (id.includes('pdfjs-dist') || id.includes('react-pdf')) {
-                return 'vendor-pdf';
-              }
-              if (id.includes('recharts') || id.includes('d3-') || id.includes('d3-shape')) {
-                return 'vendor-charts';
-              }
-              if (id.includes('motion') || id.includes('framer-motion')) {
+              if (/node_modules\/(motion|framer-motion|motion-dom|motion-utils)\//.test(id)) {
                 return 'vendor-motion';
               }
-              if (id.includes('@supabase') || id.includes('@tanstack')) {
+              // react-query seulement : react-table ne sert qu'à la console.
+              if (/node_modules\/@tanstack\/(react-query|query-core)\//.test(id)) {
                 return 'vendor-data';
               }
             }

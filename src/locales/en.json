@@ -1265,5 +1265,20 @@
     "text": "This page does not exist or has been moved.",
     "home": "Home",
     "catalog": "Catalogue"
+  },
+  "slides": {
+    "sponsored": "Sponsored",
+    "suppliers": {
+      "title": "Verified industrial suppliers",
+      "subtitle": "Find the right partner",
+      "description": "Contact them directly and ask for a quote",
+      "tagline": "The Algerian B2B marketplace"
+    },
+    "founder": {
+      "title": "Founding member",
+      "subtitle": "Premium free for 12 months",
+      "description": "For the first 100 verified suppliers",
+      "tagline": "Launch offer"
+    }
   }
 }

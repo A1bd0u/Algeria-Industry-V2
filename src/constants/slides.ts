@@ -8,6 +8,8 @@ export interface Slide {
   brandLogo: string;
   brandName: string;
   brandTagline: string;
+  // Slides éditoriaux : textes lus dans les traductions (slides.<clé>.*).
+  i18nKey?: string;
 }
 
 // Slides éditoriaux de la plateforme. Les emplacements publicitaires réels
@@ -17,23 +19,25 @@ export const DEFAULT_SLIDES: Slide[] = [
     id: 1,
     bgGradient: "from-[#1a1a1a] to-[#333333]",
     productImg: "/placeholder.svg",
-    title: "FOURNISSEURS INDUSTRIELS VÉRIFIÉS",
-    subtitle: "TROUVEZ LE BON PARTENAIRE",
-    description: "OBTENEZ UN DEVIS EN 48 H",
+    title: "",
+    subtitle: "",
+    description: "",
     brandLogo: "/favicon.svg",
     brandName: "ALGERIA INDUSTRY",
-    brandTagline: "LA MARKETPLACE B2B ALGÉRIENNE"
+    brandTagline: "",
+    i18nKey: "suppliers"
   },
   {
     id: 2,
     bgGradient: "from-[#0f172a] to-[#334155]",
     productImg: "/placeholder.svg",
-    title: "MEMBRE FONDATEUR",
-    subtitle: "PREMIUM OFFERT 12 MOIS",
-    description: "POUR LES 100 PREMIERS FOURNISSEURS VÉRIFIÉS",
+    title: "",
+    subtitle: "",
+    description: "",
     brandLogo: "/favicon.svg",
     brandName: "ALGERIA INDUSTRY",
-    brandTagline: "OFFRE DE LANCEMENT"
+    brandTagline: "",
+    i18nKey: "founder"
   }
 ];
 

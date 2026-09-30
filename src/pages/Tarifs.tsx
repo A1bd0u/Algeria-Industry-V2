@@ -158,11 +158,11 @@ const Tarifs = () => {
                     <div className="mb-4 flex flex-col items-center justify-center">
                       <div className="flex items-baseline justify-center whitespace-nowrap">
                         <span className={cn(
-                          "text-3xl sm:text-4xl md:text-5xl font-black tracking-tighter leading-none",
+                          "text-3xl sm:text-4xl xl:text-5xl font-black tracking-tighter leading-none",
                           plan.id === 'pro' ? "text-white" : "text-neutral-900"
                         )}>{plan.price}</span>
                         <span className={cn(
-                          "text-xl sm:text-2xl md:text-3xl font-black ms-1 uppercase tracking-tighter",
+                          "text-base sm:text-lg font-black ms-1 uppercase tracking-tighter",
                           plan.id === 'pro' ? "text-white" : "text-neutral-900"
                         )}>{t('pricing.perYear')}</span>
                       </div>
