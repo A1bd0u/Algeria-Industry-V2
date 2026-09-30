@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ShieldCheck, ArrowLeft, CheckCircle2, XCircle, AlertTriangle, FileText, Download, Building2, User } from 'lucide-react';
 import { motion } from 'motion/react';
+import { useToast } from '../context/ToastContext';
 import { Document, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
@@ -25,6 +26,7 @@ export default function AdminKYCReview() {
   const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
+  const toast = useToast();
   const [kyc, setKyc] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -74,9 +76,10 @@ export default function AdminKYCReview() {
         }
       });
       if (!res.ok) throw new Error('Erreur lors de la validation');
+      toast.success('Dossier KYC approuvé. Le client a été prévenu par e-mail.');
       navigate('/extranet');
     } catch (err: any) {
-      alert(err.message);
+      toast.error(err.message);
     } finally {
       setIsSubmitting(false);
     }
@@ -84,7 +87,7 @@ export default function AdminKYCReview() {
 
   const handleReject = async () => {
     if (!rejectReason.trim()) {
-      alert('Veuillez saisir un motif de rejet');
+      toast.error('Veuillez saisir un motif de rejet.');
       return;
     }
     try {
@@ -98,9 +101,10 @@ export default function AdminKYCReview() {
         body: JSON.stringify({ reason: rejectReason })
       });
       if (!res.ok) throw new Error('Erreur lors du rejet');
+      toast.success('Dossier KYC rejeté. Le client a été prévenu par e-mail.');
       navigate('/extranet');
     } catch (err: any) {
-      alert(err.message);
+      toast.error(err.message);
     } finally {
       setIsSubmitting(false);
       setShowRejectModal(false);

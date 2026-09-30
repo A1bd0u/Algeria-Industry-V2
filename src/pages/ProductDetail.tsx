@@ -24,6 +24,8 @@ import { useAuth } from '../context/AuthContext';
 import { cn, extractIdFromSlug, generateSlugUrl } from '../lib/utils';
 import axios from 'axios';
 import { categoryLabel } from '../data/productCategories';
+import { useToast } from '../context/ToastContext';
+import { apiErrorMessage } from '../lib/apiError';
 
 const ProductDetail = () => {
   const { t } = useTranslation();
@@ -41,29 +43,26 @@ const ProductDetail = () => {
   const [favoriteId, setFavoriteId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  const toast = useToast();
   const [showReport, setShowReport] = useState(false);
   const [reportReason, setReportReason] = useState("");
 
   const handleReport = async () => {
     if (!isAuthenticated) {
-       alert("Vous devez être connecté pour signaler un produit.");
+       toast.info(t('products.detail.reportLogin'));
        return;
     }
     if (!reportReason.trim()) {
-       alert("Veuillez saisir un motif");
+       toast.error(t('products.detail.reportReasonRequired'));
        return;
     }
     try {
-      const res = await axios.post(`/api/products/${id}/report`, { reason: reportReason });
-      if (res.status === 200) {
-        alert("Le produit a été signalé avec succès. Merci.");
-        setShowReport(false);
-        setReportReason("");
-      } else {
-        alert("Erreur lors du signalement");
-      }
-    } catch (e) {
-      alert("Erreur réseau");
+      await axios.post(`/api/products/${id}/report`, { reason: reportReason });
+      toast.success(t('products.detail.reportSent'));
+      setShowReport(false);
+      setReportReason("");
+    } catch (e: any) {
+      toast.error(e?.response ? apiErrorMessage(e.response.data, 'products.detail.reportError') : t('common.networkError'));
     }
   };
 
@@ -91,9 +90,9 @@ const ProductDetail = () => {
       } catch (err: any) {
         console.error(err);
         if (err.response && err.response.status === 404) {
-          setError("Produit introuvable");
+          setError('notFound');
         } else {
-          setError("Erreur lors du chargement du produit");
+          setError('loadError');
         }
       } finally {
         setIsLoading(false);
@@ -125,7 +124,7 @@ const ProductDetail = () => {
       }
     } catch (e) {
       console.error(e);
-      alert("Erreur lors de l'ajout aux favoris");
+      toast.error(t('products.detail.favoriteError'));
     }
   };
 
@@ -136,7 +135,21 @@ const ProductDetail = () => {
     if (isCompared) {
       removeFromCompare(product.id);
     } else {
-      addToCompare(product as unknown as IProduct);
+      if (comparedProducts.length >= 4) {
+        toast.info(t('products.detail.compareFull'));
+        return;
+      }
+      addToCompare({
+        id: product.id,
+        name: product.name,
+        category: product.category,
+        brand: product.companyName || '',
+        image: product.images?.[0] || '',
+        priceValue: product.priceValue || null,
+        sellerId: product.sellerId || null,
+        companyVerified: Boolean(product.companyVerified),
+        specs: product.specs || {},
+      } as IProduct);
     }
   };
 
@@ -147,9 +160,9 @@ const ProductDetail = () => {
   if (error || !product) {
     return (
       <div className="min-h-[50vh] flex flex-col items-center justify-center">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">{error || "Produit introuvable"}</h2>
+        <h2 className="text-2xl font-bold text-gray-800 mb-4">{t(`products.detail.${error || 'notFound'}`)}</h2>
         <button onClick={() => navigate('/products')} className="text-primary hover:underline font-medium">
-          Retour aux produits
+          {t('products.detail.backToProducts')}
         </button>
       </div>
     );
@@ -164,7 +177,7 @@ const ProductDetail = () => {
           className="flex items-center space-x-2 text-gray-500 hover:text-primary transition-colors mb-8 group"
         >
           <ArrowLeft className="h-5 w-5 group-hover:-translate-x-1 transition-transform rtl:rotate-180" />
-          <span className="text-xs font-black uppercase tracking-widest">Retour au catalogue</span>
+          <span className="text-xs font-black uppercase tracking-widest">{t('products.detail.backToCatalog')}</span>
         </button>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
@@ -184,7 +197,7 @@ const ProductDetail = () => {
               ) : (
                 <div className="w-full h-full flex flex-col items-center justify-center text-gray-300">
                   <img src="/favicon.svg" alt="" className="h-20 w-20 opacity-30 mb-4" />
-                  <span className="text-xs font-black uppercase tracking-widest">Visuel non fourni</span>
+                  <span className="text-xs font-black uppercase tracking-widest">{t('products.detail.noImage')}</span>
                 </div>
               )}
               <div className="absolute top-6 end-6 flex flex-col space-y-3">
@@ -194,6 +207,8 @@ const ProductDetail = () => {
                     favoriteId !== null ? "text-red-500" : "text-gray-400 hover:text-red-500"
                   )} 
                   onClick={(e) => { e.preventDefault(); toggleFavorite(); }}
+                  aria-label={t('products.detail.favorite')}
+                  aria-pressed={favoriteId !== null}
                 >
                   <Heart className="h-5 w-5" fill={favoriteId ? "currentColor" : "none"} />
                 </button>
@@ -202,15 +217,16 @@ const ProductDetail = () => {
                   if (navigator.share) {
                     navigator.share({ title: document.title, url: window.location.href }).catch(console.error);
                   } else {
-                    navigator.clipboard.writeText(window.location.href);
-                    alert("Lien copié dans le presse-papier !");
+                    navigator.clipboard.writeText(window.location.href)
+                      .then(() => toast.success(t('common.linkCopied')))
+                      .catch(() => toast.error(t('common.networkError')));
                   }
-                }}>
+                }} aria-label={t('products.detail.share')}>
                   <Share2 className="h-5 w-5" />
                 </button>
-                <button onClick={() => setShowReport(true)} className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-gray-400 hover:text-red-500 shadow-sm border border-gray-100 hover:border-red-200 transition-all group relative">
+                <button onClick={() => setShowReport(true)} aria-label={t('products.detail.reportShort')} className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-gray-400 hover:text-red-500 shadow-sm border border-gray-100 hover:border-red-200 transition-all group relative">
                   <AlertTriangle className="h-5 w-5" />
-                  <span className="absolute -top-10 bg-gray-900 text-white text-[10px] font-bold px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">Signaler</span>
+                  <span className="absolute -top-10 bg-gray-900 text-white text-[10px] font-bold px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">{t('products.detail.reportShort')}</span>
                 </button>
 
               </div>
@@ -240,7 +256,7 @@ const ProductDetail = () => {
                 {product.companyVerified && (
                   <span className="flex items-center space-x-1 text-success text-[10px] font-black uppercase tracking-widest">
                     <ShieldCheck className="h-4 w-4" />
-                    <span>Entreprise vérifiée</span>
+                    <span>{t('products.detail.verifiedCompany')}</span>
                   </span>
                 )}
               </div>
@@ -251,9 +267,9 @@ const ProductDetail = () => {
                 <p className="text-sm font-bold text-secondary uppercase tracking-widest flex items-center space-x-2">
                   <Globe className="h-4 w-4" />
                   {product.companyId ? (
-                    <a href={`/directory/${generateSlugUrl(product.companyName, product.companyId)}`} className="hover:underline">Fournisseur : {product.companyName}</a>
+                    <a href={`/directory/${generateSlugUrl(product.companyName, product.companyId)}`} className="hover:underline">{t('products.detail.supplier', { name: product.companyName })}</a>
                   ) : (
-                    <span>Fournisseur : {product.companyName}</span>
+                    <span>{t('products.detail.supplier', { name: product.companyName })}</span>
                   )}
                 </p>
               )}
@@ -262,25 +278,25 @@ const ProductDetail = () => {
             <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm mb-8">
               <div className="flex items-end justify-between mb-8">
                 <div>
-                  <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Prix indicatif</p>
+                  <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">{t('products.detail.indicativePrice')}</p>
                   <p className="text-4xl font-mono font-black text-primary tracking-tighter">
-                    {product.priceValue ? formatPrice(product.priceValue) : 'Sur devis'}
+                    {product.priceValue ? formatPrice(product.priceValue) : t('common.onQuote')}
                   </p>
                 </div>
                 {product.reference_id && (
                   <div className="text-end">
-                    <p className="text-[10px] text-gray-500 mt-2 font-bold uppercase tracking-widest">Référence : {product.reference_id}</p>
+                    <p className="text-[10px] text-gray-500 mt-2 font-bold uppercase tracking-widest">{t('products.detail.reference', { ref: product.reference_id })}</p>
                   </div>
                 )}
               </div>
 
               <div className="space-y-4">
                 <button 
-                  onClick={() => navigate(`/contact?subject=${encodeURIComponent('Devis pour ' + product.name)}`)}
+                  onClick={() => navigate(`/contact?subject=${encodeURIComponent(t('products.detail.quoteSubject', { name: product.name }))}`)}
                   className="w-full btn-primary py-4 rounded-2xl flex items-center justify-center space-x-3 text-lg group"
                 >
                   <FileText className="h-6 w-6" />
-                  <span>DEMANDER UN DEVIS PROFESSIONNEL</span>
+                  <span className="uppercase">{t('products.detail.requestQuote')}</span>
                   <ArrowRight className="h-5 w-5 opacity-0 group-hover:opacity-100 group-hover:translate-x-2 transition-all rtl:rotate-180" />
                 </button>
                 <div className="grid grid-cols-2 gap-4">
@@ -294,7 +310,7 @@ const ProductDetail = () => {
                     )}
                   >
                     <GitCompare className="h-5 w-5" />
-                    <span>{isCompared ? "Comparé" : "Comparer"}</span>
+                    <span>{isCompared ? t('products.detail.compared') : t('common.compare')}</span>
                   </button>
                   {product.sellerId && product.sellerId !== user?.id && (
                     <button className="bg-neutral-bg text-primary py-4 rounded-2xl font-bold text-sm uppercase tracking-widest flex items-center justify-center space-x-2 hover:bg-gray-100 transition-all border border-gray-100" onClick={(e) => {
@@ -306,7 +322,7 @@ const ProductDetail = () => {
                       navigate(`/dashboard?tab=messages&to=${product.sellerId}`);
                     }}>
                       <MessageSquare className="h-5 w-5" />
-                      <span>Contacter le fournisseur</span>
+                      <span>{t('common.contact_supplier')}</span>
                     </button>
                   )}
                 </div>
@@ -316,15 +332,15 @@ const ProductDetail = () => {
             {/* Tabs for detailed content */}
             <div className="space-y-6">
               <div className="flex space-x-8 border-b border-gray-200">
-                <button className={`pb-4 border-b-2 ${activeTab === 'description' ? 'border-secondary text-primary' : 'border-transparent text-gray-400 hover:text-primary'} text-sm font-black uppercase tracking-widest transition-all`} onClick={() => setActiveTab('description')}>Description</button>
-                <button className={`pb-4 border-b-2 ${activeTab === 'specs' ? 'border-secondary text-primary' : 'border-transparent text-gray-400 hover:text-primary'} text-sm font-black uppercase tracking-widest transition-all`} onClick={() => setActiveTab('specs')}>Spécifications</button>
+                <button className={`pb-4 border-b-2 ${activeTab === 'description' ? 'border-secondary text-primary' : 'border-transparent text-gray-400 hover:text-primary'} text-sm font-black uppercase tracking-widest transition-all`} onClick={() => setActiveTab('description')}>{t('products.detail.description')}</button>
+                <button className={`pb-4 border-b-2 ${activeTab === 'specs' ? 'border-secondary text-primary' : 'border-transparent text-gray-400 hover:text-primary'} text-sm font-black uppercase tracking-widest transition-all`} onClick={() => setActiveTab('specs')}>{t('products.detail.specs')}</button>
               </div>
               
               {activeTab === 'description' && (
                 <div className="prose prose-sm max-w-none text-gray-600">
                   {product.description
                     ? <p className="whitespace-pre-line">{product.description}</p>
-                    : <p className="text-gray-400">Le fournisseur n'a pas encore ajouté de description.</p>}
+                    : <p className="text-gray-400">{t('products.detail.noDescription')}</p>}
                   {product.features?.length > 0 && (
                     <ul className="mt-4 list-disc ps-5">
                       {product.features.map((f: string) => <li key={f}>{f}</li>)}
@@ -364,7 +380,7 @@ const ProductDetail = () => {
                   </div>
                   {p.companyName && <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">{p.companyName}</p>}
                   <h3 className="text-lg font-bold text-primary leading-tight mb-2 flex-1">{p.name}</h3>
-                  <p className="text-xl font-black text-secondary">{Number(p.price) > 0 ? formatPrice(Number(p.price)) : 'Sur devis'}</p>
+                  <p className="text-xl font-black text-secondary">{Number(p.price) > 0 ? formatPrice(Number(p.price)) : t('common.onQuote')}</p>
                 </div>
               ))}
             </div>
@@ -379,7 +395,7 @@ const ProductDetail = () => {
             <textarea
               value={reportReason}
               onChange={(e) => setReportReason(e.target.value)}
-              placeholder="Ex: Contrefaçon, contenu trompeur, images inappropriées..."
+              placeholder={t('products.detail.reportPlaceholder')}
               className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-red-500 focus:ring-2 focus:ring-red-500/20 text-sm outline-none transition-all resize-none h-32 mb-6"
             ></textarea>
             <div className="flex space-x-3">

@@ -57,10 +57,10 @@ const SearchResults = () => {
         <div className="mb-12">
           <div className="flex items-center space-x-3 mb-4">
              <Search className="h-5 w-5 text-secondary" />
-             <h1 className="text-4xl font-black text-primary uppercase tracking-tighter">{t('search.results_for')} "{query || 'Toutes les données'}"</h1>
+             <h1 className="text-4xl font-black text-primary uppercase tracking-tighter">{t('search.results_for')} "{query || t('search.everything')}"</h1>
           </div>
           <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-2">
-            Nous avons trouvé {isLoading ? '...' : totalResults} résultats correspondant à votre requête.
+            {isLoading ? '…' : t('search.found', { count: totalResults })}
           </p>
         </div>
 
@@ -70,13 +70,13 @@ const SearchResults = () => {
             <div className="bg-white p-8 border border-gray-100 shadow-sm rounded-none">
               <h3 className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-6 flex items-center">
                 <Filter className="h-4 w-4 me-2 text-secondary" />
-                Filtrer par type
+                {t('search.filterType')}
               </h3>
               <div className="space-y-3 mb-8">
                 {[
-                  { id: 'all', label: 'Tous les résultats' },
-                  { id: 'products', label: 'Produits' },
-                  { id: 'companies', label: 'Entreprises' }
+                  { id: 'all', label: t('search.allResults') },
+                  { id: 'products', label: t('search.products') },
+                  { id: 'companies', label: t('search.companies') }
                 ].map((filter) => (
                   <label key={filter.id} className="flex items-center space-x-3 cursor-pointer group" onClick={() => setTypeFilter(filter.id)}>
                     <div className={cn(
@@ -92,7 +92,7 @@ const SearchResults = () => {
               </div>
               
               <h3 className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-6 flex items-center">
-                Filtres Avancés
+                {t('search.advancedFilters')}
               </h3>
               
               <div className="space-y-4">
@@ -100,7 +100,7 @@ const SearchResults = () => {
                    <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2 block">{t('search.sector_cat')}</label>
                    <input 
                      type="text" 
-                     placeholder="Ex: Énergie, IT..." 
+                     placeholder={t('search.sectorPlaceholder')}
                      value={sectorFilter}
                      onChange={(e) => setSectorFilter(e.target.value)}
                      className="w-full bg-gray-50 border border-gray-100 p-3 text-xs focus:border-secondary outline-none transition-all"
@@ -110,7 +110,7 @@ const SearchResults = () => {
                    <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2 block">{t('search.region')}</label>
                    <input 
                      type="text" 
-                     placeholder="Ex: Alger, Oran..." 
+                     placeholder={t('search.wilayaPlaceholder')}
                      value={wilayaFilter}
                      onChange={(e) => setWilayaFilter(e.target.value)}
                      className="w-full bg-gray-50 border border-gray-100 p-3 text-xs focus:border-secondary outline-none transition-all"
@@ -125,10 +125,10 @@ const SearchResults = () => {
                </div>
                <h3 className="text-xl font-black uppercase tracking-tighter mb-4 relative z-10">{t('search.boost_vis')}</h3>
                <p className="text-white/60 text-[9px] font-bold uppercase tracking-widest leading-relaxed mb-8 relative z-10">
-                 Apparaissez en tête des résultats de recherche pour vos mots-clés stratégiques.
+                 {t('search.adsText')}
                </p>
-               <Link to="/contact" className="w-full bg-secondary py-4 text-[10px] font-black uppercase tracking-widest hover:rotate-1 transition-all relative z-10 flex items-center justify-center text-white cursor-pointer">
-                 Publicité Ciblée
+               <Link to="/ads-request" className="w-full bg-secondary py-4 text-[10px] font-black uppercase tracking-widest hover:rotate-1 transition-all relative z-10 flex items-center justify-center text-white cursor-pointer">
+                 {t('search.adsButton')}
                </Link>
             </div>
           </aside>
@@ -160,7 +160,7 @@ const SearchResults = () => {
                               </div>
                               <div className="p-6 flex flex-col justify-between flex-1">
                                 <div>
-                                  <p className="text-[9px] font-black text-secondary uppercase tracking-widest mb-1">{product.category || 'Général'}</p>
+                                  <p className="text-[9px] font-black text-secondary uppercase tracking-widest mb-1">{product.category || t('search.general')}</p>
                                   <h4 className="text-lg font-black text-primary uppercase tracking-tighter group-hover:text-secondary transition-colors leading-tight mb-4">{product.name}</h4>
                                 </div>
                                 <div className="flex items-center justify-between pt-4 border-t border-gray-50">
@@ -198,8 +198,8 @@ const SearchResults = () => {
                                     {company.status === 'approved' && <ShieldCheck className="h-4 w-4 text-emerald-500" />}
                                   </div>
                                   <div className="flex items-center space-x-4 text-[9px] font-black text-gray-400 uppercase tracking-widest">
-                                    <span className="flex items-center"><Globe className="h-3 w-3 me-1" /> {company.wilaya || company.address || 'Algérie'}</span>
-                                    <span className="flex items-center"><Package className="h-3 w-3 me-1" /> {company.activity_sector || 'Général'}</span>
+                                    <span className="flex items-center"><Globe className="h-3 w-3 me-1" /> {company.wilaya || company.address || t('search.algeria')}</span>
+                                    <span className="flex items-center"><Package className="h-3 w-3 me-1" /> {company.activity_sector || t('search.general')}</span>
                                   </div>
                                 </div>
                               </div>
@@ -221,7 +221,7 @@ const SearchResults = () => {
                          disabled={isFetchingNextPage}
                          className="px-8 py-4 bg-gray-50 text-[10px] font-black text-primary uppercase tracking-widest hover:bg-gray-100 transition-colors disabled:opacity-50"
                        >
-                         {isFetchingNextPage ? 'Chargement...' : 'Voir plus de résultats'}
+                         {isFetchingNextPage ? t('search.loading') : t('search.loadMore')}
                        </button>
                      </div>
                    )}

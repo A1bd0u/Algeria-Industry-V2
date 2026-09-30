@@ -51,6 +51,7 @@ import ComparisonBar from './components/ComparisonBar';
 import { AuthProvider } from './context/AuthContext';
 import { ComparisonProvider } from './context/ComparisonContext';
 import { CurrencyProvider } from './context/CurrencyContext';
+import { ToastProvider } from './context/ToastContext';
 import VerifyAccountModal from './components/VerifyAccountModal';
 import CookieBanner from './components/CookieBanner';
 import { Navigate } from 'react-router-dom';
@@ -97,6 +98,7 @@ export default function App() {
     <HelmetProvider>
       <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
+      <ToastProvider>
       <AuthProvider>
           <CurrencyProvider>
             <ComparisonProvider>
@@ -182,6 +184,7 @@ export default function App() {
             </ComparisonProvider>
           </CurrencyProvider>
       </AuthProvider>
+      </ToastProvider>
     </QueryClientProvider>
     </ErrorBoundary>
     </HelmetProvider>

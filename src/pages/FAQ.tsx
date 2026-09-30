@@ -8,6 +8,8 @@ import {
 import { AnimatePresence, motion } from 'motion/react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
+import { SUPPORT, telHref } from '../config/site';
 import { cn } from '../lib/utils';
 
 const FAQ = () => {
@@ -130,14 +132,16 @@ const FAQ = () => {
             <p className="text-white/60 font-medium text-sm">{t('faq.help_desc')}</p>
           </div>
           <div className="relative z-10 flex flex-wrap justify-center gap-4">
-             <button className="flex items-center space-x-3 bg-secondary px-6 py-4 rounded-2xl text-xs font-black uppercase tracking-widest shadow-xl hover:scale-105 transition-all" onClick={(e) => { e.preventDefault(); alert("Fonctionnalité en cours de développement"); }}>
-                <Phone className="h-4 w-4" />
-                <span>{t('faq.call_expert')}</span>
-             </button>
-             <button className="flex items-center space-x-3 bg-white/10 border border-white/20 px-6 py-4 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-white/20 transition-all" onClick={(e) => { e.preventDefault(); alert("Fonctionnalité en cours de développement"); }}>
+             {SUPPORT.phone && (
+               <a href={telHref(SUPPORT.phone)} className="flex items-center gap-3 bg-secondary px-6 py-4 rounded-2xl text-xs font-black uppercase tracking-widest shadow-xl hover:scale-105 transition-all">
+                  <Phone className="h-4 w-4" />
+                  <span>{t('faq.call_expert')}</span>
+               </a>
+             )}
+             <Link to="/contact" className="flex items-center gap-3 bg-white/10 border border-white/20 px-6 py-4 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-white/20 transition-all">
                 <Mail className="h-4 w-4" />
                 <span>{t('faq.send_ticket')}</span>
-             </button>
+             </Link>
           </div>
         </div>
       </div>

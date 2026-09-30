@@ -16,10 +16,13 @@ import { BlogCardSkeleton } from '../components/Skeleton';
 import { cn, generateSlugUrl } from '../lib/utils';
 import SEO from '../components/SEO';
 import { absoluteUrl } from '../config/site';
+import { useToast } from '../context/ToastContext';
+import { formatDate } from '../lib/format';
 
 const Blog = () => {
   const { t, i18n } = useTranslation();
-  const CATEGORIES = [t('categories.all'), t('categories.energy'), t('categories.electronic'), t('categories.automotive'), t('categories.agri'), t('categories.construction')];
+  const toast = useToast();
+  const CATEGORIES = [t('categories.all'), t('categories.energy'), t('categories.electronics'), t('categories.auto'), t('categories.agrifood'), t('categories.btph')];
   const [activeCategory, setActiveCategory] = useState(t('categories.all'));
 
   const [posts, setPosts] = useState<any[]>([]);
@@ -31,11 +34,18 @@ const Blog = () => {
       try {
         setIsLoading(true);
         const res = await fetch('/api/articles');
-        if (!res.ok) throw new Error("Erreur de récupération des articles");
+        if (!res.ok) throw new Error('load');
         const data = await res.json();
-        setPosts(data);
+        setPosts(data.map((post: any) => ({
+          ...post,
+          image: post.image_url || null,
+          date: formatDate(post.created_at),
+          readTime: t('blog.readTime', {
+            count: Math.max(1, Math.round((post.content || '').trim().split(/\s+/).filter(Boolean).length / 200)),
+          }),
+        })));
       } catch (err: any) {
-        setError(err.message);
+        setError(t('blog.loadError'));
       } finally {
         setIsLoading(false);
       }
@@ -119,7 +129,7 @@ const Blog = () => {
               <div className={cn("bg-white rounded-[40px] overflow-hidden shadow-xl border border-gray-100 flex flex-col lg:flex-row group", i18n.language?.startsWith('ar') && "lg:flex-row-reverse text-end")}>
                 <Link to={`/blog/${generateSlugUrl(featuredPost.title, featuredPost.id)}`} className="lg:w-3/5 h-64 lg:h-auto overflow-hidden">
                   <img 
-                    src={featuredPost.image} 
+                    src={featuredPost.image || '/favicon.svg'}
                     alt={featuredPost.title} 
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                     referrerPolicy="no-referrer"
@@ -173,12 +183,17 @@ const Blog = () => {
                 className={cn("bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-xl transition-all group flex flex-col", i18n.language?.startsWith('ar') && "text-end")}
               >
                 <Link to={`/blog/${generateSlugUrl(post.title, post.id)}`} className="h-48 overflow-hidden relative block">
-                  <img 
-                    src={post.image} 
-                    alt={post.title} 
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    referrerPolicy="no-referrer"
-                  />
+                  {post.image ? (
+                    <img
+                      src={post.image}
+                      alt={post.title}
+                      loading="lazy"
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      referrerPolicy="no-referrer"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gray-50 flex items-center justify-center"><img src="/favicon.svg" alt="" className="h-12 w-12 opacity-20" /></div>
+                  )}
                   <div className={cn("absolute top-4", i18n.language?.startsWith('ar') ? "end-4" : "start-4")}>
                     <span className="bg-white/90 backdrop-blur-sm text-primary px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">
                       {post.category}
@@ -212,7 +227,17 @@ const Blog = () => {
                       </div>
                       <span className="text-xs font-bold text-gray-600">{post.author}</span>
                     </div>
-                    <button className="text-primary hover:text-secondary transition-colors" onClick={(e) => { e.preventDefault(); alert("Fonctionnalité en cours de développement"); }}>
+                    <button type="button" aria-label={t('blog.copyLink')} className="text-primary hover:text-secondary transition-colors" onClick={(e) => {
+                      e.preventDefault();
+                      const url = absoluteUrl(`/blog/${generateSlugUrl(post.title, post.id)}`);
+                      if (navigator.share) {
+                        navigator.share({ title: post.title, url }).catch(() => {});
+                        return;
+                      }
+                      navigator.clipboard.writeText(url)
+                        .then(() => toast.success(t('common.linkCopied')))
+                        .catch(() => toast.error(t('common.networkError')));
+                    }}>
                       <Share2 className="h-4 w-4" />
                     </button>
                   </div>
@@ -223,31 +248,14 @@ const Blog = () => {
             </>
           )}
 
-          {/* Newsletter CTA */}
-          <section className="mt-24 bg-primary p-12 rounded-[40px] text-white relative overflow-hidden text-center">
-            <div className="absolute top-0 start-0 w-full h-full opacity-5">
-              <div className="absolute top-0 start-0 w-64 h-64 bg-white rounded-full -translate-x-1/2 -translate-y-1/2"></div>
-              <div className="absolute bottom-0 end-0 w-96 h-96 bg-white rounded-full translate-x-1/2 translate-y-1/2"></div>
-            </div>
-            <div className="relative z-10 max-w-2xl mx-auto">
-              <h2 className="text-3xl font-bold mb-4">{t('blog.newsletter_title')}</h2>
-              <p className="text-primary-foreground/80 mb-8">
-                {t('blog.newsletter_subtitle')}
-              </p>
-              <form className={cn("flex flex-col sm:flex-row gap-4", i18n.language?.startsWith('ar') && "sm:flex-row-reverse")}>
-                <input 
-                  type="email" 
-                  placeholder="votre-email@entreprise.dz" 
-                  className={cn("flex-1 px-6 py-4 bg-white/10 border border-white/20 rounded-2xl text-white placeholder:text-white/40 outline-none focus:bg-white/20 transition-all", i18n.language?.startsWith('ar') && "text-end")}
-                  required
-                />
-                <button className="bg-secondary text-white px-8 py-4 rounded-2xl font-bold hover:scale-105 transition-all shadow-xl" onClick={(e) => { e.preventDefault(); window.scrollTo(0,0); }}>
-                  {t('blog.subscribe')}
-                </button>
-              </form>
-              <p className="text-[10px] text-white/40 mt-4">
-                {t('blog.privacy_note')}
-              </p>
+          {/* Appel à l'action : pas de newsletter tant qu'aucun envoi n'existe. */}
+          <section className="mt-24 bg-primary p-12 rounded-[40px] text-white text-center">
+            <div className="max-w-2xl mx-auto">
+              <h2 className="text-3xl font-bold mb-4">{t('blog.ctaTitle')}</h2>
+              <p className="text-white/70 mb-8">{t('blog.ctaText')}</p>
+              <Link to="/directory" className="inline-block bg-secondary text-white px-8 py-4 rounded-2xl font-bold hover:scale-105 transition-all shadow-xl">
+                {t('blog.ctaButton')}
+              </Link>
             </div>
           </section>
         </div>

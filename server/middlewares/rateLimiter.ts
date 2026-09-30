@@ -94,3 +94,18 @@ export const aiLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
 });
+
+// Demandes de devis groupées depuis le comparateur : chaque demande écrit à
+// plusieurs fournisseurs, le quota est donc compté par compte (après requireAuth).
+export const quoteRequestLimiter = rateLimit({
+  store: sharedStore('quote'),
+  windowMs: 60 * 60 * 1000,
+  max: 10,
+  keyGenerator: (req: Request) => (req as any).user?.id || ipKey(req),
+  message: {
+    error: 'Trop de demandes de devis envoyées. Veuillez réessayer plus tard.',
+    code: 'QUOTE_RATE_LIMIT'
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});

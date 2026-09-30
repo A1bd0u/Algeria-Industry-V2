@@ -9,6 +9,7 @@ import { cn } from '../lib/utils';
 
 // Étape 1 : saisie du code reçu par e-mail. La session s'ouvre à la validation.
 const EmailCodeStep = ({ initialEmail }: { initialEmail: string }) => {
+  const { t } = useTranslation();
   const { verifyCode, resendCode } = useAuth();
   const [email, setEmail] = useState(initialEmail);
   const [code, setCode] = useState('');
@@ -26,7 +27,7 @@ const EmailCodeStep = ({ initialEmail }: { initialEmail: string }) => {
     try {
       await verifyCode(email.trim().toLowerCase(), code);
     } catch (err: any) {
-      setError(err.message || 'Code invalide.');
+      setError(err.message || t('registerSuccess.invalidCode'));
     } finally {
       setLoading(false);
     }
@@ -34,7 +35,7 @@ const EmailCodeStep = ({ initialEmail }: { initialEmail: string }) => {
 
   const handleResend = async () => {
     if (!captchaToken) {
-      setError('Veuillez valider le captcha pour renvoyer le code.');
+      setError(t('registerSuccess.captchaRequired'));
       return;
     }
     setError('');
@@ -42,9 +43,9 @@ const EmailCodeStep = ({ initialEmail }: { initialEmail: string }) => {
     setResending(true);
     try {
       await resendCode(email.trim().toLowerCase(), captchaToken);
-      setInfo('Si un compte en attente existe pour cette adresse, un nouveau code vient d\'être envoyé.');
+      setInfo(t('registerSuccess.codeResent'));
     } catch (err: any) {
-      setError(err.message || "Erreur lors de l'envoi.");
+      setError(err.message || t('registerSuccess.sendError'));
     } finally {
       setResending(false);
     }
@@ -57,9 +58,9 @@ const EmailCodeStep = ({ initialEmail }: { initialEmail: string }) => {
           <div className="w-16 h-16 bg-secondary rounded-2xl flex items-center justify-center mx-auto mb-6">
             <Mail className="h-8 w-8 text-white" />
           </div>
-          <h1 className="text-2xl font-black uppercase tracking-tight mb-2">Vérifiez votre adresse e-mail</h1>
+          <h1 className="text-2xl font-black uppercase tracking-tight mb-2">{t('registerSuccess.verifyTitle')}</h1>
           <p className="text-white/70 text-sm">
-            Si cette adresse peut être utilisée, un code à 6 chiffres vient d'y être envoyé. Il est valable 15 minutes.
+            {t('registerSuccess.verifyText')}
           </p>
         </div>
 
@@ -68,7 +69,7 @@ const EmailCodeStep = ({ initialEmail }: { initialEmail: string }) => {
           {info && <div role="status" className="bg-blue-50 text-blue-600 p-3 text-xs font-bold border border-blue-100 rounded-xl">{info}</div>}
 
           <div className="space-y-2">
-            <label htmlFor="verify_email" className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Adresse e-mail</label>
+            <label htmlFor="verify_email" className="text-[10px] font-black text-gray-500 uppercase tracking-widest">{t('registerSuccess.email')}</label>
             <input
               id="verify_email"
               type="email"
@@ -80,7 +81,7 @@ const EmailCodeStep = ({ initialEmail }: { initialEmail: string }) => {
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="verify_code" className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Code de vérification</label>
+            <label htmlFor="verify_code" className="text-[10px] font-black text-gray-500 uppercase tracking-widest">{t('registerSuccess.code')}</label>
             <input
               id="verify_code"
               type="text"
@@ -100,7 +101,7 @@ const EmailCodeStep = ({ initialEmail }: { initialEmail: string }) => {
             disabled={loading || code.length !== 6 || !email}
             className="w-full btn-secondary py-4 rounded-xl flex items-center justify-center space-x-2 disabled:opacity-50"
           >
-            <span className="text-xs font-black uppercase tracking-widest">{loading ? 'Vérification…' : 'Confirmer mon adresse'}</span>
+            <span className="text-xs font-black uppercase tracking-widest">{loading ? t('registerSuccess.verifying') : t('registerSuccess.confirm')}</span>
             {!loading && <ArrowRight className="h-4 w-4 rtl:rotate-180" />}
           </button>
 
@@ -114,7 +115,7 @@ const EmailCodeStep = ({ initialEmail }: { initialEmail: string }) => {
                   onExpire={() => setCaptchaToken(null)}
                 />
               ) : (
-                <p className="text-red-500 text-[10px] font-bold">Erreur de configuration : VITE_TURNSTILE_SITE_KEY manquant</p>
+                <p className="text-red-500 text-[10px] font-bold">{t('registerSuccess.captchaUnavailable')}</p>
               )}
             </div>
             <button
@@ -124,10 +125,10 @@ const EmailCodeStep = ({ initialEmail }: { initialEmail: string }) => {
               className="w-full text-[10px] font-black text-secondary hover:text-primary uppercase tracking-widest flex items-center justify-center disabled:opacity-50"
             >
               <RefreshCw className={cn('h-3 w-3 me-2', resending && 'animate-spin')} />
-              {resending ? 'Envoi…' : 'Renvoyer le code'}
+              {resending ? t('compare.sending') : t('registerSuccess.resend')}
             </button>
             <p className="text-center text-xs text-gray-500">
-              Vous avez déjà un compte ? <Link to="/login" className="font-bold text-primary hover:underline">Connectez-vous</Link>
+              {t('registerSuccess.haveAccount')} <Link to="/login" className="font-bold text-primary hover:underline">{t('registerSuccess.login')}</Link>
             </p>
           </div>
         </form>
@@ -137,7 +138,7 @@ const EmailCodeStep = ({ initialEmail }: { initialEmail: string }) => {
 };
 
 const RegisterSuccess = () => {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const location = useLocation();
   const initialEmail = (location.state as any)?.email || user?.email || '';
@@ -153,20 +154,18 @@ const RegisterSuccess = () => {
 
   // Parcours fournisseur en 3 étapes : compte → entreprise et KYC → premier produit.
   const onboarding = [
-    { icon: CheckCircle2, title: isAr ? 'الحساب' : 'Compte créé', desc: isAr ? 'تم التحقق من بريدك الإلكتروني.' : 'Adresse e-mail vérifiée.', done: true, link: null },
+    { icon: CheckCircle2, title: t('registerSuccess.steps.account'), desc: t('registerSuccess.steps.accountText'), done: true, link: null },
     {
       icon: ShieldCheck,
-      title: isAr ? 'المؤسسة و KYC' : 'Entreprise et KYC',
-      desc: kycPending
-        ? (isAr ? 'ملفك قيد المراجعة.' : 'Votre dossier est en cours de vérification.')
-        : (isAr ? 'أرسل السجل التجاري و NIF للحصول على شارة "مؤسسة موثقة".' : 'Déposez RC et NIF pour obtenir le badge « entreprise vérifiée ».'),
+      title: t('registerSuccess.steps.kyc'),
+      desc: kycPending ? t('registerSuccess.steps.kycPending') : t('registerSuccess.steps.kycText'),
       done: kycDone,
       link: kycDone || kycPending ? null : '/kyc-upload',
     },
     {
       icon: Package,
-      title: isAr ? 'أول منتج' : 'Premier produit',
-      desc: isAr ? 'انشر منتجك الأول بعد الموافقة على KYC.' : 'Publiez votre premier produit une fois le KYC approuvé.',
+      title: t('registerSuccess.steps.product'),
+      desc: t('registerSuccess.steps.productText'),
       done: false,
       link: kycDone ? '/dashboard?tab=products' : null,
     },
@@ -174,9 +173,9 @@ const RegisterSuccess = () => {
   const completed = onboarding.filter((s) => s.done).length;
 
   const buyerSteps = [
-    { icon: Search, title: isAr ? 'استكشاف الموردين' : 'Trouver un fournisseur', desc: isAr ? 'تصفح الموردين الموثقين.' : 'Parcourez les fournisseurs vérifiés.', link: '/directory' },
-    { icon: Building2, title: isAr ? 'تصفح المنتجات' : 'Explorer les produits', desc: isAr ? 'قارن واطلب عرض سعر.' : 'Comparez et demandez un devis.', link: '/products' },
-    { icon: LayoutDashboard, title: isAr ? 'لوحة التحكم' : 'Compléter votre profil', desc: isAr ? 'أضف معلومات مؤسستك.' : 'Ajoutez les informations de votre entreprise.', link: '/dashboard' },
+    { icon: Search, title: t('registerSuccess.buyer.find'), desc: t('registerSuccess.buyer.findText'), link: '/directory' },
+    { icon: Building2, title: t('registerSuccess.buyer.explore'), desc: t('registerSuccess.buyer.exploreText'), link: '/products' },
+    { icon: LayoutDashboard, title: t('registerSuccess.buyer.profile'), desc: t('registerSuccess.buyer.profileText'), link: '/dashboard' },
   ];
 
   return (
@@ -193,23 +192,23 @@ const RegisterSuccess = () => {
                 <CheckCircle2 className="h-12 w-12 text-white" />
               </motion.div>
               <h1 className="text-4xl font-black uppercase tracking-tighter leading-none mb-6">
-                {isAr ? 'تم إنشاء الحساب بنجاح' : 'Compte créé avec succès'}
+                {t('registerSuccess.createdTitle')}
               </h1>
               <p className="text-white/60 text-sm font-medium leading-relaxed">
-                {isAr ? 'مرحبًا بك في Algeria Industry.' : 'Bienvenue sur Algeria Industry, la marketplace des fournisseurs industriels algériens vérifiés.'}
+                {t('registerSuccess.welcome')}
               </p>
             </div>
 
             <div className="md:w-1/2 p-12">
               <h2 className="text-xs font-black text-secondary uppercase tracking-[0.3em] mb-4">
-                {isAr ? 'الخطوات التالية' : 'Prochaines étapes'}
+                {t('registerSuccess.nextSteps')}
               </h2>
 
               {isSupplier ? (
                 <>
-                  <div className="mb-8" aria-label={`Étape ${completed} sur 3`}>
+                  <div className="mb-8" aria-label={t('registerSuccess.progressLabel', { done: completed, total: 3 })}>
                     <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-gray-500 mb-2">
-                      <span>{isAr ? 'التقدم' : 'Progression'}</span>
+                      <span>{t('registerSuccess.progress')}</span>
                       <span>{completed}/3</span>
                     </div>
                     <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
@@ -264,7 +263,7 @@ const RegisterSuccess = () => {
               <div className="mt-12 flex flex-col space-y-4">
                 <Link to="/dashboard" className="w-full btn-secondary py-4 rounded-xl flex items-center justify-center space-x-2">
                   <span className="text-xs font-black uppercase tracking-widest">
-                    {isAr ? 'الانتقال إلى لوحة التحكم' : 'Aller au tableau de bord'}
+                    {t('registerSuccess.goDashboard')}
                   </span>
                   <ArrowRight className="h-4 w-4 rtl:rotate-180" />
                 </Link>
@@ -276,10 +275,10 @@ const RegisterSuccess = () => {
         <div className="mt-12 flex flex-col md:flex-row items-center justify-between text-gray-500 px-8">
           <div className="flex items-center space-x-2 mb-4 md:mb-0">
             <Settings className="h-4 w-4" />
-            <span className="text-[10px] font-bold uppercase tracking-widest">Besoin d'aide pour configurer votre compte ?</span>
+            <span className="text-[10px] font-bold uppercase tracking-widest">{t('registerSuccess.needHelp')}</span>
           </div>
           <Link to="/contact" className="text-[10px] font-bold uppercase tracking-widest text-primary hover:text-secondary border-b border-primary/20 pb-0.5">
-            Contacter le support
+            {t('registerSuccess.contactSupport')}
           </Link>
         </div>
       </div>

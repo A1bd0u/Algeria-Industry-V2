@@ -7,6 +7,9 @@ export interface Product {
   brand: string;
   image: string;
   price?: string;
+  priceValue?: number | null;
+  sellerId?: string | null;
+  companyVerified?: boolean;
   specs: { [key: string]: string };
 }
 

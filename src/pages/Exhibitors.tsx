@@ -12,13 +12,16 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { cn, generateSlugUrl } from '../lib/utils';
 import { CompanySkeleton } from '../components/Skeleton';
+import { formatNumber } from '../lib/format';
 
 const Exhibitors = () => {
   const { t, i18n } = useTranslation();
   const [searchTerm, setSearchTerm] = useState('');
-  const [activeSector, setActiveSector] = useState('Tous');
+  // '' = tous les secteurs / toutes les wilayas.
+  const [activeSector, setActiveSector] = useState('');
   const [isSectorOpen, setIsSectorOpen] = useState(false);
-  const [activeRegion, setActiveRegion] = useState('Toutes');
+  const [activeRegion, setActiveRegion] = useState('');
+  const [stats, setStats] = useState<{ verifiedCompanies: number; publishedProducts: number } | null>(null);
   const [isRegionOpen, setIsRegionOpen] = useState(false);
   const [showVerifiedOnly, setShowVerifiedOnly] = useState(false);
   const [exhibitors, setExhibitors] = useState<any[]>([]);
@@ -80,8 +83,12 @@ const Exhibitors = () => {
     const fetchExhibitors = async () => {
       try {
         setIsLoading(true);
-        const res = await fetch('/api/companies?limit=1000');
-        if (!res.ok) throw new Error('Erreur lors du chargement des exposants');
+        fetch('/api/stats/public')
+          .then((r) => (r.ok ? r.json() : null))
+          .then((value) => value && setStats(value))
+          .catch(() => {});
+        const res = await fetch('/api/companies?limit=50');
+        if (!res.ok) throw new Error('load');
         let data = await res.json();
         if (data && data.data) data = data.data;
         
@@ -89,22 +96,17 @@ const Exhibitors = () => {
         const formatted = data.map((c: any) => ({
           id: c.id,
           name: c.name,
-          sector: c.activity_sector || 'Non spécifié',
-          location: c.wilaya || c.region || 'Alger',
-          description: c.description || 'Aucune description',
-          logo: c.logo_url || '/placeholder.svg',
-          stats: {
-            products: 0, // À remplacer par un vrai compteur si disponible
-            views: '0',
-            employees: 'N/A'
-          },
-          verified: c.certified || c.is_verified || false,
+          sector: c.activity_sector || '',
+          location: c.wilaya || '',
+          description: c.description || '',
+          logo: c.logo_url || '/favicon.svg',
+          verified: c.status === 'approved',
           status: c.status
         }));
         
         setExhibitors(formatted);
       } catch (err: any) {
-        setError(err.message);
+        setError(t('exhibitor.list.loadError'));
       } finally {
         setIsLoading(false);
       }
@@ -117,8 +119,8 @@ const Exhibitors = () => {
   const filteredExhibitors = exhibitors.filter((exhibitor: any) => {
     const matchesSearch = exhibitor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           exhibitor.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesSector = activeSector === 'Tous' || exhibitor.sector === activeSector;
-    const matchesRegion = activeRegion === 'Toutes' || exhibitor.location.includes(activeRegion);
+    const matchesSector = !activeSector || exhibitor.sector === activeSector;
+    const matchesRegion = !activeRegion || exhibitor.location === activeRegion;
     const matchesVerified = !showVerifiedOnly || exhibitor.verified;
     return matchesSearch && matchesSector && matchesRegion && matchesVerified;
   });
@@ -129,11 +131,10 @@ const Exhibitors = () => {
   const endIndex = startIndex + itemsPerPage;
   const paginatedExhibitors = filteredExhibitors.slice(startIndex, endIndex);
 
-  const sectors = ['Tous', 'Agroalimentaire', 'BTPH', 'Chimie & Pétrochimie', 'Énergie & Mines', 
-                   'Industrie Pharmaceutique', 'Métallurgie & Mécanique', 'Plasturgie & Caoutchouc', 
-                   'Textile & Cuir', 'Électronique & Électroménager', 'Automobile & Transport', 
-                   'Énergies Renouvelables'];
-  const regions = ['Toutes', 'Alger', 'Oran', 'Sétif', 'Annaba', 'Constantine', 'Blida'];
+  // Filtres construits à partir des entreprises réellement inscrites.
+  const uniqueSorted = (values: string[]) => Array.from(new Set(values.filter(Boolean))).sort((a, b) => a.localeCompare(b));
+  const sectors = ['', ...uniqueSorted(exhibitors.map((e: any) => e.sector))];
+  const regions = ['', ...uniqueSorted(exhibitors.map((e: any) => e.location))];
 
   return (
     <div className={cn("min-h-screen bg-neutral-bg pt-8 pb-20", i18n.language?.startsWith('ar') && "font-arabic")}>
@@ -146,27 +147,29 @@ const Exhibitors = () => {
               className="flex items-center space-x-2 text-secondary mb-4"
             >
               <Factory className="h-4 w-4" />
-              <span className="text-[10px] font-black uppercase tracking-[0.4em]">Annuaire Entreprises</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.4em]">{t('exhibitor.list.label')}</span>
             </motion.div>
             <h1 className="text-4xl md:text-5xl font-black text-primary uppercase tracking-tighter leading-none mb-6">
-              Exposants & <span className="text-secondary">Partenaires</span>
+              {t('exhibitor.list.title')}
             </h1>
             <p className="text-gray-500 font-medium text-lg leading-relaxed">
-              Découvrez l'écosystème industriel algérien. Trouvez des partenaires stratégiques et explorez les leaders de chaque secteur.
+              {t('exhibitor.list.subtitle')}
             </p>
           </div>
           
-          <div className="flex items-center space-x-4 bg-white p-3 rounded-2xl border border-gray-100 shadow-sm">
-            <div className="text-end">
-              <p className="text-[10px] font-black text-primary uppercase tracking-widest">Exposants Actifs</p>
-              <p className="text-2xl font-black text-secondary tracking-tighter">542+</p>
+          {stats && (
+            <div className="flex items-center gap-4 bg-white p-3 rounded-2xl border border-gray-100 shadow-sm">
+              <div className="text-end">
+                <p className="text-[10px] font-black text-primary uppercase tracking-widest">{t('home.stats.verifiedCompanies')}</p>
+                <p className="text-2xl font-black text-secondary tracking-tighter">{formatNumber(stats.verifiedCompanies)}</p>
+              </div>
+              <div className="w-px h-8 bg-gray-100" />
+              <div className="text-end">
+                <p className="text-[10px] font-black text-primary uppercase tracking-widest">{t('home.stats.publishedProducts')}</p>
+                <p className="text-2xl font-black text-secondary tracking-tighter">{formatNumber(stats.publishedProducts)}</p>
+              </div>
             </div>
-            <div className="w-px h-8 bg-gray-100" />
-            <div className="text-end">
-              <p className="text-[10px] font-black text-primary uppercase tracking-widest">Secteurs</p>
-              <p className="text-2xl font-black text-secondary tracking-tighter">18</p>
-            </div>
-          </div>
+          )}
         </div>
 
         {/* Search & Filters */}
@@ -176,14 +179,12 @@ const Exhibitors = () => {
               <Search className="h-5 w-5 text-gray-400 ms-3" />
               <input 
                 type="text" 
-                placeholder="Rechercher une entreprise par nom ou activité..."
+                placeholder={t('exhibitor.list.searchPlaceholder')}
+                aria-label={t('exhibitor.list.searchPlaceholder')}
                 className="flex-1 bg-transparent px-4 py-3 text-sm font-medium focus:outline-none"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
-              <button className="px-6 py-3 bg-primary rounded-xl text-[10px] font-black uppercase tracking-widest text-white hover:bg-secondary transition-all">
-                Rechercher
-              </button>
             </div>
             
             <div className="flex flex-col sm:flex-row gap-4 shrink-0">
@@ -193,8 +194,8 @@ const Exhibitors = () => {
                   className="w-full sm:w-auto flex items-center justify-between bg-white px-5 py-3 rounded-xl border border-gray-100 shadow-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all cursor-pointer text-gray-800 hover:border-gray-300 min-w-[260px] text-start"
                 >
                   <div className="flex flex-col gap-0.5">
-                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{i18n.language?.startsWith('ar') ? 'القطاع' : 'Secteur d\'activité'}</span>
-                    <span className="text-xs font-black uppercase tracking-widest truncate">{activeSector === 'Tous' ? 'Tous les Secteurs' : activeSector}</span>
+                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{t('exhibitor.list.sector')}</span>
+                    <span className="text-xs font-black uppercase tracking-widest truncate">{activeSector || t('exhibitor.list.allSectors')}</span>
                   </div>
                   <ChevronDown className={cn("w-4 h-4 text-gray-400 transition-transform ms-4 shrink-0", isSectorOpen && "rotate-180")} />
                 </button>
@@ -202,7 +203,7 @@ const Exhibitors = () => {
                 {isSectorOpen && (
                   <div className="absolute top-full start-0 z-50 w-full mt-2 bg-white rounded-xl shadow-xl border border-gray-100 py-2 overflow-hidden transform origin-top animate-in fade-in slide-in-from-top-2 duration-200">
                     <div className="px-4 py-2">
-                       <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{i18n.language?.startsWith('ar') ? 'القطاعات' : 'Secteurs'}</span>
+                       <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{t('exhibitor.list.sectors')}</span>
                     </div>
                     {sectors.map(s => (
                       <button
@@ -216,7 +217,7 @@ const Exhibitors = () => {
                           setIsSectorOpen(false);
                         }}
                       >
-                        <span className={cn(activeSector === s ? "" : "group-hover:translate-x-1 transition-transform")}>{s === 'Tous' ? "Tous les secteurs" : s}</span>
+                        <span className={cn(activeSector === s ? "" : "group-hover:translate-x-1 transition-transform")}>{s || t('exhibitor.list.allSectors')}</span>
                         {activeSector === s && <Check className="w-4 h-4 text-primary" />}
                       </button>
                     ))}
@@ -230,8 +231,8 @@ const Exhibitors = () => {
                   className="w-full sm:w-auto flex items-center justify-between bg-white px-5 py-3 rounded-xl border border-gray-100 shadow-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all cursor-pointer text-gray-800 hover:border-gray-300 min-w-[200px] text-start"
                 >
                   <div className="flex flex-col gap-0.5">
-                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{i18n.language?.startsWith('ar') ? 'الولاية' : 'Wilaya'}</span>
-                    <span className="text-xs font-black uppercase tracking-widest truncate">{activeRegion === 'Toutes' ? 'Toutes les Wilayas' : activeRegion}</span>
+                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{t('exhibitor.list.wilaya')}</span>
+                    <span className="text-xs font-black uppercase tracking-widest truncate">{activeRegion || t('exhibitor.list.allWilayas')}</span>
                   </div>
                   <ChevronDown className={cn("w-4 h-4 text-gray-400 transition-transform ms-4 shrink-0", isRegionOpen && "rotate-180")} />
                 </button>
@@ -239,7 +240,7 @@ const Exhibitors = () => {
                 {isRegionOpen && (
                   <div className="absolute top-full start-0 z-50 w-full mt-2 bg-white rounded-xl shadow-xl border border-gray-100 py-2 overflow-hidden transform origin-top animate-in fade-in slide-in-from-top-2 duration-200">
                     <div className="px-4 py-2">
-                       <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{i18n.language?.startsWith('ar') ? 'الولايات' : 'Wilayas'}</span>
+                       <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{t('exhibitor.list.wilayas')}</span>
                     </div>
                     {regions.map(r => (
                       <button
@@ -253,7 +254,7 @@ const Exhibitors = () => {
                           setIsRegionOpen(false);
                         }}
                       >
-                        <span className={cn(activeRegion === r ? "" : "group-hover:translate-x-1 transition-transform")}>{r === 'Toutes' ? "Toutes les wilayas" : r}</span>
+                        <span className={cn(activeRegion === r ? "" : "group-hover:translate-x-1 transition-transform")}>{r || t('exhibitor.list.allWilayas')}</span>
                         {activeRegion === r && <Check className="w-4 h-4 text-primary" />}
                       </button>
                     ))}
@@ -278,7 +279,7 @@ const Exhibitors = () => {
             </div>
           ) : filteredExhibitors.length === 0 ? (
             <div className="col-span-full text-center py-12 bg-white rounded-2xl p-8 border border-gray-100">
-              <p className="text-gray-400 font-bold">Aucun exposant trouvé</p>
+              <p className="text-gray-400 font-bold">{t('exhibitor.list.none')}</p>
             </div>
           ) : (
             paginatedExhibitors.map((exhibitor: any, idx) => (
@@ -294,36 +295,39 @@ const Exhibitors = () => {
                     <div className="w-16 h-16 rounded-xl bg-gray-50 border border-gray-100 p-2 overflow-hidden group-hover:scale-105 transition-transform">
                       <img src={exhibitor.logo} alt={exhibitor.name} className="w-full h-full object-contain" />
                     </div>
-                    <div className="flex flex-col items-end">
-                    </div>
+                    {exhibitor.verified && (
+                      <span className="flex items-center gap-1 text-success text-[9px] font-black uppercase tracking-widest">
+                        <ShieldCheck className="h-4 w-4" />
+                        {t('compare.verified')}
+                      </span>
+                    )}
                   </div>
 
                   <div className="mb-5">
-                    <p className="text-[10px] font-black text-secondary uppercase tracking-[0.2em] mb-1">{exhibitor.sector}</p>
+                    {exhibitor.sector && <p className="text-[10px] font-black text-secondary uppercase tracking-[0.2em] mb-1">{exhibitor.sector}</p>}
                     <h3 className="text-lg font-black text-primary uppercase tracking-tight group-hover:text-secondary transition-colors mb-2 line-clamp-1">
                       {exhibitor.name}
                     </h3>
-                    <div className="flex items-center text-gray-400 mb-1">
-                      <MapPin className="h-3.5 w-3.5 me-2 shrink-0 text-secondary" />
-                      <span className="text-[10px] font-bold uppercase tracking-widest truncate">{exhibitor.location}</span>
-                    </div>
+                    {exhibitor.location && (
+                      <div className="flex items-center text-gray-400 mb-1">
+                        <MapPin className="h-3.5 w-3.5 me-2 shrink-0 text-secondary" />
+                        <span className="text-[10px] font-bold uppercase tracking-widest truncate">{exhibitor.location}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
 
                 <div>
-                  <div className="mb-5 py-4 border-y border-gray-50">
-                    <div>
-                      <p className="text-[10px] font-bold text-gray-400 uppercase mb-0.5">Produits</p>
-                      <p className="text-sm font-black text-primary">{exhibitor.stats?.products ?? 0}</p>
-                    </div>
-                  </div>
+                  {exhibitor.description && (
+                    <p className="mb-5 pt-4 border-t border-gray-50 text-xs text-gray-500 line-clamp-3">{exhibitor.description}</p>
+                  )}
 
                   <div className="flex gap-3">
                     <Link to={`/directory/${generateSlugUrl(exhibitor.name, String(exhibitor.id))}`} className="flex-1 py-3 bg-primary text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-secondary transition-all flex items-center justify-center space-x-2 shadow-lg group">
-                      <span>Visiter</span>
+                      <span>{t('exhibitor.list.visit')}</span>
                       <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform rtl:rotate-180" />
                     </Link>
-                    <Link to="/contact" className="w-12 h-12 bg-gray-50 text-gray-400 rounded-xl flex items-center justify-center hover:text-secondary hover:bg-secondary/5 transition-all shrink-0">
+                    <Link to={`/directory/${generateSlugUrl(exhibitor.name, String(exhibitor.id))}`} aria-label={t('common.contact_supplier')} className="w-12 h-12 bg-gray-50 text-gray-400 rounded-xl flex items-center justify-center hover:text-secondary hover:bg-secondary/5 transition-all shrink-0">
                       <MessageSquare className="h-4 w-4" />
                     </Link>
                   </div>
@@ -417,17 +421,17 @@ const Exhibitors = () => {
           
           <div className="relative z-10 max-w-2xl mx-auto">
             <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tighter mb-6">
-              Vous aussi, <span className="text-secondary">Exposez ICI</span>
+              {t('exhibitor.list.ctaTitle')}
             </h2>
             <p className="text-white/60 font-medium mb-10 text-lg">
-              Ne manquez pas l'opportunité de présenter vos innovations au plus grand réseau industriel en Algérie.
+              {t('exhibitor.list.ctaText')}
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link to="/register?role=fournisseur" className="btn-secondary px-12 py-5 rounded-2xl text-sm font-black uppercase tracking-widest shadow-2xl">
-                Devenir Exposant
+                {t('exhibitor.list.ctaButton')}
               </Link>
               <Link to="/tarifs" className="bg-white/10 border border-white/20 px-12 py-5 rounded-2xl text-sm font-black uppercase tracking-widest hover:bg-white/20 transition-all flex items-center justify-center">
-                Voir toutes les options
+                {t('exhibitor.list.ctaPricing')}
               </Link>
             </div>
           </div>

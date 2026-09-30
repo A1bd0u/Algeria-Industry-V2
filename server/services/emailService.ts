@@ -29,7 +29,8 @@ export type TemplateType =
   | 'kycRejected'
   | 'securityAlert'
   | 'accountExists'
-  | 'contactMessage';
+  | 'contactMessage'
+  | 'notification';
 
 const SUBJECTS: Record<TemplateType, string> = {
   verificationCode: 'Votre code de vérification - Algeria Industry',
@@ -39,6 +40,7 @@ const SUBJECTS: Record<TemplateType, string> = {
   securityAlert: 'Alerte de sécurité - Algeria Industry',
   accountExists: 'Tentative d\'inscription avec votre adresse - Algeria Industry',
   contactMessage: 'Nouveau message de contact - Algeria Industry',
+  notification: 'Algeria Industry',
 };
 
 // Les templates sont copiés dans l'image Docker (voir Dockerfile) :
@@ -74,7 +76,12 @@ export const renderTemplate = (templateType: TemplateType, variables: Record<str
   return htmlContent;
 };
 
-export async function sendTransactionalEmail(to: string, templateType: TemplateType, variables: Record<string, string>) {
+export async function sendTransactionalEmail(
+  to: string,
+  templateType: TemplateType,
+  variables: Record<string, string>,
+  subject: string = SUBJECTS[templateType],
+) {
   const resend = getResendClient();
   if (!resend) {
     if (process.env.NODE_ENV === 'production') {
@@ -96,7 +103,7 @@ export async function sendTransactionalEmail(to: string, templateType: TemplateT
     const { data, error } = await resend.emails.send({
       from,
       to,
-      subject: SUBJECTS[templateType],
+      subject,
       html,
     });
 
@@ -109,5 +116,58 @@ export async function sendTransactionalEmail(to: string, templateType: TemplateT
   } catch (error) {
     logger.error('[Email Service] Unexpected error:', error);
     return { success: false, error };
+  }
+}
+
+export interface NotificationEmail {
+  subject: string;
+  heading: string;
+  name?: string | null;
+  intro: string;
+  details?: string;
+  ctaLabel: string;
+  // Chemin relatif à l'application (ex. /dashboard?tab=messages).
+  ctaPath: string;
+}
+
+// E-mail d'information générique (facture, paiement, message, alerte admin) :
+// un seul modèle, le texte est fourni par l'appelant et toujours échappé.
+export async function sendNotificationEmail(to: string | null | undefined, mail: NotificationEmail) {
+  if (!to) return { success: false, error: 'NO_RECIPIENT' };
+  return sendTransactionalEmail(
+    to,
+    'notification',
+    {
+      heading: mail.heading,
+      name: mail.name || '',
+      intro: mail.intro,
+      details: mail.details || '',
+      ctaLabel: mail.ctaLabel,
+      ctaUrl: `${getAppUrl()}${mail.ctaPath}`,
+    },
+    `${mail.subject} - Algeria Industry`,
+  );
+}
+
+// Adresses des administrateurs, pour les alertes internes (nouveau dossier
+// KYC, justificatif de virement, demande de support). ADMIN_ALERT_EMAILS
+// (liste séparée par des virgules) prend le pas sur les comptes admin.
+export async function getAdminAlertRecipients(supabase: any): Promise<string[]> {
+  const configured = (process.env.ADMIN_ALERT_EMAILS || '')
+    .split(',')
+    .map((email) => email.trim())
+    .filter(Boolean);
+  if (configured.length) return configured;
+  const { data } = await supabase.from('users').select('email').eq('role', 'admin');
+  return (data || []).map((row: any) => row.email).filter(Boolean);
+}
+
+// Alerte envoyée à chaque administrateur ; n'échoue jamais la requête appelante.
+export async function notifyAdmins(supabase: any, mail: NotificationEmail) {
+  try {
+    const recipients = await getAdminAlertRecipients(supabase);
+    await Promise.all(recipients.map((to) => sendNotificationEmail(to, { ...mail, name: mail.name || 'administrateur' })));
+  } catch (err) {
+    logger.error('[Email Service] Alerte admin non envoyée :', err);
   }
 }
