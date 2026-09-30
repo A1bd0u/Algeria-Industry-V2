@@ -10,6 +10,7 @@ import {
 } from '../services/billingService';
 import { createCheckout, isOnlinePaymentEnabled } from '../services/chargily';
 import { getAppUrl } from '../services/emailService';
+import { alertAdminsTransferProof, notifyInvoiceIssued } from '../services/notificationService';
 
 // Espace abonnement du client : souscription, factures, justificatif de
 // virement et paiement en ligne.
@@ -129,6 +130,8 @@ router.post('/', requireEmailVerified, validate(subscribeSchema), async (req, re
     }
     if (error) throw error;
 
+    await notifyInvoiceIssued({ ...data, user: { email: user.email, name: user.name } });
+
     return res.status(201).json(data);
   } catch (err) {
     logger.error('Subscribe error', err);
@@ -171,6 +174,7 @@ router.post('/:id/transfer-proof', requireUuidParams('id'), validate(proofSchema
       .select(CLIENT_COLUMNS)
       .maybeSingle();
     if (error) throw error;
+    if (data) await alertAdminsTransferProof(data.invoice_number, user.company || '');
     return res.json(data);
   } catch (err) {
     next(err);

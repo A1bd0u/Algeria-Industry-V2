@@ -59,6 +59,8 @@ passées en `--build-arg` à Docker. Voir la liste des `ARG` du `Dockerfile` :
 | `CHARGILY_SECRET_KEY`, `CHARGILY_MODE` | non | paiement en ligne |
 | `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` | si > 1 instance | rate limiting partagé |
 | `SENTRY_DSN` | non | erreurs serveur |
+| `CRON_SECRET` | oui | secret de la tâche quotidienne (§ 6) : `openssl rand -hex 32` |
+| `ADMIN_ALERT_EMAILS` | non | destinataires des alertes internes ; vide = tous les comptes admin |
 | `VITE_PLAUSIBLE_DOMAIN`, `VITE_PLAUSIBLE_SRC` | non | à redonner au runtime : la CSP du serveur autorise leur origine |
 
 La liste complète et commentée est dans `.env.example`.
@@ -87,7 +89,7 @@ gcloud run deploy algeria-industry \
   --min-instances 1 --max-instances 1 \
   --memory 1Gi --cpu 1 \
   --set-env-vars NODE_ENV=production,APP_URL=https://algeria-industry.dz,BEHIND_CLOUDFLARE=true,SENDER_EMAIL=noreply@algeria-industry.dz \
-  --set-secrets JWT_SECRET=jwt-secret:latest,MFA_ENCRYPTION_KEY=mfa-key:latest,SUPABASE_SERVICE_ROLE_KEY=supabase-service-role:latest,TURNSTILE_SECRET_KEY=turnstile-secret:latest,RESEND_API_KEY=resend-key:latest \
+  --set-secrets JWT_SECRET=jwt-secret:latest,MFA_ENCRYPTION_KEY=mfa-key:latest,SUPABASE_SERVICE_ROLE_KEY=supabase-service-role:latest,TURNSTILE_SECRET_KEY=turnstile-secret:latest,RESEND_API_KEY=resend-key:latest,CRON_SECRET=cron-secret:latest \
   --set-env-vars SUPABASE_URL=https://<ref>.supabase.co
 ```
 
@@ -117,6 +119,17 @@ gcloud run deploy algeria-industry \
 - [ ] Parcours complet : inscription → code e-mail → KYC → validation admin →
       publication d'un produit → souscription → facture.
 - [ ] Alertes : Sentry (erreurs), Cloud Monitoring (5xx, latence), budget GCP.
+- [ ] Tâche quotidienne : créer un job Cloud Scheduler qui appelle
+      `POST https://<domaine>/api/cron/daily` chaque jour (ex. 6 h, fuseau
+      Africa/Algiers) avec l'en-tête `Authorization: Bearer <CRON_SECRET>`.
+      Elle expire les abonnements échus et envoie les rappels J-30, J-7 et
+      l'avis d'expiration ; relancée, elle ne renvoie aucun e-mail.
+      ```bash
+      gcloud scheduler jobs create http algeria-industry-daily \
+        --location $REGION --schedule "0 6 * * *" --time-zone "Africa/Algiers" \
+        --uri https://algeria-industry.dz/api/cron/daily --http-method POST \
+        --headers "Authorization=Bearer <CRON_SECRET>"
+      ```
 
 ## 7. Mises à jour
 
