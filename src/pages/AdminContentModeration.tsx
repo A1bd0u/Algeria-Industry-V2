@@ -10,9 +10,11 @@ import {
 } from '@tanstack/react-table';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '../lib/utils';
+import { useToast } from '../context/ToastContext';
 
 export default function AdminContentModeration() {
   const navigate = useNavigate();
+  const toast = useToast();
   const queryClient = useQueryClient();
   const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; id: string; type: 'product' | 'tender' } | null>(null);
 
@@ -21,7 +23,7 @@ export default function AdminContentModeration() {
     queryKey: ['admin-products'],
     queryFn: async () => {
       const res = await fetch('/api/products');
-      if (!res.ok) throw new Error('Failed to fetch products');
+      if (!res.ok) throw new Error('Impossible de charger les produits.');
       const data = await res.json();
       return data.data || data;
     }
@@ -32,7 +34,7 @@ export default function AdminContentModeration() {
     queryKey: ['admin-tenders'],
     queryFn: async () => {
       const res = await fetch('/api/tenders');
-      if (!res.ok) throw new Error('Failed to fetch tenders');
+      if (!res.ok) throw new Error('Impossible de charger les appels d\'offres.');
       const data = await res.json();
       return data.data || data;
     }
@@ -53,7 +55,7 @@ export default function AdminContentModeration() {
           body: JSON.stringify({ status: newStatus }) // we need to check if /api/products/:id supports status only update.
           // Wait, typically PUT replaces. Let's use the full object or see if a specific status route exists.
         });
-        if (!res.ok) throw new Error('Failed to update product');
+        if (!res.ok) throw new Error('Mise à jour du produit impossible.');
       } else {
         newStatus = currentStatus === 'open' ? 'closed' : 'open';
         const res = await fetch(`/api/tenders/${id}`, {
@@ -64,7 +66,7 @@ export default function AdminContentModeration() {
           },
           body: JSON.stringify({ status: newStatus })
         });
-        if (!res.ok) throw new Error('Failed to update tender');
+        if (!res.ok) throw new Error('Mise à jour de l\'appel d\'offres impossible.');
       }
       return { id, type, newStatus };
     },
@@ -91,7 +93,7 @@ export default function AdminContentModeration() {
     onError: (err, variables, context) => {
       queryClient.setQueryData(['admin-products'], context?.prevProducts);
       queryClient.setQueryData(['admin-tenders'], context?.prevTenders);
-      alert(err.message);
+      toast.error(err.message);
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-products'] });
@@ -109,7 +111,7 @@ export default function AdminContentModeration() {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-      if (!res.ok) throw new Error('Failed to delete');
+      if (!res.ok) throw new Error('Suppression impossible.');
       return { id, type };
     },
     onMutate: async (variables) => {
@@ -130,7 +132,7 @@ export default function AdminContentModeration() {
     onError: (err, variables, context) => {
       queryClient.setQueryData(['admin-products'], context?.prevProducts);
       queryClient.setQueryData(['admin-tenders'], context?.prevTenders);
-      alert(err.message);
+      toast.error(err.message);
     },
     onSettled: () => {
       setDeleteModal(null);

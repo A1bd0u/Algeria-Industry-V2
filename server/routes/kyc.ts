@@ -8,6 +8,7 @@ import { logAdminAction } from '../utils/auditLogger';
 import { generateReferenceId } from '../utils/reference';
 import { sendTransactionalEmail, getAppUrl } from '../services/emailService';
 import { KYC_BUCKET } from './upload';
+import { alertAdminsKycSubmitted } from '../services/notificationService';
 
 import { requireAuth, requireEmailVerified, verifyRole } from '../middlewares/authMiddleware';
 
@@ -189,6 +190,8 @@ router.post('/submit', requireAuth, requireEmailVerified, validate(kycSubmitSche
 
     await supabase.from('companies').update({ status: 'pending' }).eq('id', companyId);
     await supabase.from('users').update({ kyc_status: 'pending' }).eq('id', user.id);
+
+    await alertAdminsKycSubmitted(companyName, userData?.name || user.name || '');
 
     return res.json({ success: true, message: 'Votre demande KYC a bien été soumise.' });
   } catch (e: any) {

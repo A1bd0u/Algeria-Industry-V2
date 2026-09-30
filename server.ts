@@ -52,6 +52,7 @@ import adRoutes from './server/routes/ads';
 import userRoutes from './server/routes/users';
 import uploadRoutes from './server/routes/upload';
 import statsRoutes from './server/routes/stats';
+import cronRoutes from './server/routes/cron';
 import aiRoutes from './server/routes/ai';
 import adminRoutes from './server/routes/admin';
 import mfaRoutes from './server/routes/mfa';
@@ -179,6 +180,7 @@ export async function createApp() {
   app.use('/api/admin', adminRoutes);
   app.use('/api/search', searchRoutes);
   app.use('/api/contact', contactRoutes);
+  app.use('/api/cron', cronRoutes);
 
   // Route API inconnue : 404 JSON plutôt que la page SPA.
   app.use('/api', (req, res) => {

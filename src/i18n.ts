@@ -1,22 +1,44 @@
-import i18n from 'i18next';
+import i18n, { BackendModule } from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import { initReactI18next } from 'react-i18next';
 
 import fr from './locales/fr.json';
-import en from './locales/en.json';
-import ar from './locales/ar.json';
 
-const resources = {
-  fr: { translation: fr },
-  en: { translation: en },
-  ar: { translation: ar }
+// Le français (langue de repli) est embarqué ; l'anglais et l'arabe sont
+// chargés à la demande, dans leur propre fichier, pour alléger le premier
+// affichage de ceux qui ne s'en servent pas.
+const loaders: Record<string, () => Promise<{ default: Record<string, unknown> }>> = {
+  en: () => import('./locales/en.json'),
+  ar: () => import('./locales/ar.json'),
 };
 
-i18n
+const lazyLocales: BackendModule = {
+  type: 'backend',
+  init: () => {},
+  read(language, _namespace, callback) {
+    const load = loaders[language.split('-')[0]];
+    if (!load) {
+      callback(null, {});
+      return;
+    }
+    load()
+      .then((module) => callback(null, module.default))
+      .catch((error) => callback(error, false));
+  },
+};
+
+// Promesse résolue quand la langue de l'utilisateur est prête : main.tsx
+// attend ce signal avant le premier rendu (pas de texte français fugace).
+export const i18nReady = i18n
+  .use(lazyLocales)
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
-    resources,
+    resources: { fr: { translation: fr } },
+    partialBundledLanguages: true,
+    supportedLngs: ['fr', 'en', 'ar'],
+    nonExplicitSupportedLngs: true,
+    load: 'languageOnly',
     fallbackLng: 'fr',
     detection: {
       order: ['querystring', 'cookie', 'localStorage', 'sessionStorage', 'navigator', 'htmlTag', 'path', 'subdomain'],
@@ -24,7 +46,10 @@ i18n
     },
     interpolation: {
       escapeValue: false
-    }
+    },
+    react: {
+      useSuspense: false,
+    },
   });
 
 // Support RTL

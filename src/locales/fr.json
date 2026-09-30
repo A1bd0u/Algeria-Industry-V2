@@ -28,7 +28,8 @@
     "workspaceText": "Gérez votre activité",
     "memberSpace": "Espace membre",
     "openMenu": "Ouvrir le menu",
-    "closeMenu": "Fermer le menu"
+    "closeMenu": "Fermer le menu",
+    "console_pro": "Espace administrateur"
   },
   "hero": {
     "title": "Connectez-vous à l'industrie",
@@ -65,7 +66,51 @@
     "stats_title": "L'Industrie en Chiffres",
     "partners": "Nos Partenaires de Confiance",
     "view_all": "Voir tous",
-    "read_more": "VOIR PLUS DE PRODUITS"
+    "read_more": "VOIR PLUS DE PRODUITS",
+    "seoDescription": "Trouvez un fournisseur industriel algérien vérifié et contactez-le directement.",
+    "promise": {
+      "verificationLabel": "Vérification",
+      "verificationTitle": "Fournisseurs vérifiés",
+      "verificationText": "Badge « entreprise vérifiée » après contrôle du RC et du NIF (KYC).",
+      "contactLabel": "Contact",
+      "contactTitle": "Contact direct",
+      "contactText": "Demandez un devis au fournisseur par la messagerie intégrée ou WhatsApp.",
+      "languagesLabel": "Langues",
+      "languagesText": "Une plateforme pensée pour l'industrie algérienne."
+    },
+    "catalogLabel": "Catalogue",
+    "fullCatalog": "Accéder au catalogue complet",
+    "noProducts": "Aucun produit publié pour le moment.",
+    "beFirst": "Soyez le premier fournisseur à publier votre catalogue",
+    "price": "Prix",
+    "whyTitle": "Pourquoi choisir Algeria Industry ?",
+    "why": {
+      "visibility": "Visibilité accrue pour les fournisseurs",
+      "sourcing": "Sourcing simplifié pour les acheteurs",
+      "kyc": "Entreprises vérifiées (KYC)",
+      "local": "Équipe support en Algérie"
+    },
+    "help": {
+      "title": "Besoin d'aide ?",
+      "text": "Notre équipe vous aide à trouver un fournisseur, à référencer votre entreprise ou à utiliser la plateforme.",
+      "delayTitle": "Réponse sous 48 h ouvrées",
+      "delayText": "Par e-mail, pour toute demande envoyée depuis le formulaire de contact.",
+      "guidesTitle": "Questions fréquentes",
+      "guidesText": "Inscription, vérification, abonnements et paiement.",
+      "contact": "Nous contacter",
+      "faq": "Consulter la FAQ"
+    },
+    "stats": {
+      "title": "La plateforme aujourd'hui",
+      "verifiedCompanies": "Entreprises vérifiées",
+      "publishedProducts": "Produits publiés",
+      "commitment": "Chiffres mis à jour en continu à partir de la base de la plateforme."
+    },
+    "start": {
+      "title": "Prêt à démarrer ?",
+      "text": "Créez votre compte gratuitement",
+      "button": "Créer mon profil fournisseur"
+    }
   },
   "directory": {
     "title": "Annuaire des Industriels",
@@ -92,7 +137,7 @@
     "report_desc": "Aidez-nous à garder Algeria Industry sûr. Pourquoi signalez-vous ce produit ?",
     "cancel": "Annuler",
     "send_report": "Envoyer le signalement",
-    "join_suppliers": "Rejoignez 500+ fournisseurs en Algérie",
+    "join_suppliers": "Rejoignez les fournisseurs vérifiés d'Algeria Industry",
     "prev": "Précédent",
     "next": "Suivant",
     "sourcing": "Sourcing Industriel",
@@ -106,7 +151,34 @@
     "add_product": "Ajouter un produit",
     "quotes": "Devis",
     "hero_desc": "Explorez les meilleures technologies industrielles disponibles en Algérie. Comparez, demandez des devis et connectez-vous aux fournisseurs.",
-    "no_results": "Aucun produit trouvé."
+    "no_results": "Aucun produit trouvé.",
+    "detail": {
+      "notFound": "Produit introuvable",
+      "loadError": "Erreur lors du chargement du produit",
+      "backToProducts": "Retour aux produits",
+      "backToCatalog": "Retour au catalogue",
+      "noImage": "Visuel non fourni",
+      "favorite": "Ajouter aux favoris",
+      "share": "Partager",
+      "reportShort": "Signaler",
+      "verifiedCompany": "Entreprise vérifiée",
+      "supplier": "Fournisseur : {{name}}",
+      "indicativePrice": "Prix indicatif",
+      "reference": "Référence : {{ref}}",
+      "requestQuote": "Demander un devis professionnel",
+      "quoteSubject": "Devis pour {{name}}",
+      "compared": "Comparé",
+      "compareFull": "Le comparateur contient déjà 4 produits.",
+      "description": "Description",
+      "specs": "Spécifications",
+      "noDescription": "Le fournisseur n'a pas encore ajouté de description.",
+      "reportPlaceholder": "Ex. : contrefaçon, contenu trompeur, images inappropriées…",
+      "reportLogin": "Connectez-vous pour signaler un produit.",
+      "reportReasonRequired": "Indiquez le motif du signalement.",
+      "reportSent": "Signalement envoyé. Merci, notre équipe va l'examiner.",
+      "reportError": "Le signalement n'a pas pu être envoyé.",
+      "favoriteError": "Impossible de mettre à jour vos favoris."
+    }
   },
   "rfq": {
     "title": "Demande de Devis (RFQ)",
@@ -141,7 +213,17 @@
     "subscribe": "S'abonner gratuitement",
     "privacy_note": "En vous inscrivant, vous acceptez notre politique de confidentialité. Vous pouvez vous désabonner à tout moment.",
     "featured": "À la une",
-    "read_time": "min de lecture"
+    "read_time": "min de lecture",
+    "notFound": "Article introuvable.",
+    "back": "Retour au blog",
+    "loadError": "Impossible de charger les articles.",
+    "readTime": "{{count}} min de lecture",
+    "share": "Partager",
+    "copyLink": "Copier le lien",
+    "latest": "Derniers articles",
+    "ctaTitle": "Trouvez vos fournisseurs industriels",
+    "ctaText": "Consultez l'annuaire des entreprises algériennes vérifiées et contactez-les directement.",
+    "ctaButton": "Voir l'annuaire"
   },
   "catalogues": {
     "title": "Catalogues Industriels",
@@ -153,7 +235,9 @@
     "view": "Visualiser",
     "download": "Télécharger",
     "none_found": "Aucun catalogue trouvé",
-    "none_found_text": "Ajustez vos critères de recherche technique."
+    "none_found_text": "Les catalogues publiés par les fournisseurs apparaîtront ici.",
+    "loadError": "Impossible de charger les catalogues.",
+    "noFile": "Document non disponible"
   },
   "footer": {
     "about": "À Propos",
@@ -172,7 +256,19 @@
     "backToTop": "Retour en haut",
     "errorTitle": "Une erreur est survenue",
     "errorText": "Nous n'avons pas pu charger cette section. Veuillez réessayer.",
-    "reload": "Recharger la page"
+    "reload": "Recharger la page",
+    "close": "Fermer",
+    "networkError": "Erreur réseau. Vérifiez votre connexion et réessayez.",
+    "linkCopied": "Lien copié dans le presse-papier.",
+    "onQuote": "Sur devis",
+    "all": "Toutes",
+    "clear_filters": "Effacer les filtres",
+    "error": "Une erreur est survenue",
+    "error_desc": "Les données n'ont pas pu être chargées.",
+    "no_results": "Aucun résultat",
+    "no_results_desc": "Modifiez vos filtres ou votre recherche.",
+    "retry": "Réessayer",
+    "search": "Rechercher"
   },
   "hero_slider": {
     "tech_spec": "Spécification Technique"
@@ -181,7 +277,28 @@
     "results_for": "Résultats pour",
     "sector_cat": "Secteur / Catégorie",
     "region": "Wilaya (Région)",
-    "boost_vis": "Booster votre visibilité ?"
+    "boost_vis": "Booster votre visibilité ?",
+    "everything": "tout le catalogue",
+    "found": "{{count}} résultat(s) correspondant à votre recherche.",
+    "filterType": "Filtrer par type",
+    "allResults": "Tous les résultats",
+    "products": "Produits",
+    "companies": "Entreprises",
+    "advancedFilters": "Filtres avancés",
+    "sectorPlaceholder": "Ex. : énergie, informatique…",
+    "wilayaPlaceholder": "Ex. : Alger, Oran…",
+    "adsText": "Présentez votre entreprise aux acheteurs grâce à nos espaces publicitaires.",
+    "adsButton": "Demander un espace publicitaire",
+    "general": "Général",
+    "algeria": "Algérie",
+    "loading": "Chargement…",
+    "loadMore": "Voir plus de résultats",
+    "products_found": "Produits",
+    "companies_found": "Entreprises",
+    "view_profile": "Voir la fiche",
+    "no_results": "Aucun résultat",
+    "no_results_desc": "Essayez d'autres mots-clés ou",
+    "contact_support": "contactez notre équipe"
   },
   "faq": {
     "title": "Questions Fréquentes",
@@ -240,7 +357,18 @@
     "formats": "Formats acceptés: JPG, PNG, WEBP (Max 5MB)",
     "error_send": "Une erreur est survenue lors de l'envoi. Veuillez réessayer plus tard.",
     "send_request": "Envoyer la Demande",
-    "why_advertise": "Pourquoi annoncer sur Algeria Industry ?"
+    "why_advertise": "Pourquoi annoncer sur Algeria Industry ?",
+    "captchaRequired": "Validez le captcha.",
+    "placementHome": "Bandeau de la page d'accueil",
+    "heroTitle": "Faites connaître votre entreprise",
+    "heroText": "Présentez votre offre aux professionnels de l'industrie qui visitent Algeria Industry. Remplissez le formulaire : notre équipe vous recontacte avec une proposition.",
+    "successText": "Notre équipe a bien reçu votre demande d'espace publicitaire. Nous vous répondons par e-mail sous 48 h ouvrées.",
+    "newRequest": "Nouvelle demande",
+    "companyPlaceholder": "Votre entreprise",
+    "contactPlaceholder": "Nom et prénom",
+    "messagePlaceholder": "Décrivez vos objectifs, la durée souhaitée…",
+    "visualsNote": "Vos visuels vous seront demandés par notre équipe après validation de la demande.",
+    "whyText": "Algeria Industry s'adresse aux acheteurs et fournisseurs industriels algériens. Vos bannières sont vues par des professionnels qui recherchent activement des produits et des partenaires."
   },
   "auth": {
     "captchaRequired": "Veuillez valider le captcha pour continuer.",
@@ -406,7 +534,9 @@
     "AI_UNAVAILABLE": "L'assistant est momentanément indisponible.",
     "INVALID_ID": "Identifiant invalide.",
     "WHATSAPP_INVALID": "Numéro WhatsApp invalide. Utilisez un mobile algérien (05, 06, 07) ou le format international.",
-    "COMPANY_LEGAL_LOCKED": "Le RC et le NIF vérifiés ne peuvent plus être modifiés. Contactez le support."
+    "COMPANY_LEGAL_LOCKED": "Le RC et le NIF vérifiés ne peuvent plus être modifiés. Contactez le support.",
+    "QUOTE_NO_SUPPLIER": "Aucun fournisseur à contacter pour ces produits.",
+    "QUOTE_RATE_LIMIT": "Trop de demandes de devis envoyées. Réessayez plus tard."
   },
   "mfa": {
     "title": "Double authentification",
@@ -738,7 +868,22 @@
     "addAnother": "Ajoutez un autre produit pour comparer",
     "clear": "Vider la liste",
     "requestQuote": "Demander un devis comparatif",
-    "open": "Comparer"
+    "open": "Comparer",
+    "emptyTitle": "Comparaison vide",
+    "emptyText": "Ajoutez des produits au comparateur depuis leur fiche.",
+    "explore": "Explorer le catalogue",
+    "back": "Continuer le sourcing",
+    "specs": "Caractéristiques",
+    "verification": "Fournisseur",
+    "verified": "Entreprise vérifiée",
+    "notVerified": "Non vérifiée",
+    "quoteTitle": "Demander un devis",
+    "quoteText": "Chaque fournisseur reçoit un message dans sa messagerie Algeria Industry avec la liste de ses produits. Les réponses arrivent dans votre tableau de bord.",
+    "notePlaceholder": "Précisions pour les fournisseurs (quantités, délai, lieu de livraison…) — facultatif",
+    "sendQuote": "Envoyer la demande",
+    "sending": "Envoi…",
+    "quoteSent": "Demande envoyée à {{count}} fournisseur(s). Suivez les réponses dans votre messagerie.",
+    "quoteError": "La demande n'a pas pu être envoyée."
   },
   "contact": {
     "titleStart": "Contactez",
@@ -906,7 +1051,26 @@
       "pro": "10 images par produit, support sous 24 h"
     },
     "start": "Commencer",
-    "comparePlans": "Comparer les offres en détail"
+    "comparePlans": "Comparer les offres en détail",
+    "list": {
+      "label": "Annuaire des entreprises",
+      "title": "Exposants et partenaires",
+      "subtitle": "Découvrez les entreprises industrielles inscrites sur Algeria Industry et contactez-les directement.",
+      "loadError": "Impossible de charger les entreprises.",
+      "searchPlaceholder": "Rechercher une entreprise par nom ou activité…",
+      "sector": "Secteur d'activité",
+      "sectors": "Secteurs",
+      "allSectors": "Tous les secteurs",
+      "wilaya": "Wilaya",
+      "wilayas": "Wilayas",
+      "allWilayas": "Toutes les wilayas",
+      "none": "Aucune entreprise trouvée",
+      "visit": "Voir la fiche",
+      "ctaTitle": "Référencez votre entreprise",
+      "ctaText": "Présentez vos produits aux acheteurs industriels des 58 wilayas. L'inscription est gratuite.",
+      "ctaButton": "Créer mon compte fournisseur",
+      "ctaPricing": "Voir les offres"
+    }
   },
   "searchModal": {
     "dialog": "Recherche",
@@ -989,5 +1153,132 @@
     "cataloguesCtaButton": "Voir les catalogues",
     "whatsapp": "WhatsApp",
     "whatsappMessage": "Bonjour, je vous contacte via Algeria Industry au sujet de {{name}}."
+  },
+  "pricing": {
+    "eyebrow": "Tarification transparente",
+    "title": "Tarifs fournisseurs",
+    "subtitle": "Pour présenter vos produits et services",
+    "founder": {
+      "label": "Offre membre fondateur",
+      "text": "Premium offert pendant 12 mois aux 100 premiers fournisseurs vérifiés (KYC approuvé) qui publient un catalogue d'au moins 10 produits. Offre valable jusqu'au 31 décembre 2026.",
+      "button": "Devenir membre fondateur"
+    },
+    "free": {
+      "description": "Pour découvrir la plateforme"
+    },
+    "basic": {
+      "description": "Le meilleur rapport qualité-prix"
+    },
+    "pro": {
+      "description": "Pour les entreprises ambitieuses"
+    },
+    "features": {
+      "products": "{{count}} produits",
+      "unlimitedProducts": "Produits illimités",
+      "images": "{{count}} images par produit",
+      "messaging": "Messagerie",
+      "supportStandard": "Support standard",
+      "statsBasic": "Statistiques de base",
+      "statsAdvanced": "Statistiques avancées",
+      "support48": "Support sous 48 h",
+      "support24": "Support sous 24 h",
+      "featured": "3 mises en avant"
+    },
+    "popular": "Populaire",
+    "recommended": "Recommandé",
+    "start": "Commencer",
+    "perYear": " / an",
+    "vatIncluded": "Prix TTC (TVA 19 % incluse)",
+    "included": "Inclus",
+    "notIncluded": "Non inclus",
+    "table": {
+      "title": "Tableau comparatif détaillé",
+      "subtitle": "Comparez les fonctionnalités et choisissez l'offre la plus adaptée à vos besoins.",
+      "feature": "Caractéristique",
+      "price": "Prix annuel TTC",
+      "products": "Produits",
+      "images": "Images par produit",
+      "featured": "Mise en avant",
+      "featuredPro": "3 produits (page d'accueil)",
+      "stats": "Statistiques",
+      "statsBasic": "Basiques (vues)",
+      "statsAdvanced": "Avancées (vues, clics, contacts)",
+      "support": "Support",
+      "supportStandard": "Standard",
+      "support48": "48 h",
+      "support24": "24 h, prioritaire",
+      "messaging": "Messagerie",
+      "catalogues": "Catalogues PDF",
+      "visibility": "Visibilité",
+      "sectorHighlight": "Mise en avant dans le secteur"
+    },
+    "payment": {
+      "title": "Paiement sur facture",
+      "text": "Tous nos abonnements sont facturés en dinars algériens (DZD), TVA 19 % incluse. Le règlement se fait par virement bancaire sur facture ou, lorsqu'il est proposé, en ligne par carte CIB / Edahabia. Votre abonnement est activé dès réception du paiement.",
+      "termsBefore": "Durée, renouvellement, résiliation et remboursement : voir nos",
+      "termsLink": "conditions générales"
+    }
+  },
+  "registerSuccess": {
+    "invalidCode": "Code invalide.",
+    "captchaRequired": "Validez le captcha pour renvoyer le code.",
+    "codeResent": "Si un compte en attente existe pour cette adresse, un nouveau code vient d'être envoyé.",
+    "sendError": "Erreur lors de l'envoi.",
+    "verifyTitle": "Vérifiez votre adresse e-mail",
+    "verifyText": "Si cette adresse peut être utilisée, un code à 6 chiffres vient d'y être envoyé. Il est valable 15 minutes.",
+    "email": "Adresse e-mail",
+    "code": "Code de vérification",
+    "verifying": "Vérification…",
+    "confirm": "Confirmer mon adresse",
+    "captchaUnavailable": "Vérification anti-robot indisponible. Réessayez plus tard.",
+    "resend": "Renvoyer le code",
+    "haveAccount": "Vous avez déjà un compte ?",
+    "login": "Connectez-vous",
+    "steps": {
+      "account": "Compte créé",
+      "accountText": "Adresse e-mail vérifiée.",
+      "kyc": "Entreprise et KYC",
+      "kycPending": "Votre dossier est en cours de vérification.",
+      "kycText": "Déposez RC et NIF pour obtenir le badge « entreprise vérifiée ».",
+      "product": "Premier produit",
+      "productText": "Publiez votre premier produit une fois le KYC approuvé."
+    },
+    "buyer": {
+      "find": "Trouver un fournisseur",
+      "findText": "Parcourez les fournisseurs vérifiés.",
+      "explore": "Explorer les produits",
+      "exploreText": "Comparez et demandez un devis.",
+      "profile": "Compléter votre profil",
+      "profileText": "Ajoutez les informations de votre entreprise."
+    },
+    "createdTitle": "Compte créé avec succès",
+    "welcome": "Bienvenue sur Algeria Industry, la place de marché des fournisseurs industriels algériens vérifiés.",
+    "nextSteps": "Prochaines étapes",
+    "progressLabel": "Étape {{done}} sur {{total}}",
+    "progress": "Progression",
+    "goDashboard": "Aller au tableau de bord",
+    "needHelp": "Besoin d'aide pour configurer votre compte ?",
+    "contactSupport": "Contacter le support"
+  },
+  "notFound": {
+    "title": "Page introuvable",
+    "text": "Cette page n'existe pas ou a été déplacée.",
+    "home": "Accueil",
+    "catalog": "Catalogue"
+  },
+  "slides": {
+    "sponsored": "Annonce",
+    "suppliers": {
+      "title": "Fournisseurs industriels vérifiés",
+      "subtitle": "Trouvez le bon partenaire",
+      "description": "Contactez-les directement et demandez un devis",
+      "tagline": "La place de marché B2B algérienne"
+    },
+    "founder": {
+      "title": "Membre fondateur",
+      "subtitle": "Premium offert 12 mois",
+      "description": "Pour les 100 premiers fournisseurs vérifiés",
+      "tagline": "Offre de lancement"
+    }
   }
 }

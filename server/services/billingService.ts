@@ -1,5 +1,6 @@
 import { getSupabase } from '../db/supabaseClient';
 import { escapeHtml } from '../utils/html';
+import { notifyPaymentReceived } from './notificationService';
 
 // Offres et prix annuels TTC (TVA 19 % incluse), identiques à la page /tarifs.
 export const PLANS = {
@@ -52,6 +53,7 @@ export const expireSubscriptions = async () => {
       .in('id', companyIds)
       .lt('plan_ends_at', nowIso);
   }
+  return (expired || []).length;
 };
 
 // Offre en vigueur pour une entreprise (gratuite si l'abonnement est échu).
@@ -160,6 +162,8 @@ export const activateSubscription = async (
       reference: payment.reference || null,
     }]);
   }
+
+  await notifyPaymentReceived(updated);
 
   return { ok: true, subscription: updated };
 };

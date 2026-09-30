@@ -32,7 +32,7 @@ const AdsRequest = () => {
     e.preventDefault();
     setErrorMessage('');
     if (TURNSTILE_SITE_KEY && !captchaToken) {
-      setErrorMessage('Veuillez valider le captcha.');
+      setErrorMessage(t('ads.captchaRequired'));
       setStatus('error');
       return;
     }
@@ -68,7 +68,7 @@ const AdsRequest = () => {
   };
 
   const adPlacements = [
-    { id: 'homepage_banner', label: 'Slide d\'accueil (Hero Slider)', price: 'Sur devis' }
+    { id: 'homepage_banner', label: t('ads.placementHome'), price: t('common.onQuote') }
   ];
 
   return (
@@ -84,10 +84,10 @@ const AdsRequest = () => {
             <span className="font-bold text-sm uppercase tracking-widest">{t('ads.title')}</span>
           </div>
           <h1 className="text-4xl md:text-5xl font-black text-primary uppercase tracking-tighter mb-6">
-            Boostez Votre Visibilité
+            {t('ads.heroTitle')}
           </h1>
           <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-            Touchez les professionnels de l'industrie avec nos solutions publicitaires ciblées. Remplissez le formulaire ci-dessous pour être recontacté par notre équipe commerciale.
+            {t('ads.heroText')}
           </p>
         </motion.div>
 
@@ -104,13 +104,13 @@ const AdsRequest = () => {
               </div>
               <h3 className="text-2xl font-black text-primary mb-4">{t('ads.success')}</h3>
               <p className="text-gray-600 mb-8 max-w-md mx-auto">
-                Notre équipe commerciale a bien reçu votre demande d'espace publicitaire. Nous vous contacterons dans les plus brefs délais.
+                {t('ads.successText')}
               </p>
               <button 
                 onClick={() => setStatus('idle')}
                 className="btn-primary py-4 px-8"
               >
-                Nouvelle demande
+                {t('ads.newRequest')}
               </button>
             </div>
           ) : (
@@ -127,7 +127,7 @@ const AdsRequest = () => {
                       value={formData.companyName}
                       onChange={handleChange}
                       className="w-full ps-12 pe-4 py-4 bg-gray-50 border border-gray-200 rounded-2xl focus:border-primary focus:ring-0 transition-all outline-none"
-                      placeholder="Votre entreprise"
+                      placeholder={t('ads.companyPlaceholder')}
                     />
                   </div>
                 </div>
@@ -143,7 +143,7 @@ const AdsRequest = () => {
                       value={formData.contactName}
                       onChange={handleChange}
                       className="w-full ps-12 pe-4 py-4 bg-gray-50 border border-gray-200 rounded-2xl focus:border-primary focus:ring-0 transition-all outline-none"
-                      placeholder="Nom et prénom"
+                      placeholder={t('ads.contactPlaceholder')}
                     />
                   </div>
                 </div>
@@ -223,12 +223,12 @@ const AdsRequest = () => {
                   onChange={handleChange}
                   rows={4}
                   className="w-full p-4 bg-gray-50 border border-gray-200 rounded-2xl focus:border-primary focus:ring-0 transition-all outline-none resize-none"
-                  placeholder="Décrivez vos objectifs, la durée souhaitée..."
+                  placeholder={t('ads.messagePlaceholder')}
                 ></textarea>
               </div>
 
               <p className="text-xs text-gray-500">
-                Vos visuels vous seront demandés par notre équipe après validation de la demande.
+                {t('ads.visualsNote')}
               </p>
 
               {TURNSTILE_SITE_KEY && (
@@ -273,7 +273,7 @@ const AdsRequest = () => {
            <div>
              <h4 className="font-bold text-primary mb-2">{t('ads.why_advertise')}</h4>
              <p className="text-sm text-gray-600 leading-relaxed">
-               Notre plateforme regroupe la plus grande communauté de professionnels de l'industrie en Algérie. En diffusant vos bannières sur nos espaces, vous touchez directement les décideurs (acheteurs, fournisseurs, investisseurs).
+               {t('ads.whyText')}
              </p>
            </div>
         </div>

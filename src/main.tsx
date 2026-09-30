@@ -1,16 +1,17 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter as Router } from 'react-router-dom';
-import * as Sentry from '@sentry/react';
 import App from './App.tsx';
 import ErrorBoundary from './components/ErrorBoundary';
-import './i18n';
+import { i18nReady } from './i18n';
 import './index.css';
 import { getConsent, onConsentChange } from './lib/consent';
 import { initAnalytics } from './lib/analytics';
 
-// Initialisation Sentry (Client)
-if (import.meta.env.VITE_SENTRY_DSN && import.meta.env.VITE_SENTRY_DSN.startsWith('http')) {
+// Initialisation Sentry (client), chargé à part pour ne pas alourdir le premier
+// affichage : les erreurs survenues avant son chargement ne sont pas remontées.
+const initSentry = async () => {
+  const Sentry = await import('@sentry/react');
   Sentry.init({
     dsn: import.meta.env.VITE_SENTRY_DSN,
     integrations: [Sentry.browserTracingIntegration()],
@@ -48,11 +49,15 @@ if (import.meta.env.VITE_SENTRY_DSN && import.meta.env.VITE_SENTRY_DSN.startsWit
   onConsentChange((value) => {
     if (value === 'accepted') enableReplay();
   });
+};
+
+if (import.meta.env.VITE_SENTRY_DSN && import.meta.env.VITE_SENTRY_DSN.startsWith('http')) {
+  initSentry().catch(() => { /* suivi d'erreurs indisponible */ });
 }
 
 initAnalytics();
 
-createRoot(document.getElementById('root')!).render(
+const render = () => createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ErrorBoundary>
       <Router>
@@ -61,3 +66,7 @@ createRoot(document.getElementById('root')!).render(
     </ErrorBoundary>
   </StrictMode>,
 );
+
+// Rendu une fois la langue chargée ; en cas d'échec du chargement, l'interface
+// s'affiche quand même (en français, langue de repli).
+i18nReady.then(render, render);

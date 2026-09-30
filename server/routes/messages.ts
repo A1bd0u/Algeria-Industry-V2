@@ -5,6 +5,8 @@ import { getSupabase } from '../db/supabaseClient';
 import { requireAuth, requireEmailVerified } from '../middlewares/authMiddleware';
 import { requireUuidParams, isUuid } from '../middlewares/validateParams';
 import { validate } from '../middlewares/validateMiddleware';
+import { quoteRequestLimiter } from '../middlewares/rateLimiter';
+import { sendNotificationEmail } from '../services/emailService';
 
 const router = express.Router();
 
@@ -12,6 +14,52 @@ const messageSchema = z.object({
   text: z.string().trim().min(1, 'Message vide').max(5000, 'Message trop long'),
   receiver_id: z.string().uuid('Destinataire invalide'),
 });
+
+const quoteRequestSchema = z.object({
+  product_ids: z.array(z.string().uuid('Produit invalide')).min(1, 'Aucun produit').max(4, 'Quatre produits au plus'),
+  note: z.string().trim().max(2000, 'Message trop long').optional(),
+});
+
+// Statuts des produits visibles publiquement (voir routes/products.ts).
+const PUBLISHED_STATUSES = ['Actif', 'active'];
+
+const NOTIFY_WINDOW_MS = 60 * 60 * 1000;
+
+// Prévient le destinataire par e-mail d'un nouveau message, au plus une fois
+// par heure et par conversation : si l'expéditeur lui a déjà écrit dans
+// l'heure (avant ce message), l'e-mail est déjà parti.
+export async function notifyNewMessage(supabase: any, message: { id: string; sender_id: string; receiver_id: string }, senderName: string) {
+  try {
+    const since = new Date(Date.now() - NOTIFY_WINDOW_MS).toISOString();
+    const { data: recent } = await supabase
+      .from('messages')
+      .select('id')
+      .eq('sender_id', message.sender_id)
+      .eq('receiver_id', message.receiver_id)
+      .gte('created_at', since)
+      .neq('id', message.id)
+      .limit(1);
+    if (recent && recent.length > 0) return;
+
+    const { data: receiver } = await supabase
+      .from('users')
+      .select('email, name')
+      .eq('id', message.receiver_id)
+      .maybeSingle();
+    if (!receiver?.email) return;
+
+    await sendNotificationEmail(receiver.email, {
+      subject: 'Nouveau message',
+      heading: 'Vous avez reçu un nouveau message',
+      name: receiver.name,
+      intro: `${senderName} vous a écrit sur Algeria Industry. Pour votre sécurité, le contenu du message n'est lisible que sur la plateforme.`,
+      ctaLabel: 'Lire le message',
+      ctaPath: `/dashboard?tab=messages&to=${message.sender_id}`,
+    });
+  } catch (err) {
+    logger.error('Notification de nouveau message non envoyée :', err);
+  }
+}
 
 const formatTime = (iso: string) =>
   new Date(iso).toLocaleTimeString('fr-DZ', { hour: '2-digit', minute: '2-digit' });
@@ -123,6 +171,8 @@ router.post('/', requireAuth, requireEmailVerified, validate(messageSchema), asy
 
     if (error) throw error;
 
+    await notifyNewMessage(supabase, data, user.company || user.name || 'Un utilisateur');
+
     return res.status(201).json({
        ...data,
        sender: 'me',
@@ -130,6 +180,61 @@ router.post('/', requireAuth, requireEmailVerified, validate(messageSchema), asy
     });
   } catch (err: any) {
     logger.error("Supabase Error POST /messages:", err);
+    next(err);
+  }
+});
+
+// POST /api/messages/quote-requests - Demande de devis groupée depuis le
+// comparateur : un message par fournisseur, listant ses produits concernés.
+// Les destinataires sont déduits des produits côté serveur, jamais fournis
+// par le client.
+router.post('/quote-requests', requireAuth, quoteRequestLimiter, requireEmailVerified, validate(quoteRequestSchema), async (req, res, next) => {
+  const { product_ids, note } = req.body as { product_ids: string[]; note?: string };
+  const user = (req as any).user;
+
+  try {
+    const supabase = getSupabase();
+    const { data: products, error } = await supabase
+      .from('products')
+      .select('id, name, owner_id')
+      .in('id', Array.from(new Set(product_ids)))
+      .in('status', PUBLISHED_STATUSES);
+    if (error) throw error;
+
+    const bySeller = new Map<string, string[]>();
+    for (const product of products || []) {
+      if (!product.owner_id || product.owner_id === user.id) continue;
+      const names = bySeller.get(product.owner_id) || [];
+      names.push(product.name);
+      bySeller.set(product.owner_id, names);
+    }
+
+    if (bySeller.size === 0) {
+      return res.status(400).json({ error: 'Aucun fournisseur à contacter pour ces produits.', code: 'QUOTE_NO_SUPPLIER' });
+    }
+
+    const buyer = user.company || user.name || 'Un acheteur';
+    const rows = Array.from(bySeller.entries()).map(([sellerId, names]) => ({
+      sender_id: user.id,
+      receiver_id: sellerId,
+      text: [
+        `Demande de devis de ${buyer} pour :`,
+        ...names.map((name) => `- ${name}`),
+        note ? `\n${note}` : '',
+        '\nMerci de préciser prix, délai de livraison et conditions de paiement.',
+      ].filter(Boolean).join('\n'),
+    }));
+
+    const { data: inserted, error: insertError } = await supabase.from('messages').insert(rows).select();
+    if (insertError) throw insertError;
+
+    for (const message of inserted || []) {
+      await notifyNewMessage(supabase, message, buyer);
+    }
+
+    return res.status(201).json({ sent: rows.length });
+  } catch (err: any) {
+    logger.error('Supabase Error POST /messages/quote-requests:', err);
     next(err);
   }
 });

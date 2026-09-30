@@ -49,7 +49,8 @@ const Products = () => {
     p.delete('page');
     setSearchParams(p);
   };
-  const [selectedRegion, setSelectedRegion] = useState('Toutes les wilayas');
+  // '' = toutes les wilayas.
+  const [selectedRegion, setSelectedRegion] = useState('');
   const [isRegionOpen, setIsRegionOpen] = useState(false);
 
   const categoryRef = useRef<HTMLDivElement>(null);
@@ -118,7 +119,7 @@ const Products = () => {
       if (searchParams.get('companyId')) params.append('company_id', searchParams.get('companyId')!);
       
       const res = await fetch(`/api/products?${params.toString()}`);
-      if (!res.ok) throw new Error('Erreur lors du chargement des produits');
+      if (!res.ok) throw new Error('load');
       
       let result = await res.json();
       
@@ -126,12 +127,12 @@ const Products = () => {
           id: p.id,
           reference_id: p.reference_id,
           name: p.name,
-          brand: p.company_name || 'Marque Standard',
+          brand: p.company_name || '',
           price: p.price,
-          category: p.category || 'Non catégorisé',
-          region: p.region || 'Alger',
+          category: p.category || '',
+          region: p.region || '',
           image: p.file_url || p.image_url || '/placeholder.svg',
-          features: p.features || ['Produit de qualité'],
+          features: p.features || [],
           verified: p.verified || false,
           owner_id: p.owner_id || p.company_id
       }));
@@ -144,7 +145,7 @@ const Products = () => {
   });
   
   const products = productsData.data;
-  const regionsList = ["Toutes les wilayas", ...Array.from(new Set(products.map((p: any) => p.region).filter(Boolean)))];
+  const regionsList: string[] = ['', ...Array.from(new Set<string>(products.map((p: any) => p.region).filter(Boolean)))];
   const totalPages = productsData.totalPages;
   const totalItems = productsData.totalItems;
 
@@ -189,7 +190,7 @@ const Products = () => {
   const filteredProducts = products.filter(product => {
      if (companyIdParam && product.owner_id !== companyIdParam && product.company_id !== companyIdParam) return false;
      if (activeCategory !== 'Tous' && product.category !== activeCategory) return false;
-     if (selectedRegion !== 'Toutes les wilayas' && product.region !== selectedRegion) return false;
+     if (selectedRegion && product.region !== selectedRegion) return false;
      if (searchQuery) {
         const query = searchQuery.toLowerCase();
         return product.name?.toLowerCase().includes(query) ||
@@ -344,7 +345,7 @@ const Products = () => {
                     onClick={() => setIsRegionOpen(!isRegionOpen)}
                     className="w-full flex items-center justify-between bg-gray-50 px-5 py-3 rounded-xl border border-transparent focus:ring-2 focus:ring-primary/20 focus:border-primary focus:bg-white transition-all cursor-pointer text-gray-800 hover:bg-gray-100 text-start"
                   >
-                    <span className="text-xs font-black uppercase tracking-widest truncate">{selectedRegion === 'Toutes les wilayas' ? 'Toutes les wilayas' : selectedRegion}</span>
+                    <span className="text-xs font-black uppercase tracking-widest truncate">{selectedRegion || t('exhibitor.list.allWilayas')}</span>
                     <ChevronDown className={cn("w-4 h-4 text-gray-400 transition-transform ms-4 shrink-0", isRegionOpen && "rotate-180")} />
                   </button>
                   
@@ -362,24 +363,12 @@ const Products = () => {
                             setIsRegionOpen(false);
                           }}
                         >
-                          <span className={cn(selectedRegion === r ? "" : "group-hover:translate-x-1 transition-transform")}>{r === 'Toutes les wilayas' ? "Toutes les wilayas" : r}</span>
+                          <span className={cn(selectedRegion === r ? "" : "group-hover:translate-x-1 transition-transform")}>{r || t('exhibitor.list.allWilayas')}</span>
                           {selectedRegion === r && <Check className="w-4 h-4 text-primary" />}
                         </button>
                       ))}
                     </div>
                   )}
-                </div>
-
-                <div>
-                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 block">{t('products.sales_type')}</label>
-                  <div className="space-y-2">
-                    {['Neuf', 'Occasions Rénovées', 'Déstockage'].map(type => (
-                      <label key={type} className="flex items-center space-x-3 cursor-pointer group">
-                        <div className="w-5 h-5 rounded-md border-2 border-gray-100 group-hover:border-secondary transition-all" />
-                        <span className="text-xs font-bold text-gray-600">{type}</span>
-                      </label>
-                    ))}
-                  </div>
                 </div>
               </div>
             </div>
@@ -490,7 +479,7 @@ const Products = () => {
 
                     <div className="pt-4 mt-4 border-t border-gray-50">
                       <Link to={`/products/${generateSlugUrl(product.name, product.id)}`} className="w-full py-2.5 rounded-xl bg-primary/5 text-primary text-[10px] font-black uppercase tracking-widest flex items-center justify-center hover:bg-primary hover:text-white transition-all group-hover:bg-primary group-hover:text-white">
-                        Voir détails
+                        {t('common.see_details')}
                         <ArrowRight className="h-3.5 w-3.5 ms-2 rtl:rotate-180 transition-transform group-hover:translate-x-1" />
                       </Link>
                     </div>

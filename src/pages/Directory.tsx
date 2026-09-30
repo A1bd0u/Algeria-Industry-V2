@@ -195,18 +195,6 @@ const Directory = () => {
                 </select>
               </div>
 
-              {/* Zones Industrielles */}
-              <div className={cn("mb-8 pt-8 border-t border-gray-100", i18n.language?.startsWith('ar') && "text-end")}>
-                <span className="text-[10px] font-black text-primary uppercase tracking-widest">{t('directory.zones')}</span>
-                <div className={cn("flex flex-wrap gap-2 mt-4", i18n.language?.startsWith('ar') && "justify-end")}>
-                  {["Rouiba", "Hassi Messaoud", "Arzew", "Chelghoum Laid"].map(zone => (
-                    <button key={zone} className="px-3 py-1 bg-gray-50 border border-gray-100 text-[9px] font-black uppercase tracking-widest text-gray-400 hover:border-secondary hover:text-secondary transition-all" onClick={(e) => { e.preventDefault(); alert("Fonctionnalité en cours de développement"); }}>
-                      {zone}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
               {/* Certification Toggle */}
               <div className="pt-8 border-t border-gray-100">
                 <button 
@@ -298,9 +286,9 @@ const Directory = () => {
                               <div className={cn("flex items-center space-x-3", i18n.language?.startsWith('ar') && "flex-row-reverse space-x-reverse justify-end")}>
                                 <h3 className="text-xl font-black text-primary uppercase tracking-tighter group-hover:text-secondary transition-colors">{company.name}</h3>
                                 {company.certified && (
-                                  <div className="bg-secondary/10 text-secondary px-2 py-0.5 border border-secondary/20 flex items-center space-x-1" title="Certifié ISO">
+                                  <div className="bg-secondary/10 text-secondary px-2 py-0.5 border border-secondary/20 flex items-center space-x-1" title={t('compare.verified')}>
                                     <Award className="h-3 w-3" />
-                                    <span className="text-[9px] font-black uppercase tracking-widest">ISO CERTIFIED</span>
+                                    <span className="text-[9px] font-black uppercase tracking-widest">{t('compare.verified')}</span>
                                   </div>
                                 )}
                               </div>
@@ -315,16 +303,16 @@ const Directory = () => {
                                 </div>
                               </div>
                             </div>
-                            <button className="text-gray-300 hover:text-secondary transition-colors" onClick={(e) => { e.preventDefault(); alert("Fonctionnalité en cours de développement"); }}>
+                            <Link to={`/directory/${generateSlugUrl(company.name, company.id)}`} aria-label={company.name} className="text-gray-300 hover:text-secondary transition-colors">
                               <ExternalLink className="h-5 w-5" />
-                            </button>
+                            </Link>
                           </div>
                           <p className={cn("text-gray-500 text-[13px] mt-4 leading-relaxed font-medium uppercase tracking-tight", i18n.language?.startsWith('ar') && "text-end")}>{company.description}</p>
                           
                           <div className={cn("mt-8 pt-6 border-t border-border-tech grid grid-cols-2 md:grid-cols-4 gap-6", i18n.language?.startsWith('ar') && "md:flex md:flex-row-reverse md:justify-between")}>
                             <div className={i18n.language?.startsWith('ar') ? "text-end" : ""}>
                               <span className="tech-label">{t('directory.id_reg')}</span>
-                              <span className="text-[11px] font-mono font-bold text-primary">{company.reference_id ? company.reference_id : `${company.founded}-DZ-${company.id.toString().substring(0, 4)}`}</span>
+                              <span className="text-[11px] font-mono font-bold text-primary">{company.reference_id || '—'}</span>
                             </div>
                             <div className={i18n.language?.startsWith('ar') ? "text-end" : ""}>
                               <span className="tech-label">{t('directory.workforce')}</span>

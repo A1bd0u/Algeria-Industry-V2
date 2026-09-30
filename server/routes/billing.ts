@@ -10,6 +10,7 @@ import {
   PLANS, PlanId, SUBSCRIPTION_COLUMNS, expireSubscriptions, activateSubscription, renderInvoiceHtml,
 } from '../services/billingService';
 import { KYC_BUCKET } from './upload';
+import { notifyInvoiceIssued } from '../services/notificationService';
 
 // Facturation des abonnements (console admin). Au lancement : facture +
 // virement bancaire, activation manuelle après réception du paiement.
@@ -150,6 +151,8 @@ router.post('/', validate(createSchema), async (req, res, next) => {
       targetCompanyName: company.name,
       plan,
     });
+
+    await notifyInvoiceIssued(data);
 
     return res.status(201).json(data);
   } catch (err) {

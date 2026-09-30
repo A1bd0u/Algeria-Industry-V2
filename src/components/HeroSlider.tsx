@@ -28,13 +28,13 @@ const HeroSlider: React.FC<HeroSliderProps> = ({ slides }) => {
           const formattedSlides: Slide[] = activeAds.map((ad: any) => ({
             id: ad.id,
             bgGradient: ad.bg_gradient || 'from-primary to-primary/90',
-            productImg: ad.image_url || 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=400',
+            productImg: ad.image_url || '/placeholder.svg',
             title: ad.title,
-            subtitle: ad.subtitle || 'Espace Publicitaire',
-            description: ad.description || ad.objective || 'Découvrez les offres de nos partenaires.',
-            brandLogo: ad.brand_logo || 'https://images.unsplash.com/photo-1560179707-f14e90ef3623?auto=format&fit=crop&q=80&w=100',
-            brandName: ad.brand_name || 'Partenaire',
-            brandTagline: ad.brand_tagline || 'Sponsor Premium'
+            subtitle: ad.subtitle || '',
+            description: ad.description || ad.objective || '',
+            brandLogo: ad.brand_logo || '/favicon.svg',
+            brandName: ad.brand_name || '',
+            brandTagline: ad.brand_tagline || t('slides.sponsored')
           }));
           setDynamicSlides(formattedSlides);
         }
@@ -45,7 +45,15 @@ const HeroSlider: React.FC<HeroSliderProps> = ({ slides }) => {
     fetchAds();
   }, []);
 
-  const displaySlides = dynamicSlides.length > 0 ? [...dynamicSlides, ...slides] : slides;
+  // Les slides éditoriaux sont traduits ; les annonces gardent leur texte.
+  const localize = (slide: Slide): Slide => slide.i18nKey ? {
+    ...slide,
+    title: t(`slides.${slide.i18nKey}.title`),
+    subtitle: t(`slides.${slide.i18nKey}.subtitle`),
+    description: t(`slides.${slide.i18nKey}.description`),
+    brandTagline: t(`slides.${slide.i18nKey}.tagline`),
+  } : slide;
+  const displaySlides = (dynamicSlides.length > 0 ? [...dynamicSlides, ...slides] : slides).map(localize);
 
   useEffect(() => {
     setCurrent(0); // Reset current slide when slides change
@@ -110,7 +118,7 @@ const HeroSlider: React.FC<HeroSliderProps> = ({ slides }) => {
                   className={cn("flex items-center space-x-2 mb-2", i18n.language?.startsWith('ar') && "flex-row-reverse space-x-reverse justify-end")}
                 >
                   <span className="text-[9px] font-black uppercase tracking-[0.3em] text-secondary">
-                    {i18n.language?.startsWith('ar') ? 'المواصفات الفنية' : 'Technical Specification'}
+                    {t('hero_slider.tech_spec')}
                   </span>
                   <div className="h-[1px] w-8 bg-secondary" />
                 </motion.div>

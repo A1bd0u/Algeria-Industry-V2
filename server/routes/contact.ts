@@ -5,6 +5,7 @@ import { validate } from '../middlewares/validateMiddleware';
 import { formLimiter } from '../middlewares/rateLimiter';
 import { verifyCaptcha } from '../utils/captcha';
 import { sendTransactionalEmail } from '../services/emailService';
+import { alertAdminsSupportRequest } from '../services/notificationService';
 import { logger } from '../utils/logger';
 
 const router = express.Router();
@@ -41,7 +42,8 @@ router.post('/', formLimiter, validate(contactSchema), async (req, res) => {
         message
       });
     } else {
-      logger.warn('SUPPORT_EMAIL non configuré : message de contact enregistré sans notification.');
+      // Sans boîte support dédiée, les administrateurs sont prévenus.
+      await alertAdminsSupportRequest(name, email, subject || '(sans sujet)');
     }
 
     return res.status(201).json({ success: true, message: 'Votre message a bien été envoyé.' });

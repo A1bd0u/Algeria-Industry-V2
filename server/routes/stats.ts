@@ -6,6 +6,34 @@ import { isUuid } from '../middlewares/validateParams';
 
 const router = express.Router();
 
+// Compteurs publics réels (accueil, page Exposants), mis en cache 10 minutes :
+// aucun chiffre affiché sur le site n'est inventé.
+const PUBLIC_STATS_TTL_MS = 10 * 60 * 1000;
+let publicStatsCache: { at: number; value: { verifiedCompanies: number; publishedProducts: number } } | null = null;
+
+export const resetPublicStatsCache = () => { publicStatsCache = null; };
+
+router.get('/public', async (req, res) => {
+  if (publicStatsCache && Date.now() - publicStatsCache.at < PUBLIC_STATS_TTL_MS) {
+    return res.json(publicStatsCache.value);
+  }
+  try {
+    const supabase = getSupabase();
+    const [companies, products] = await Promise.all([
+      supabase.from('companies').select('id', { count: 'exact', head: true }).eq('status', 'approved'),
+      supabase.from('products').select('id', { count: 'exact', head: true }).in('status', ['Actif', 'active']),
+    ]);
+    if (companies.error) throw companies.error;
+    if (products.error) throw products.error;
+    const value = { verifiedCompanies: companies.count || 0, publishedProducts: products.count || 0 };
+    publicStatsCache = { at: Date.now(), value };
+    return res.json(value);
+  } catch (err: any) {
+    logger.error('Supabase Error GET /stats/public:', err);
+    return res.status(500).json({ error: 'Une erreur interne est survenue.' });
+  }
+});
+
 router.get('/dashboard', requireAuth, async (req, res) => {
   const user = (req as any).user;
   const timeframe = req.query.timeframe === '1y' ? '1y' : '6m';

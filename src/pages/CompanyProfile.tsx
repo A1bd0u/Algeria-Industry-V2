@@ -33,9 +33,11 @@ import { useTranslation } from 'react-i18next';
 import { ApiError } from '../lib/apiError';
 import { whatsappHref } from '../config/site';
 import { formatDate, currentLocale } from '../lib/format';
+import { useToast } from '../context/ToastContext';
 
 const CompanyProfile = () => {
   const { t } = useTranslation();
+  const toast = useToast();
   const { id: slugId } = useParams();
   const id = extractIdFromSlug(slugId);
   const navigate = useNavigate();
@@ -376,8 +378,9 @@ const CompanyProfile = () => {
                             url: window.location.href
                           }).catch(console.error);
                         } else {
-                          navigator.clipboard.writeText(window.location.href);
-                          alert(t('company.linkCopied'));
+                          navigator.clipboard.writeText(window.location.href)
+                            .then(() => toast.success(t('company.linkCopied')))
+                            .catch(() => toast.error(t('common.networkError')));
                         }
                       }} className="flex items-center justify-center space-x-2 py-3 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 transition-all font-bold text-sm cursor-pointer">
                         <Share2 className="h-4 w-4" />

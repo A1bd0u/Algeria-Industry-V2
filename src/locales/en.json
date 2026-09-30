@@ -28,7 +28,8 @@
     "workspaceText": "Manage your business",
     "memberSpace": "Member area",
     "openMenu": "Open menu",
-    "closeMenu": "Close menu"
+    "closeMenu": "Close menu",
+    "console_pro": "Admin area"
   },
   "hero": {
     "title": "Connect to the industry",
@@ -65,7 +66,51 @@
     "stats_title": "Industry in Figures",
     "partners": "Our Trusted Partners",
     "view_all": "View all",
-    "read_more": "VIEW MORE PRODUCTS"
+    "read_more": "VIEW MORE PRODUCTS",
+    "seoDescription": "Find a verified Algerian industrial supplier and contact them directly.",
+    "promise": {
+      "verificationLabel": "Verification",
+      "verificationTitle": "Verified suppliers",
+      "verificationText": "“Verified company” badge after checking the trade register and tax ID (KYC).",
+      "contactLabel": "Contact",
+      "contactTitle": "Direct contact",
+      "contactText": "Ask the supplier for a quote through the built-in messaging or WhatsApp.",
+      "languagesLabel": "Languages",
+      "languagesText": "A platform built for Algerian industry."
+    },
+    "catalogLabel": "Catalogue",
+    "fullCatalog": "Browse the full catalogue",
+    "noProducts": "No products published yet.",
+    "beFirst": "Be the first supplier to publish your catalogue",
+    "price": "Price",
+    "whyTitle": "Why choose Algeria Industry?",
+    "why": {
+      "visibility": "More visibility for suppliers",
+      "sourcing": "Simpler sourcing for buyers",
+      "kyc": "Verified companies (KYC)",
+      "local": "Support team in Algeria"
+    },
+    "help": {
+      "title": "Need help?",
+      "text": "Our team helps you find a supplier, list your company or use the platform.",
+      "delayTitle": "Reply within 2 business days",
+      "delayText": "By email, for any request sent through the contact form.",
+      "guidesTitle": "Frequently asked questions",
+      "guidesText": "Registration, verification, subscriptions and payment.",
+      "contact": "Contact us",
+      "faq": "Read the FAQ"
+    },
+    "stats": {
+      "title": "The platform today",
+      "verifiedCompanies": "Verified companies",
+      "publishedProducts": "Published products",
+      "commitment": "Figures updated continuously from the platform database."
+    },
+    "start": {
+      "title": "Ready to start?",
+      "text": "Create your account for free",
+      "button": "Create my supplier profile"
+    }
   },
   "directory": {
     "title": "Industrial Directory",
@@ -92,7 +137,7 @@
     "report_desc": "Help us keep Algeria Industry safe. Why are you reporting this product?",
     "cancel": "Cancel",
     "send_report": "Send Report",
-    "join_suppliers": "Join 500+ suppliers in Algeria",
+    "join_suppliers": "Join Algeria Industry's verified suppliers",
     "prev": "Previous",
     "next": "Next",
     "sourcing": "Industrial Sourcing",
@@ -106,7 +151,34 @@
     "add_product": "Add Product",
     "quotes": "Quotes",
     "hero_desc": "Explore the best industrial technologies available in Algeria. Compare, request quotes and connect with suppliers.",
-    "no_results": "No products found."
+    "no_results": "No products found.",
+    "detail": {
+      "notFound": "Product not found",
+      "loadError": "Error while loading the product",
+      "backToProducts": "Back to products",
+      "backToCatalog": "Back to catalogue",
+      "noImage": "No image provided",
+      "favorite": "Add to favourites",
+      "share": "Share",
+      "reportShort": "Report",
+      "verifiedCompany": "Verified company",
+      "supplier": "Supplier: {{name}}",
+      "indicativePrice": "Indicative price",
+      "reference": "Reference: {{ref}}",
+      "requestQuote": "Request a professional quote",
+      "quoteSubject": "Quote for {{name}}",
+      "compared": "Compared",
+      "compareFull": "The comparison already holds 4 products.",
+      "description": "Description",
+      "specs": "Specifications",
+      "noDescription": "The supplier has not added a description yet.",
+      "reportPlaceholder": "E.g. counterfeit, misleading content, inappropriate images…",
+      "reportLogin": "Sign in to report a product.",
+      "reportReasonRequired": "Please give a reason for the report.",
+      "reportSent": "Report sent. Thank you, our team will review it.",
+      "reportError": "The report could not be sent.",
+      "favoriteError": "Unable to update your favourites."
+    }
   },
   "rfq": {
     "title": "Request for Quote (RFQ)",
@@ -141,7 +213,17 @@
     "subscribe": "Subscribe for free",
     "privacy_note": "By registering, you accept our privacy policy. You can unsubscribe at any time.",
     "featured": "Featured",
-    "read_time": "min read"
+    "read_time": "min read",
+    "notFound": "Article not found.",
+    "back": "Back to the blog",
+    "loadError": "Unable to load articles.",
+    "readTime": "{{count}} min read",
+    "share": "Share",
+    "copyLink": "Copy link",
+    "latest": "Latest articles",
+    "ctaTitle": "Find your industrial suppliers",
+    "ctaText": "Browse the directory of verified Algerian companies and contact them directly.",
+    "ctaButton": "View the directory"
   },
   "catalogues": {
     "title": "Industrial Catalogues",
@@ -153,7 +235,9 @@
     "view": "View",
     "download": "Download",
     "none_found": "No catalogues found",
-    "none_found_text": "Adjust your technical search criteria."
+    "none_found_text": "Catalogues published by suppliers will appear here.",
+    "loadError": "Unable to load catalogues.",
+    "noFile": "Document not available"
   },
   "footer": {
     "about": "About Us",
@@ -172,7 +256,19 @@
     "backToTop": "Back to top",
     "errorTitle": "Something went wrong",
     "errorText": "We could not load this section. Please try again.",
-    "reload": "Reload the page"
+    "reload": "Reload the page",
+    "close": "Close",
+    "networkError": "Network error. Check your connection and try again.",
+    "linkCopied": "Link copied to clipboard.",
+    "onQuote": "On quotation",
+    "all": "All",
+    "clear_filters": "Clear filters",
+    "error": "Something went wrong",
+    "error_desc": "The data could not be loaded.",
+    "no_results": "No results",
+    "no_results_desc": "Change your filters or search.",
+    "retry": "Try again",
+    "search": "Search"
   },
   "hero_slider": {
     "tech_spec": "Technical Specification"
@@ -181,7 +277,28 @@
     "results_for": "Results for",
     "sector_cat": "Sector / Category",
     "region": "Region (Wilaya)",
-    "boost_vis": "Boost your visibility?"
+    "boost_vis": "Boost your visibility?",
+    "everything": "the whole catalogue",
+    "found": "{{count}} result(s) match your search.",
+    "filterType": "Filter by type",
+    "allResults": "All results",
+    "products": "Products",
+    "companies": "Companies",
+    "advancedFilters": "Advanced filters",
+    "sectorPlaceholder": "E.g. energy, IT…",
+    "wilayaPlaceholder": "E.g. Algiers, Oran…",
+    "adsText": "Present your company to buyers with our advertising spaces.",
+    "adsButton": "Request an ad space",
+    "general": "General",
+    "algeria": "Algeria",
+    "loading": "Loading…",
+    "loadMore": "Show more results",
+    "products_found": "Products",
+    "companies_found": "Companies",
+    "view_profile": "View profile",
+    "no_results": "No results",
+    "no_results_desc": "Try other keywords or",
+    "contact_support": "contact our team"
   },
   "faq": {
     "title": "Frequently Asked Questions",
@@ -240,7 +357,18 @@
     "formats": "Accepted formats: JPG, PNG, WEBP (Max 5MB)",
     "error_send": "An error occurred while sending. Please try again later.",
     "send_request": "Send Request",
-    "why_advertise": "Why advertise on Algeria Industry?"
+    "why_advertise": "Why advertise on Algeria Industry?",
+    "captchaRequired": "Please complete the captcha.",
+    "placementHome": "Home page banner",
+    "heroTitle": "Promote your company",
+    "heroText": "Present your offer to the industry professionals who visit Algeria Industry. Fill in the form and our team will get back to you with a proposal.",
+    "successText": "Our team has received your advertising request. We will reply by email within 2 business days.",
+    "newRequest": "New request",
+    "companyPlaceholder": "Your company",
+    "contactPlaceholder": "Full name",
+    "messagePlaceholder": "Describe your goals, the desired duration…",
+    "visualsNote": "Our team will ask for your visuals once the request is approved.",
+    "whyText": "Algeria Industry is aimed at Algerian industrial buyers and suppliers. Your banners are seen by professionals actively looking for products and partners."
   },
   "auth": {
     "captchaRequired": "Please complete the captcha to continue.",
@@ -406,7 +534,9 @@
     "AI_UNAVAILABLE": "The assistant is temporarily unavailable.",
     "INVALID_ID": "Invalid identifier.",
     "WHATSAPP_INVALID": "Invalid WhatsApp number. Use an Algerian mobile (05, 06, 07) or the international format.",
-    "COMPANY_LEGAL_LOCKED": "The verified trade register and tax ID can no longer be changed. Please contact support."
+    "COMPANY_LEGAL_LOCKED": "The verified trade register and tax ID can no longer be changed. Please contact support.",
+    "QUOTE_NO_SUPPLIER": "No supplier to contact for these products.",
+    "QUOTE_RATE_LIMIT": "Too many quote requests sent. Please try again later."
   },
   "mfa": {
     "title": "Two-factor authentication",
@@ -738,7 +868,22 @@
     "addAnother": "Add another product to compare",
     "clear": "Clear the list",
     "requestQuote": "Request a comparative quote",
-    "open": "Compare"
+    "open": "Compare",
+    "emptyTitle": "Nothing to compare",
+    "emptyText": "Add products to the comparison from their product page.",
+    "explore": "Browse the catalogue",
+    "back": "Keep sourcing",
+    "specs": "Specifications",
+    "verification": "Supplier",
+    "verified": "Verified company",
+    "notVerified": "Not verified",
+    "quoteTitle": "Request a quote",
+    "quoteText": "Each supplier receives a message in their Algeria Industry inbox listing their products. Replies arrive in your dashboard.",
+    "notePlaceholder": "Details for suppliers (quantities, lead time, delivery place…) — optional",
+    "sendQuote": "Send the request",
+    "sending": "Sending…",
+    "quoteSent": "Request sent to {{count}} supplier(s). Follow the replies in your inbox.",
+    "quoteError": "The request could not be sent."
   },
   "contact": {
     "titleStart": "Contact",
@@ -906,7 +1051,26 @@
       "pro": "10 images per product, support within 24 h"
     },
     "start": "Get started",
-    "comparePlans": "Compare plans in detail"
+    "comparePlans": "Compare plans in detail",
+    "list": {
+      "label": "Company directory",
+      "title": "Exhibitors and partners",
+      "subtitle": "Discover the industrial companies registered on Algeria Industry and contact them directly.",
+      "loadError": "Unable to load companies.",
+      "searchPlaceholder": "Search a company by name or activity…",
+      "sector": "Business sector",
+      "sectors": "Sectors",
+      "allSectors": "All sectors",
+      "wilaya": "Province (wilaya)",
+      "wilayas": "Provinces",
+      "allWilayas": "All provinces",
+      "none": "No company found",
+      "visit": "View profile",
+      "ctaTitle": "List your company",
+      "ctaText": "Show your products to industrial buyers across all 58 provinces. Registration is free.",
+      "ctaButton": "Create my supplier account",
+      "ctaPricing": "See the plans"
+    }
   },
   "searchModal": {
     "dialog": "Search",
@@ -989,5 +1153,132 @@
     "cataloguesCtaButton": "View catalogues",
     "whatsapp": "WhatsApp",
     "whatsappMessage": "Hello, I am contacting you via Algeria Industry about {{name}}."
+  },
+  "pricing": {
+    "eyebrow": "Transparent pricing",
+    "title": "Supplier pricing",
+    "subtitle": "To showcase your products and services",
+    "founder": {
+      "label": "Founding member offer",
+      "text": "Premium free for 12 months for the first 100 verified suppliers (KYC approved) who publish a catalogue of at least 10 products. Offer valid until 31 December 2026.",
+      "button": "Become a founding member"
+    },
+    "free": {
+      "description": "To discover the platform"
+    },
+    "basic": {
+      "description": "The best value for money"
+    },
+    "pro": {
+      "description": "For ambitious companies"
+    },
+    "features": {
+      "products": "{{count}} products",
+      "unlimitedProducts": "Unlimited products",
+      "images": "{{count}} images per product",
+      "messaging": "Messaging",
+      "supportStandard": "Standard support",
+      "statsBasic": "Basic statistics",
+      "statsAdvanced": "Advanced statistics",
+      "support48": "Support within 48 h",
+      "support24": "Support within 24 h",
+      "featured": "3 featured listings"
+    },
+    "popular": "Popular",
+    "recommended": "Recommended",
+    "start": "Get started",
+    "perYear": " / year",
+    "vatIncluded": "Price incl. VAT (19%)",
+    "included": "Included",
+    "notIncluded": "Not included",
+    "table": {
+      "title": "Detailed comparison",
+      "subtitle": "Compare features and choose the plan that suits you best.",
+      "feature": "Feature",
+      "price": "Annual price incl. VAT",
+      "products": "Products",
+      "images": "Images per product",
+      "featured": "Featured listings",
+      "featuredPro": "3 products (home page)",
+      "stats": "Statistics",
+      "statsBasic": "Basic (views)",
+      "statsAdvanced": "Advanced (views, clicks, leads)",
+      "support": "Support",
+      "supportStandard": "Standard",
+      "support48": "48 h",
+      "support24": "24 h, priority",
+      "messaging": "Messaging",
+      "catalogues": "PDF catalogues",
+      "visibility": "Visibility",
+      "sectorHighlight": "Highlighted in sector"
+    },
+    "payment": {
+      "title": "Payment by invoice",
+      "text": "All subscriptions are invoiced in Algerian dinars (DZD), 19% VAT included. You pay by bank transfer against the invoice or, when available, online with a CIB / Edahabia card. Your subscription is activated as soon as payment is received.",
+      "termsBefore": "Duration, renewal, cancellation and refunds: see our",
+      "termsLink": "terms and conditions"
+    }
+  },
+  "registerSuccess": {
+    "invalidCode": "Invalid code.",
+    "captchaRequired": "Complete the captcha to resend the code.",
+    "codeResent": "If a pending account exists for this address, a new code has just been sent.",
+    "sendError": "Error while sending.",
+    "verifyTitle": "Verify your email address",
+    "verifyText": "If this address can be used, a 6-digit code has just been sent to it. It is valid for 15 minutes.",
+    "email": "Email address",
+    "code": "Verification code",
+    "verifying": "Verifying…",
+    "confirm": "Confirm my address",
+    "captchaUnavailable": "Anti-bot check unavailable. Please try again later.",
+    "resend": "Resend the code",
+    "haveAccount": "Already have an account?",
+    "login": "Sign in",
+    "steps": {
+      "account": "Account created",
+      "accountText": "Email address verified.",
+      "kyc": "Company and KYC",
+      "kycPending": "Your file is being reviewed.",
+      "kycText": "Upload your trade register and tax ID to get the “verified company” badge.",
+      "product": "First product",
+      "productText": "Publish your first product once KYC is approved."
+    },
+    "buyer": {
+      "find": "Find a supplier",
+      "findText": "Browse verified suppliers.",
+      "explore": "Explore products",
+      "exploreText": "Compare and request a quote.",
+      "profile": "Complete your profile",
+      "profileText": "Add your company information."
+    },
+    "createdTitle": "Account created successfully",
+    "welcome": "Welcome to Algeria Industry, the marketplace of verified Algerian industrial suppliers.",
+    "nextSteps": "Next steps",
+    "progressLabel": "Step {{done}} of {{total}}",
+    "progress": "Progress",
+    "goDashboard": "Go to the dashboard",
+    "needHelp": "Need help setting up your account?",
+    "contactSupport": "Contact support"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "text": "This page does not exist or has been moved.",
+    "home": "Home",
+    "catalog": "Catalogue"
+  },
+  "slides": {
+    "sponsored": "Sponsored",
+    "suppliers": {
+      "title": "Verified industrial suppliers",
+      "subtitle": "Find the right partner",
+      "description": "Contact them directly and ask for a quote",
+      "tagline": "The Algerian B2B marketplace"
+    },
+    "founder": {
+      "title": "Founding member",
+      "subtitle": "Premium free for 12 months",
+      "description": "For the first 100 verified suppliers",
+      "tagline": "Launch offer"
+    }
   }
 }
