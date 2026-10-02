@@ -99,6 +99,31 @@ describe('Companies Ownership', () => {
     }
   });
 
+  it('enregistre la vitrine : année, effectif, certifications, site et galerie', async () => {
+    process.env.SUPABASE_URL = 'https://proj.supabase.co';
+    const mock = mockWith(sessionRow({ id: OWNER_ID, role: 'fournisseur' }));
+    const photo = `https://proj.supabase.co/storage/v1/object/public/product-images/${OWNER_ID}/usine.jpg`;
+
+    const ok = await request(app).put(`/api/companies/${COMPANY_ID}`).set('Cookie', ['token=t']).send({
+      name: 'Acme', founded_year: '1998', employees: '50-249', website: 'www.acme.dz',
+      certifications: ['ISO 9001', 'ISO 9001', 'CE'], gallery: [photo],
+    });
+    expect(ok.status).toBe(200);
+    const update = mock.queries.find((q) => q.table === 'companies' && q.op === 'update');
+    expect(update?.payload).toMatchObject({
+      founded_year: 1998, employees: '50-249', website: 'https://www.acme.dz',
+      certifications: ['ISO 9001', 'CE'], gallery: [photo],
+    });
+
+    const badSite = await request(app).put(`/api/companies/${COMPANY_ID}`).set('Cookie', ['token=t'])
+      .send({ name: 'Acme', website: 'javascript:alert(1)' });
+    expect(badSite.status).toBe(400);
+
+    const badGallery = await request(app).put(`/api/companies/${COMPANY_ID}`).set('Cookie', ['token=t'])
+      .send({ name: 'Acme', gallery: ['https://evil.example/x.jpg'] });
+    expect(badGallery.body.code).toBe('COMPANY_IMAGE_INVALID');
+  });
+
   it('devrait rejeter un identifiant qui n\'est pas un UUID', async () => {
     mockWith(sessionRow({ role: 'admin' }));
 

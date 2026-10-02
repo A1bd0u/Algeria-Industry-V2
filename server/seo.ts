@@ -1,3 +1,4 @@
+import { productCategories, sectorBySlug, sectorPath } from '../src/data/productCategories';
 import express from 'express';
 import { getSupabase } from './db/supabaseClient';
 import { escapeHtml } from './utils/html';
@@ -224,7 +225,31 @@ export const resolveMeta = async (path: string): Promise<PageMeta> => {
   return meta || defaultMeta(path);
 };
 
+// Pages secteurs : métadonnées connues sans requête.
+const sectorMeta = (path: string): PageMeta | null => {
+  const m = path.match(/^\/secteurs\/([a-z-]+)\/?$/);
+  const group = m ? sectorBySlug(m[1]) : null;
+  if (!group) return null;
+  const siteUrl = getSiteUrl();
+  const subs = group.subCategories.map((s) => s.name.split(/[:(]/)[0].trim()).join(', ');
+  return {
+    title: `${group.name} : fournisseurs et produits en Algérie | ${SITE_NAME}`,
+    description: `${group.name} : ${subs}. Fournisseurs industriels algériens vérifiés, catalogues et demandes de devis.`.slice(0, 300),
+    canonical: `${siteUrl}${sectorPath(group.id)}`,
+    jsonLd: [{
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: SITE_NAME, item: `${siteUrl}/` },
+        { '@type': 'ListItem', position: 2, name: group.name, item: `${siteUrl}${sectorPath(group.id)}` },
+      ],
+    }],
+  };
+};
+
 const resolveMetaFromDb = async (path: string): Promise<PageMeta> => {
+  const sector = sectorMeta(path);
+  if (sector) return sector;
   try {
     const match = path.match(/^\/(directory|products|blog)\/([^/?#]+)\/?$/);
     if (match) {
@@ -295,6 +320,7 @@ seoRouter.get('/sitemaps/:part.xml', async (req, res) => {
           urlEntry(`${siteUrl}/`, undefined, 'daily', '1.0'),
           urlEntry(`${siteUrl}/directory`, undefined, 'daily', '0.9'),
           urlEntry(`${siteUrl}/products`, undefined, 'daily', '0.9'),
+          ...productCategories.map((g) => urlEntry(`${siteUrl}${sectorPath(g.id)}`, undefined, 'daily', '0.8')),
           urlEntry(`${siteUrl}/tarifs`, undefined, 'monthly', '0.6'),
           urlEntry(`${siteUrl}/blog`, undefined, 'weekly', '0.8'),
           urlEntry(`${siteUrl}/events`, undefined, 'weekly', '0.7'),

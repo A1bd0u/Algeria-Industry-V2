@@ -7,7 +7,7 @@ import { useAuth } from '../context/AuthContext';
 import { cn } from '../lib/utils';
 import SearchModal from './SearchModal';
 import Logo from './ui/Logo';
-import { productCategories } from '../data/productCategories';
+import { productCategories, sectorPath } from '../data/productCategories';
 
 const Navbar = () => {
   const { t, i18n } = useTranslation();
@@ -78,11 +78,6 @@ const Navbar = () => {
 
   // Groupes de la nomenclature des produits (même libellé que le filtre du catalogue).
   const groupIcons: Record<string, React.ElementType> = { A: Package, B: Wrench, C: Cpu, D: Truck, E: HardHat };
-  const categories = productCategories.map((group) => ({
-    name: t(`productCategories.${group.id}`),
-    val: group.name,
-    icon: groupIcons[group.id] || Package,
-  }));
 
   return (
     <nav className={cn("bg-[#1a1a1a] text-white sticky top-0 z-50 border-b border-white/[0.05] shadow-2xl", i18n.language?.startsWith('ar') && "font-arabic")}>
@@ -136,44 +131,55 @@ const Navbar = () => {
                 <AnimatePresence>
                   {item.hasMega && showMegaMenu && (
                     <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 10 }}
-                      className={cn(
-                        "absolute top-full w-[400px] bg-[#222] text-white shadow-2xl border border-white/10 overflow-hidden rounded-2xl mt-2",
-                        "start-0"
-                      )}
+                      initial={{ opacity: 0, y: 10, x: '-50%' }}
+                      animate={{ opacity: 1, y: 0, x: '-50%' }}
+                      exit={{ opacity: 0, y: 10, x: '-50%' }}
+                      // Panneau centré sous la barre ; le haut transparent fait le pont
+                      // avec le lien pour que le survol ne se perde pas.
+                      className="fixed left-1/2 top-[76px] pt-4 w-[min(1040px,calc(100vw-4rem))] z-50"
                     >
-                      <div className="p-2">
-                        <div className={cn("px-4 py-2 mb-1")}>
-                           <p className="text-xs font-black text-white/30 uppercase tracking-wider">{t('nav.browse_industries')}</p>
-                        </div>
-                        <div className="grid grid-cols-1">
-                            {categories.map((cat, idx) => (
+                      <div className="bg-[#222] text-white shadow-2xl border border-white/10 overflow-hidden rounded-2xl">
+                      <div className="grid grid-cols-5 gap-1 p-3">
+                        {productCategories.map((group) => {
+                          const Icon = groupIcons[group.id] || Package;
+                          return (
+                            <div key={group.id} className="rounded-xl p-3 hover:bg-white/[0.03] transition-colors">
                               <Link
-                                key={idx}
-                                to={`/products?category=${encodeURIComponent(cat.val)}`}
+                                to={sectorPath(group.id)}
                                 onClick={() => setShowMegaMenu(false)}
-                                className={cn(
-                                  "flex items-center justify-between px-5 py-3 hover:bg-white/5 rounded-xl transition-colors group"
-                                )}
+                                className="group/sector flex items-start gap-2.5 mb-3"
                               >
-                                <div className={cn("flex items-center space-x-3")}>
-                                  <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center group-hover:bg-secondary/20 transition-colors">
-                                    <cat.icon className="h-4 w-4 text-white/20 group-hover:text-secondary" />
-                                  </div>
-                                  <span className={cn(
-                                    "text-xs font-bold text-white/60 group-hover:text-secondary uppercase tracking-wider",
-                                    i18n.language?.startsWith('ar') && "text-sm"
-                                  )}>{cat.name}</span>
-                                </div>
-                                <ChevronRight className={cn(
-                                  "h-3 w-3 text-white/10 group-hover:text-secondary transition-transform",
-                                  "rtl:rotate-180 group-hover:translate-x-1 rtl:group-hover:-translate-x-1"
-                                )} />
+                                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-secondary/15 text-secondary group-hover/sector:bg-secondary group-hover/sector:text-white transition-colors">
+                                  <Icon className="h-4 w-4" />
+                                </span>
+                                <span className="text-sm font-bold leading-snug text-white group-hover/sector:text-secondary normal-case tracking-normal">
+                                  {t(`productCategories.${group.id}`)}
+                                </span>
                               </Link>
-                            ))}
-                        </div>
+                              <ul className="space-y-1.5 ps-1">
+                                {group.subCategories.map((sub) => (
+                                  <li key={sub.id}>
+                                    <Link
+                                      to={`/products?category=${encodeURIComponent(sub.name)}`}
+                                      onClick={() => setShowMegaMenu(false)}
+                                      className="block text-[13px] leading-snug text-white/55 hover:text-white normal-case tracking-normal"
+                                    >
+                                      {t(`productCategories.${sub.id}`).split(/[:(]/)[0].trim().replace(/\.$/, '')}
+                                    </Link>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          );
+                        })}
+                      </div>
+                      <div className="flex items-center justify-between gap-4 border-t border-white/10 bg-white/[0.03] px-6 py-3">
+                        <p className="text-xs text-white/50 normal-case tracking-normal">{t('nav.megaHint')}</p>
+                        <Link to="/products" onClick={() => setShowMegaMenu(false)} className="inline-flex items-center gap-1.5 text-sm font-bold text-secondary hover:text-white normal-case tracking-normal">
+                          {t('home.categories.all')}
+                          <ChevronRight className="h-4 w-4 rtl:rotate-180" />
+                        </Link>
+                      </div>
                       </div>
                     </motion.div>
                   )}

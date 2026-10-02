@@ -72,6 +72,7 @@ const CompanyProfile = () => {
 
   // Sub-pages (sections) states
   const [activeTab, setActiveTab] = useState<'about' | 'products' | 'catalogues' | 'news_events'>('about');
+  const [galleryIndex, setGalleryIndex] = useState<number | null>(null);
   const [catalogues, setCatalogues] = useState<any[]>([]);
   const [cataloguesLoading, setCataloguesLoading] = useState(false);
   const [articles, setArticles] = useState<any[]>([]);
@@ -232,6 +233,7 @@ const CompanyProfile = () => {
           banner: companyData.banner_url || null,
           // ensure arrays and properties exist to avoid UI crash
           certifications: companyData.certifications || [],
+          gallery: companyData.gallery || [],
           products: companyData.products || []
         };
 
@@ -458,6 +460,36 @@ const CompanyProfile = () => {
                           )}
                         </div>
                       </div>
+                      {company.founded_year && (
+                        <div className="flex items-start gap-3">
+                          <Award className="h-5 w-5 text-secondary mt-0.5 flex-shrink-0" />
+                          <div>
+                            <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">{t('company.foundedYear')}</p>
+                            <p className="text-sm text-gray-700 font-bold">{company.founded_year}</p>
+                          </div>
+                        </div>
+                      )}
+                      {company.employees && (
+                        <div className="flex items-start gap-3">
+                          <Users className="h-5 w-5 text-secondary mt-0.5 flex-shrink-0" />
+                          <div>
+                            <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">{t('company.employees')}</p>
+                            <p className="text-sm text-gray-700 font-bold">{t('company.employeesValue', { value: company.employees })}</p>
+                          </div>
+                        </div>
+                      )}
+                      {company.website && (
+                        <div className="flex items-start gap-3">
+                          <Globe className="h-5 w-5 text-secondary mt-0.5 flex-shrink-0" />
+                          <div className="min-w-0">
+                            <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">{t('company.website')}</p>
+                            <a href={company.website} target="_blank" rel="noopener noreferrer nofollow" dir="ltr"
+                              className="text-sm font-bold text-secondary hover:underline break-all">
+                              {company.website.replace(/^https?:\/\//, '').replace(/\/$/, '')}
+                            </a>
+                          </div>
+                        </div>
+                      )}
                     </div>
 
                     <div className="pt-6 border-t border-gray-200/40 flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -503,6 +535,22 @@ const CompanyProfile = () => {
                     {company.description || t('company.noDescription')}
                   </p>
                 </section>
+
+                {/* Galerie : usine, ateliers, réalisations */}
+                {company.gallery.length > 0 && (
+                  <section>
+                    <h2 className="text-2xl font-bold text-primary mb-4">{t('company.gallery')}</h2>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                      {company.gallery.map((url: string, i: number) => (
+                        <button key={url} type="button" onClick={() => setGalleryIndex(i)}
+                          className={cn('relative overflow-hidden rounded-xl border border-gray-100 group', i === 0 && 'col-span-2 row-span-2')}
+                          aria-label={`${t('company.gallery')} ${i + 1}`}>
+                          <img src={url} alt="" loading="lazy" className="h-full w-full object-cover aspect-square group-hover:scale-105 transition-transform duration-500" />
+                        </button>
+                      ))}
+                    </div>
+                  </section>
+                )}
 
                 {/* Informations Légales */}
                 <section>
@@ -929,6 +977,22 @@ const CompanyProfile = () => {
                 )}
               </div>
             </div>
+
+            {galleryIndex !== null && company.gallery[galleryIndex] && (
+              <div className="fixed inset-0 z-[95] bg-black/90 flex items-center justify-center p-4" role="dialog" aria-modal="true" onClick={() => setGalleryIndex(null)}>
+                <button type="button" className="absolute top-4 end-4 text-white p-2" aria-label={t('common.close')} onClick={() => setGalleryIndex(null)}>
+                  <XCircle className="h-8 w-8" />
+                </button>
+                <img src={company.gallery[galleryIndex]} alt="" className="max-w-full max-h-full object-contain" onClick={(e) => e.stopPropagation()} />
+                {company.gallery.length > 1 && (
+                  <button type="button" aria-label={t('slides.next')}
+                    onClick={(e) => { e.stopPropagation(); setGalleryIndex((galleryIndex + 1) % company.gallery.length); }}
+                    className="absolute end-4 top-1/2 -translate-y-1/2 h-12 w-12 rounded-full bg-white/15 text-white flex items-center justify-center hover:bg-white/30">
+                    <ChevronRight className="h-6 w-6 rtl:rotate-180" />
+                  </button>
+                )}
+              </div>
+            )}
 
             {/* Download Brochure CTA */}
             <div className="bg-primary p-10 rounded-2xl text-white flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden shadow-2xl">

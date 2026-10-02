@@ -28,7 +28,8 @@
     "adminConsole": "Console d'administration",
     "mobileTabs": "Navigation principale",
     "language": "Langue : {{name}}",
-    "console_pro": "Espace administrateur"
+    "console_pro": "Espace administrateur",
+    "megaHint": "Cinq secteurs, de la matière première aux services industriels."
   },
   "hero": {
     "title": "Connectez-vous à l'industrie",
@@ -293,7 +294,12 @@
     "emptyText": "Essayez une autre catégorie ou retirez des filtres. Vous pouvez aussi chercher directement un fournisseur dans l'annuaire.",
     "pagination": "Pagination",
     "pageOf": "Page {{page}} sur {{total}}",
-    "showResults": "Voir {{count}} résultat(s)"
+    "showResults": "Voir {{count}} résultat(s)",
+    "badges": {
+      "new": "Nouveau",
+      "verified": "Vérifié"
+    },
+    "quickView": "Aperçu"
   },
   "blog": {
     "title": "Actualités Industrielles",
@@ -639,7 +645,8 @@
     "QUOTE_RATE_LIMIT": "Trop de demandes de devis envoyées. Réessayez plus tard.",
     "COMPANY_IMAGE_INVALID": "Image invalide : déposez-la depuis votre tableau de bord.",
     "PRODUCT_IMAGE_INVALID": "Image invalide : déposez-la depuis votre tableau de bord.",
-    "PLAN_IMAGE_LIMIT": "Nombre de photos limité par votre offre. Passez à une offre supérieure."
+    "PLAN_IMAGE_LIMIT": "Nombre de photos limité par votre offre. Passez à une offre supérieure.",
+    "WEBSITE_INVALID": "Adresse de site web invalide."
   },
   "mfa": {
     "title": "Double authentification",
@@ -909,7 +916,10 @@
       "whatsappPlaceholder": "Ex : 0550 12 34 56",
       "whatsappHelp": "Affiché sur votre fiche publique une fois votre entreprise vérifiée. Laissez vide pour ne pas l'afficher.",
       "changeLogo": "Changer le logo",
-      "changeBanner": "Changer la bannière"
+      "changeBanner": "Changer la bannière",
+      "showcase": "Vitrine de l'entreprise",
+      "certificationsHelp": "Séparées par des virgules (10 au plus). Affichées sur votre fiche.",
+      "galleryHelp": "Jusqu'à 8 photos : usine, ateliers, équipe, réalisations. La première est mise en avant."
     },
     "menu": {
       "overview": "Vue d'ensemble",
@@ -965,7 +975,8 @@
       "whatsapp": "Renseigner un numéro WhatsApp",
       "wilaya": "Indiquer la wilaya",
       "kyc": "Faire vérifier l'entreprise (RC et NIF)",
-      "products": "Publier au moins 10 produits"
+      "products": "Publier au moins 10 produits",
+      "gallery": "Au moins 3 photos dans la galerie"
     }
   },
   "help": {
@@ -1276,7 +1287,13 @@
     "cataloguesCtaButton": "Voir les catalogues",
     "whatsapp": "WhatsApp",
     "whatsappMessage": "Bonjour, je vous contacte via Algeria Industry au sujet de {{name}}.",
-    "verifiedOn": "RC et NIF contrôlés le {{date}}"
+    "verifiedOn": "RC et NIF contrôlés le {{date}}",
+    "foundedYear": "Année de création",
+    "employees": "Effectif",
+    "employeesValue": "{{value}} salariés",
+    "website": "Site web",
+    "certifications": "Certifications",
+    "gallery": "Galerie"
   },
   "pricing": {
     "eyebrow": "Tarification transparente",
@@ -1413,6 +1430,34 @@
       "title": "Premium offert 12 mois",
       "subtitle": "Pour les 100 premiers fournisseurs vérifiés.",
       "cta": "Voir l'offre"
+    }
+  },
+  "sector": {
+    "seoTitle": "{{name}} : fournisseurs et produits en Algérie",
+    "breadcrumb": "Fil d'Ariane",
+    "seeProducts": "Voir les {{count}} produits",
+    "seeCatalog": "Voir le catalogue",
+    "listCompany": "Vous êtes fournisseur de ce secteur ?",
+    "subcategories": "Sous-catégories",
+    "latest": "Derniers produits du secteur",
+    "seeAll": "Tout voir",
+    "empty": "Aucun produit publié dans ce secteur pour le moment.",
+    "suppliers": "Fournisseurs actifs dans ce secteur",
+    "others": "Autres secteurs",
+    "A": {
+      "intro": "Métaux, chimie de base, matériaux de construction, textiles et produits agricoles bruts : trouvez vos fournisseurs de matières premières en Algérie."
+    },
+    "B": {
+      "intro": "Machines-outils, lignes de production, engins de chantier, matériel agricole et de manutention, auprès de fournisseurs vérifiés."
+    },
+    "C": {
+      "intro": "Composants électroniques, pièces mécaniques et automobiles, hydraulique et pneumatique : les pièces dont votre production a besoin."
+    },
+    "D": {
+      "intro": "Maintenance, ingénierie, logistique, conseil, sous-traitance et informatique industrielle : des prestataires pour vos projets."
+    },
+    "E": {
+      "intro": "Outillage, produits d'entretien, équipements de protection, emballages et fournitures : les consommables de votre activité."
     }
   }
 }
