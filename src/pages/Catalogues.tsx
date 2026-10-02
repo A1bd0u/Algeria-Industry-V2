@@ -1,10 +1,12 @@
 import { AlertCircle, Building2, Download, ExternalLink, FileText } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CatalogueSkeleton } from '../components/Skeleton';
 import { formatDate } from '../lib/format';
 import { cn } from '../lib/utils';
+import EmptyState from '../components/ui/EmptyState';
 
 // Seuls les liens http(s) sont ouverts : une URL javascript: ou data:
 // enregistrée en base ne doit jamais devenir un lien cliquable.
@@ -59,11 +61,9 @@ const Catalogues = () => {
              <p className="text-xs font-black uppercase text-red-500 tracking-widest">{t('catalogues.loadError')}</p>
           </div>
         ) : catalogues.length === 0 ? (
-          <div className="text-center py-20 bg-white border border-dashed border-gray-300">
-            <FileText className="h-16 w-16 text-gray-200 mx-auto mb-4" />
-            <h3 className="text-xl font-black text-primary tracking-tighter">{t('catalogues.none_found')}</h3>
-            <p className="text-xs text-gray-500 mt-2 font-medium tracking-widest">{t('catalogues.none_found_text')}</p>
-          </div>
+          <EmptyState illustration="document" title={t('catalogues.none_found')} text={t('catalogues.none_found_text')}>
+            <Link to="/directory" className="btn-ghost">{t('home.hero.browseSuppliers')}</Link>
+          </EmptyState>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {catalogues.map((cat, index) => {

@@ -1,5 +1,5 @@
 import type React from 'react';
-import { BadgeCheck, Eye, Sparkles } from 'lucide-react';
+import { BadgeCheck, Eye, Sparkles, Star } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { useCurrency } from '../../context/CurrencyContext';
@@ -8,7 +8,8 @@ import { cn, generateSlugUrl } from '../../lib/utils';
 import ProductImage from './ProductImage';
 
 // Carte produit commune (accueil, secteurs, catalogue) : photo, badges
-// « Nouveau » et « Vérifié », fournisseur, prix ou « Sur devis ».
+// « Nouveau » et « Vérifié », fournisseur, prix ou « Sur devis » ; en option,
+// favori et aperçu rapide.
 
 const NEW_DAYS = 14;
 
@@ -22,10 +23,11 @@ interface ProductCardProps {
   product: any;
   layout?: 'grid' | 'list';
   onQuickView?: (product: any) => void;
+  favorite?: { active: boolean; onToggle: (e: React.MouseEvent) => void };
   className?: string;
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ product, layout = 'grid', onQuickView, className }) => {
+const ProductCard: React.FC<ProductCardProps> = ({ product, layout = 'grid', onQuickView, favorite, className }) => {
   const { t } = useTranslation();
   const { formatPrice } = useCurrency();
   const href = `/products/${generateSlugUrl(product.name, product.id)}`;
@@ -36,35 +38,45 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, layout = 'grid', onQ
   const list = layout === 'list';
 
   return (
-    <div className={cn(
-      'group relative flex rounded-2xl bg-white border border-border-tech hover:border-secondary hover:shadow-xl transition-all',
+    <article className={cn(
+      'group flex rounded-2xl bg-white border border-border-tech hover:border-secondary hover:shadow-xl transition-all',
       list ? 'flex-row gap-4 p-3' : 'flex-col p-3',
       className,
     )}>
-      <Link to={href} className={cn('relative block overflow-hidden rounded-xl shrink-0', list ? 'w-28 sm:w-40 aspect-square' : 'aspect-square mb-4')}>
-        <ProductImage src={product.file_url || product.image} alt={product.name} category={product.category}
-          imgClassName="group-hover:scale-105 transition-transform duration-500" />
-        <div className="absolute top-2 start-2 flex flex-wrap gap-1">
-          {isNew && (
-            <span className="inline-flex items-center gap-1 rounded-md bg-secondary px-1.5 py-0.5 text-[11px] font-bold text-white">
-              <Sparkles className="h-3 w-3" aria-hidden="true" /> {t('products.badges.new')}
-            </span>
-          )}
-        </div>
-      </Link>
-      {onQuickView && (
-        <button
-          type="button"
-          onClick={() => onQuickView(product)}
-          className={cn(
-            'absolute z-10 inline-flex items-center gap-1 rounded-lg bg-white/95 px-2.5 py-1.5 text-xs font-bold text-primary shadow-md border border-border-tech',
-            'opacity-100 lg:opacity-0 lg:group-hover:opacity-100 focus:opacity-100 transition-opacity hover:text-secondary',
-            list ? 'top-3 end-3' : 'top-5 end-5',
-          )}
-        >
-          <Eye className="h-3.5 w-3.5" aria-hidden="true" /> {t('products.quickView')}
-        </button>
-      )}
+      <div className={cn('relative shrink-0', list ? 'w-28 sm:w-44' : 'mb-4')}>
+        <Link to={href} className="block aspect-square overflow-hidden rounded-xl" tabIndex={-1} aria-hidden="true">
+          <ProductImage src={product.file_url || product.image} alt="" category={product.category}
+            imgClassName="group-hover:scale-105 transition-transform duration-500" />
+        </Link>
+        {isNew && (
+          <span className="absolute top-2 start-2 inline-flex items-center gap-1 rounded-md bg-secondary px-1.5 py-0.5 text-[11px] font-bold text-white">
+            <Sparkles className="h-3 w-3" aria-hidden="true" /> {t('products.badges.new')}
+          </span>
+        )}
+        {favorite && (
+          <button
+            type="button"
+            onClick={favorite.onToggle}
+            aria-label={t('products.detail.favorite')}
+            aria-pressed={favorite.active}
+            className={cn(
+              'absolute top-2 end-2 h-8 w-8 rounded-full bg-white/95 shadow-md flex items-center justify-center',
+              favorite.active ? 'text-secondary' : 'text-gray-500 hover:text-secondary',
+            )}
+          >
+            <Star className="h-4 w-4" fill={favorite.active ? 'currentColor' : 'none'} />
+          </button>
+        )}
+        {onQuickView && (
+          <button
+            type="button"
+            onClick={() => onQuickView(product)}
+            className="absolute bottom-2 left-1/2 -translate-x-1/2 hidden lg:inline-flex items-center gap-1 whitespace-nowrap rounded-lg bg-white/95 px-3 py-1.5 text-xs font-bold text-primary shadow-md border border-border-tech opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity hover:text-secondary"
+          >
+            <Eye className="h-3.5 w-3.5" aria-hidden="true" /> {t('products.quickView')}
+          </button>
+        )}
+      </div>
       <div className={cn('flex flex-col flex-1 min-w-0', list ? 'py-1' : 'px-1')}>
         {company && (
           <p className="text-xs text-gray-500 truncate mb-1 flex items-center gap-1">
@@ -72,11 +84,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, layout = 'grid', onQ
             {company}
           </p>
         )}
-        <Link to={href}>
-          <h3 className={cn('font-bold text-primary group-hover:text-secondary transition-colors', list ? 'text-base line-clamp-2' : 'text-sm line-clamp-2 min-h-[2.5rem]')}>
-            {product.name}
-          </h3>
-        </Link>
+        <h3 className={cn('font-bold text-primary', list ? 'text-base line-clamp-2' : 'text-sm line-clamp-2 min-h-[2.5rem]')}>
+          <Link to={href} className="hover:text-secondary transition-colors">{product.name}</Link>
+        </h3>
         {list && (
           <>
             <p className="text-xs text-gray-500 mt-1">{categoryLabel(t, product.category)}{product.region ? ` · ${product.region}` : ''}</p>
@@ -88,13 +98,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, layout = 'grid', onQ
             {priced ? formatPrice(Number(product.price)) : <span className="text-secondary">{t('common.onQuote')}</span>}
           </p>
           {verified && !list && (
-            <span className="text-[11px] font-bold text-success inline-flex items-center gap-0.5">
+            <span className="hidden sm:inline-flex text-[11px] font-bold text-success items-center gap-0.5">
               <BadgeCheck className="h-3.5 w-3.5" aria-hidden="true" /> {t('products.badges.verified')}
             </span>
           )}
         </div>
       </div>
-    </div>
+    </article>
   );
 };
 

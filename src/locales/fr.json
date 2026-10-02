@@ -28,8 +28,8 @@
     "adminConsole": "Console d'administration",
     "mobileTabs": "Navigation principale",
     "language": "Langue : {{name}}",
-    "console_pro": "Espace administrateur",
-    "megaHint": "Cinq secteurs, de la matière première aux services industriels."
+    "megaHint": "Cinq secteurs, de la matière première aux services industriels.",
+    "console_pro": "Espace administrateur"
   },
   "hero": {
     "title": "Connectez-vous à l'industrie",
@@ -206,6 +206,13 @@
     },
     "latest": {
       "label": "Nouveautés"
+    },
+    "reviews": {
+      "label": "Avis",
+      "title": "Ce que disent les acheteurs",
+      "subtitle": "Avis laissés sur les fiches des fournisseurs vérifiés.",
+      "rating": "{{rating}} étoiles sur 5",
+      "about": "à propos de"
     }
   },
   "directory": {
@@ -299,7 +306,13 @@
       "new": "Nouveau",
       "verified": "Vérifié"
     },
-    "quickView": "Aperçu"
+    "quickView": "Aperçu",
+    "view": {
+      "label": "Affichage",
+      "grid": "Vue en grille",
+      "list": "Vue en liste"
+    },
+    "quickViewOpen": "Voir la fiche complète"
   },
   "blog": {
     "title": "Actualités Industrielles",
@@ -977,6 +990,31 @@
       "kyc": "Faire vérifier l'entreprise (RC et NIF)",
       "products": "Publier au moins 10 produits",
       "gallery": "Au moins 3 photos dans la galerie"
+    },
+    "onboarding": {
+      "title": "Bien démarrer sur Algeria Industry",
+      "subtitle": "Quatre étapes pour être visible et recevoir des demandes de devis.",
+      "progress": "{{done}} / {{total}} étapes",
+      "account": {
+        "title": "Compte créé",
+        "text": "Votre espace fournisseur est prêt."
+      },
+      "company": {
+        "title": "Fiche entreprise",
+        "text": "Logo, description de 80 caractères ou plus, coordonnées.",
+        "cta": "Compléter ma fiche"
+      },
+      "kyc": {
+        "title": "Vérification",
+        "text": "Envoyez votre RC et votre NIF pour obtenir le badge « vérifiée ».",
+        "pending": "Documents reçus : vérification en cours par notre équipe.",
+        "cta": "Envoyer mes documents"
+      },
+      "product": {
+        "title": "Premier produit",
+        "text": "Publiez un produit avec de bonnes photos.",
+        "cta": "Ajouter un produit"
+      }
     }
   },
   "help": {
@@ -1459,5 +1497,9 @@
     "E": {
       "intro": "Outillage, produits d'entretien, équipements de protection, emballages et fournitures : les consommables de votre activité."
     }
+  },
+  "emptyStates": {
+    "directoryText": "Essayez une autre wilaya ou un autre secteur, ou référencez votre entreprise.",
+    "messagesText": "Contactez un fournisseur depuis une fiche produit ou entreprise : la conversation apparaîtra ici."
   }
 }

@@ -368,6 +368,63 @@ const Dashboard = () => {
             exit={{ opacity: 0, y: -10 }}
             className="space-y-8"
           >
+            {/* Démarrage fournisseur : les 4 étapes pour être visible et contacté */}
+            {(user.role === 'fournisseur' || user.role === 'exposant') && (() => {
+              const steps = [
+                { key: 'account', done: true, action: null },
+                { key: 'company', done: Boolean(companyInfo.name && companyInfo.logo_url && companyInfo.bio.trim().length >= 80), action: () => setActiveTab('company') },
+                { key: 'kyc', done: user.kycStatus === 'approved', pending: user.kycStatus === 'pending', action: () => navigate('/kyc-upload') },
+                { key: 'product', done: products.length > 0, action: () => setShowAddProduct(true) },
+              ];
+              const doneCount = steps.filter((s) => s.done).length;
+              if (doneCount === steps.length) return null;
+              const next = steps.find((s) => !s.done && !(s as any).pending);
+              return (
+                <section className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8" aria-labelledby="onboarding-title">
+                  <div className="flex flex-col md:flex-row md:items-end justify-between gap-3 mb-6">
+                    <div>
+                      <h2 id="onboarding-title" className="text-xl font-black text-primary">{t('dashboard.onboarding.title')}</h2>
+                      <p className="text-sm text-gray-500 mt-1">{t('dashboard.onboarding.subtitle')}</p>
+                    </div>
+                    <span className="text-sm font-black text-secondary">{t('dashboard.onboarding.progress', { done: doneCount, total: steps.length })}</span>
+                  </div>
+                  <div className="h-2 bg-gray-100 rounded-full overflow-hidden mb-6" role="progressbar" aria-valuenow={doneCount} aria-valuemin={0} aria-valuemax={steps.length} aria-label={t('dashboard.onboarding.title')}>
+                    <div className="h-full bg-secondary transition-all" style={{ width: `${(doneCount / steps.length) * 100}%` }} />
+                  </div>
+                  <ol className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                    {steps.map((step, i) => {
+                      const isNext = next?.key === step.key;
+                      const pending = (step as any).pending && !step.done;
+                      return (
+                        <li key={step.key} className={cn(
+                          'rounded-xl border p-4 flex flex-col',
+                          step.done ? 'border-success/30 bg-success/5' : isNext ? 'border-secondary bg-secondary/5' : 'border-gray-100',
+                        )}>
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className={cn(
+                              'flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-black',
+                              step.done ? 'bg-success text-white' : isNext ? 'bg-secondary text-white' : 'bg-gray-100 text-gray-500',
+                            )}>
+                              {step.done ? <CheckCircle className="h-4 w-4" /> : i + 1}
+                            </span>
+                            <p className="font-bold text-primary text-sm">{t(`dashboard.onboarding.${step.key}.title`)}</p>
+                          </div>
+                          <p className="text-xs text-gray-500 mb-3">
+                            {pending ? t('dashboard.onboarding.kyc.pending') : t(`dashboard.onboarding.${step.key}.text`)}
+                          </p>
+                          {!step.done && !pending && step.action && (
+                            <button type="button" onClick={step.action} className={cn('mt-auto w-fit', isNext ? 'btn-primary !py-2' : 'text-sm font-bold text-secondary hover:underline')}>
+                              {t(`dashboard.onboarding.${step.key}.cta`)}
+                            </button>
+                          )}
+                        </li>
+                      );
+                    })}
+                  </ol>
+                </section>
+              );
+            })()}
+
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {stats.map((stat, i) => (

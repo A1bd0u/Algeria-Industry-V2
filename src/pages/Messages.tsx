@@ -5,6 +5,7 @@ import { motion } from 'motion/react';
 import { useSearchParams } from 'react-router-dom';
 import { cn } from '../lib/utils';
 import { useTranslation } from 'react-i18next';
+import EmptyState from '../components/ui/EmptyState';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -205,7 +206,7 @@ export default function Messages() {
         <div className="flex-1 overflow-y-auto no-scrollbar">
           {isLoading && <div className="p-8 text-center text-gray-500 text-sm">{t('messages.loading')}</div>}
           {conversations.length === 0 && !isLoading && (
-            <div className="p-8 text-center text-gray-500 text-sm">{t('messages.empty')}</div>
+            <EmptyState className="m-4 border-none !py-8" illustration="messages" title={t('messages.empty')} text={t('emptyStates.messagesText')} />
           )}
           {conversations.length > 0 && visibleConversations.length === 0 && (
             <div className="p-8 text-center text-gray-500 text-sm">{t('messages.noMatch')}</div>

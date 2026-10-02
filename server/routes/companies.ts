@@ -93,6 +93,45 @@ router.get('/', async (req, res, next) => {
   }
 });
 
+// GET /api/companies/reviews/featured - Avis réels mis en avant sur l'accueil :
+// note de 4 ou 5, commentaire développé, entreprise vérifiée, un par entreprise.
+// L'auteur n'apparaît que par son prénom et l'initiale de son nom.
+router.get('/reviews/featured', async (req, res) => {
+  try {
+    const supabase = getSupabase();
+    const { data, error } = await supabase
+      .from('reviews')
+      .select('id, rating, comment, created_at, users:user_id(name), company:companies(id, name, status)')
+      .gte('rating', 4)
+      .not('comment', 'is', null)
+      .order('created_at', { ascending: false })
+      .limit(40);
+    if (error) throw error;
+
+    const seen = new Set<string>();
+    const featured = (data || [])
+      .filter((r: any) => r.company?.status === 'approved' && typeof r.comment === 'string' && r.comment.trim().length >= 30)
+      .filter((r: any) => (seen.has(r.company.id) ? false : (seen.add(r.company.id), true)))
+      .slice(0, 6)
+      .map((r: any) => {
+        const [first = '', last = ''] = String(r.users?.name || '').trim().split(/\s+/);
+        return {
+          id: r.id,
+          rating: r.rating,
+          comment: r.comment.trim().slice(0, 400),
+          created_at: r.created_at,
+          author: first ? `${first}${last ? ` ${last.charAt(0)}.` : ''}` : null,
+          company: { id: r.company.id, name: r.company.name },
+        };
+      });
+    res.set('Cache-Control', 'public, max-age=300');
+    return res.json(featured);
+  } catch (err: any) {
+    logger.error('Error GET /companies/reviews/featured:', err);
+    return res.json([]);
+  }
+});
+
 // GET /api/companies/:id - Détails d'une entreprise
 router.get('/:id', requireUuidParams('id'), async (req, res, next) => {
   try {

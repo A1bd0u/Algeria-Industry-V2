@@ -1,6 +1,6 @@
 import {
   ArrowRight, BadgeCheck, Building2, CheckCircle2, Globe2, Megaphone, MessageSquare, Package, Search,
-  ShieldCheck, Sparkles, MapPin,
+  ShieldCheck, Star, Sparkles, MapPin,
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import type React from 'react';
@@ -52,6 +52,7 @@ const Home = () => {
   const { t, i18n } = useTranslation();
   const [products, setProducts] = useState<any[]>([]);
   const [companies, setCompanies] = useState<any[]>([]);
+  const [reviews, setReviews] = useState<any[]>([]);
   const [stats, setStats] = useState<PublicStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [query, setQuery] = useState('');
@@ -76,11 +77,13 @@ const Home = () => {
       setIsLoading(true);
       // Uniquement des données réelles : chaque bloc se masque ou affiche un
       // état vide si l'API ne renvoie rien.
-      const [prod, comp, st] = await Promise.all([
+      const [prod, comp, st, rev] = await Promise.all([
         json('/api/products?limit=8'),
         json('/api/companies?certified=true&limit=8'),
         json('/api/stats/public'),
+        json('/api/companies/reviews/featured'),
       ]);
+      setReviews(Array.isArray(rev) ? rev.slice(0, 3) : []);
       const list = (v: any) => (Array.isArray(v) ? v : Array.isArray(v?.data) ? v.data : []);
       // Rangées complètes : 4, puis 8 produits.
       const latest = list(prod).slice(0, 8);
@@ -371,6 +374,32 @@ const Home = () => {
           </div>
         </div>
       </section>
+
+      {/* Avis réels d'acheteurs (masqué tant qu'il n'y en a pas) */}
+      {reviews.length > 0 && (
+        <section className="py-16 md:py-20 bg-white border-t border-border-tech">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <SectionHeader label={t('home.reviews.label')} title={t('home.reviews.title')} subtitle={t('home.reviews.subtitle')} />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              {reviews.map((r) => (
+                <figure key={r.id} className="flex flex-col rounded-2xl border border-border-tech bg-neutral-bg p-6">
+                  <div className="flex gap-0.5 text-amber-500 mb-4" aria-label={t('home.reviews.rating', { rating: r.rating })}>
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <Star key={i} className="h-4 w-4" fill={i < r.rating ? 'currentColor' : 'none'} aria-hidden="true" />
+                    ))}
+                  </div>
+                  <blockquote className="text-gray-700 leading-relaxed flex-1">« {r.comment} »</blockquote>
+                  <figcaption className="mt-5 pt-4 border-t border-border-tech text-sm">
+                    {r.author && <span className="font-bold text-primary">{r.author}</span>}
+                    <span className="text-gray-500"> {t('home.reviews.about')} </span>
+                    <Link to={`/directory/${generateSlugUrl(r.company.name, r.company.id)}`} className="font-bold text-secondary hover:underline">{r.company.name}</Link>
+                  </figcaption>
+                </figure>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* 6. Fournisseurs : bénéfices et appel à l'action */}
       <section className="relative overflow-hidden bg-primary text-white py-16 md:py-20">

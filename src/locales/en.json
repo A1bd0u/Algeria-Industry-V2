@@ -28,8 +28,8 @@
     "adminConsole": "Admin console",
     "mobileTabs": "Main navigation",
     "language": "Language: {{name}}",
-    "console_pro": "Admin area",
-    "megaHint": "Five sectors, from raw materials to industrial services."
+    "megaHint": "Five sectors, from raw materials to industrial services.",
+    "console_pro": "Admin area"
   },
   "hero": {
     "title": "Connect to the industry",
@@ -206,6 +206,13 @@
     },
     "latest": {
       "label": "New"
+    },
+    "reviews": {
+      "label": "Reviews",
+      "title": "What buyers say",
+      "subtitle": "Reviews left on verified suppliers' profiles.",
+      "rating": "{{rating}} out of 5 stars",
+      "about": "about"
     }
   },
   "directory": {
@@ -299,7 +306,13 @@
       "new": "New",
       "verified": "Verified"
     },
-    "quickView": "Quick view"
+    "quickView": "Quick view",
+    "view": {
+      "label": "Display",
+      "grid": "Grid view",
+      "list": "List view"
+    },
+    "quickViewOpen": "See the full page"
   },
   "blog": {
     "title": "Industrial News",
@@ -977,6 +990,31 @@
       "kyc": "Get the company verified (trade register, tax ID)",
       "products": "Publish at least 10 products",
       "gallery": "At least 3 photos in the gallery"
+    },
+    "onboarding": {
+      "title": "Getting started on Algeria Industry",
+      "subtitle": "Four steps to be visible and receive quote requests.",
+      "progress": "{{done}} / {{total}} steps",
+      "account": {
+        "title": "Account created",
+        "text": "Your supplier space is ready."
+      },
+      "company": {
+        "title": "Company profile",
+        "text": "Logo, description of 80+ characters, contact details.",
+        "cta": "Complete my profile"
+      },
+      "kyc": {
+        "title": "Verification",
+        "text": "Send your trade register and tax ID to get the “verified” badge.",
+        "pending": "Documents received: our team is reviewing them.",
+        "cta": "Send my documents"
+      },
+      "product": {
+        "title": "First product",
+        "text": "Publish a product with good photos.",
+        "cta": "Add a product"
+      }
     }
   },
   "help": {
@@ -1459,5 +1497,9 @@
     "E": {
       "intro": "Tools, cleaning products, protective equipment, packaging and supplies: the consumables of your business."
     }
+  },
+  "emptyStates": {
+    "directoryText": "Try another province or sector, or list your company.",
+    "messagesText": "Contact a supplier from a product or company page: the conversation will appear here."
   }
 }

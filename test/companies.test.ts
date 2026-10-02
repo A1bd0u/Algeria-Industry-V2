@@ -124,6 +124,28 @@ describe('Companies Ownership', () => {
     expect(badGallery.body.code).toBe('COMPANY_IMAGE_INVALID');
   });
 
+  it('met en avant des avis réels : 4 ou 5 étoiles, entreprise vérifiée, auteur abrégé', async () => {
+    const long = 'Livraison rapide et matériel conforme, je recommande ce fournisseur.';
+    const mock = createSupabaseMock({
+      reviews: () => ({
+        data: [
+          { id: 'r1', rating: 5, comment: long, users: { name: 'Karim Benali' }, company: { id: 'c1', name: 'Acme', status: 'approved' } },
+          { id: 'r2', rating: 5, comment: long, users: { name: 'Sara' }, company: { id: 'c1', name: 'Acme', status: 'approved' } },
+          { id: 'r3', rating: 4, comment: 'Trop court', users: { name: 'Ali' }, company: { id: 'c2', name: 'Beta', status: 'approved' } },
+          { id: 'r4', rating: 5, comment: long, users: { name: 'Nadia' }, company: { id: 'c3', name: 'Gamma', status: 'unverified' } },
+        ],
+      }),
+    });
+    vi.mocked(getSupabase).mockReturnValue(mock.client as any);
+
+    const res = await request(app).get('/api/companies/reviews/featured');
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveLength(1);
+    expect(res.body[0]).toMatchObject({ id: 'r1', author: 'Karim B.', company: { id: 'c1', name: 'Acme' } });
+    const q = mock.queries.find((x) => x.table === 'reviews');
+    expect(q?.columns).not.toContain('email');
+  });
+
   it('devrait rejeter un identifiant qui n\'est pas un UUID', async () => {
     mockWith(sessionRow({ role: 'admin' }));
 
