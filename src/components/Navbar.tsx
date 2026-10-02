@@ -7,6 +7,7 @@ import { useAuth } from '../context/AuthContext';
 import { cn } from '../lib/utils';
 import SearchModal from './SearchModal';
 import Logo from './ui/Logo';
+import { SectorIcon } from './ui/IndustryIcons';
 import { productCategories, sectorPath } from '../data/productCategories';
 
 const Navbar = () => {
@@ -146,7 +147,7 @@ const Navbar = () => {
                                 onClick={() => setShowMegaMenu(false)}
                                 className="group/sector flex items-start gap-2.5 mb-3"
                               >
-                                <span className="text-xs font-bold text-white/40 tabular-nums pt-0.5 w-4 shrink-0 group-hover/sector:text-secondary">{group.id}</span>
+                                <SectorIcon id={group.id} className="h-6 w-6 shrink-0 text-white/80 group-hover/sector:text-secondary transition-colors" />
                                 <span className="text-sm font-bold leading-snug text-white group-hover/sector:text-secondary normal-case tracking-normal">
                                   {t(`productCategories.${group.id}`)}
                                 </span>

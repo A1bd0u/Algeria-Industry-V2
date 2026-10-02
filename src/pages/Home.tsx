@@ -10,6 +10,7 @@ import { cn, generateSlugUrl } from '../lib/utils';
 import SEO from '../components/SEO';
 import { SITE_NAME, absoluteUrl } from '../config/site';
 import { CompanyAvatar } from '../components/ui/ProductImage';
+import { AlgeriaMapIcon, LanguagesIcon, SectorIcon, StorefrontIcon, VerifiedRegistryIcon } from '../components/ui/IndustryIcons';
 import { productCategories, sectorPath } from '../data/productCategories';
 import ProductCard from '../components/ui/ProductCard';
 
@@ -93,13 +94,13 @@ const Home = () => {
   // Bande de faits : chiffres réels si disponibles, sinon engagements vérifiables.
   const trust = [
     stats && stats.verifiedCompanies > 0
-      ? { value: formatNumber(stats.verifiedCompanies), label: t('home.stats.verifiedCompanies') }
-      : { value: t('home.trust.kycValue'), label: t('home.trust.kycText') },
+      ? { icon: VerifiedRegistryIcon, value: formatNumber(stats.verifiedCompanies), label: t('home.stats.verifiedCompanies') }
+      : { icon: VerifiedRegistryIcon, value: t('home.trust.kycValue'), label: t('home.trust.kycText') },
     stats && stats.publishedProducts > 0
-      ? { value: formatNumber(stats.publishedProducts), label: t('home.stats.publishedProducts') }
-      : { value: t('home.trust.freeValue'), label: t('home.trust.freeText') },
-    { value: '58', label: t('home.trust.wilayasText') },
-    { value: '3', label: t('home.trust.languagesText') },
+      ? { icon: StorefrontIcon, value: formatNumber(stats.publishedProducts), label: t('home.stats.publishedProducts') }
+      : { icon: StorefrontIcon, value: t('home.trust.freeValue'), label: t('home.trust.freeText') },
+    { icon: AlgeriaMapIcon, value: '58', label: t('home.trust.wilayasText') },
+    { icon: LanguagesIcon, value: '3', label: t('home.trust.languagesText') },
   ];
 
   return (
@@ -196,9 +197,12 @@ const Home = () => {
         <div className="relative border-t border-border-tech bg-white">
           <dl className="max-w-7xl mx-auto grid grid-cols-2 lg:grid-cols-4 gap-px bg-border-tech">
             {trust.map((item, i) => (
-              <div key={i} className="flex flex-col-reverse justify-end bg-white py-6 px-4 md:px-8">
-                <dt className="text-sm text-gray-600 leading-snug mt-1">{item.label}</dt>
-                <dd className="text-2xl md:text-3xl font-black text-primary tracking-tight tabular-nums">{item.value}</dd>
+              <div key={i} className="flex items-center gap-4 bg-white py-6 px-4 md:px-8">
+                <item.icon className="h-9 w-9 md:h-11 md:w-11 shrink-0 text-primary" />
+                <div className="flex min-w-0 flex-col-reverse">
+                  <dt className="text-sm text-gray-600 leading-snug mt-1">{item.label}</dt>
+                  <dd className="text-2xl md:text-3xl font-black text-primary tracking-tight tabular-nums">{item.value}</dd>
+                </div>
               </div>
             ))}
           </dl>
@@ -227,11 +231,11 @@ const Home = () => {
                 to={sectorPath(group.id)}
                 className="group flex flex-col border-b border-border-tech sm:border-e lg:last:border-e-0 px-0 sm:px-5 py-6 lg:first:ps-0 hover:bg-neutral-bg transition-colors"
               >
-                <div className="flex items-baseline justify-between gap-3 mb-3">
-                  <span className="text-xs font-bold text-gray-400 tabular-nums tracking-[0.18em]">{group.id}</span>
-                  <ArrowRight className="h-4 w-4 text-gray-300 group-hover:text-secondary rtl:rotate-180 transition-colors" aria-hidden="true" />
+                <div className="flex items-start justify-between gap-3 mb-4">
+                  <SectorIcon id={group.id} className="h-11 w-11 text-primary transition-transform duration-300 group-hover:-translate-y-0.5" />
+                  <ArrowRight className="h-4 w-4 mt-1 text-gray-300 group-hover:text-secondary rtl:rotate-180 transition-colors" aria-hidden="true" />
                 </div>
-                <h3 className="text-base font-black text-primary leading-snug mb-4 group-hover:text-secondary transition-colors">
+                <h3 className="text-base font-black text-primary leading-snug mb-4 lg:min-h-[2.75em] group-hover:text-secondary transition-colors">
                   {t(`productCategories.${group.id}`)}
                 </h3>
                 <ul className="space-y-1.5 text-sm text-gray-600">
