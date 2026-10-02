@@ -182,13 +182,13 @@ const HeroSlider: React.FC<{ placement: AdPlacement }> = ({ placement }) => {
     <section
       aria-roledescription="carousel"
       aria-label={t('slides.label')}
-      // Proportions des bannières image : accueil 4:1 (3:2 sur mobile), autres
+      // Proportions des bannières image : accueil 5:1 (16:9 sur mobile), autres
       // pages 8:1 (3:1 sur mobile). Voir BANNER_FORMATS.
       className={cn(
         'relative w-full overflow-hidden bg-primary',
         compact
           ? 'aspect-[3/1] md:aspect-[8/1] md:min-h-[112px] max-h-[260px]'
-          : 'aspect-[3/2] md:aspect-[4/1] md:min-h-[230px] max-h-[520px]',
+          : 'aspect-[16/9] md:aspect-[5/1] md:min-h-[200px] max-h-[420px]',
       )}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
