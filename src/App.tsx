@@ -7,6 +7,8 @@ import BackToTop from './components/BackToTop';
 import Footer from './components/Footer';
 import HelpWidget from './components/HelpWidget';
 import HeroSlider from './components/HeroSlider';
+import { AdTargetingProvider } from './context/AdTargetingContext';
+import { adPlacementForPath } from './data/adPlacements';
 import Navbar from './components/Navbar';
 import PageTransition from './components/PageTransition';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -67,8 +69,9 @@ export default function App() {
   const { i18n } = useTranslation();
   const location = useLocation();
   const isExtranet = location.pathname.startsWith('/extranet');
-  // Carrousel limité à l'accueil (LCP mobile).
-  const hideHeroSlider = isExtranet || location.pathname !== '/';
+  // Bandeau publicitaire : grand sur l'accueil, compact sur les pages du
+  // catalogue, des fournisseurs et des contenus ; absent ailleurs.
+  const adPlacement = isExtranet ? null : adPlacementForPath(location.pathname);
 
   useEffect(() => {
     const handleLanguageChange = (lng: string) => {
@@ -101,11 +104,12 @@ export default function App() {
       <AuthProvider>
           <CurrencyProvider>
             <ComparisonProvider>
+            <AdTargetingProvider>
               <VerifyAccountModal />
               <ScrollToTop />
               <div className={cn("flex flex-col min-h-screen", !isExtranet && "pb-16 lg:pb-0")}>
               {!isExtranet && <Navbar />}
-              {!hideHeroSlider && <HeroSlider />}
+              {adPlacement && <HeroSlider placement={adPlacement} />}
               <main className="flex-grow">
                 <Suspense fallback={<div className="flex items-center justify-center min-h-[50vh]"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
                   <AnimatePresence mode="wait">
@@ -179,6 +183,7 @@ export default function App() {
                 {!isExtranet && <ComparisonBar />}
                 {!isExtranet && <MobileTabBar />}
               </div>
+            </AdTargetingProvider>
             </ComparisonProvider>
           </CurrencyProvider>
       </AuthProvider>

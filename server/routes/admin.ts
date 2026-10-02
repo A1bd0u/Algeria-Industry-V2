@@ -10,6 +10,7 @@ import { PUBLIC_USER_COLUMNS } from '../utils/userFields';
 import { z } from 'zod';
 import { validate } from '../middlewares/validateMiddleware';
 import { isAllowedImageUrl, isSafeLinkUrl } from '../utils/storageUrl';
+import { AD_CATEGORY_GROUPS, AD_PLACEMENTS } from '../../src/data/adPlacements';
 
 const router = express.Router();
 
@@ -306,7 +307,7 @@ router.get('/products', verifyRole(['admin']), async (req, res) => {
   }
 });
 
-const ADMIN_AD_COLUMNS = 'id, title, subtitle, type, objective, url, duration, status, company, contact_email, contact_phone, message, rejection_reason, image_url, logo_url, brand_name, cta_label, starts_at, ends_at, sort_order, clicks, created_at';
+const ADMIN_AD_COLUMNS = 'id, title, subtitle, type, objective, url, duration, status, company, contact_email, contact_phone, message, rejection_reason, image_url, logo_url, brand_name, cta_label, starts_at, ends_at, sort_order, placements, categories, clicks, created_at';
 
 // GET /api/admin/ads - Toutes les demandes de publicité (y compris en attente)
 router.get('/ads', verifyRole(['admin']), async (req, res) => {
@@ -345,6 +346,9 @@ const adCreativeSchema = z.object({
   starts_at: optionalDate,
   ends_at: optionalDate,
   sort_order: z.coerce.number().int().min(0).max(999).optional(),
+  // Vide = toutes les pages / toutes les catégories.
+  placements: z.array(z.enum(AD_PLACEMENTS)).max(AD_PLACEMENTS.length).optional(),
+  categories: z.array(z.enum(AD_CATEGORY_GROUPS)).max(AD_CATEGORY_GROUPS.length).optional(),
 });
 
 const buildCreative = (body: z.infer<typeof adCreativeSchema>, user: { id: string; role: string }) => {
@@ -374,6 +378,8 @@ const buildCreative = (body: z.infer<typeof adCreativeSchema>, user: { id: strin
       ends_at: orNull(body.ends_at),
       ...(body.company !== undefined && { company: orNull(body.company) }),
       ...(body.sort_order !== undefined && { sort_order: body.sort_order }),
+      ...(body.placements !== undefined && { placements: [...new Set(body.placements)] }),
+      ...(body.categories !== undefined && { categories: [...new Set(body.categories)] }),
     },
   };
 };

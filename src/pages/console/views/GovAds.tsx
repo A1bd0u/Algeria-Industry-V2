@@ -3,12 +3,31 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'motion/react';
 import { CheckCircle, ImagePlus, Loader2, Mail, MousePointerClick, Pencil, Phone, Plus, StopCircle, X, XCircle, Zap } from 'lucide-react';
 import { adminFetch, formatDate } from '../adminApi';
+import { AD_PLACEMENTS } from '../../../data/adPlacements';
+import { productCategories } from '../../../data/productCategories';
 
 const PUBLISHED = ['published', 'Actif', 'approuvée', 'Approuvé'];
+
+const PLACEMENT_LABELS: Record<string, { label: string; hint: string }> = {
+  home: { label: 'Accueil', hint: 'grand bandeau' },
+  catalog: { label: 'Catalogue', hint: 'produits, fiche produit, recherche, comparateur' },
+  suppliers: { label: 'Fournisseurs', hint: 'annuaire, fiche entreprise' },
+  content: { label: 'Contenus', hint: 'actualités, événements, catalogues PDF, ressources' },
+};
+
+const targetingLabel = (ad: any) => {
+  const placements: string[] = ad.placements || [];
+  const categories: string[] = ad.categories || [];
+  const pages = placements.length === 0 || placements.length === AD_PLACEMENTS.length
+    ? 'Toutes les pages'
+    : placements.map((p) => PLACEMENT_LABELS[p]?.label || p).join(', ');
+  return categories.length ? `${pages} · catégories ${categories.join(', ')}` : pages;
+};
 
 const EMPTY_FORM = {
   title: '', subtitle: '', brand_name: '', cta_label: '', url: '',
   image_url: '', logo_url: '', starts_at: '', ends_at: '', sort_order: 0, company: '',
+  placements: [...AD_PLACEMENTS] as string[], categories: [] as string[],
 };
 type AdForm = typeof EMPTY_FORM;
 
@@ -29,6 +48,9 @@ const formFromAd = (ad: any): AdForm => ({
   ends_at: toDateInput(ad.ends_at),
   sort_order: ad.sort_order ?? 0,
   company: ad.company || '',
+  // Vide en base = toutes les pages.
+  placements: ad.placements?.length ? ad.placements : [...AD_PLACEMENTS],
+  categories: ad.categories || [],
 });
 
 const periodLabel = (ad: any) => {
@@ -85,11 +107,18 @@ function AdEditor({ ad, onClose, onSaved, showNotify }: {
   const [form, setForm] = useState<AdForm>(ad ? formFromAd(ad) : EMPTY_FORM);
   const set = (key: keyof AdForm) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((f) => ({ ...f, [key]: key === 'sort_order' ? Number(e.target.value) : e.target.value }));
+  const toggle = (key: 'placements' | 'categories', value: string) =>
+    setForm((f) => ({
+      ...f,
+      [key]: f[key].includes(value) ? f[key].filter((v) => v !== value) : [...f[key], value],
+    }));
+  const allPages = form.placements.length === AD_PLACEMENTS.length;
 
   const save = useMutation({
     mutationFn: () => {
       const payload = {
         ...form,
+        placements: allPages ? [] : form.placements,
         starts_at: fromDateInput(form.starts_at, false),
         ends_at: fromDateInput(form.ends_at, true),
       };
@@ -167,12 +196,47 @@ function AdEditor({ ad, onClose, onSaved, showNotify }: {
           <label className="text-xs font-bold text-gray-600">Fin de diffusion
             <input type="date" value={form.ends_at} onChange={set('ends_at')} className={`${field} mt-1`} />
           </label>
+          <fieldset className="md:col-span-2 rounded-xl border border-gray-100 p-4">
+            <legend className="px-1 text-xs font-bold text-gray-600">Pages de diffusion *</legend>
+            <label className="mb-2 flex items-center gap-2 text-sm font-bold text-primary">
+              <input
+                type="checkbox"
+                checked={allPages}
+                onChange={() => setForm((f) => ({ ...f, placements: allPages ? [] : [...AD_PLACEMENTS] }))}
+              />
+              Toutes les pages
+            </label>
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+              {AD_PLACEMENTS.map((p) => (
+                <label key={p} className="flex items-start gap-2 text-sm text-gray-700">
+                  <input type="checkbox" className="mt-1" checked={form.placements.includes(p)} onChange={() => toggle('placements', p)} />
+                  <span><span className="font-bold">{PLACEMENT_LABELS[p].label}</span> <span className="text-xs text-gray-500">({PLACEMENT_LABELS[p].hint})</span></span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+          <fieldset className="md:col-span-2 rounded-xl border border-gray-100 p-4">
+            <legend className="px-1 text-xs font-bold text-gray-600">Ciblage par catégorie produit (facultatif)</legend>
+            <p className="mb-2 text-xs text-gray-500">
+              Sans case cochée, l'annonce s'affiche sur toutes les pages choisies. Avec des catégories, elle n'apparaît que sur les produits,
+              listes filtrées, comparateur et fiches entreprises de ces catégories (pas sur l'accueil ni les contenus).
+            </p>
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+              {productCategories.map((g) => (
+                <label key={g.id} className="flex items-start gap-2 text-sm text-gray-700">
+                  <input type="checkbox" className="mt-1" checked={form.categories.includes(g.id)} onChange={() => toggle('categories', g.id)} />
+                  <span><span className="font-bold">{g.id}</span> · {g.name}</span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
           <label className="text-xs font-bold text-gray-600">Ordre d'affichage (0 = en premier)
             <input type="number" min={0} max={999} value={form.sort_order} onChange={set('sort_order')} className={`${field} mt-1`} />
           </label>
           <div className="md:col-span-2 flex justify-end gap-3 border-t border-gray-100 pt-4">
             <button type="button" onClick={onClose} className="btn-ghost">Annuler</button>
-            <button type="submit" disabled={save.isPending} className="btn-primary">
+            {form.placements.length === 0 && <p className="me-auto self-center text-xs font-bold text-red-500">Choisissez au moins une page.</p>}
+            <button type="submit" disabled={save.isPending || form.placements.length === 0} className="btn-primary">
               {save.isPending && <Loader2 className="h-4 w-4 animate-spin" />} Enregistrer
             </button>
           </div>
@@ -225,7 +289,7 @@ export default function GovAds({ state }: { state: any }) {
         <div>
           <h3 className="text-2xl font-black text-primary">Gestion des publicités</h3>
           <p className="text-gray-500 mt-2 text-sm">
-            Une campagne publiée apparaît dans le bandeau de l'accueil, pendant sa période de diffusion. Sans campagne en ligne, le bandeau présente la plateforme et propose l'emplacement.
+            Une campagne publiée apparaît dans le bandeau des pages choisies (accueil, catalogue, fournisseurs, contenus), pendant sa période de diffusion. Sans campagne, l'accueil présente la plateforme et les autres pages n'affichent pas de bandeau.
           </p>
         </div>
         <button type="button" onClick={() => setEditing(null)} className="btn-primary shrink-0">
@@ -320,6 +384,7 @@ export default function GovAds({ state }: { state: any }) {
                         <p className="text-xs text-gray-500">{ad.brand_name || ad.company || ad.user?.name}</p>
                         <p className="text-xs text-gray-500 mt-1 flex flex-wrap gap-x-3">
                           <span>{periodLabel(ad)}</span>
+                          <span>{targetingLabel(ad)}</span>
                           <span className="inline-flex items-center gap-1"><MousePointerClick className="h-3 w-3" /> {ad.clicks || 0} clic{(ad.clicks || 0) > 1 ? 's' : ''}</span>
                         </p>
                       </div>

@@ -231,6 +231,24 @@ describe('Console admin', () => {
       });
     });
 
+    it('enregistre les pages et catégories ciblées, refuse une valeur inconnue', async () => {
+      const mock = createSupabaseMock({
+        users: usersHandler(admin),
+        ads: (q) => (q.op === 'update' ? { data: { id: SUB_ID, ...q.payload } } : undefined),
+      });
+      vi.mocked(getSupabase).mockReturnValue(mock.client as any);
+
+      const bad = await request(app).put(`/api/admin/ads/${SUB_ID}`).set('Cookie', ['token=t'])
+        .send({ title: 'Promo', placements: ['checkout'] });
+      expect(bad.status).toBe(400);
+
+      const res = await request(app).put(`/api/admin/ads/${SUB_ID}`).set('Cookie', ['token=t'])
+        .send({ title: 'Promo', placements: ['catalog', 'catalog', 'suppliers'], categories: ['B'] });
+      expect(res.status).toBe(200);
+      const update = mock.queries.find((q) => q.table === 'ads' && q.op === 'update');
+      expect(update?.payload).toMatchObject({ placements: ['catalog', 'suppliers'], categories: ['B'] });
+    });
+
     it('refuse une fin de diffusion avant le début', async () => {
       const mock = createSupabaseMock({ users: usersHandler(admin) });
       vi.mocked(getSupabase).mockReturnValue(mock.client as any);

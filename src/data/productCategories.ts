@@ -79,3 +79,11 @@ export const categoryMatches = (filter: string, value?: string | null) => {
   const group = productCategories.find((g) => g.name === filter);
   return Boolean(group && group.subCategories.some((sub) => sub.name === value));
 };
+
+// Groupe (A à E) d'une catégorie stockée en libellé : nom de groupe ou de
+// sous-catégorie. Sert au ciblage des annonces par catégorie.
+export const categoryGroupId = (value?: string | null): string | null => {
+  if (!value) return null;
+  const id = idByName.get(value) || (productCategories.some((g) => g.id === value) ? value : undefined);
+  return id ? id.charAt(0) : null;
+};

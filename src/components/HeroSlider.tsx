@@ -5,11 +5,14 @@ import type React from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+import { useAdTargeting } from '../context/AdTargetingContext';
+import type { AdPlacement } from '../data/adPlacements';
 import { cn } from '../lib/utils';
 
-// Bandeau de l'accueil : annonces publiées depuis la console admin
-// (/api/campaigns), sinon les messages de la plateforme, dont l'emplacement
-// publicitaire lui-même.
+// Bandeau publicitaire : annonces publiées depuis la console admin et ciblant
+// la page (groupe de pages et catégories produit). Grand format sur l'accueil,
+// qui présente la plateforme quand aucune annonce n'est en ligne ; format
+// compact ailleurs, masqué sans annonce.
 
 interface Ad {
   id: string;
@@ -53,21 +56,27 @@ const trackClick = (adId: string) => {
 const prefersReducedMotion = () =>
   typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
-const HeroSlider: React.FC = () => {
+const HeroSlider: React.FC<{ placement: AdPlacement }> = ({ placement }) => {
   const { t } = useTranslation();
+  const categories = useAdTargeting();
+  const compact = placement !== 'home';
   const [current, setCurrent] = useState(0);
   const [paused, setPaused] = useState(prefersReducedMotion);
   const [hovered, setHovered] = useState(false);
   const touchStart = useRef<number | null>(null);
 
   const { data: ads = [] } = useQuery<Ad[]>({
-    queryKey: ['home-ads'],
+    queryKey: ['ads', placement, categories.join(',')],
     queryFn: async () => {
-      const res = await fetch('/api/campaigns');
+      const params = new URLSearchParams({ placement });
+      if (categories.length) params.set('categories', categories.join(','));
+      const res = await fetch(`/api/campaigns?${params}`);
       if (!res.ok) return [];
       return res.json();
     },
     staleTime: 60_000,
+    // Garde l'annonce affichée pendant le rechargement (changement de page).
+    placeholderData: (previous) => previous,
   });
 
   const slides: SlideView[] = ads.length > 0
@@ -83,7 +92,7 @@ const HeroSlider: React.FC = () => {
         href: ad.url || undefined,
         tint: 'from-primary to-accent',
       }))
-    : [
+    : compact ? [] : [
         { key: 'listing', title: t('slides.listing.title'), subtitle: t('slides.listing.subtitle'), cta: t('slides.listing.cta'), href: '/register', icon: Building2, tint: 'from-primary to-accent' },
         { key: 'founder', title: t('slides.founder.title'), subtitle: t('slides.founder.subtitle'), cta: t('slides.founder.cta'), href: '/tarifs', icon: Sparkles, tint: 'from-primary to-[#3a1d00]' },
         { key: 'advertise', title: t('slides.advertise.title'), subtitle: t('slides.advertise.subtitle'), cta: t('slides.advertise.cta'), href: '/ads-request', icon: Megaphone, tint: 'from-accent to-primary' },
@@ -114,7 +123,10 @@ const HeroSlider: React.FC = () => {
     go((dx < 0) !== rtl ? 1 : -1);
   };
 
-  const ctaClass = 'inline-flex items-center gap-2 bg-secondary text-white px-4 py-2 md:px-5 md:py-2.5 rounded-lg text-sm font-bold hover:bg-white hover:text-primary transition-colors';
+  const ctaClass = cn(
+    'inline-flex items-center gap-2 bg-secondary text-white rounded-lg text-sm font-bold hover:bg-white hover:text-primary transition-colors whitespace-nowrap',
+    compact ? 'px-3 py-1.5' : 'px-4 py-2 md:px-5 md:py-2.5',
+  );
   const ctaContent = (
     <>
       {slide.cta}
@@ -129,7 +141,7 @@ const HeroSlider: React.FC = () => {
     <section
       aria-roledescription="carousel"
       aria-label={t('slides.label')}
-      className="relative w-full h-[230px] md:h-[240px] overflow-hidden bg-primary"
+      className={cn('relative w-full overflow-hidden bg-primary', compact ? 'h-[128px] md:h-[112px]' : 'h-[230px] md:h-[240px]')}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onFocusCapture={() => setHovered(true)}
@@ -169,9 +181,13 @@ const HeroSlider: React.FC = () => {
             />
           )}
 
-          <div className="relative h-full max-w-7xl mx-auto px-4 sm:px-6 md:px-16 pb-7 md:pb-4 flex items-center gap-8">
-            <div className="flex-1 min-w-0 text-white">
-              <div className="flex items-center gap-2 mb-2">
+          <div className={cn(
+            'relative h-full max-w-7xl mx-auto px-4 sm:px-6 md:px-16 flex items-center',
+            compact ? 'pb-5 md:pb-0 gap-4' : 'pb-7 md:pb-4 gap-8',
+          )}>
+            <div className={cn('flex-1 min-w-0 text-white', compact && 'md:flex md:items-center md:gap-6')}>
+              <div className={cn('min-w-0', compact && 'md:flex-1')}>
+              <div className={cn('flex items-center gap-2', compact ? 'mb-1' : 'mb-2')}>
                 {isAd ? (
                   <span className="text-xs font-bold uppercase tracking-wider bg-white/15 backdrop-blur px-2 py-0.5 rounded">
                     {t('slides.sponsored')}
@@ -183,12 +199,19 @@ const HeroSlider: React.FC = () => {
                 )}
                 {slide.brand && <span className="text-sm font-bold text-white/90 truncate">{slide.brand}</span>}
               </div>
-              <h2 className="text-xl md:text-3xl font-black tracking-tight leading-tight line-clamp-2">{slide.title}</h2>
+              <h2 className={cn(
+                'font-black tracking-tight leading-tight',
+                compact ? 'text-base md:text-xl line-clamp-1' : 'text-xl md:text-3xl line-clamp-2',
+              )}>{slide.title}</h2>
               {slide.subtitle && (
-                <p className="mt-1.5 text-sm md:text-base text-white/80 max-w-xl line-clamp-2">{slide.subtitle}</p>
+                <p className={cn(
+                  'text-white/80 max-w-xl',
+                  compact ? 'max-md:hidden mt-0.5 text-sm line-clamp-1' : 'mt-1.5 text-sm md:text-base line-clamp-2',
+                )}>{slide.subtitle}</p>
               )}
+              </div>
               {slide.href && (
-                <div className="mt-3 md:mt-4">
+                <div className={compact ? 'mt-2 md:mt-0 shrink-0' : 'mt-3 md:mt-4'}>
                   {isExternal(slide.href) ? (
                     <a href={slide.href} target="_blank" rel="noopener noreferrer sponsored" onClick={onCta} className={ctaClass}>
                       {ctaContent}
@@ -203,7 +226,10 @@ const HeroSlider: React.FC = () => {
             </div>
 
             {slide.logo && (
-              <div className="hidden md:flex shrink-0 h-24 w-40 lg:h-28 lg:w-48 items-center justify-center rounded-2xl bg-white p-4 shadow-xl">
+              <div className={cn(
+                'hidden md:flex shrink-0 items-center justify-center bg-white shadow-xl',
+                compact ? 'h-16 w-28 rounded-xl p-2.5' : 'h-24 w-40 lg:h-28 lg:w-48 rounded-2xl p-4',
+              )}>
                 <img src={slide.logo} alt={slide.brand || ''} className="max-h-full max-w-full object-contain" loading="lazy" />
               </div>
             )}
@@ -230,7 +256,7 @@ const HeroSlider: React.FC = () => {
             <ChevronRight className="h-5 w-5 rtl:rotate-180" />
           </button>
 
-          <div className="absolute bottom-3 inset-x-0 z-10 flex items-center justify-center gap-2">
+          <div className={cn('absolute inset-x-0 z-10 flex items-center justify-center gap-2', compact ? 'bottom-0.5' : 'bottom-3')}>
             {slides.map((s, i) => (
               <button
                 key={s.key}

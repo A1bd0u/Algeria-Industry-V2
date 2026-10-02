@@ -103,6 +103,7 @@ Balises `title`, description, Open Graph, `canonical` et JSON-LD (`Organization`
 - Seules les annonces publiées **et** dans leur période sont servies (8 au plus). Sans annonce en ligne, le bandeau présente la plateforme : inscription gratuite, offre fondateur et « Votre annonce ici » vers la page Publicité.
 - Liens limités à http(s) ou aux chemins internes, images limitées au stockage de la plateforme.
 - Migration `20261006090000_ad_creatives.sql`.
+- **Ciblage** (migration `20261007090000_ad_targeting.sql`) : chaque annonce choisit ses pages — accueil (grand bandeau), catalogue (produits, fiche produit, recherche, comparateur), fournisseurs (annuaire, fiche entreprise), contenus (actualités, événements, catalogues PDF, ressources) — et, en option, des catégories produit (groupes A à E). Une annonce ciblée par catégorie n'apparaît que sur les pages qui affichent cette catégorie. Hors accueil, le bandeau est compact et absent sans annonce. Jamais de bandeau sur les formulaires, l'espace client, la console, les pages juridiques, Tarifs, FAQ ni Contact. Les annonces existantes restent sur l'accueil.
 
 ## Reste à faire (code, non bloquant pour le lancement)
 
