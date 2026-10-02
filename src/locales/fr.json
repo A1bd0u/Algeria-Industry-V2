@@ -113,6 +113,30 @@
       "browseSuppliers": "Parcourir les fournisseurs",
       "listCompany": "Référencer mon entreprise gratuitement",
       "founder": "Premium offert 12 mois aux 100 premiers fournisseurs vérifiés."
+    },
+    "how": {
+      "title": "Comment ça marche",
+      "subtitle": "Deux parcours simples, gratuits pour démarrer.",
+      "buyer": {
+        "title": "Vous cherchez un fournisseur",
+        "step1": "Recherchez",
+        "step1Text": "Par produit, catégorie ou wilaya, en français ou en arabe.",
+        "step2": "Comparez",
+        "step2Text": "Jusqu'à 4 produits côte à côte, avec le statut de vérification des fournisseurs.",
+        "step3": "Contactez",
+        "step3Text": "Demandez un devis par la messagerie ou par WhatsApp.",
+        "cta": "Explorer le catalogue"
+      },
+      "supplier": {
+        "title": "Vous êtes fournisseur",
+        "step1": "Créez votre compte",
+        "step1Text": "Gratuit, en deux minutes.",
+        "step2": "Faites vérifier l'entreprise",
+        "step2Text": "Déposez RC et NIF pour obtenir le badge « vérifiée ».",
+        "step3": "Publiez vos produits",
+        "step3Text": "Recevez les demandes des acheteurs dans votre messagerie.",
+        "cta": "Référencer mon entreprise"
+      }
     }
   },
   "directory": {
@@ -525,7 +549,8 @@
     "WHATSAPP_INVALID": "Numéro WhatsApp invalide. Utilisez un mobile algérien (05, 06, 07) ou le format international.",
     "COMPANY_LEGAL_LOCKED": "Le RC et le NIF vérifiés ne peuvent plus être modifiés. Contactez le support.",
     "QUOTE_NO_SUPPLIER": "Aucun fournisseur à contacter pour ces produits.",
-    "QUOTE_RATE_LIMIT": "Trop de demandes de devis envoyées. Réessayez plus tard."
+    "QUOTE_RATE_LIMIT": "Trop de demandes de devis envoyées. Réessayez plus tard.",
+    "COMPANY_IMAGE_INVALID": "Image invalide : déposez-la depuis votre tableau de bord."
   },
   "mfa": {
     "title": "Double authentification",
@@ -781,7 +806,9 @@
       "save": "Mettre à jour la fiche",
       "whatsapp": "Numéro WhatsApp",
       "whatsappPlaceholder": "Ex : 0550 12 34 56",
-      "whatsappHelp": "Affiché sur votre fiche publique une fois votre entreprise vérifiée. Laissez vide pour ne pas l'afficher."
+      "whatsappHelp": "Affiché sur votre fiche publique une fois votre entreprise vérifiée. Laissez vide pour ne pas l'afficher.",
+      "changeLogo": "Changer le logo",
+      "changeBanner": "Changer la bannière"
     },
     "menu": {
       "overview": "Vue d'ensemble",
@@ -828,6 +855,16 @@
       "duration3m": "3 mois",
       "cancel": "Annuler",
       "submit": "Soumettre la demande"
+    },
+    "completion": {
+      "title": "Profil complété",
+      "logo": "Ajouter un logo",
+      "banner": "Ajouter une bannière (photo de l'usine, des locaux…)",
+      "description": "Décrire l'entreprise (80 caractères au moins)",
+      "whatsapp": "Renseigner un numéro WhatsApp",
+      "wilaya": "Indiquer la wilaya",
+      "kyc": "Faire vérifier l'entreprise (RC et NIF)",
+      "products": "Publier au moins 10 produits"
     }
   },
   "help": {
@@ -1136,7 +1173,8 @@
     "cataloguesCtaText": "Consultez les catalogues publiés par {{name}}.",
     "cataloguesCtaButton": "Voir les catalogues",
     "whatsapp": "WhatsApp",
-    "whatsappMessage": "Bonjour, je vous contacte via Algeria Industry au sujet de {{name}}."
+    "whatsappMessage": "Bonjour, je vous contacte via Algeria Industry au sujet de {{name}}.",
+    "verifiedOn": "RC et NIF contrôlés le {{date}}"
   },
   "pricing": {
     "eyebrow": "Tarification transparente",

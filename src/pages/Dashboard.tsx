@@ -136,7 +136,26 @@ const Dashboard = () => {
     setTimeout(() => setNotification(null), 3000);
   };
 
-  const [companyInfo, setCompanyInfo] = useState({ name: '', bio: '', wilaya: '', whatsapp: '' });
+  const [companyInfo, setCompanyInfo] = useState({ name: '', bio: '', wilaya: '', whatsapp: '', logo_url: '', banner_url: '' });
+  const [uploadingImage, setUploadingImage] = useState<'logo_url' | 'banner_url' | null>(null);
+
+  // Dépose le logo ou la bannière ; l'URL est enregistrée avec le formulaire.
+  const uploadCompanyImage = async (field: 'logo_url' | 'banner_url', file: File | undefined) => {
+    if (!file) return;
+    setUploadingImage(field);
+    try {
+      const form = new FormData();
+      form.append('file', file);
+      const res = await fetch('/api/upload?bucket=product-images', { method: 'POST', body: form });
+      const d = await res.json().catch(() => ({}));
+      if (!res.ok) throw new ApiError(d, 'dashboard.updateError');
+      setCompanyInfo((prev) => ({ ...prev, [field]: d.url }));
+    } catch (err: any) {
+      showNotify(err.message, 'error');
+    } finally {
+      setUploadingImage(null);
+    }
+  };
 
   useEffect(() => {
     const loadCompany = async () => {
@@ -145,7 +164,7 @@ const Dashboard = () => {
         const res = await fetch(`/api/companies/${user.company_id}`);
         if (res.ok) {
           const c = await res.json();
-          setCompanyInfo({ name: c.name || '', bio: c.description || '', wilaya: c.wilaya || '', whatsapp: c.whatsapp ? `+${c.whatsapp}` : '' });
+          setCompanyInfo({ name: c.name || '', bio: c.description || '', wilaya: c.wilaya || '', whatsapp: c.whatsapp ? `+${c.whatsapp}` : '', logo_url: c.logo_url || '', banner_url: c.banner_url || '' });
         }
       } catch (e) {
         console.error('Erreur chargement entreprise', e);
@@ -165,7 +184,7 @@ const Dashboard = () => {
       const res = await fetch(`/api/companies/${user.company_id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: companyInfo.name, description: companyInfo.bio, wilaya: companyInfo.wilaya || undefined, whatsapp: companyInfo.whatsapp.trim() })
+        body: JSON.stringify({ name: companyInfo.name, description: companyInfo.bio, wilaya: companyInfo.wilaya || undefined, whatsapp: companyInfo.whatsapp.trim(), logo_url: companyInfo.logo_url, banner_url: companyInfo.banner_url })
       });
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
@@ -717,11 +736,55 @@ const Dashboard = () => {
             exit={{ opacity: 0, y: -10 }}
             className="max-w-4xl"
           >
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-               <div className="h-32 bg-primary relative">
-                  <div className="absolute -bottom-10 start-10 w-24 h-24 bg-white rounded-2xl border-4 border-white shadow-xl flex items-center justify-center">
-                     <Building2 className="h-10 w-10 text-primary" />
+            {(() => {
+              // Jauge de complétion : ce qui rend une fiche crédible pour un acheteur.
+              const checks = [
+                { done: Boolean(companyInfo.logo_url), label: t('dashboard.completion.logo') },
+                { done: Boolean(companyInfo.banner_url), label: t('dashboard.completion.banner') },
+                { done: companyInfo.bio.trim().length >= 80, label: t('dashboard.completion.description') },
+                { done: Boolean(companyInfo.whatsapp.trim()), label: t('dashboard.completion.whatsapp') },
+                { done: Boolean(companyInfo.wilaya.trim()), label: t('dashboard.completion.wilaya') },
+                { done: user?.kycStatus === 'approved', label: t('dashboard.completion.kyc') },
+                { done: products.length >= 10, label: t('dashboard.completion.products') },
+              ];
+              const percent = Math.round((checks.filter((c) => c.done).length / checks.length) * 100);
+              return (
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-6">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="font-bold text-primary">{t('dashboard.completion.title')}</h3>
+                    <span className="text-sm font-black text-secondary">{percent} %</span>
                   </div>
+                  <div className="h-2 bg-gray-100 rounded-full overflow-hidden mb-4" role="progressbar" aria-valuenow={percent} aria-valuemin={0} aria-valuemax={100} aria-label={t('dashboard.completion.title')}>
+                    <div className="h-full bg-secondary transition-all" style={{ width: `${percent}%` }} />
+                  </div>
+                  <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+                    {checks.map((c) => (
+                      <li key={c.label} className={cn('flex items-center gap-2', c.done ? 'text-gray-500 line-through' : 'text-primary font-medium')}>
+                        <CheckCircle className={cn('h-4 w-4 shrink-0', c.done ? 'text-success' : 'text-gray-300')} />
+                        {c.label}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              );
+            })()}
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+               <div className="h-40 bg-primary relative">
+                  {companyInfo.banner_url && <img src={companyInfo.banner_url} alt="" className="absolute inset-0 w-full h-full object-cover" />}
+                  <label className="absolute top-4 end-4 btn-ghost !px-3 !py-2 text-xs cursor-pointer">
+                     {uploadingImage === 'banner_url' ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                     {t('dashboard.company.changeBanner')}
+                     <input type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" onChange={(e) => uploadCompanyImage('banner_url', e.target.files?.[0])} />
+                  </label>
+                  <label className="absolute -bottom-10 start-10 w-24 h-24 bg-white rounded-2xl border-4 border-white shadow-xl flex items-center justify-center overflow-hidden cursor-pointer group" title={t('dashboard.company.changeLogo')}>
+                     {companyInfo.logo_url
+                       ? <img src={companyInfo.logo_url} alt="" className="w-full h-full object-contain" />
+                       : <Building2 className="h-10 w-10 text-primary" />}
+                     <span className="absolute inset-0 bg-black/50 text-white text-xs font-bold flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                       {uploadingImage === 'logo_url' ? <Loader2 className="h-5 w-5 animate-spin" /> : t('dashboard.company.changeLogo')}
+                     </span>
+                     <input type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" aria-label={t('dashboard.company.changeLogo')} onChange={(e) => uploadCompanyImage('logo_url', e.target.files?.[0])} />
+                  </label>
                </div>
                <form onSubmit={handleUpdateCompany} className="p-12 pt-20 space-y-8">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

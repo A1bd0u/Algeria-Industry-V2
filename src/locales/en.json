@@ -113,6 +113,30 @@
       "browseSuppliers": "Browse suppliers",
       "listCompany": "List my company for free",
       "founder": "Premium free for 12 months for the first 100 verified suppliers."
+    },
+    "how": {
+      "title": "How it works",
+      "subtitle": "Two simple paths, free to start.",
+      "buyer": {
+        "title": "You are looking for a supplier",
+        "step1": "Search",
+        "step1Text": "By product, category or province, in French or Arabic.",
+        "step2": "Compare",
+        "step2Text": "Up to 4 products side by side, with each supplier's verification status.",
+        "step3": "Get in touch",
+        "step3Text": "Ask for a quote through messaging or WhatsApp.",
+        "cta": "Browse the catalogue"
+      },
+      "supplier": {
+        "title": "You are a supplier",
+        "step1": "Create your account",
+        "step1Text": "Free, in two minutes.",
+        "step2": "Get your company verified",
+        "step2Text": "Upload your trade register and tax ID to get the “verified” badge.",
+        "step3": "Publish your products",
+        "step3Text": "Receive buyers' requests in your inbox.",
+        "cta": "List my company"
+      }
     }
   },
   "directory": {
@@ -525,7 +549,8 @@
     "WHATSAPP_INVALID": "Invalid WhatsApp number. Use an Algerian mobile (05, 06, 07) or the international format.",
     "COMPANY_LEGAL_LOCKED": "The verified trade register and tax ID can no longer be changed. Please contact support.",
     "QUOTE_NO_SUPPLIER": "No supplier to contact for these products.",
-    "QUOTE_RATE_LIMIT": "Too many quote requests sent. Please try again later."
+    "QUOTE_RATE_LIMIT": "Too many quote requests sent. Please try again later.",
+    "COMPANY_IMAGE_INVALID": "Invalid image: upload it from your dashboard."
   },
   "mfa": {
     "title": "Two-factor authentication",
@@ -781,7 +806,9 @@
       "save": "Update the profile",
       "whatsapp": "WhatsApp number",
       "whatsappPlaceholder": "e.g. +213 550 12 34 56",
-      "whatsappHelp": "Shown on your public profile once your company is verified. Leave empty to hide it."
+      "whatsappHelp": "Shown on your public profile once your company is verified. Leave empty to hide it.",
+      "changeLogo": "Change logo",
+      "changeBanner": "Change banner"
     },
     "menu": {
       "overview": "Overview",
@@ -828,6 +855,16 @@
       "duration3m": "3 months",
       "cancel": "Cancel",
       "submit": "Submit the request"
+    },
+    "completion": {
+      "title": "Profile completion",
+      "logo": "Add a logo",
+      "banner": "Add a banner (factory, premises…)",
+      "description": "Describe the company (at least 80 characters)",
+      "whatsapp": "Add a WhatsApp number",
+      "wilaya": "Add the province (wilaya)",
+      "kyc": "Get the company verified (trade register, tax ID)",
+      "products": "Publish at least 10 products"
     }
   },
   "help": {
@@ -1136,7 +1173,8 @@
     "cataloguesCtaText": "View the catalogues published by {{name}}.",
     "cataloguesCtaButton": "View catalogues",
     "whatsapp": "WhatsApp",
-    "whatsappMessage": "Hello, I am contacting you via Algeria Industry about {{name}}."
+    "whatsappMessage": "Hello, I am contacting you via Algeria Industry about {{name}}.",
+    "verifiedOn": "Trade register and tax ID checked on {{date}}"
   },
   "pricing": {
     "eyebrow": "Transparent pricing",

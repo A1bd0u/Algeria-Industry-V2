@@ -33,6 +33,7 @@ import { useTranslation } from 'react-i18next';
 import { ApiError } from '../lib/apiError';
 import { whatsappHref } from '../config/site';
 import { formatDate, currentLocale } from '../lib/format';
+import { CompanyAvatar } from '../components/ui/ProductImage';
 import { useToast } from '../context/ToastContext';
 
 const CompanyProfile = () => {
@@ -224,8 +225,8 @@ const CompanyProfile = () => {
         // Use real data, provide safe fallback for images
         const data = {
           ...companyData,
-          logo: '/placeholder.svg',
-          banner: '/placeholder.svg',
+          logo: companyData.logo_url || null,
+          banner: companyData.banner_url || null,
           // ensure arrays and properties exist to avoid UI crash
           certifications: companyData.certifications || [],
           products: companyData.products || []
@@ -274,7 +275,7 @@ const CompanyProfile = () => {
           title={company.name} 
           description={company.description}
           url={absoluteUrl(`/directory/${generateSlugUrl(company.name, company.id)}`)}
-          image={company.logo}
+          image={company.logo || undefined}
           structuredData={{
             "@context": "https://schema.org",
             "@type": "Organization",
@@ -290,8 +291,44 @@ const CompanyProfile = () => {
           }}
         />
       )}
-    <div className="bg-neutral-bg min-h-screen pb-20 pt-2 md:pt-3">
-      <div className="w-full max-w-none px-4 sm:px-8 md:px-12 lg:px-16 relative z-10">
+    <div className="bg-neutral-bg min-h-screen pb-20">
+      {/* Bandeau d'identité : bannière, logo, nom, badge et contact direct. */}
+      <div className="relative bg-primary">
+        {company.banner && <img src={company.banner} alt="" className="absolute inset-0 w-full h-full object-cover opacity-60" />}
+        <div className="absolute inset-0 bg-gradient-to-t from-primary via-primary/60 to-transparent" />
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-8 flex flex-col sm:flex-row sm:items-end gap-6">
+          <CompanyAvatar src={company.logo} name={company.name} className="w-24 h-24 rounded-2xl text-2xl border-4 border-white shadow-xl shrink-0" />
+          <div className="flex-1 text-white">
+            <div className="flex flex-wrap items-center gap-3 mb-2">
+              <h1 className="text-3xl md:text-4xl font-black tracking-tight">{company.name}</h1>
+              {company.status === 'approved' && (
+                <span
+                  className="inline-flex items-center gap-1 bg-success/20 text-emerald-200 border border-emerald-300/30 rounded-full px-3 py-1 text-xs font-bold"
+                  title={company.verified_at ? t('company.verifiedOn', { date: formatDate(company.verified_at) }) : t('company.verified')}
+                >
+                  <ShieldCheck className="h-4 w-4" />
+                  {t('compare.verified')}
+                </span>
+              )}
+            </div>
+            <p className="text-sm text-white/70 flex flex-wrap gap-x-4 gap-y-1">
+              {company.sector && <span>{company.sector}</span>}
+              {company.wilaya && <span className="inline-flex items-center gap-1"><MapPin className="h-4 w-4" />{company.wilaya}</span>}
+            </p>
+          </div>
+          {company.whatsapp && company.owner_id !== user?.id && (
+            <a
+              href={`${whatsappHref(company.whatsapp)}?text=${encodeURIComponent(t('company.whatsappMessage', { name: company.name }))}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-secondary !bg-[#25D366] hover:!bg-[#1ebe5b] shrink-0"
+            >
+              {t('company.whatsapp')}
+            </a>
+          )}
+        </div>
+      </div>
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 pt-6">
         
         {/* Navigation par Onglets (Sous-pages) */}
         <div className="bg-white rounded-xl md:rounded-2xl shadow-sm border border-gray-100 p-2 md:p-2.5 mb-1 overflow-x-auto scrollbar-none">
@@ -337,13 +374,9 @@ const CompanyProfile = () => {
                   {/* Left block: Logo & Basic identity */}
                   <div className="lg:col-span-1 flex flex-col items-center lg:items-start text-center lg:text-left justify-between border-b lg:border-b-0 lg:border-e border-gray-200/60 lg:pe-8 pb-6 lg:pb-0">
                     <div className="space-y-4 w-full flex flex-col items-center lg:items-start">
-                      <div className="w-28 h-28 bg-white rounded-xl shadow-md border-4 border-white overflow-hidden">
-                        <img src={company.logo} alt={company.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-                      </div>
                       <div>
                         <div className="flex items-center justify-center lg:justify-start space-x-2 mb-1">
-                          <h1 className="text-2xl font-bold text-primary">{company.name}</h1>
-                          {company.certified && <ShieldCheck className="h-6 w-6 text-success" />}
+                          <h2 className="text-2xl font-bold text-primary">{company.name}</h2>
                         </div>
                         <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">{company.sector}</p>
                       </div>
@@ -417,6 +450,9 @@ const CompanyProfile = () => {
                           <p className="text-sm text-gray-700 font-bold">
                             {company.status === 'approved' ? t('company.verified') : company.owner_id ? t('company.notVerified') : t('company.unclaimed')}
                           </p>
+                          {company.status === 'approved' && company.verified_at && (
+                            <p className="text-xs text-gray-500 mt-1">{t('company.verifiedOn', { date: formatDate(company.verified_at) })}</p>
+                          )}
                         </div>
                       </div>
                     </div>

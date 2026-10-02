@@ -76,6 +76,29 @@ describe('Companies Ownership', () => {
     expect(res.body.name).toBe('Updated Company');
   });
 
+  it('accepte un logo déposé par le titulaire et refuse une image externe', async () => {
+    process.env.SUPABASE_URL = 'https://proj.supabase.co';
+    const mock = mockWith(sessionRow({ id: OWNER_ID, role: 'fournisseur' }));
+    const own = `https://proj.supabase.co/storage/v1/object/public/product-images/${OWNER_ID}/logo.png`;
+
+    const ok = await request(app).put(`/api/companies/${COMPANY_ID}`).set('Cookie', ['token=t'])
+      .send({ name: 'Acme', logo_url: own, banner_url: '' });
+    expect(ok.status).toBe(200);
+    const update = mock.queries.find((q) => q.table === 'companies' && q.op === 'update');
+    expect(update?.payload).toMatchObject({ logo_url: own, banner_url: null });
+
+    for (const url of [
+      'https://evil.example/logo.png',
+      'https://proj.supabase.co/storage/v1/object/public/product-images/someone-else/logo.png',
+      'https://proj.supabase.co/storage/v1/object/public/kyc-documents/' + OWNER_ID + '/rc.pdf',
+    ]) {
+      const bad = await request(app).put(`/api/companies/${COMPANY_ID}`).set('Cookie', ['token=t'])
+        .send({ name: 'Acme', logo_url: url });
+      expect(bad.status, url).toBe(400);
+      expect(bad.body.code).toBe('COMPANY_IMAGE_INVALID');
+    }
+  });
+
   it('devrait rejeter un identifiant qui n\'est pas un UUID', async () => {
     mockWith(sessionRow({ role: 'admin' }));
 

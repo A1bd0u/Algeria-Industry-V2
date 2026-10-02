@@ -236,6 +236,39 @@ const Home = () => {
         </div>
       </section>
 
+      {/* Comment ça marche : deux parcours en trois étapes */}
+      <section className="py-20 bg-white border-t border-border-tech">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl md:text-4xl font-black text-primary tracking-tight text-center mb-4">{t('home.how.title')}</h2>
+          <p className="text-gray-500 text-center max-w-2xl mx-auto mb-14">{t('home.how.subtitle')}</p>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {(['buyer', 'supplier'] as const).map((role) => (
+              <div key={role} className={cn('rounded-2xl p-8 border', role === 'buyer' ? 'bg-neutral-bg border-gray-100' : 'bg-primary text-white border-primary')}>
+                <h3 className={cn('text-xl font-black mb-8', role === 'supplier' && 'text-white')}>{t(`home.how.${role}.title`)}</h3>
+                <ol className="space-y-6">
+                  {[1, 2, 3].map((n) => (
+                    <li key={n} className="flex gap-4">
+                      <span className="w-9 h-9 shrink-0 rounded-full bg-secondary text-white font-black flex items-center justify-center">{n}</span>
+                      <div>
+                        <p className="font-bold">{t(`home.how.${role}.step${n}`)}</p>
+                        <p className={cn('text-sm mt-1', role === 'buyer' ? 'text-gray-500' : 'text-white/60')}>{t(`home.how.${role}.step${n}Text`)}</p>
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+                <Link
+                  to={role === 'buyer' ? '/products' : '/register?role=fournisseur'}
+                  className={cn('mt-8', role === 'buyer' ? 'btn-primary' : 'btn-secondary')}
+                >
+                  {t(`home.how.${role}.cta`)}
+                  <ArrowRight className="h-4 w-4 rtl:rotate-180" />
+                </Link>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Pourquoi Algeria Industry */}
       <section className="py-16 bg-neutral-bg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">

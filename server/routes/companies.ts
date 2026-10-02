@@ -8,6 +8,7 @@ import { validate } from '../middlewares/validateMiddleware';
 import { generateReferenceId } from '../utils/reference';
 import { requireAuth, requireEmailVerified, getOptionalUser } from '../middlewares/authMiddleware';
 import { requireUuidParams } from '../middlewares/validateParams';
+import { PRODUCT_BUCKET } from './upload';
 
 const router = express.Router();
 
@@ -19,8 +20,21 @@ const companySchema = z.object({
   activity_sector: z.string().max(200).optional(),
   wilaya: z.string().max(100).optional(),
   // Chaîne vide : supprime le numéro.
-  whatsapp: z.string().trim().max(30).optional()
+  whatsapp: z.string().trim().max(30).optional(),
+  // Images déposées via /api/upload?bucket=product-images ; chaîne vide : retire l'image.
+  logo_url: z.string().trim().max(500).optional(),
+  banner_url: z.string().trim().max(500).optional(),
 });
+
+// Une image d'entreprise doit venir du stockage public de la plateforme,
+// dans le dossier de l'utilisateur qui l'a déposée (un admin : tout le bucket).
+const isAllowedImageUrl = (url: string, user: { id: string; role: string }) => {
+  const base = (process.env.SUPABASE_URL || '').replace(/\/+$/, '');
+  if (!base) return false;
+  const prefix = `${base}/storage/v1/object/public/${PRODUCT_BUCKET}/`;
+  if (!url.startsWith(prefix) || url.includes('..')) return false;
+  return user.role === 'admin' || url.slice(prefix.length).startsWith(`${user.id}/`);
+};
 
 const reviewSchema = z.object({
   rating: z.coerce.number().int().min(1, 'La note doit être comprise entre 1 et 5.').max(5, 'La note doit être comprise entre 1 et 5.'),
@@ -30,7 +44,7 @@ const reviewSchema = z.object({
 // Colonnes publiques d'une entreprise : ni NIF/RC bruts ni motifs KYC.
 const PUBLISHED_PRODUCT_STATUSES = ['Actif', 'active'];
 
-const PUBLIC_COMPANY_COLUMNS = 'id, reference_id, name, description, activity_sector, wilaya, status, certified, created_at';
+const PUBLIC_COMPANY_COLUMNS = 'id, reference_id, name, description, activity_sector, wilaya, status, certified, logo_url, banner_url, verified_at, created_at';
 
 
 // GET /api/companies - Liste toutes les entreprises (pour l'annuaire)
@@ -190,8 +204,17 @@ router.post('/', requireAuth, validate(companySchema), async (req, res) => {
 
 // PUT /api/companies/:id - Mettre à jour une entreprise spécifique
 router.put('/:id', requireAuth, requireUuidParams('id'), validate(companySchema), async (req, res) => {
-  const { name, nif, rc, description, activity_sector, wilaya, whatsapp } = req.body;
+  const { name, nif, rc, description, activity_sector, wilaya, whatsapp, logo_url, banner_url } = req.body;
   const user = (req as any).user;
+
+  const images: Record<string, string | null> = {};
+  for (const [key, value] of Object.entries({ logo_url, banner_url })) {
+    if (value === undefined) continue;
+    if (value !== '' && !isAllowedImageUrl(value as string, user)) {
+      return res.status(400).json({ error: 'Image invalide : déposez-la depuis votre tableau de bord.', code: 'COMPANY_IMAGE_INVALID' });
+    }
+    images[key] = value === '' ? null : (value as string);
+  }
 
   let whatsappValue: string | null | undefined;
   if (whatsapp !== undefined) {
@@ -224,7 +247,7 @@ router.put('/:id', requireAuth, requireUuidParams('id'), validate(companySchema)
 
     const { data, error } = await supabase
       .from('companies')
-      .update({ name, nif, rc, description, activity_sector, wilaya, whatsapp: whatsappValue })
+      .update({ name, nif, rc, description, activity_sector, wilaya, whatsapp: whatsappValue, ...images })
       .eq('id', req.params.id)
       .select()
       .single();
