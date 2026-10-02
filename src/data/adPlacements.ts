@@ -31,6 +31,6 @@ export const adMatches = (
 // Bannière image : formats conseillés (largeur × hauteur) par emplacement.
 // L'accueil a un grand bandeau, les autres pages un bandeau compact.
 export const BANNER_FORMATS = {
-  home: { desktop: [1920, 480], mobile: [1200, 800] },
+  home: { desktop: [1920, 384], mobile: [1200, 675] },
   compact: { desktop: [1920, 240], mobile: [1200, 400] },
 } as const;
