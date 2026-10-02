@@ -249,6 +249,30 @@ describe('Console admin', () => {
       expect(update?.payload).toMatchObject({ placements: ['catalog', 'suppliers'], categories: ['B'] });
     });
 
+    it('une bannière image exige son visuel et accepte une version mobile', async () => {
+      const mock = createSupabaseMock({
+        users: usersHandler(admin),
+        ads: (q) => (q.op === 'update' ? { data: { id: SUB_ID, ...q.payload } } : undefined),
+      });
+      vi.mocked(getSupabase).mockReturnValue(mock.client as any);
+
+      const missing = await request(app).put(`/api/admin/ads/${SUB_ID}`).set('Cookie', ['token=t'])
+        .send({ title: 'Promo', display_mode: 'banner' });
+      expect(missing.status).toBe(400);
+      expect(missing.body.code).toBe('AD_BANNER_IMAGE_REQUIRED');
+
+      const badMobile = await request(app).put(`/api/admin/ads/${SUB_ID}`).set('Cookie', ['token=t'])
+        .send({ title: 'Promo', display_mode: 'banner', image_url: IMG, mobile_image_url: 'https://evil.example/m.png' });
+      expect(badMobile.body.code).toBe('AD_IMAGE_INVALID');
+
+      const MOBILE = IMG.replace('banner.webp', 'banner-mobile.png');
+      const res = await request(app).put(`/api/admin/ads/${SUB_ID}`).set('Cookie', ['token=t'])
+        .send({ title: 'Promo', display_mode: 'banner', image_url: IMG, mobile_image_url: MOBILE, url: '/tarifs' });
+      expect(res.status).toBe(200);
+      const update = mock.queries.filter((q) => q.table === 'ads' && q.op === 'update').pop();
+      expect(update?.payload).toMatchObject({ display_mode: 'banner', image_url: IMG, mobile_image_url: MOBILE });
+    });
+
     it('refuse une fin de diffusion avant le début', async () => {
       const mock = createSupabaseMock({ users: usersHandler(admin) });
       vi.mocked(getSupabase).mockReturnValue(mock.client as any);

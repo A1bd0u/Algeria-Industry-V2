@@ -307,7 +307,7 @@ router.get('/products', verifyRole(['admin']), async (req, res) => {
   }
 });
 
-const ADMIN_AD_COLUMNS = 'id, title, subtitle, type, objective, url, duration, status, company, contact_email, contact_phone, message, rejection_reason, image_url, logo_url, brand_name, cta_label, starts_at, ends_at, sort_order, placements, categories, clicks, created_at';
+const ADMIN_AD_COLUMNS = 'id, title, subtitle, type, objective, url, duration, status, company, contact_email, contact_phone, message, rejection_reason, image_url, logo_url, brand_name, cta_label, starts_at, ends_at, sort_order, placements, categories, display_mode, mobile_image_url, clicks, created_at';
 
 // GET /api/admin/ads - Toutes les demandes de publicité (y compris en attente)
 router.get('/ads', verifyRole(['admin']), async (req, res) => {
@@ -341,7 +341,10 @@ const adCreativeSchema = z.object({
   cta_label: optionalText(40),
   url: optionalText(1000),
   image_url: optionalText(1000),
+  mobile_image_url: optionalText(1000),
   logo_url: optionalText(1000),
+  // template : textes posés sur le visuel ; banner : visuel complet affiché tel quel.
+  display_mode: z.enum(['template', 'banner']).optional(),
   company: optionalText(200),
   starts_at: optionalDate,
   ends_at: optionalDate,
@@ -352,11 +355,14 @@ const adCreativeSchema = z.object({
 });
 
 const buildCreative = (body: z.infer<typeof adCreativeSchema>, user: { id: string; role: string }) => {
-  for (const key of ['image_url', 'logo_url'] as const) {
+  for (const key of ['image_url', 'mobile_image_url', 'logo_url'] as const) {
     const value = body[key];
     if (value && !isAllowedImageUrl(value, user)) {
       return { error: 'Image invalide : déposez-la depuis la console.', code: 'AD_IMAGE_INVALID' };
     }
+  }
+  if (body.display_mode === 'banner' && !body.image_url) {
+    return { error: 'Une bannière image demande au moins le visuel pour ordinateur.', code: 'AD_BANNER_IMAGE_REQUIRED' };
   }
   if (body.url && !isSafeLinkUrl(body.url)) {
     return { error: 'Lien invalide : adresse http(s) ou chemin interne (/tarifs).', code: 'AD_URL_INVALID' };
@@ -373,6 +379,8 @@ const buildCreative = (body: z.infer<typeof adCreativeSchema>, user: { id: strin
       cta_label: orNull(body.cta_label),
       url: orNull(body.url),
       image_url: orNull(body.image_url),
+      mobile_image_url: orNull(body.mobile_image_url),
+      ...(body.display_mode !== undefined && { display_mode: body.display_mode }),
       logo_url: orNull(body.logo_url),
       starts_at: orNull(body.starts_at),
       ends_at: orNull(body.ends_at),

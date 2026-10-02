@@ -27,3 +27,10 @@ export const adMatches = (
   if (categories.length > 0 && !categories.some((c) => pageCategories.includes(c))) return false;
   return true;
 };
+
+// Bannière image : formats conseillés (largeur × hauteur) par emplacement.
+// L'accueil a un grand bandeau, les autres pages un bandeau compact.
+export const BANNER_FORMATS = {
+  home: { desktop: [1920, 480], mobile: [1200, 800] },
+  compact: { desktop: [1920, 240], mobile: [1200, 400] },
+} as const;
