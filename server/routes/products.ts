@@ -6,6 +6,7 @@ import { requireUuidParams, isUuid } from '../middlewares/validateParams';
 import { productCategories } from '../../src/data/productCategories';
 import { createReport, reportSchema } from '../utils/reports';
 import { PLAN_LIMITS, getCompanyPlan } from '../services/billingService';
+import { isAllowedImageUrl } from '../utils/storageUrl';
 import { generateReferenceId } from '../utils/reference';
 import { z } from 'zod';
 import { validate } from '../middlewares/validateMiddleware';
@@ -20,6 +21,8 @@ const productSchema = z.object({
   price: z.coerce.number().nonnegative('Le prix doit être positif').nullable().optional(),
   description: z.string().max(10000).optional(),
   file_url: z.string().url().max(1000).optional().or(z.literal('')),
+  // Galerie ordonnée ; la première image sert de vignette (file_url).
+  images: z.array(z.string().url().max(1000)).max(10).optional(),
   status: z.enum(['Actif', 'Brouillon', 'Inactif']).optional()
 });
 
@@ -29,6 +32,29 @@ const statusSchema = z.object({
 
 // 'active' : valeur par défaut historique du schéma initial.
 const PUBLISHED_STATUSES = ['Actif', 'active'];
+
+// Images de la galerie : déposées par l'utilisateur dans le stockage de la
+// plateforme, et dans la limite de son offre.
+const checkImages = async (images: string[] | undefined, user: any) => {
+  if (!images || images.length === 0) return null;
+  if (images.some((url) => !isAllowedImageUrl(url, user))) {
+    return { status: 400, body: { error: 'Image invalide : déposez-la depuis votre tableau de bord.', code: 'PRODUCT_IMAGE_INVALID' } };
+  }
+  if (user.role !== 'admin') {
+    const plan = await getCompanyPlan(user.company_id);
+    const limit = PLAN_LIMITS[plan].imagesPerProduct;
+    if (images.length > limit) {
+      return {
+        status: 403,
+        body: { error: `Votre offre permet ${limit} images par produit.`, code: 'PLAN_IMAGE_LIMIT', plan, limit },
+      };
+    }
+  }
+  return null;
+};
+
+const galleryOf = (p: any): string[] =>
+  Array.isArray(p.images) && p.images.length > 0 ? p.images : (p.file_url ? [p.file_url] : []);
 
 const escapeLike = (value: string) => value.replace(/[%_,()]/g, ' ').slice(0, 100);
 
@@ -177,7 +203,7 @@ router.get('/:id', requireUuidParams('id'), async (req, res, next) => {
 
     const formattedProduct = {
       ...formatProduct(product),
-      images: product.file_url ? [product.file_url] : [],
+      images: galleryOf(product),
       companyName,
       companyId: company?.id || null,
       companyVerified: company?.status === 'approved',
@@ -220,10 +246,12 @@ router.get('/:id', requireUuidParams('id'), async (req, res, next) => {
 
 // POST /api/products - Créer un produit
 router.post('/', verifyRole(['fournisseur', 'exposant', 'admin']), requireKyc, validate(productSchema), async (req, res, next) => {
-  const { name, category, price, description, file_url, status } = req.body;
+  const { name, category, price, description, file_url, images, status } = req.body;
   const user = (req as any).user;
 
   try {
+    const imageError = await checkImages(images, user);
+    if (imageError) return res.status(imageError.status).json(imageError.body);
     const supabase = getSupabase();
     
     // Limite de produits selon l'offre (Free 5, Basic 15, Pro illimité).
@@ -256,7 +284,8 @@ router.post('/', verifyRole(['fournisseur', 'exposant', 'admin']), requireKyc, v
         name,
         category: category || "Non catégorisé",
         description: description || '',
-        file_url: file_url || null,
+        file_url: images?.[0] || file_url || null,
+        ...(images && { images }),
         price: price ?? null,
         status: status || 'Actif',
         owner_id: user.id,
@@ -275,10 +304,12 @@ router.post('/', verifyRole(['fournisseur', 'exposant', 'admin']), requireKyc, v
 
 // PUT /api/products/:id - Mettre à jour un produit
 router.put('/:id', verifyRole(['fournisseur', 'exposant', 'admin']), requireUuidParams('id'), validate(productSchema), async (req, res, next) => {
-  const { name, category, price, description, file_url, status } = req.body;
+  const { name, category, price, description, file_url, images, status } = req.body;
   const user = (req as any).user;
 
   try {
+    const imageError = await checkImages(images, user);
+    if (imageError) return res.status(imageError.status).json(imageError.body);
     const supabase = getSupabase();
     
     // Ensure product exists and belongs to user (or user is admin)
@@ -296,7 +327,15 @@ router.put('/:id', verifyRole(['fournisseur', 'exposant', 'admin']), requireUuid
 
     const { data, error } = await supabase
       .from('products')
-      .update({ name, category: category || "Non catégorisé", description: description || '', file_url: file_url || null, price: price ?? null, status: status || 'Actif' })
+      .update({
+        name,
+        category: category || "Non catégorisé",
+        description: description || '',
+        file_url: images?.[0] || file_url || null,
+        ...(images && { images }),
+        price: price ?? null,
+        status: status || 'Actif',
+      })
       .eq('id', req.params.id)
       .select()
       .single();

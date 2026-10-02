@@ -2,6 +2,8 @@ import {
   AlertTriangle,
   ArrowLeft,
   ArrowRight,
+  ChevronLeft,
+  ChevronRight,
   FileText,
   GitCompare,
   Globe,
@@ -134,6 +136,24 @@ const ProductDetail = () => {
   };
 
   const [zoomOpen, setZoomOpen] = useState(false);
+  const touchX = React.useRef<number | null>(null);
+  const imageCount = product?.images?.length || 0;
+  const stepImage = React.useCallback(
+    (delta: number) => setActiveImage((i) => (imageCount ? (i + delta + imageCount) % imageCount : 0)),
+    [imageCount],
+  );
+  // Clavier dans l'image agrandie : flèches et Échap.
+  useEffect(() => {
+    if (!zoomOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      const rtl = document.documentElement.dir === 'rtl';
+      if (e.key === 'Escape') setZoomOpen(false);
+      if (e.key === 'ArrowRight') stepImage(rtl ? -1 : 1);
+      if (e.key === 'ArrowLeft') stepImage(rtl ? 1 : -1);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [zoomOpen, stepImage]);
 
   // Demande de devis : message pré-rempli au fournisseur s'il a un compte,
   // sinon formulaire de contact de la plateforme.
@@ -208,7 +228,22 @@ const ProductDetail = () => {
           <div className="space-y-6">
             <div className="aspect-square bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm relative group">
               {product.images.length > 0 ? (
-                <button type="button" onClick={() => setZoomOpen(true)} className="w-full h-full cursor-zoom-in" aria-label={t('products.detail.zoom')}>
+                <button
+                  type="button"
+                  onClick={() => setZoomOpen(true)}
+                  onTouchStart={(e) => { touchX.current = e.touches[0].clientX; }}
+                  onTouchEnd={(e) => {
+                    if (touchX.current === null) return;
+                    const dx = e.changedTouches[0].clientX - touchX.current;
+                    touchX.current = null;
+                    if (Math.abs(dx) > 40) {
+                      e.preventDefault();
+                      stepImage((dx < 0) !== (document.documentElement.dir === 'rtl') ? 1 : -1);
+                    }
+                  }}
+                  className="w-full h-full cursor-zoom-in"
+                  aria-label={t('products.detail.zoom')}
+                >
                   <motion.img
                     key={activeImage}
                     initial={{ opacity: 0 }}
@@ -221,6 +256,21 @@ const ProductDetail = () => {
                 </button>
               ) : (
                 <ProductImage alt={product.name} category={product.category} iconClassName="h-20 w-20" />
+              )}
+              {product.images.length > 1 && (
+                <>
+                  <button type="button" onClick={() => stepImage(-1)} aria-label={t('slides.prev')}
+                    className="absolute start-3 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-white/90 shadow-md flex items-center justify-center text-primary hover:text-secondary">
+                    <ChevronLeft className="h-5 w-5 rtl:rotate-180" />
+                  </button>
+                  <button type="button" onClick={() => stepImage(1)} aria-label={t('slides.next')}
+                    className="absolute end-3 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-white/90 shadow-md flex items-center justify-center text-primary hover:text-secondary">
+                    <ChevronRight className="h-5 w-5 rtl:rotate-180" />
+                  </button>
+                  <span className="absolute bottom-4 start-4 rounded-full bg-primary/80 px-2.5 py-1 text-xs font-bold text-white">
+                    {activeImage + 1} / {product.images.length}
+                  </span>
+                </>
               )}
               <div className="absolute top-6 end-6 flex flex-col space-y-3">
                 <button 
@@ -254,17 +304,20 @@ const ProductDetail = () => {
               </div>
             </div>
             
-            {product.images.length > 1 && <div className="grid grid-cols-3 gap-4">
+            {product.images.length > 1 && <div className="grid grid-cols-5 gap-3">
               {product.images.map((img, i) => (
-                <button 
-                  key={i}
+                <button
+                  key={img}
+                  type="button"
                   onClick={() => setActiveImage(i)}
+                  aria-label={`${i + 1} / ${product.images.length}`}
+                  aria-current={activeImage === i}
                   className={cn(
-                    "aspect-square rounded-2xl border-2 overflow-hidden bg-white transition-all",
-                    activeImage === i ? "border-secondary scale-95 shadow-inner" : "border-gray-100 opacity-60 hover:opacity-100"
+                    "aspect-square rounded-xl border-2 overflow-hidden bg-white transition-all",
+                    activeImage === i ? "border-secondary" : "border-gray-100 opacity-70 hover:opacity-100"
                   )}
                 >
-                  <img src={img} alt="" className="w-full h-full object-cover p-2" referrerPolicy="no-referrer" />
+                  <img src={img} alt="" loading="lazy" className="w-full h-full object-contain" referrerPolicy="no-referrer" />
                 </button>
               ))}
             </div>}
@@ -429,7 +482,20 @@ const ProductDetail = () => {
           <button type="button" className="absolute top-4 end-4 text-white p-2" aria-label={t('common.close')} onClick={() => setZoomOpen(false)}>
             <X className="h-7 w-7" />
           </button>
-          <img src={product.images[activeImage]} alt={product.name} className="max-w-full max-h-full object-contain" referrerPolicy="no-referrer" />
+          <img src={product.images[activeImage]} alt={product.name} className="max-w-full max-h-full object-contain" referrerPolicy="no-referrer" onClick={(e) => e.stopPropagation()} />
+          {product.images.length > 1 && (
+            <>
+              <button type="button" onClick={(e) => { e.stopPropagation(); stepImage(-1); }} aria-label={t('slides.prev')}
+                className="absolute start-4 top-1/2 -translate-y-1/2 h-12 w-12 rounded-full bg-white/15 text-white flex items-center justify-center hover:bg-white/30">
+                <ChevronLeft className="h-6 w-6 rtl:rotate-180" />
+              </button>
+              <button type="button" onClick={(e) => { e.stopPropagation(); stepImage(1); }} aria-label={t('slides.next')}
+                className="absolute end-4 top-1/2 -translate-y-1/2 h-12 w-12 rounded-full bg-white/15 text-white flex items-center justify-center hover:bg-white/30">
+                <ChevronRight className="h-6 w-6 rtl:rotate-180" />
+              </button>
+              <span className="absolute bottom-6 inset-x-0 text-center text-sm font-bold text-white/80">{activeImage + 1} / {product.images.length}</span>
+            </>
+          )}
         </div>
       )}
 

@@ -15,6 +15,7 @@ import SEO from '../components/SEO';
 import { SITE_NAME, absoluteUrl } from '../config/site';
 import ProductImage, { CompanyAvatar, GROUP_STYLE } from '../components/ui/ProductImage';
 import { productCategories } from '../data/productCategories';
+import SectorArt from '../components/ui/SectorArt';
 
 interface PublicStats {
   verifiedCompanies: number;
@@ -238,8 +239,9 @@ const Home = () => {
                 <Link
                   key={group.id}
                   to={`/products?category=${encodeURIComponent(group.name)}`}
-                  className="group flex h-full flex-col rounded-2xl border border-border-tech bg-white p-4 md:p-6 hover:border-secondary hover:shadow-xl hover:-translate-y-0.5 transition-all max-lg:last:col-span-2"
+                  className="group relative overflow-hidden flex h-full flex-col rounded-2xl border border-border-tech bg-white p-4 md:p-6 hover:border-secondary hover:shadow-xl hover:-translate-y-0.5 transition-all max-lg:last:col-span-2"
                 >
+                  <SectorArt group={group.id} className={cn('absolute -end-6 -bottom-4 w-32 md:w-36 opacity-[0.13] group-hover:opacity-25 transition-opacity', style.tint.split(' ').find((c) => c.startsWith('text-')))} />
                   <span className={cn('flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-xl mb-3 md:mb-5', style.tint)}>
                     <Icon className="h-6 w-6" aria-hidden="true" />
                   </span>

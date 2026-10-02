@@ -637,7 +637,9 @@
     "COMPANY_LEGAL_LOCKED": "Le RC et le NIF vérifiés ne peuvent plus être modifiés. Contactez le support.",
     "QUOTE_NO_SUPPLIER": "Aucun fournisseur à contacter pour ces produits.",
     "QUOTE_RATE_LIMIT": "Trop de demandes de devis envoyées. Réessayez plus tard.",
-    "COMPANY_IMAGE_INVALID": "Image invalide : déposez-la depuis votre tableau de bord."
+    "COMPANY_IMAGE_INVALID": "Image invalide : déposez-la depuis votre tableau de bord.",
+    "PRODUCT_IMAGE_INVALID": "Image invalide : déposez-la depuis votre tableau de bord.",
+    "PLAN_IMAGE_LIMIT": "Nombre de photos limité par votre offre. Passez à une offre supérieure."
   },
   "mfa": {
     "title": "Double authentification",
@@ -768,13 +770,13 @@
   "addProduct": {
     "titleNew": "Nouveau produit",
     "titleEdit": "Modifier le produit",
-    "subtitle": "Référencement au catalogue (brouillon sauvegardé)",
+    "subtitle": "Brouillon enregistré automatiquement sur cet appareil",
     "close": "Fermer",
     "name": "Nom du produit",
     "namePlaceholder": "Ex : Pompe à engrenages HP-300",
     "category": "Catégorie",
     "selectCategory": "Sélectionner...",
-    "price": "Gamme de prix (DZD)",
+    "price": "Prix (DA)",
     "pricePlaceholder": "Ex : 50 000",
     "description": "Description technique",
     "descriptionPlaceholder": "Spécifications, dimensions, usage...",
@@ -787,7 +789,19 @@
     "cancel": "Annuler",
     "uploadParseError": "Erreur lors du traitement de la réponse du serveur.",
     "uploadError": "L'envoi du fichier a échoué.",
-    "saveError": "Erreur lors de la sauvegarde du produit."
+    "saveError": "Erreur lors de la sauvegarde du produit.",
+    "photos": "Photos du produit",
+    "photosCount": "{{count}} / {{max}} photos",
+    "morePhotos": "Plus de photos",
+    "addPhotos": "Ajouter des photos",
+    "mainPhoto": "Principale",
+    "moveBefore": "Déplacer avant",
+    "moveAfter": "Déplacer après",
+    "removePhoto": "Retirer la photo",
+    "photoRequired": "Ajoutez au moins une photo du produit.",
+    "imagesLimit": "Votre offre permet {{count}} photos par produit.",
+    "photoTips": "Conseils : produit entier, fond neutre et bonne lumière. Les photos sont mises au carré automatiquement, sans être coupées. La première est la photo principale.",
+    "priceHint": "Laissez vide pour « Sur devis »."
   },
   "dashboard": {
     "planBadge": {

@@ -637,7 +637,9 @@
     "COMPANY_LEGAL_LOCKED": "The verified trade register and tax ID can no longer be changed. Please contact support.",
     "QUOTE_NO_SUPPLIER": "No supplier to contact for these products.",
     "QUOTE_RATE_LIMIT": "Too many quote requests sent. Please try again later.",
-    "COMPANY_IMAGE_INVALID": "Invalid image: upload it from your dashboard."
+    "COMPANY_IMAGE_INVALID": "Invalid image: upload it from your dashboard.",
+    "PRODUCT_IMAGE_INVALID": "Invalid image: upload it from your dashboard.",
+    "PLAN_IMAGE_LIMIT": "Number of photos limited by your plan. Upgrade your plan."
   },
   "mfa": {
     "title": "Two-factor authentication",
@@ -768,13 +770,13 @@
   "addProduct": {
     "titleNew": "New product",
     "titleEdit": "Edit product",
-    "subtitle": "Catalogue listing (draft saved)",
+    "subtitle": "Draft saved automatically on this device",
     "close": "Close",
     "name": "Product name",
     "namePlaceholder": "e.g. HP-300 gear pump",
     "category": "Category",
     "selectCategory": "Select...",
-    "price": "Price range (DZD)",
+    "price": "Price (DZD)",
     "pricePlaceholder": "e.g. 50,000",
     "description": "Technical description",
     "descriptionPlaceholder": "Specifications, dimensions, use...",
@@ -787,7 +789,19 @@
     "cancel": "Cancel",
     "uploadParseError": "Error processing the server response.",
     "uploadError": "The file upload failed.",
-    "saveError": "Error while saving the product."
+    "saveError": "Error while saving the product.",
+    "photos": "Product photos",
+    "photosCount": "{{count}} / {{max}} photos",
+    "morePhotos": "More photos",
+    "addPhotos": "Add photos",
+    "mainPhoto": "Main",
+    "moveBefore": "Move earlier",
+    "moveAfter": "Move later",
+    "removePhoto": "Remove photo",
+    "photoRequired": "Add at least one product photo.",
+    "imagesLimit": "Your plan allows {{count}} photos per product.",
+    "photoTips": "Tips: whole product, neutral background and good light. Photos are made square automatically, without cropping. The first one is the main photo.",
+    "priceHint": "Leave empty for “On quote”."
   },
   "dashboard": {
     "planBadge": {
