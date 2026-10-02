@@ -74,15 +74,15 @@ export default function GovProducts({ state }: { state: any }) {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
       <div>
-        <h3 className="text-2xl font-black text-primary uppercase italic">Catalogue produits</h3>
+        <h3 className="text-2xl font-black text-primary">Catalogue produits</h3>
         <p className="text-gray-500 mt-2 text-sm">
           Les produits sont publiés directement par les fournisseurs vérifiés (KYC). Vous pouvez les retirer, les remettre en ligne ou les supprimer.
         </p>
       </div>
 
-      <div className="bg-white p-6 rounded-[32px] border border-gray-100 shadow-sm flex flex-col lg:flex-row lg:items-center gap-4">
+      <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col lg:flex-row lg:items-center gap-4">
         <div className="flex-1 relative">
-          <Search className="absolute start-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Search className="absolute start-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
           <input
             type="search"
             aria-label="Rechercher un produit"
@@ -97,7 +97,7 @@ export default function GovProducts({ state }: { state: any }) {
             <button
               key={f.id}
               onClick={() => setFilter(f.id)}
-              className={cn('px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest', filter === f.id ? 'bg-primary text-white' : 'bg-gray-50 text-gray-500 hover:text-primary')}
+              className={cn('px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest', filter === f.id ? 'bg-primary text-white' : 'bg-gray-50 text-gray-500 hover:text-primary')}
             >
               {f.label}
             </button>
@@ -105,9 +105,9 @@ export default function GovProducts({ state }: { state: any }) {
         </div>
       </div>
 
-      <div className="bg-white rounded-[32px] border border-gray-100 shadow-sm overflow-x-auto">
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-x-auto">
         <table className="w-full text-xs">
-          <thead className="bg-gray-50/50 text-[10px] font-black text-gray-500 uppercase tracking-widest">
+          <thead className="bg-gray-50/50 text-xs font-black text-gray-500 uppercase tracking-widest">
             <tr>
               <th className="p-5 text-start">Produit</th>
               <th className="p-5 text-start">Entreprise</th>
@@ -118,7 +118,7 @@ export default function GovProducts({ state }: { state: any }) {
           </thead>
           <tbody className="divide-y divide-gray-50">
             {isLoading && (
-              <tr><td colSpan={5} className="p-10 text-center"><Loader2 className="h-5 w-5 animate-spin inline text-gray-400" /></td></tr>
+              <tr><td colSpan={5} className="p-10 text-center"><Loader2 className="h-5 w-5 animate-spin inline text-gray-500" /></td></tr>
             )}
             {!isLoading && visible.length === 0 && (
               <tr><td colSpan={5} className="p-10 text-center text-gray-500">Aucun produit ne correspond.</td></tr>
@@ -129,11 +129,11 @@ export default function GovProducts({ state }: { state: any }) {
                 <tr key={p.id} className="hover:bg-gray-50/40">
                   <td className="p-5">
                     <p className="font-bold text-primary">{p.name}</p>
-                    <p className="text-[11px] text-gray-500">{[p.reference_id, p.category, `ajouté le ${formatDate(p.created_at)}`].filter(Boolean).join(' · ')}</p>
+                    <p className="text-xs text-gray-500">{[p.reference_id, p.category, `ajouté le ${formatDate(p.created_at)}`].filter(Boolean).join(' · ')}</p>
                   </td>
-                  <td className="p-5 text-gray-600">{p.company?.name || '—'}{p.company?.wilaya ? <span className="block text-[11px] text-gray-500">{p.company.wilaya}</span> : null}</td>
+                  <td className="p-5 text-gray-600">{p.company?.name || '—'}{p.company?.wilaya ? <span className="block text-xs text-gray-500">{p.company.wilaya}</span> : null}</td>
                   <td className="p-5">{Number(p.price) > 0 ? formatDzd(p.price) : 'Sur devis'}</td>
-                  <td className="p-5"><span className={cn('px-2.5 py-1 rounded-full text-[10px] font-black', status.className)}>{status.label}</span></td>
+                  <td className="p-5"><span className={cn('px-2.5 py-1 rounded-full text-xs font-black', status.className)}>{status.label}</span></td>
                   <td className="p-5">
                     <div className="flex justify-end gap-2">
                       <a href={`/products/${generateSlugUrl(p.name, p.id)}`} target="_blank" rel="noopener" className="p-2 rounded-lg bg-gray-50 text-gray-500 hover:text-primary" title="Voir la fiche">

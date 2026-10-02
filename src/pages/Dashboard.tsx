@@ -136,7 +136,26 @@ const Dashboard = () => {
     setTimeout(() => setNotification(null), 3000);
   };
 
-  const [companyInfo, setCompanyInfo] = useState({ name: '', bio: '', wilaya: '', whatsapp: '' });
+  const [companyInfo, setCompanyInfo] = useState({ name: '', bio: '', wilaya: '', whatsapp: '', logo_url: '', banner_url: '' });
+  const [uploadingImage, setUploadingImage] = useState<'logo_url' | 'banner_url' | null>(null);
+
+  // Dépose le logo ou la bannière ; l'URL est enregistrée avec le formulaire.
+  const uploadCompanyImage = async (field: 'logo_url' | 'banner_url', file: File | undefined) => {
+    if (!file) return;
+    setUploadingImage(field);
+    try {
+      const form = new FormData();
+      form.append('file', file);
+      const res = await fetch('/api/upload?bucket=product-images', { method: 'POST', body: form });
+      const d = await res.json().catch(() => ({}));
+      if (!res.ok) throw new ApiError(d, 'dashboard.updateError');
+      setCompanyInfo((prev) => ({ ...prev, [field]: d.url }));
+    } catch (err: any) {
+      showNotify(err.message, 'error');
+    } finally {
+      setUploadingImage(null);
+    }
+  };
 
   useEffect(() => {
     const loadCompany = async () => {
@@ -145,7 +164,7 @@ const Dashboard = () => {
         const res = await fetch(`/api/companies/${user.company_id}`);
         if (res.ok) {
           const c = await res.json();
-          setCompanyInfo({ name: c.name || '', bio: c.description || '', wilaya: c.wilaya || '', whatsapp: c.whatsapp ? `+${c.whatsapp}` : '' });
+          setCompanyInfo({ name: c.name || '', bio: c.description || '', wilaya: c.wilaya || '', whatsapp: c.whatsapp ? `+${c.whatsapp}` : '', logo_url: c.logo_url || '', banner_url: c.banner_url || '' });
         }
       } catch (e) {
         console.error('Erreur chargement entreprise', e);
@@ -165,7 +184,7 @@ const Dashboard = () => {
       const res = await fetch(`/api/companies/${user.company_id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: companyInfo.name, description: companyInfo.bio, wilaya: companyInfo.wilaya || undefined, whatsapp: companyInfo.whatsapp.trim() })
+        body: JSON.stringify({ name: companyInfo.name, description: companyInfo.bio, wilaya: companyInfo.wilaya || undefined, whatsapp: companyInfo.whatsapp.trim(), logo_url: companyInfo.logo_url, banner_url: companyInfo.banner_url })
       });
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
@@ -333,7 +352,7 @@ const Dashboard = () => {
             {/* Charts & Recent Activity */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Chart */}
-              <div className="lg:col-span-2 bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
+              <div className="lg:col-span-2 bg-white p-8 rounded-2xl border border-gray-100 shadow-sm">
                 <div className="flex items-center justify-between mb-8">
                   <h3 className="font-bold text-primary text-lg">
                     {user.role === 'fournisseur' ? t('dashboard.chart.contacts') : t('dashboard.chart.messages')}
@@ -341,13 +360,13 @@ const Dashboard = () => {
                   <div className="flex bg-gray-50 p-1 rounded-lg">
                     <button 
                       onClick={() => setChartTimeframe('6m')}
-                      className={cn("px-3 py-1 rounded-md text-[10px] font-black uppercase transition-all", chartTimeframe === '6m' ? "bg-white shadow-sm text-primary" : "text-gray-400 hover:text-primary")}
+                      className={cn("px-3 py-1 rounded-md text-xs font-black uppercase transition-all", chartTimeframe === '6m' ? "bg-white shadow-sm text-primary" : "text-gray-500 hover:text-primary")}
                     >
                       {t('dashboard.chart.6m')}
                     </button>
                     <button 
                       onClick={() => setChartTimeframe('1y')}
-                      className={cn("px-3 py-1 rounded-md text-[10px] font-black uppercase transition-all", chartTimeframe === '1y' ? "bg-white shadow-sm text-primary" : "text-gray-400 hover:text-primary")}
+                      className={cn("px-3 py-1 rounded-md text-xs font-black uppercase transition-all", chartTimeframe === '1y' ? "bg-white shadow-sm text-primary" : "text-gray-500 hover:text-primary")}
                     >
                       {t('dashboard.chart.1y')}
                     </button>
@@ -382,7 +401,7 @@ const Dashboard = () => {
               </div>
 
               {/* Prochaines actions */}
-              <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
+              <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm">
                 <h3 className="font-bold text-primary text-lg mb-6">{t('dashboard.next.title')}</h3>
                 <div className="space-y-3">
                   {(user.role === 'fournisseur' || user.role === 'exposant') && user.kycStatus !== 'approved' && user.kycStatus !== 'pending' && (
@@ -416,22 +435,22 @@ const Dashboard = () => {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="bg-white p-8 rounded-[40px] border border-gray-100 shadow-sm max-w-4xl"
+            className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm max-w-4xl"
           >
             <div className="flex items-center space-x-6 rtl:space-x-reverse mb-12">
-               <div className="w-24 h-24 bg-gray-100 rounded-3xl flex items-center justify-center text-primary font-black text-3xl shrink-0">
+               <div className="w-24 h-24 bg-gray-100 rounded-2xl flex items-center justify-center text-primary font-black text-3xl shrink-0">
                   {(profileInfo.name || '?').charAt(0)}
                </div>
                <div>
-                  <h3 className="text-xl font-black text-primary uppercase italic">{profileInfo.name}</h3>
-                  <p className="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em]">{roleLabel(user.role)}</p>
+                  <h3 className="text-xl font-black text-primary">{profileInfo.name}</h3>
+                  <p className="text-xs font-bold text-gray-500 uppercase tracking-wider">{roleLabel(user.role)}</p>
                </div>
             </div>
 
             <form onSubmit={handleUpdateProfile} className="space-y-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="space-y-2">
-                  <label htmlFor="profile_name" className="text-[10px] font-black text-primary uppercase tracking-widest italic">{t('dashboard.profile.fullName')}</label>
+                  <label htmlFor="profile_name" className="text-xs font-black text-primary uppercase tracking-widest italic">{t('dashboard.profile.fullName')}</label>
                   <input
                     id="profile_name"
                     type="text"
@@ -443,7 +462,7 @@ const Dashboard = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label htmlFor="profile_email" className="text-[10px] font-black text-primary uppercase tracking-widest italic">{t('dashboard.profile.email')}</label>
+                  <label htmlFor="profile_email" className="text-xs font-black text-primary uppercase tracking-widest italic">{t('dashboard.profile.email')}</label>
                   <input
                     id="profile_email"
                     type="email"
@@ -453,7 +472,7 @@ const Dashboard = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label htmlFor="profile_company" className="text-[10px] font-black text-primary uppercase tracking-widest italic">{t('dashboard.profile.company')}</label>
+                  <label htmlFor="profile_company" className="text-xs font-black text-primary uppercase tracking-widest italic">{t('dashboard.profile.company')}</label>
                   <input
                     id="profile_company"
                     type="text"
@@ -466,24 +485,24 @@ const Dashboard = () => {
 
               <div className="pt-8 border-t border-gray-50 flex flex-wrap gap-4 items-center justify-between">
                 <div>
-                   <h4 className="text-[10px] font-black text-primary uppercase italic mb-1">{t('dashboard.profile.security')}</h4>
-                   <Link to="/forgot-password" className="text-[9px] font-black text-secondary hover:underline uppercase tracking-widest">{t('dashboard.profile.changePassword')}</Link>
+                   <h4 className="text-xs font-black text-primary uppercase italic mb-1">{t('dashboard.profile.security')}</h4>
+                   <Link to="/forgot-password" className="text-xs font-black text-secondary hover:underline uppercase tracking-widest">{t('dashboard.profile.changePassword')}</Link>
                 </div>
-                <button type="submit" disabled={isLoading} className="bg-primary text-white px-10 py-5 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl hover:bg-secondary transition-all flex items-center space-x-2">
+                <button type="submit" disabled={isLoading} className="bg-primary text-white px-10 py-5 rounded-2xl text-xs font-black uppercase tracking-widest shadow-xl hover:bg-secondary transition-all flex items-center space-x-2">
                   {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <span>{t('dashboard.profile.save')}</span>}
                 </button>
               </div>
             </form>
 
             <div className="mt-12 pt-8 border-t border-gray-100">
-              <h4 className="text-[10px] font-black text-primary uppercase italic mb-2">{t('dashboard.profile.dataTitle')}</h4>
+              <h4 className="text-xs font-black text-primary uppercase italic mb-2">{t('dashboard.profile.dataTitle')}</h4>
               <p className="text-xs text-gray-500 mb-4">{t('dashboard.profile.dataText')}</p>
               <div className="flex flex-wrap gap-4">
-                <button type="button" onClick={handleExportData} className="px-6 py-3 rounded-2xl border border-gray-200 text-[10px] font-black uppercase tracking-widest text-primary hover:border-secondary">
+                <button type="button" onClick={handleExportData} className="px-6 py-3 rounded-2xl border border-gray-200 text-xs font-black uppercase tracking-widest text-primary hover:border-secondary">
                   {t('dashboard.profile.export')}
                 </button>
                 {user.role !== 'admin' && (
-                  <button type="button" onClick={handleDeleteAccount} className="px-6 py-3 rounded-2xl border border-red-200 bg-red-50 text-[10px] font-black uppercase tracking-widest text-red-600 hover:bg-red-100">
+                  <button type="button" onClick={handleDeleteAccount} className="px-6 py-3 rounded-2xl border border-red-200 bg-red-50 text-xs font-black uppercase tracking-widest text-red-600 hover:bg-red-100">
                     {t('dashboard.profile.deleteAccount')}
                   </button>
                 )}
@@ -505,7 +524,7 @@ const Dashboard = () => {
             className="grid grid-cols-1 md:grid-cols-2 gap-6"
           >
             {favorites.map((fav) => (
-              <div key={fav.id} className="bg-white p-6 rounded-[32px] border border-gray-100 shadow-sm group hover:shadow-xl transition-all flex flex-col">
+              <div key={fav.id} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm group hover:shadow-xl transition-all flex flex-col">
                 <div className="flex justify-between items-start mb-6">
                   <div className="flex items-center space-x-4">
                     {fav.item_type === 'product' && fav.image ? (
@@ -518,9 +537,9 @@ const Dashboard = () => {
                       </div>
                     )}
                     <div>
-                      <h4 className="text-base font-black text-primary uppercase italic">{fav.name || `Favori (${fav.reference_id || fav.item_id.substring(0,8)})`}</h4>
-                      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{fav.category || fav.item_type}</p>
-                      <p className="text-[9px] font-mono text-gray-400 uppercase mt-1 tracking-widest">
+                      <h4 className="text-base font-black text-primary">{fav.name || `Favori (${fav.reference_id || fav.item_id.substring(0,8)})`}</h4>
+                      <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">{fav.category || fav.item_type}</p>
+                      <p className="text-xs font-mono text-gray-500 uppercase mt-1 tracking-widest">
                          {fav.reference_id ? `REF: ${fav.reference_id}` : `ID: ${fav.item_id.substring(0,8)}`}
                       </p>
                     </div>
@@ -535,11 +554,11 @@ const Dashboard = () => {
                 </div>
                 <div className="mt-auto flex items-center justify-between pt-6 border-t border-gray-50">
                    <div className="flex items-center space-x-2 text-gray-500">
-                      <span className="text-[10px] font-bold uppercase">{fav.location || ''}</span>
+                      <span className="text-xs font-bold uppercase">{fav.location || ''}</span>
                    </div>
                    <Link 
                     to={fav.item_type === 'product' ? `/products/${generateSlugUrl(fav.name, String(fav.item_id))}` : `/directory/${generateSlugUrl(fav.name, String(fav.item_id))}`}
-                    className="text-[10px] font-black text-secondary hover:underline uppercase tracking-widest flex items-center space-x-1"
+                    className="text-xs font-black text-secondary hover:underline uppercase tracking-widest flex items-center space-x-1"
                    >
                      <span>{fav.item_type === 'product' ? t('dashboard.favorites.viewProduct') : t('dashboard.favorites.viewProfile')}</span>
                      <ChevronRight className="h-3 w-3 rtl:rotate-180" />
@@ -552,7 +571,7 @@ const Dashboard = () => {
                  <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6 text-gray-300">
                     <Heart className="h-10 w-10" />
                  </div>
-                 <h4 className="text-xl font-black text-primary uppercase italic mb-2">{t('dashboard.favorites.emptyTitle')}</h4>
+                 <h4 className="text-xl font-black text-primary mb-2">{t('dashboard.favorites.emptyTitle')}</h4>
                  <p className="text-sm text-gray-500">{t('dashboard.favorites.emptyText')}</p>
               </div>
             )}
@@ -566,14 +585,14 @@ const Dashboard = () => {
             exit={{ opacity: 0, y: -10 }}
             className="space-y-8"
           >
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-8 rounded-[40px] border border-gray-100 shadow-sm">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-8 rounded-2xl border border-gray-100 shadow-sm">
               <div>
-                <h3 className="text-2xl font-black text-primary uppercase italic">{t('dashboard.ads.title')}</h3>
+                <h3 className="text-2xl font-black text-primary">{t('dashboard.ads.title')}</h3>
                 <p className="text-gray-500 mt-2">{t('dashboard.ads.subtitle')}</p>
               </div>
               <button 
                 onClick={() => setShowAdForm(true)}
-                className="bg-secondary text-white px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-xl flex items-center gap-2"
+                className="bg-secondary text-white px-8 py-4 rounded-2xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-all shadow-xl flex items-center gap-2"
               >
                 <Plus className="h-4 w-4" />
                 <span>{t('dashboard.ads.request')}</span>
@@ -583,15 +602,15 @@ const Dashboard = () => {
             <div className="max-w-4xl">
               <div className="space-y-6">
                 <h4 className="font-bold text-primary text-lg">{t('dashboard.ads.activeTitle')}</h4>
-                <div className="bg-white p-12 text-center rounded-3xl border border-dashed border-gray-200">
+                <div className="bg-white p-12 text-center rounded-2xl border border-dashed border-gray-200">
                    <div className="bg-gray-50 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                     <Zap className="h-8 w-8 text-gray-400" />
+                     <Zap className="h-8 w-8 text-gray-500" />
                    </div>
                    <h5 className="font-bold text-gray-900 mb-2">{t('dashboard.ads.noneTitle')}</h5>
                    <p className="text-sm text-gray-500">{t('dashboard.ads.noneText')}</p>
                 </div>
                
-                <div className="bg-primary/5 border border-primary/10 p-6 rounded-3xl mt-4">
+                <div className="bg-primary/5 border border-primary/10 p-6 rounded-2xl mt-4">
                    <h5 className="font-bold text-primary mb-2">{t('dashboard.ads.whyTitle')}</h5>
                    <ul className="space-y-2 text-sm text-gray-700">
                       <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" /> {t('dashboard.ads.why1')}</li>
@@ -620,10 +639,10 @@ const Dashboard = () => {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="bg-white p-12 rounded-[40px] border border-gray-100 shadow-sm text-center"
+            className="bg-white p-12 rounded-2xl border border-gray-100 shadow-sm text-center"
           >
             <BarChart3 className="h-12 w-12 text-gray-300 mx-auto mb-6" />
-            <h3 className="text-xl font-black text-primary uppercase italic mb-2">{t('dashboard.statsSoon.title')}</h3>
+            <h3 className="text-xl font-black text-primary mb-2">{t('dashboard.statsSoon.title')}</h3>
             <p className="text-sm text-gray-500 max-w-md mx-auto">
               {t('dashboard.statsSoon.text')}
             </p>
@@ -637,7 +656,7 @@ const Dashboard = () => {
             exit={{ opacity: 0, y: -10 }}
           >
             <div className="flex justify-between items-center mb-8">
-               <h3 className="text-2xl font-black text-primary uppercase italic">{t('dashboard.products.title')}</h3>
+               <h3 className="text-2xl font-black text-primary">{t('dashboard.products.title')}</h3>
                <button 
                  onClick={() => setShowAddProduct(true)}
                  className="bg-primary text-white px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-widest flex items-center space-x-2 hover:bg-secondary transition-all"
@@ -648,7 +667,7 @@ const Dashboard = () => {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                {filteredProducts.map(p => (
-                 <div key={p.id} className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm relative group hover:shadow-md transition-all flex flex-col">
+                 <div key={p.id} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm relative group hover:shadow-md transition-all flex flex-col">
                    {p.file_url ? (
                      <img src={p.file_url} className="w-full h-40 object-cover rounded-2xl mb-4" alt={p.name} />
                    ) : (
@@ -659,7 +678,7 @@ const Dashboard = () => {
                    <h4 className="font-bold text-primary mb-1">{p.name}</h4>
                    <p className="text-xs text-gray-500 mb-2">{categoryLabel(t, p.category)}</p>
                    <div className="mt-auto pt-4 border-t border-gray-50 flex justify-between items-center">
-                     <span className={cn("text-[10px] font-black uppercase tracking-widest", p.status === 'Actif' ? 'text-success' : 'text-orange-500')}>{t(`dashboard.products.status.${p.status}`, { defaultValue: p.status })}</span>
+                     <span className={cn("text-xs font-black uppercase tracking-widest", p.status === 'Actif' ? 'text-success' : 'text-orange-500')}>{t(`dashboard.products.status.${p.status}`, { defaultValue: p.status })}</span>
                      <div className="flex gap-2">
                        <button 
                          type="button"
@@ -692,10 +711,10 @@ const Dashboard = () => {
                  </div>
                ))}
                {products.length === 0 && (
-                 <div className="col-span-full py-12 flex flex-col items-center justify-center text-center bg-gray-50 rounded-3xl border border-dashed border-gray-200">
+                 <div className="col-span-full py-12 flex flex-col items-center justify-center text-center bg-gray-50 rounded-2xl border border-dashed border-gray-200">
                     <Package className="h-12 w-12 text-gray-300 mb-4" />
-                    <p className="text-gray-500 font-bold uppercase tracking-widest text-sm">{t('dashboard.products.emptyTitle')}</p>
-                    <p className="text-gray-400 text-xs mt-2 max-w-xs">{t('dashboard.products.emptyText')}</p>
+                    <p className="text-gray-500 font-bold tracking-widest text-sm">{t('dashboard.products.emptyTitle')}</p>
+                    <p className="text-gray-500 text-xs mt-2 max-w-xs">{t('dashboard.products.emptyText')}</p>
                  </div>
                )}
             </div>
@@ -717,16 +736,60 @@ const Dashboard = () => {
             exit={{ opacity: 0, y: -10 }}
             className="max-w-4xl"
           >
-            <div className="bg-white rounded-[40px] border border-gray-100 shadow-sm overflow-hidden">
-               <div className="h-32 bg-primary relative">
-                  <div className="absolute -bottom-10 start-10 w-24 h-24 bg-white rounded-[24px] border-4 border-white shadow-xl flex items-center justify-center">
-                     <Building2 className="h-10 w-10 text-primary" />
+            {(() => {
+              // Jauge de complétion : ce qui rend une fiche crédible pour un acheteur.
+              const checks = [
+                { done: Boolean(companyInfo.logo_url), label: t('dashboard.completion.logo') },
+                { done: Boolean(companyInfo.banner_url), label: t('dashboard.completion.banner') },
+                { done: companyInfo.bio.trim().length >= 80, label: t('dashboard.completion.description') },
+                { done: Boolean(companyInfo.whatsapp.trim()), label: t('dashboard.completion.whatsapp') },
+                { done: Boolean(companyInfo.wilaya.trim()), label: t('dashboard.completion.wilaya') },
+                { done: user?.kycStatus === 'approved', label: t('dashboard.completion.kyc') },
+                { done: products.length >= 10, label: t('dashboard.completion.products') },
+              ];
+              const percent = Math.round((checks.filter((c) => c.done).length / checks.length) * 100);
+              return (
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-6">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="font-bold text-primary">{t('dashboard.completion.title')}</h3>
+                    <span className="text-sm font-black text-secondary">{percent} %</span>
                   </div>
+                  <div className="h-2 bg-gray-100 rounded-full overflow-hidden mb-4" role="progressbar" aria-valuenow={percent} aria-valuemin={0} aria-valuemax={100} aria-label={t('dashboard.completion.title')}>
+                    <div className="h-full bg-secondary transition-all" style={{ width: `${percent}%` }} />
+                  </div>
+                  <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+                    {checks.map((c) => (
+                      <li key={c.label} className={cn('flex items-center gap-2', c.done ? 'text-gray-500 line-through' : 'text-primary font-medium')}>
+                        <CheckCircle className={cn('h-4 w-4 shrink-0', c.done ? 'text-success' : 'text-gray-300')} />
+                        {c.label}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              );
+            })()}
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+               <div className="h-40 bg-primary relative">
+                  {companyInfo.banner_url && <img src={companyInfo.banner_url} alt="" className="absolute inset-0 w-full h-full object-cover" />}
+                  <label className="absolute top-4 end-4 btn-ghost !px-3 !py-2 text-xs cursor-pointer">
+                     {uploadingImage === 'banner_url' ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                     {t('dashboard.company.changeBanner')}
+                     <input type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" onChange={(e) => uploadCompanyImage('banner_url', e.target.files?.[0])} />
+                  </label>
+                  <label className="absolute -bottom-10 start-10 w-24 h-24 bg-white rounded-2xl border-4 border-white shadow-xl flex items-center justify-center overflow-hidden cursor-pointer group" title={t('dashboard.company.changeLogo')}>
+                     {companyInfo.logo_url
+                       ? <img src={companyInfo.logo_url} alt="" className="w-full h-full object-contain" />
+                       : <Building2 className="h-10 w-10 text-primary" />}
+                     <span className="absolute inset-0 bg-black/50 text-white text-xs font-bold flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                       {uploadingImage === 'logo_url' ? <Loader2 className="h-5 w-5 animate-spin" /> : t('dashboard.company.changeLogo')}
+                     </span>
+                     <input type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" aria-label={t('dashboard.company.changeLogo')} onChange={(e) => uploadCompanyImage('logo_url', e.target.files?.[0])} />
+                  </label>
                </div>
                <form onSubmit={handleUpdateCompany} className="p-12 pt-20 space-y-8">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                      <div className="space-y-2">
-                        <label htmlFor="company_name" className="text-[10px] font-black text-primary uppercase tracking-widest italic">{t('dashboard.company.name')}</label>
+                        <label htmlFor="company_name" className="text-xs font-black text-primary uppercase tracking-widest italic">{t('dashboard.company.name')}</label>
                         <input
                           id="company_name"
                           type="text"
@@ -738,7 +801,7 @@ const Dashboard = () => {
                         />
                      </div>
                      <div className="space-y-2">
-                        <label htmlFor="company_wilaya" className="text-[10px] font-black text-primary uppercase tracking-widest italic">{t('dashboard.company.wilaya')}</label>
+                        <label htmlFor="company_wilaya" className="text-xs font-black text-primary uppercase tracking-widest italic">{t('dashboard.company.wilaya')}</label>
                         <input
                           id="company_wilaya"
                           type="text"
@@ -749,7 +812,7 @@ const Dashboard = () => {
                         />
                      </div>
                      <div className="space-y-2 md:col-span-2">
-                        <label htmlFor="company_whatsapp" className="text-[10px] font-black text-primary uppercase tracking-widest italic">{t('dashboard.company.whatsapp')}</label>
+                        <label htmlFor="company_whatsapp" className="text-xs font-black text-primary uppercase tracking-widest italic">{t('dashboard.company.whatsapp')}</label>
                         <input
                           id="company_whatsapp"
                           type="tel"
@@ -766,17 +829,17 @@ const Dashboard = () => {
                      </div>
                   </div>
                   <div className="space-y-2">
-                     <label htmlFor="company_bio" className="text-[10px] font-black text-primary uppercase tracking-widest italic">{t('dashboard.company.bio')}</label>
+                     <label htmlFor="company_bio" className="text-xs font-black text-primary uppercase tracking-widest italic">{t('dashboard.company.bio')}</label>
                      <textarea
                         id="company_bio"
                         rows={4}
                         value={companyInfo.bio}
                         onChange={(e) => setCompanyInfo({...companyInfo, bio: e.target.value})}
-                        className="w-full bg-gray-50 border-none px-8 py-6 rounded-3xl text-sm font-medium outline-none resize-none"
+                        className="w-full bg-gray-50 border-none px-8 py-6 rounded-2xl text-sm font-medium outline-none resize-none"
                      />
                   </div>
                   <div className="pt-4">
-                     <button type="submit" disabled={isLoading} className="bg-primary text-white px-10 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl hover:bg-secondary transition-all flex items-center space-x-2">
+                     <button type="submit" disabled={isLoading} className="bg-primary text-white px-10 py-4 rounded-2xl text-xs font-black uppercase tracking-widest shadow-xl hover:bg-secondary transition-all flex items-center space-x-2">
                         {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
                         <span>{t('dashboard.company.save')}</span>
                      </button>
@@ -812,7 +875,7 @@ const Dashboard = () => {
             </div>
             <div className="min-w-0">
               <p className="text-sm font-bold text-primary truncate">{user?.company}</p>
-              <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">{roleLabel(user?.role)}</p>
+              <p className="text-xs text-gray-500 font-bold uppercase tracking-widest">{roleLabel(user?.role)}</p>
             </div>
           </div>
 
@@ -836,7 +899,7 @@ const Dashboard = () => {
                 >
                   <item.icon className={cn(
                     "h-5 w-5 transition-colors",
-                    isActive ? "text-white" : "text-gray-400 group-hover:text-secondary"
+                    isActive ? "text-white" : "text-gray-500 group-hover:text-secondary"
                   )} />
                   <span>{item.name}</span>
                 </Link>
@@ -868,14 +931,14 @@ const Dashboard = () => {
             
             <div className={cn("flex-1 max-w-md hidden", activeTab === 'products' && "xl:block")}>
                <div className="relative group">
-                  <Search className="absolute start-6 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-secondary transition-colors" />
+                  <Search className="absolute start-6 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500 group-focus-within:text-secondary transition-colors" />
                   <input 
                     type="text" 
                     value={globalSearch}
                     onChange={(e) => setGlobalSearch(e.target.value)}
                     placeholder={t('dashboard.searchPlaceholder')}
                     aria-label={t('dashboard.searchPlaceholder')}
-                    className="w-full bg-white border border-gray-100 px-16 py-4 rounded-[32px] text-xs font-bold outline-none focus:border-secondary focus:shadow-xl transition-all"
+                    className="w-full bg-white border border-gray-100 px-16 py-4 rounded-2xl text-xs font-bold outline-none focus:border-secondary focus:shadow-xl transition-all"
                   />
                </div>
             </div>
@@ -918,7 +981,7 @@ const Dashboard = () => {
                      {user?.companyStatus === 'pending' ? <Building2 className="h-6 w-6" /> : <AlertTriangle className="h-6 w-6" />}
                   </div>
                   <div>
-                     <h3 className="font-black text-primary uppercase text-sm mt-1">
+                     <h3 className="font-black text-primary text-sm mt-1">
                        {user?.companyStatus === 'pending' ? t('dashboard.kycBanner.pendingTitle') : t('dashboard.kycBanner.requiredTitle')}
                      </h3>
                      <p className="text-xs text-gray-600 mt-1">
@@ -929,7 +992,7 @@ const Dashboard = () => {
                   </div>
                </div>
                {user?.companyStatus !== 'pending' && (
-                  <Link to="/kyc-upload" className="bg-primary text-white px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-secondary transition-all whitespace-nowrap shadow-lg shrink-0">
+                  <Link to="/kyc-upload" className="bg-primary text-white px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-secondary transition-all whitespace-nowrap shadow-lg shrink-0">
                      {t('dashboard.kycBanner.submit')}
                   </Link>
                )}
@@ -958,18 +1021,18 @@ const Dashboard = () => {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="bg-white max-w-2xl w-full rounded-[40px] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+              className="bg-white max-w-2xl w-full rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
             >
               <div className="p-8 md:p-12 overflow-y-auto">
                 <div className="flex justify-between items-start mb-8">
                   <div>
-                    <h2 className="text-3xl font-black text-primary uppercase italic mb-2">{t('dashboard.adForm.title')}</h2>
+                    <h2 className="text-3xl font-black text-primary mb-2">{t('dashboard.adForm.title')}</h2>
                     <p className="text-gray-500 font-medium">{t('dashboard.adForm.subtitle')}</p>
                   </div>
                   <button 
                     onClick={() => setShowAdForm(false)}
                     aria-label={t('dashboard.adForm.close')}
-                    className="p-3 bg-gray-50 text-gray-400 hover:text-red-500 rounded-full transition-colors"
+                    className="p-3 bg-gray-50 text-gray-500 hover:text-red-500 rounded-full transition-colors"
                   >
                     <X className="h-6 w-6" />
                   </button>
@@ -977,7 +1040,7 @@ const Dashboard = () => {
 
                 <div className="space-y-8">
                   <div className="space-y-2">
-                    <label htmlFor="ad_name" className="text-[10px] font-black text-primary uppercase tracking-widest italic">{t('dashboard.adForm.name')}</label>
+                    <label htmlFor="ad_name" className="text-xs font-black text-primary uppercase tracking-widest italic">{t('dashboard.adForm.name')}</label>
                     <input 
                       id="ad_name"
                       type="text" 
@@ -989,7 +1052,7 @@ const Dashboard = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-primary uppercase tracking-widest italic">{t('dashboard.adForm.placement')}</label>
+                    <label className="text-xs font-black text-primary uppercase tracking-widest italic">{t('dashboard.adForm.placement')}</label>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <label className="flex flex-col p-4 bg-gray-50 rounded-2xl border-2 border-transparent hover:border-gray-200 cursor-pointer transition-all">
                         <div className="flex items-center space-x-3 mb-2">
@@ -1002,7 +1065,7 @@ const Dashboard = () => {
                           />
                           <span className="text-sm font-bold text-primary">{t('dashboard.adForm.homeBanner')}</span>
                         </div>
-                        <span className="text-[10px] text-gray-500 ms-7">{t('dashboard.adForm.homeBannerText')}</span>
+                        <span className="text-xs text-gray-500 ms-7">{t('dashboard.adForm.homeBannerText')}</span>
                       </label>
                       <label className="flex flex-col p-4 bg-gray-50 rounded-2xl border-2 border-transparent hover:border-gray-200 cursor-pointer transition-all">
                         <div className="flex items-center space-x-3 mb-2">
@@ -1015,18 +1078,18 @@ const Dashboard = () => {
                           />
                           <span className="text-sm font-bold text-primary">{t('dashboard.adForm.directorySlot')}</span>
                         </div>
-                        <span className="text-[10px] text-gray-500 ms-7">{t('dashboard.adForm.directorySlotText')}</span>
+                        <span className="text-xs text-gray-500 ms-7">{t('dashboard.adForm.directorySlotText')}</span>
                       </label>
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-primary uppercase tracking-widest italic">{t('dashboard.adForm.visual')}</label>
+                    <label className="text-xs font-black text-primary uppercase tracking-widest italic">{t('dashboard.adForm.visual')}</label>
                     <p className="text-sm text-gray-600 bg-gray-50 rounded-2xl p-5">{t('dashboard.adForm.visualText')}</p>
                   </div>
 
                   <div className="space-y-2">
-                    <label htmlFor="ad_url" className="text-[10px] font-black text-primary uppercase tracking-widest italic">{t('dashboard.adForm.url')}</label>
+                    <label htmlFor="ad_url" className="text-xs font-black text-primary uppercase tracking-widest italic">{t('dashboard.adForm.url')}</label>
                     <input 
                       id="ad_url"
                       type="url" 
@@ -1038,12 +1101,12 @@ const Dashboard = () => {
                   </div>
                   
                   <div className="space-y-2">
-                    <label htmlFor="ad_duration" className="text-[10px] font-black text-primary uppercase tracking-widest italic">{t('dashboard.adForm.duration')}</label>
+                    <label htmlFor="ad_duration" className="text-xs font-black text-primary uppercase tracking-widest italic">{t('dashboard.adForm.duration')}</label>
                     <select 
                       id="ad_duration"
                       value={adFormData.duration}
                       onChange={e => setAdFormData({...adFormData, duration: e.target.value})}
-                      className="w-full bg-gray-50 border-none px-6 py-5 rounded-2xl text-[10px] font-black uppercase tracking-widest outline-none">
+                      className="w-full bg-gray-50 border-none px-6 py-5 rounded-2xl text-xs font-black uppercase tracking-widest outline-none">
                       <option value="1 Semaine">{t('dashboard.adForm.duration1w')}</option>
                       <option value="1 Mois">{t('dashboard.adForm.duration1m')}</option>
                       <option value="3 Mois">{t('dashboard.adForm.duration3m')}</option>
@@ -1053,14 +1116,14 @@ const Dashboard = () => {
                   <div className="pt-6 border-t border-gray-100 flex justify-end space-x-4">
                     <button 
                       onClick={() => setShowAdForm(false)}
-                      className="px-8 py-4 rounded-2xl text-[10px] font-black text-gray-500 uppercase tracking-widest hover:bg-gray-50 transition-colors"
+                      className="px-8 py-4 rounded-2xl text-xs font-black text-gray-500 uppercase tracking-widest hover:bg-gray-50 transition-colors"
                     >
                       {t('dashboard.adForm.cancel')}
                     </button>
                     <button 
                       onClick={submitAd}
                       disabled={isLoading}
-                      className="bg-secondary text-white px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center space-x-3"
+                      className="bg-secondary text-white px-8 py-4 rounded-2xl text-xs font-black uppercase tracking-widest shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center space-x-3"
                     >
                       {isLoading ? (
                         <Loader2 className="h-4 w-4 animate-spin" />
@@ -1089,7 +1152,7 @@ const Dashboard = () => {
             )}
           >
             {notification.type === 'success' ? <CheckCircle className="h-5 w-5" /> : <AlertTriangle className="h-5 w-5" />}
-            <span className="text-[11px] font-black uppercase tracking-widest">{notification.message}</span>
+            <span className="text-xs font-black uppercase tracking-widest">{notification.message}</span>
           </motion.div>
         )}
       </AnimatePresence>

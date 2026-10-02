@@ -108,7 +108,7 @@ const HeroSlider: React.FC<HeroSliderProps> = ({ slides }) => {
                   transition={{ delay: 0.2 }}
                   className={cn("flex items-center space-x-2 mb-2")}
                 >
-                  <span className="text-[9px] font-black uppercase tracking-[0.3em] text-secondary">
+                  <span className="text-xs font-black uppercase tracking-wider text-secondary">
                     {t('slides.sponsored')}
                   </span>
                   <div className="h-[1px] w-8 bg-secondary" />
@@ -117,7 +117,7 @@ const HeroSlider: React.FC<HeroSliderProps> = ({ slides }) => {
                   initial={{ y: 10, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: 0.3 }}
-                  className="text-xl md:text-2xl lg:text-3xl font-black tracking-tighter mb-1 uppercase"
+                  className="text-xl md:text-2xl lg:text-3xl font-black tracking-tighter mb-1"
                 >
                   {activeSlide.title}
                 </motion.h2>
@@ -133,7 +133,7 @@ const HeroSlider: React.FC<HeroSliderProps> = ({ slides }) => {
                   initial={{ y: 10, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: 0.5 }}
-                  className="text-xs font-medium text-white/60 uppercase tracking-widest max-w-sm leading-relaxed hidden lg:block"
+                  className="text-xs font-medium text-white/60 tracking-widest max-w-sm leading-relaxed hidden lg:block"
                 >
                   {activeSlide.description}
                 </motion.p>
@@ -158,8 +158,8 @@ const HeroSlider: React.FC<HeroSliderProps> = ({ slides }) => {
                   referrerPolicy="no-referrer"
                 />
               </div>
-              <h4 className="text-2xl font-black tracking-tighter mb-1 uppercase">{activeSlide.brandName}</h4>
-              <p className="text-[9px] font-black text-secondary uppercase tracking-[0.3em]">{activeSlide.brandTagline}</p>
+              <h4 className="text-2xl font-black tracking-tighter mb-1">{activeSlide.brandName}</h4>
+              <p className="text-xs font-black text-secondary uppercase tracking-wider">{activeSlide.brandTagline}</p>
             </motion.div>
           </div>
         </motion.div>
@@ -168,8 +168,8 @@ const HeroSlider: React.FC<HeroSliderProps> = ({ slides }) => {
       {/* Slide Counter (Technical Style) */}
       <div className={cn("absolute bottom-6 z-30 flex items-baseline space-x-2 text-white/40 font-mono", "end-10")}>
         <span className="text-xl font-black text-white">{(current + 1).toString().padStart(2, '0')}</span>
-        <span className="text-[10px]">/</span>
-        <span className="text-[10px]">{displaySlides.length.toString().padStart(2, '0')}</span>
+        <span className="text-xs">/</span>
+        <span className="text-xs">{displaySlides.length.toString().padStart(2, '0')}</span>
       </div>
 
       {/* Navigation Dots */}

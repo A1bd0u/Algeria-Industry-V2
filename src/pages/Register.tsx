@@ -77,7 +77,7 @@ const Register = () => {
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="max-w-4xl w-full bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden flex flex-col md:flex-row"
+        className="max-w-4xl w-full bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden flex flex-col md:flex-row"
       >
         <div className="md:w-5/12 bg-primary p-8 text-white hidden md:flex flex-col justify-between relative overflow-hidden">
           <div className="absolute top-0 end-0 p-12 opacity-10">
@@ -209,7 +209,7 @@ const Register = () => {
               </div>
             ) : (
               <div className="animate-in slide-in-from-right duration-500">
-                <button onClick={() => setStep(1)} className="text-xs font-bold text-gray-400 hover:text-primary mb-4 flex items-center space-x-1">
+                <button onClick={() => setStep(1)} className="text-xs font-bold text-gray-500 hover:text-primary mb-4 flex items-center space-x-1">
                   <ArrowRight className="h-3 w-3 rotate-180 rtl:rotate-180" />
                   <span>{t('auth.register.backToProfile')}</span>
                 </button>
@@ -232,7 +232,7 @@ const Register = () => {
                         className={`w-full px-4 py-3 bg-gray-50 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary/20 ${errors.lastName ? 'border-red-400' : 'border-gray-200'}`}
                         placeholder={t('auth.register.lastName')}
                       />
-                      {errors.lastName && <p className="text-red-500 text-[10px] mt-1 font-medium">{t(errors.lastName.message || '')}</p>}
+                      {errors.lastName && <p className="text-red-500 text-xs mt-1 font-medium">{t(errors.lastName.message || '')}</p>}
                     </div>
                     <div>
                       <label htmlFor="firstName" className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">{t('auth.register.firstName')}</label>
@@ -243,14 +243,14 @@ const Register = () => {
                         className={`w-full px-4 py-3 bg-gray-50 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary/20 ${errors.firstName ? 'border-red-400' : 'border-gray-200'}`}
                         placeholder={t('auth.register.firstName')}
                       />
-                      {errors.firstName && <p className="text-red-500 text-[10px] mt-1 font-medium">{t(errors.firstName.message || '')}</p>}
+                      {errors.firstName && <p className="text-red-500 text-xs mt-1 font-medium">{t(errors.firstName.message || '')}</p>}
                     </div>
                   </div>
 
                   <div>
                     <label htmlFor="companyName" className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">{t('auth.register.company')}</label>
                     <div className="relative">
-                      <Building2 className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
+                      <Building2 className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-500 h-4 w-4" />
                       <input 
                         id="companyName"
                         type="text" 
@@ -259,13 +259,13 @@ const Register = () => {
                         placeholder={t('auth.register.companyPlaceholder')}
                       />
                     </div>
-                    {errors.companyName && <p className="text-red-500 text-[10px] mt-1 font-medium">{t(errors.companyName.message || '')}</p>}
+                    {errors.companyName && <p className="text-red-500 text-xs mt-1 font-medium">{t(errors.companyName.message || '')}</p>}
                   </div>
 
                   <div>
                     <label htmlFor="email" className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">{t('auth.register.proEmail')}</label>
                     <div className="relative">
-                      <Mail className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
+                      <Mail className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-500 h-4 w-4" />
                       <input 
                         id="email"
                         type="email" 
@@ -274,13 +274,13 @@ const Register = () => {
                         placeholder={t('auth.emailPlaceholder')}
                       />
                     </div>
-                    {errors.email && <p className="text-red-500 text-[10px] mt-1 font-medium">{t(errors.email.message || '')}</p>}
+                    {errors.email && <p className="text-red-500 text-xs mt-1 font-medium">{t(errors.email.message || '')}</p>}
                   </div>
 
                   <div>
                     <label htmlFor="password" className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">{t('auth.password')}</label>
                     <div className="relative">
-                      <Lock className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
+                      <Lock className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-500 h-4 w-4" />
                       <input 
                         id="password"
                         type="password" 
@@ -289,7 +289,7 @@ const Register = () => {
                         placeholder="••••••••"
                       />
                     </div>
-                    {errors.password && <p className="text-red-500 text-[10px] mt-1 font-medium">{t(errors.password.message || '')}</p>}
+                    {errors.password && <p className="text-red-500 text-xs mt-1 font-medium">{t(errors.password.message || '')}</p>}
                     <PasswordStrengthIndicator password={passwordValue} />
                   </div>
 
@@ -307,7 +307,7 @@ const Register = () => {
                   </div>
 
                   <div className="pt-2">
-                    <p className="text-[10px] text-gray-400 mb-4">
+                    <p className="text-xs text-gray-500 mb-4">
                       {t('auth.register.consentPrefix')} <Link to="/terms" className="text-primary font-bold hover:underline">{t('auth.register.terms')}</Link> {t('auth.register.and')} <Link to="/privacy" className="text-primary font-bold hover:underline">{t('auth.register.privacy')}</Link>.
                     </p>
                     <button 

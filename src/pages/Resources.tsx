@@ -56,10 +56,10 @@ const Resources = () => {
 
             {isLoading ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {[1, 2].map((i) => <div key={i} className="h-72 bg-white rounded-3xl animate-pulse" />)}
+                {[1, 2].map((i) => <div key={i} className="h-72 bg-white rounded-2xl animate-pulse" />)}
               </div>
             ) : latest.length === 0 ? (
-              <p className="bg-white rounded-3xl border border-dashed border-gray-200 p-10 text-center text-gray-500">{t('resources.noArticles')}</p>
+              <p className="bg-white rounded-2xl border border-dashed border-gray-200 p-10 text-center text-gray-500">{t('resources.noArticles')}</p>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {latest.map((article: any, i: number) => {
@@ -70,16 +70,16 @@ const Resources = () => {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: i * 0.05 }}
-                      className="bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 group"
+                      className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 group"
                     >
                       <Link to={to} className="block h-48 overflow-hidden relative">
                         <img src={article.image_url || '/placeholder.svg'} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                         {article.category && (
-                          <span className="absolute top-4 start-4 bg-white/90 text-primary px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">{article.category}</span>
+                          <span className="absolute top-4 start-4 bg-white/90 text-primary px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">{article.category}</span>
                         )}
                       </Link>
                       <div className="p-6">
-                        <p className="flex items-center gap-2 text-[10px] font-bold text-gray-400 mb-2 uppercase">
+                        <p className="flex items-center gap-2 text-xs font-bold text-gray-500 mb-2 uppercase">
                           <Clock className="h-3 w-3" />
                           <span>{formatDate(article.created_at)}</span>
                         </p>
@@ -100,7 +100,7 @@ const Resources = () => {
           </section>
 
           <aside className="space-y-8">
-            <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
+            <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm">
               <h2 className="font-bold text-primary text-lg mb-2 flex items-center gap-2">
                 <Gavel className="h-5 w-5 text-secondary" />
                 <span>{t('resources.officialTitle')}</span>
@@ -126,7 +126,7 @@ const Resources = () => {
               </ul>
             </div>
 
-            <div className="p-8 rounded-3xl border border-gray-200 border-dashed text-center">
+            <div className="p-8 rounded-2xl border border-gray-200 border-dashed text-center">
               <Tag className="h-8 w-8 text-gray-300 mx-auto mb-4" />
               <h2 className="font-bold text-gray-600 mb-2">{t('resources.customTitle')}</h2>
               <p className="text-xs text-gray-500 mb-6">{t('resources.customText')}</p>

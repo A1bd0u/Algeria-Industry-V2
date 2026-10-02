@@ -161,20 +161,20 @@ export default function GovSecurity({ state }: { state: any }) {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
       {/* Banner */}
-      <div className="bg-primary p-12 rounded-[48px] text-white overflow-hidden relative">
+      <div className="bg-primary p-12 rounded-2xl text-white overflow-hidden relative">
         <div className="relative z-10 max-w-2xl">
-          <h3 className="text-3xl font-black uppercase italic mb-4">Protocole de Sécurité Actif</h3>
+          <h3 className="text-3xl font-black mb-4">Protocole de Sécurité Actif</h3>
           <p className="text-sm font-medium text-white/60 mb-8">
             Nous assurons une traçabilité totale sur les actions sensibles. Toutes les opérations administratives et de KYC sont auditées de façon immuable.
           </p>
           <div className="flex space-x-8">
             <div className="flex items-center space-x-3">
               <div className="w-2 h-2 bg-success rounded-full" />
-              <span className="text-[10px] font-black uppercase">Pare-feu B2B Actif</span>
+              <span className="text-xs font-black uppercase">Pare-feu B2B Actif</span>
             </div>
             <div className="flex items-center space-x-3">
               <div className="w-2 h-2 bg-success rounded-full" />
-              <span className="text-[10px] font-black uppercase">Audit Logs Temps Réel</span>
+              <span className="text-xs font-black uppercase">Audit Logs Temps Réel</span>
             </div>
           </div>
         </div>
@@ -182,16 +182,16 @@ export default function GovSecurity({ state }: { state: any }) {
       </div>
 
       {/* Main Logs View */}
-      <div className="bg-white p-8 rounded-[40px] border border-gray-100 shadow-sm space-y-6">
+      <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm space-y-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h4 className="text-lg font-black text-primary uppercase italic">Journalisation Administrative (Audit logs)</h4>
-            <p className="text-xs font-medium text-gray-400 mt-1">Consultez l'historique complet des actions de sécurité et de modération du staff.</p>
+            <h4 className="text-lg font-black text-primary">Journalisation Administrative (Audit logs)</h4>
+            <p className="text-xs font-medium text-gray-500 mt-1">Consultez l'historique complet des actions de sécurité et de modération du staff.</p>
           </div>
 
           <button 
             onClick={fetchAuditLogs}
-            className="self-start md:self-auto px-5 py-2.5 bg-gray-50 hover:bg-gray-100 text-primary rounded-xl text-[10px] font-black uppercase tracking-widest transition-colors flex items-center gap-2 border border-gray-200"
+            className="self-start md:self-auto px-5 py-2.5 bg-gray-50 hover:bg-gray-100 text-primary rounded-xl text-xs font-black uppercase tracking-widest transition-colors flex items-center gap-2 border border-gray-200"
           >
             <History className="h-3.5 w-3.5" />
             Actualiser
@@ -199,9 +199,9 @@ export default function GovSecurity({ state }: { state: any }) {
         </div>
 
         {/* Filters */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-gray-50/50 p-4 rounded-3xl border border-gray-100">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-gray-50/50 p-4 rounded-2xl border border-gray-100">
           <div className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
             <input 
               type="text"
               placeholder="Rechercher par administrateur, IP, cible..."
@@ -212,7 +212,7 @@ export default function GovSecurity({ state }: { state: any }) {
           </div>
 
           <div className="flex items-center space-x-2">
-            <Filter className="h-4 w-4 text-gray-400 shrink-0" />
+            <Filter className="h-4 w-4 text-gray-500 shrink-0" />
             <select
               value={selectedAction}
               onChange={(e) => setSelectedAction(e.target.value)}
@@ -230,7 +230,7 @@ export default function GovSecurity({ state }: { state: any }) {
           </div>
 
           <div className="flex items-center justify-end">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 bg-white px-4 py-3 rounded-2xl border border-gray-200 w-full text-center md:text-right">
+            <span className="text-xs font-bold uppercase tracking-wider text-gray-500 bg-white px-4 py-3 rounded-2xl border border-gray-200 w-full text-center md:text-right">
               {filteredLogs.length} Résultat{filteredLogs.length !== 1 ? 's' : ''} trouvé{filteredLogs.length !== 1 ? 's' : ''}
             </span>
           </div>
@@ -240,16 +240,16 @@ export default function GovSecurity({ state }: { state: any }) {
         {loading ? (
           <div className="py-20 text-center space-y-4">
             <div className="w-8 h-8 border-4 border-secondary border-t-transparent rounded-full animate-spin mx-auto" />
-            <p className="text-xs font-black uppercase tracking-widest text-gray-400">Récupération des logs sécurisés...</p>
+            <p className="text-xs font-black uppercase tracking-widest text-gray-500">Récupération des logs sécurisés...</p>
           </div>
         ) : filteredLogs.length === 0 ? (
-          <div className="py-20 text-center border border-dashed border-gray-100 rounded-[32px] bg-gray-50/20">
+          <div className="py-20 text-center border border-dashed border-gray-100 rounded-2xl bg-gray-50/20">
             <ShieldCheck className="h-10 w-10 text-gray-300 mx-auto mb-4" />
-            <p className="text-xs font-black uppercase tracking-widest text-gray-400">Aucun log d'audit trouvé</p>
-            <p className="text-xs text-gray-400 font-medium mt-1">Aucune action ne correspond à vos filtres de recherche.</p>
+            <p className="text-xs font-black uppercase tracking-widest text-gray-500">Aucun log d'audit trouvé</p>
+            <p className="text-xs text-gray-500 font-medium mt-1">Aucune action ne correspond à vos filtres de recherche.</p>
           </div>
         ) : (
-          <div className="overflow-hidden border border-gray-100 rounded-3xl divide-y divide-gray-100 bg-white">
+          <div className="overflow-hidden border border-gray-100 rounded-2xl divide-y divide-gray-100 bg-white">
             <div className="max-h-[600px] overflow-y-auto divide-y divide-gray-100">
               {filteredLogs.map((log) => {
                 const info = getActionInfo(log.action);
@@ -266,10 +266,10 @@ export default function GovSecurity({ state }: { state: any }) {
                       </div>
                       <div>
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className={cn("px-2.5 py-0.5 rounded-lg text-[9px] font-black uppercase tracking-widest border", info.color)}>
+                          <span className={cn("px-2.5 py-0.5 rounded-lg text-xs font-black uppercase tracking-widest border", info.color)}>
                             {info.label}
                           </span>
-                          <span className="text-[10px] font-bold text-gray-400">
+                          <span className="text-xs font-bold text-gray-500">
                             IP: {log.ip_address}
                           </span>
                         </div>
@@ -277,7 +277,7 @@ export default function GovSecurity({ state }: { state: any }) {
                           {log.admin_email}
                         </p>
                         {/* Summary of target */}
-                        <p className="text-[10px] font-medium text-gray-400 mt-1">
+                        <p className="text-xs font-medium text-gray-500 mt-1">
                           {log.action === 'suspension' || log.action === 'reactivation' || log.action === 'role_change' || log.action === 'user_delete' ? (
                             <span>Cible: <strong className="text-gray-600">{log.details?.targetUserEmail || log.details?.targetUserId}</strong></span>
                           ) : log.action === 'kyc_approve' || log.action === 'kyc_reject' ? (
@@ -290,11 +290,11 @@ export default function GovSecurity({ state }: { state: any }) {
                     </div>
 
                     <div className="mt-4 md:mt-0 text-left md:text-right shrink-0 flex flex-row md:flex-col items-center md:items-end justify-between">
-                      <span className="text-[10px] font-black text-gray-300 uppercase tracking-widest italic flex items-center gap-1.5">
+                      <span className="text-xs font-black text-gray-300 uppercase tracking-widest italic flex items-center gap-1.5">
                         <Clock className="h-3 w-3" />
                         {new Date(log.created_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                       </span>
-                      <span className="text-[9px] font-bold text-gray-400 mt-1">
+                      <span className="text-xs font-bold text-gray-500 mt-1">
                         {new Date(log.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })}
                       </span>
                     </div>
@@ -304,19 +304,19 @@ export default function GovSecurity({ state }: { state: any }) {
             </div>
             
             <div className="p-4 border-t border-gray-100 flex items-center justify-between bg-gray-50">
-                <p className="text-[10px] font-bold text-gray-500 uppercase">Page {page} sur {totalPages}</p>
+                <p className="text-xs font-bold text-gray-500 uppercase">Page {page} sur {totalPages}</p>
                 <div className="flex gap-2">
                     <button 
                         disabled={page === 1} 
                         onClick={() => setPage(p => Math.max(1, p - 1))}
-                        className="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-[10px] font-black uppercase disabled:opacity-50"
+                        className="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-black uppercase disabled:opacity-50"
                     >
                         Précédent
                     </button>
                     <button 
                         disabled={page >= totalPages} 
                         onClick={() => setPage(p => p + 1)}
-                        className="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-[10px] font-black uppercase disabled:opacity-50"
+                        className="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-black uppercase disabled:opacity-50"
                     >
                         Suivant
                     </button>
@@ -339,7 +339,7 @@ export default function GovSecurity({ state }: { state: any }) {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-3xl p-8 max-w-lg w-full shadow-2xl relative border border-gray-100"
+              className="bg-white rounded-2xl p-8 max-w-lg w-full shadow-2xl relative border border-gray-100"
             >
               <button 
                 onClick={() => setSelectedLog(null)}
@@ -353,8 +353,8 @@ export default function GovSecurity({ state }: { state: any }) {
                   {React.createElement(getActionInfo(selectedLog.action).icon, { className: "h-5 w-5" })}
                 </div>
                 <div>
-                  <span className="text-[10px] font-black uppercase tracking-wider text-gray-400">Détails d'Action Auditée</span>
-                  <h3 className="text-lg font-black text-primary uppercase italic leading-tight">
+                  <span className="text-xs font-black uppercase tracking-wider text-gray-500">Détails d'Action Auditée</span>
+                  <h3 className="text-lg font-black text-primary leading-tight">
                     {getActionInfo(selectedLog.action).label}
                   </h3>
                 </div>
@@ -364,24 +364,24 @@ export default function GovSecurity({ state }: { state: any }) {
                 <div className="bg-gray-50 p-4 rounded-2xl space-y-3 border border-gray-100">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <span className="text-[9px] font-black uppercase text-gray-400 tracking-wider">Administrateur</span>
+                      <span className="text-xs font-black uppercase text-gray-500 tracking-wider">Administrateur</span>
                       <p className="text-xs font-black text-primary uppercase truncate">{selectedLog.admin_email}</p>
                     </div>
                     <div>
-                      <span className="text-[9px] font-black uppercase text-gray-400 tracking-wider">Adresse IP</span>
+                      <span className="text-xs font-black uppercase text-gray-500 tracking-wider">Adresse IP</span>
                       <p className="text-xs font-black text-primary truncate">{selectedLog.ip_address}</p>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <span className="text-[9px] font-black uppercase text-gray-400 tracking-wider">Date</span>
+                      <span className="text-xs font-black uppercase text-gray-500 tracking-wider">Date</span>
                       <p className="text-xs font-medium text-primary">
                         {new Date(selectedLog.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
                       </p>
                     </div>
                     <div>
-                      <span className="text-[9px] font-black uppercase text-gray-400 tracking-wider">Heure</span>
+                      <span className="text-xs font-black uppercase text-gray-500 tracking-wider">Heure</span>
                       <p className="text-xs font-medium text-primary">
                         {new Date(selectedLog.created_at).toLocaleTimeString('fr-FR')} (UTC)
                       </p>
@@ -390,8 +390,8 @@ export default function GovSecurity({ state }: { state: any }) {
                 </div>
 
                 <div>
-                  <span className="text-[9px] font-black uppercase text-gray-400 tracking-wider mb-2 block">Détails techniques (Données)</span>
-                  <div className="bg-gray-900 text-gray-300 p-5 rounded-2xl font-mono text-[10px] overflow-x-auto border border-gray-800 shadow-inner max-h-60 overflow-y-auto">
+                  <span className="text-xs font-black uppercase text-gray-500 tracking-wider mb-2 block">Détails techniques (Données)</span>
+                  <div className="bg-gray-900 text-gray-300 p-5 rounded-2xl font-mono text-xs overflow-x-auto border border-gray-800 shadow-inner max-h-60 overflow-y-auto">
                     <pre>{JSON.stringify(selectedLog.details, null, 2)}</pre>
                   </div>
                 </div>

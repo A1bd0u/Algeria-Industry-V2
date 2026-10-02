@@ -102,17 +102,17 @@ export default function SiteCms({ state }: { state: any }) {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h3 className="text-2xl font-black text-primary uppercase italic">Contenu du blog</h3>
+          <h3 className="text-2xl font-black text-primary">Contenu du blog</h3>
           <p className="text-gray-500 mt-2 text-sm">Articles publiés sur /blog (2 articles par mois recommandés pour le référencement).</p>
         </div>
-        <button onClick={() => setForm({ ...EMPTY })} className="bg-secondary text-white px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 shadow-lg">
+        <button onClick={() => setForm({ ...EMPTY })} className="bg-secondary text-white px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest flex items-center gap-2 shadow-lg">
           <Plus className="h-4 w-4" /> Nouvel article
         </button>
       </div>
 
-      <div className="bg-white rounded-[32px] border border-gray-100 shadow-sm overflow-x-auto">
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-x-auto">
         <table className="w-full text-xs">
-          <thead className="bg-gray-50/50 text-[10px] font-black text-gray-500 uppercase tracking-widest">
+          <thead className="bg-gray-50/50 text-xs font-black text-gray-500 uppercase tracking-widest">
             <tr>
               <th className="p-5 text-start">Article</th>
               <th className="p-5 text-start">Catégorie</th>
@@ -122,7 +122,7 @@ export default function SiteCms({ state }: { state: any }) {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">
-            {isLoading && <tr><td colSpan={5} className="p-10 text-center"><Loader2 className="h-5 w-5 animate-spin inline text-gray-400" /></td></tr>}
+            {isLoading && <tr><td colSpan={5} className="p-10 text-center"><Loader2 className="h-5 w-5 animate-spin inline text-gray-500" /></td></tr>}
             {!isLoading && articles.length === 0 && (
               <tr><td colSpan={5} className="p-10 text-center text-gray-500">Aucun article. Créez le premier.</td></tr>
             )}
@@ -130,12 +130,12 @@ export default function SiteCms({ state }: { state: any }) {
               <tr key={a.id} className="hover:bg-gray-50/40">
                 <td className="p-5">
                   <p className="font-bold text-primary flex items-center gap-2">{a.featured && <Star className="h-3 w-3 text-secondary fill-current" />}{a.title}</p>
-                  {a.excerpt && <p className="text-[11px] text-gray-500 line-clamp-1">{a.excerpt}</p>}
+                  {a.excerpt && <p className="text-xs text-gray-500 line-clamp-1">{a.excerpt}</p>}
                 </td>
                 <td className="p-5 text-gray-600">{a.category || '—'}</td>
                 <td className="p-5 text-gray-600">{formatDate(a.created_at)}</td>
                 <td className="p-5">
-                  <span className={cn('px-2.5 py-1 rounded-full text-[10px] font-black', a.status === 'published' ? 'bg-emerald-50 text-emerald-600' : 'bg-gray-100 text-gray-500')}>
+                  <span className={cn('px-2.5 py-1 rounded-full text-xs font-black', a.status === 'published' ? 'bg-emerald-50 text-emerald-600' : 'bg-gray-100 text-gray-500')}>
                     {a.status === 'published' ? 'Publié' : 'Brouillon'}
                   </span>
                 </td>
@@ -166,39 +166,39 @@ export default function SiteCms({ state }: { state: any }) {
         <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-label="Édition d'article">
           <form
             onSubmit={(e) => { e.preventDefault(); saveMutation.mutate(form); }}
-            className="bg-white rounded-3xl w-full max-w-3xl max-h-[90vh] overflow-y-auto p-8 space-y-5"
+            className="bg-white rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto p-8 space-y-5"
           >
             <div className="flex items-center justify-between">
-              <h4 className="text-lg font-black text-primary uppercase">{form.id ? "Modifier l'article" : 'Nouvel article'}</h4>
-              <button type="button" onClick={() => setForm(null)} aria-label="Fermer"><X className="h-5 w-5 text-gray-400" /></button>
+              <h4 className="text-lg font-black text-primary">{form.id ? "Modifier l'article" : 'Nouvel article'}</h4>
+              <button type="button" onClick={() => setForm(null)} aria-label="Fermer"><X className="h-5 w-5 text-gray-500" /></button>
             </div>
             <div className="space-y-2">
-              <label htmlFor="art_title" className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Titre</label>
+              <label htmlFor="art_title" className="text-xs font-black text-gray-500 uppercase tracking-widest">Titre</label>
               <input id="art_title" required minLength={3} value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} className={field} />
             </div>
             <div className="space-y-2">
-              <label htmlFor="art_excerpt" className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Résumé (affiché dans la liste et les partages)</label>
+              <label htmlFor="art_excerpt" className="text-xs font-black text-gray-500 uppercase tracking-widest">Résumé (affiché dans la liste et les partages)</label>
               <textarea id="art_excerpt" maxLength={500} rows={2} value={form.excerpt} onChange={(e) => setForm({ ...form, excerpt: e.target.value })} className={cn(field, 'resize-none')} />
             </div>
             <div className="space-y-2">
-              <label htmlFor="art_content" className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Contenu</label>
+              <label htmlFor="art_content" className="text-xs font-black text-gray-500 uppercase tracking-widest">Contenu</label>
               <textarea id="art_content" required minLength={20} rows={12} value={form.content} onChange={(e) => setForm({ ...form, content: e.target.value })} className={field} />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div className="space-y-2">
-                <label htmlFor="art_category" className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Catégorie</label>
+                <label htmlFor="art_category" className="text-xs font-black text-gray-500 uppercase tracking-widest">Catégorie</label>
                 <input id="art_category" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} placeholder="Ex : Réglementation" className={field} />
               </div>
               <div className="space-y-2">
-                <label htmlFor="art_author" className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Auteur</label>
+                <label htmlFor="art_author" className="text-xs font-black text-gray-500 uppercase tracking-widest">Auteur</label>
                 <input id="art_author" value={form.author} onChange={(e) => setForm({ ...form, author: e.target.value })} placeholder="Par défaut : votre nom" className={field} />
               </div>
             </div>
             <div className="space-y-2">
-              <label htmlFor="art_image" className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Image de couverture</label>
+              <label htmlFor="art_image" className="text-xs font-black text-gray-500 uppercase tracking-widest">Image de couverture</label>
               <div className="flex flex-col sm:flex-row gap-3">
                 <input id="art_image" type="url" value={form.image_url} onChange={(e) => setForm({ ...form, image_url: e.target.value })} placeholder="https://…" className={field} />
-                <label className="px-4 py-3 rounded-xl border border-gray-200 text-[10px] font-black uppercase tracking-widest text-primary cursor-pointer whitespace-nowrap flex items-center gap-2">
+                <label className="px-4 py-3 rounded-xl border border-gray-200 text-xs font-black uppercase tracking-widest text-primary cursor-pointer whitespace-nowrap flex items-center gap-2">
                   {uploading && <Loader2 className="h-4 w-4 animate-spin" />}
                   Téléverser
                   <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(e) => e.target.files?.[0] && uploadImage(e.target.files[0])} />
@@ -219,7 +219,7 @@ export default function SiteCms({ state }: { state: any }) {
             <button
               type="submit"
               disabled={saveMutation.isPending || uploading}
-              className="w-full bg-primary text-white py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest disabled:opacity-50 flex items-center justify-center gap-2"
+              className="w-full bg-primary text-white py-4 rounded-2xl text-xs font-black uppercase tracking-widest disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {saveMutation.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
               {form.status === 'published' ? 'Publier' : 'Enregistrer le brouillon'}

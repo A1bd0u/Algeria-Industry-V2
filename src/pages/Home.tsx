@@ -9,6 +9,7 @@ import { formatNumber } from '../lib/format';
 import { cn, generateSlugUrl } from '../lib/utils';
 import SEO from '../components/SEO';
 import { SITE_NAME, absoluteUrl } from '../config/site';
+import ProductImage from '../components/ui/ProductImage';
 
 interface PublicStats {
   verifiedCompanies: number;
@@ -93,7 +94,7 @@ const Home = () => {
         <div className="absolute inset-0 opacity-[0.04] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#fff 1px, transparent 1px)', backgroundSize: '28px 28px' }} />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 relative">
           <div className="max-w-3xl">
-            <span className="inline-flex items-center gap-2 text-secondary text-[11px] font-black uppercase tracking-[0.3em] mb-6">
+            <span className="inline-flex items-center gap-2 text-secondary text-xs font-black uppercase tracking-wider mb-6">
               <ShieldCheck className="h-4 w-4" />
               {t('home.hero.eyebrow')}
             </span>
@@ -133,7 +134,7 @@ const Home = () => {
           </div>
 
           <Link to="/tarifs" className="mt-12 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 max-w-2xl bg-white/5 border border-secondary/30 rounded-2xl px-5 py-4 hover:border-secondary transition-colors">
-            <span className="text-[10px] font-black uppercase tracking-[0.25em] text-secondary shrink-0">{t('pricing.founder.label')}</span>
+            <span className="text-xs font-black uppercase tracking-wider text-secondary shrink-0">{t('pricing.founder.label')}</span>
             <span className="text-sm text-white/80">{t('home.hero.founder')}</span>
           </Link>
         </div>
@@ -147,7 +148,7 @@ const Home = () => {
               <div key={item.label} className="p-8 hover:bg-neutral-bg transition-colors">
                 <span className="tech-label">{item.label}</span>
                 <p className="text-2xl font-black text-primary">{item.title}</p>
-                <p className="text-[11px] text-gray-500 mt-2 font-medium uppercase tracking-wider">{item.desc}</p>
+                <p className="text-xs text-gray-500 mt-2 font-medium tracking-wider">{item.desc}</p>
               </div>
             ))}
           </div>
@@ -161,10 +162,10 @@ const Home = () => {
             <div className="max-w-2xl">
               <div className="flex items-center gap-2 text-secondary mb-4">
                 <div className="w-8 h-[2px] bg-secondary" />
-                <span className="text-xs font-black uppercase tracking-[0.3em]">{t('home.catalogLabel')}</span>
+                <span className="text-xs font-black uppercase tracking-wider">{t('home.catalogLabel')}</span>
               </div>
-              <h2 className="text-4xl font-black text-primary uppercase tracking-tighter leading-none mb-4">{t('home.trends')}</h2>
-              <p className="text-sm text-gray-500 font-medium uppercase tracking-wider">{t('home.trends_subtitle')}</p>
+              <h2 className="text-4xl font-black text-primary tracking-tighter leading-none mb-4">{t('home.trends')}</h2>
+              <p className="text-sm text-gray-500 font-medium tracking-wider">{t('home.trends_subtitle')}</p>
             </div>
             <Link to="/products" className="btn-primary flex items-center gap-3 group w-fit">
               <span>{t('home.fullCatalog')}</span>
@@ -199,31 +200,21 @@ const Home = () => {
                 transition={{ delay: (i % 4) * 0.1 }}
                 className="bg-white border-e border-b border-border-tech p-6 hover:bg-neutral-bg transition-all group relative"
               >
-                <Link to={`/products/${generateSlugUrl(product.name, product.id)}`} className="block aspect-square overflow-hidden mb-6 bg-gray-50 border border-border-tech p-4 group-hover:border-secondary transition-colors">
-                  {product.file_url || product.image ? (
-                    <img
-                      src={product.file_url || product.image}
-                      loading="lazy"
-                      alt={product.name}
-                      className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
-                      referrerPolicy="no-referrer"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center"><img src="/favicon.svg" alt="" className="h-12 w-12 opacity-20" /></div>
-                  )}
+                <Link to={`/products/${generateSlugUrl(product.name, product.id)}`} className="block aspect-square overflow-hidden mb-6 rounded-xl border border-border-tech group-hover:border-secondary transition-colors">
+                  <ProductImage src={product.file_url || product.image} alt={product.name} category={product.category} imgClassName="group-hover:scale-105 transition-transform duration-500" />
                 </Link>
                 <div className="space-y-4">
                   <div>
                     {product.company && <span className="tech-label">{product.company}</span>}
                     <Link to={`/products/${generateSlugUrl(product.name, product.id)}`}>
-                      <h3 className="text-sm font-black text-primary uppercase tracking-tight line-clamp-2 min-h-[40px] group-hover:text-secondary transition-colors">
+                      <h3 className="text-sm font-black text-primary tracking-tight line-clamp-2 min-h-[40px] group-hover:text-secondary transition-colors">
                         {product.name}
                       </h3>
                     </Link>
                   </div>
                   <div className="flex items-center justify-between pt-4 border-t border-border-tech">
                     <div className="flex flex-col">
-                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">{t('home.price')}</span>
+                      <span className="text-xs font-bold text-gray-500 uppercase tracking-tighter">{t('home.price')}</span>
                       <span className="text-sm font-mono font-bold text-primary">{Number(product.price) > 0 ? formatPrice(Number(product.price)) : t('common.onQuote')}</span>
                     </div>
                     <Link to={`/products/${generateSlugUrl(product.name, product.id)}`} aria-label={product.name} className="bg-primary text-white p-2 hover:bg-secondary transition-colors">
@@ -242,6 +233,39 @@ const Home = () => {
               </button>
             </div>
           )}
+        </div>
+      </section>
+
+      {/* Comment ça marche : deux parcours en trois étapes */}
+      <section className="py-20 bg-white border-t border-border-tech">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl md:text-4xl font-black text-primary tracking-tight text-center mb-4">{t('home.how.title')}</h2>
+          <p className="text-gray-500 text-center max-w-2xl mx-auto mb-14">{t('home.how.subtitle')}</p>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {(['buyer', 'supplier'] as const).map((role) => (
+              <div key={role} className={cn('rounded-2xl p-8 border', role === 'buyer' ? 'bg-neutral-bg border-gray-100' : 'bg-primary text-white border-primary')}>
+                <h3 className={cn('text-xl font-black mb-8', role === 'supplier' && 'text-white')}>{t(`home.how.${role}.title`)}</h3>
+                <ol className="space-y-6">
+                  {[1, 2, 3].map((n) => (
+                    <li key={n} className="flex gap-4">
+                      <span className="w-9 h-9 shrink-0 rounded-full bg-secondary text-white font-black flex items-center justify-center">{n}</span>
+                      <div>
+                        <p className="font-bold">{t(`home.how.${role}.step${n}`)}</p>
+                        <p className={cn('text-sm mt-1', role === 'buyer' ? 'text-gray-500' : 'text-white/60')}>{t(`home.how.${role}.step${n}Text`)}</p>
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+                <Link
+                  to={role === 'buyer' ? '/products' : '/register?role=fournisseur'}
+                  className={cn('mt-8', role === 'buyer' ? 'btn-primary' : 'btn-secondary')}
+                >
+                  {t(`home.how.${role}.cta`)}
+                  <ArrowRight className="h-4 w-4 rtl:rotate-180" />
+                </Link>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -270,9 +294,9 @@ const Home = () => {
             <div>
               <div className="flex items-center gap-2 text-secondary mb-6">
                 <div className="w-8 h-[2px] bg-secondary" />
-                <span className="text-xs font-black uppercase tracking-[0.3em]">{t('footer.support')}</span>
+                <span className="text-xs font-black uppercase tracking-wider">{t('footer.support')}</span>
               </div>
-              <h2 className="text-5xl font-black uppercase tracking-tighter leading-none mb-8">
+              <h2 className="text-5xl font-black tracking-tighter leading-none mb-8">
                 {t('home.help.title')}
               </h2>
               <p className="text-lg text-gray-300 font-medium leading-relaxed mb-12 max-w-xl">
@@ -285,8 +309,8 @@ const Home = () => {
                     <Clock className="h-6 w-6 text-secondary" />
                   </div>
                   <div>
-                    <h4 className="font-bold uppercase tracking-tight text-sm">{t('home.help.delayTitle')}</h4>
-                    <p className="text-xs text-gray-400 font-medium">{t('home.help.delayText')}</p>
+                    <h4 className="font-bold tracking-tight text-sm">{t('home.help.delayTitle')}</h4>
+                    <p className="text-xs text-gray-500 font-medium">{t('home.help.delayText')}</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
@@ -294,18 +318,18 @@ const Home = () => {
                     <FileText className="h-6 w-6 text-secondary" />
                   </div>
                   <div>
-                    <h4 className="font-bold uppercase tracking-tight text-sm">{t('home.help.guidesTitle')}</h4>
-                    <p className="text-xs text-gray-400 font-medium">{t('home.help.guidesText')}</p>
+                    <h4 className="font-bold tracking-tight text-sm">{t('home.help.guidesTitle')}</h4>
+                    <p className="text-xs text-gray-500 font-medium">{t('home.help.guidesText')}</p>
                   </div>
                 </div>
               </div>
 
               <div className="flex flex-wrap gap-4">
-                <Link to="/contact" className="btn-secondary px-10 py-5 font-black uppercase tracking-widest text-sm flex items-center gap-3">
+                <Link to="/contact" className="btn-secondary px-10 py-5 font-black tracking-widest text-sm flex items-center gap-3">
                   <span>{t('home.help.contact')}</span>
                   <ArrowRight className="h-4 w-4 rtl:rotate-180" />
                 </Link>
-                <Link to="/faq" className="bg-white/5 border border-white/10 hover:bg-white/10 px-10 py-5 font-black uppercase tracking-widest text-sm transition-all">
+                <Link to="/faq" className="bg-white/5 border border-white/10 hover:bg-white/10 px-10 py-5 font-black tracking-widest text-sm transition-all">
                   {t('home.help.faq')}
                 </Link>
               </div>
@@ -314,7 +338,7 @@ const Home = () => {
             <div className="relative group lg:block hidden">
               <div className="absolute -inset-4 border border-secondary/30 rounded-2xl translate-x-4 translate-y-4 -z-10 group-hover:translate-x-2 group-hover:translate-y-2 transition-transform duration-500" />
               <div className="bg-white/5 backdrop-blur-md border border-white/10 p-10 rounded-2xl relative overflow-hidden">
-                <h3 className="text-2xl font-black uppercase tracking-tight mb-8">
+                <h3 className="text-2xl font-black tracking-tight mb-8">
                   {t('home.stats.title')}
                 </h3>
                 {/* Compteurs réels, calculés par l'API ; masqués si indisponibles. */}
@@ -327,12 +351,12 @@ const Home = () => {
                       <div key={stat.label} className="bg-white/5 border border-white/10 rounded-xl p-5">
                         <stat.icon className="h-5 w-5 text-secondary mb-3" />
                         <p className="text-3xl font-black font-mono">{formatNumber(stat.value)}</p>
-                        <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mt-1">{stat.label}</p>
+                        <p className="text-xs font-bold uppercase tracking-widest text-gray-500 mt-1">{stat.label}</p>
                       </div>
                     ))}
                   </div>
                 )}
-                <p className="text-xs text-gray-400 font-medium mt-6">{t('home.stats.commitment')}</p>
+                <p className="text-xs text-gray-500 font-medium mt-6">{t('home.stats.commitment')}</p>
 
                 <div className="mt-10 p-6 bg-primary rounded-2xl border border-white/5">
                   <div className="flex items-center gap-4 mb-4">
@@ -341,7 +365,7 @@ const Home = () => {
                     </div>
                     <div>
                       <p className="text-xs font-black uppercase tracking-widest text-white">{t('home.start.title')}</p>
-                      <p className="text-[10px] text-gray-500 font-bold">{t('home.start.text')}</p>
+                      <p className="text-xs text-gray-500 font-bold">{t('home.start.text')}</p>
                     </div>
                   </div>
                   <Link to="/register" className="w-full bg-white text-primary py-3 rounded-xl font-bold text-xs uppercase tracking-widest flex items-center justify-center hover:bg-secondary hover:text-white transition-all">

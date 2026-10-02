@@ -98,7 +98,7 @@ const Events = () => {
               <p className="text-sm font-bold text-red-500">{t('events.loadError')}</p>
             </div>
           ) : visible.length === 0 ? (
-            <div className="py-20 flex flex-col items-center justify-center text-center bg-white rounded-3xl border border-dashed border-gray-200">
+            <div className="py-20 flex flex-col items-center justify-center text-center bg-white rounded-2xl border border-dashed border-gray-200">
               <CalendarX className="h-10 w-10 text-gray-300 mb-4" />
               <p className="font-bold text-primary">{view === 'past' ? t('events.noPast') : t('events.noUpcoming')}</p>
             </div>

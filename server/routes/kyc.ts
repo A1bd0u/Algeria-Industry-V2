@@ -225,7 +225,7 @@ router.post('/:id/approve', verifyRole(['admin']), requireUuidParams('id'), asyn
 
        const companyId = kycData.company_id || userData?.company_id;
        if (companyId) {
-          await supabase.from('companies').update({ status: 'approved', certified: true }).eq('id', companyId);
+          await supabase.from('companies').update({ status: 'approved', certified: true, verified_at: new Date().toISOString() }).eq('id', companyId);
           await supabase.from('kyc_documents').update({ status: 'approved' }).eq('company_id', companyId);
        }
 

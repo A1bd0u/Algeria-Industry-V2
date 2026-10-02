@@ -81,9 +81,9 @@ const AdsRequest = () => {
         >
           <div className="inline-flex items-center space-x-2 bg-secondary/10 text-secondary px-4 py-2 rounded-full mb-6">
             <Megaphone className="h-5 w-5" />
-            <span className="font-bold text-sm uppercase tracking-widest">{t('ads.title')}</span>
+            <span className="font-bold text-sm tracking-widest">{t('ads.title')}</span>
           </div>
-          <h1 className="text-4xl md:text-5xl font-black text-primary uppercase tracking-tighter mb-6">
+          <h1 className="text-4xl md:text-5xl font-black text-primary tracking-tighter mb-6">
             {t('ads.heroTitle')}
           </h1>
           <p className="text-gray-600 text-lg max-w-2xl mx-auto">
@@ -95,7 +95,7 @@ const AdsRequest = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-white p-8 md:p-12 rounded-[40px] shadow-sm border border-gray-100"
+          className="bg-white p-8 md:p-12 rounded-2xl shadow-sm border border-gray-100"
         >
           {status === 'success' ? (
             <div className="text-center py-12">
@@ -119,7 +119,7 @@ const AdsRequest = () => {
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-gray-500 uppercase">{t('ads.company_name')}</label>
                   <div className="relative">
-                    <Building className="absolute start-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                    <Building className="absolute start-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500" />
                     <input 
                       type="text" 
                       name="companyName"
@@ -135,7 +135,7 @@ const AdsRequest = () => {
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-gray-500 uppercase">{t('ads.contact')}</label>
                   <div className="relative">
-                    <User className="absolute start-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                    <User className="absolute start-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500" />
                     <input 
                       type="text" 
                       name="contactName"
@@ -151,7 +151,7 @@ const AdsRequest = () => {
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-gray-500 uppercase">{t('ads.email')}</label>
                   <div className="relative">
-                    <Mail className="absolute start-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                    <Mail className="absolute start-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500" />
                     <input 
                       type="email" 
                       name="email"
@@ -167,7 +167,7 @@ const AdsRequest = () => {
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-gray-500 uppercase">{t('ads.phone')}</label>
                   <div className="relative">
-                    <Phone className="absolute start-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                    <Phone className="absolute start-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500" />
                     <input 
                       type="tel" 
                       name="phone"

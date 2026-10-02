@@ -32,9 +32,9 @@ export const CompanySkeleton = () => (
 );
 
 export const EventSkeleton = () => (
-  <div className="bg-white rounded-[32px] overflow-hidden shadow-sm border border-gray-100 flex flex-col md:flex-row animate-pulse">
+  <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 flex flex-col md:flex-row animate-pulse">
     <div className="md:w-2/5 h-48 md:h-auto bg-gray-50 relative">
-      <Skeleton className="w-full h-full rounded-none opacity-50" />
+      <Skeleton className="w-full h-full rounded-lg opacity-50" />
     </div>
     <div className="md:w-3/5 p-8 flex flex-col space-y-4">
       <div className="flex items-center justify-between">
@@ -58,7 +58,7 @@ export const EventSkeleton = () => (
 export const CatalogueSkeleton = () => (
   <div className="bg-white border border-gray-200 flex flex-col animate-pulse">
     <div className="aspect-[4/5] relative bg-gray-50 border-b border-gray-200">
-      <Skeleton className="w-full h-full rounded-none opacity-50" />
+      <Skeleton className="w-full h-full rounded-lg opacity-50" />
     </div>
     <div className="p-6 flex-grow flex flex-col space-y-4">
       <Skeleton className="h-3 w-1/2" />
@@ -79,7 +79,7 @@ export const CatalogueSkeleton = () => (
 export const ArticleSkeleton = () => (
   <div className="min-h-screen bg-white pb-20 animate-pulse">
     <div className="relative h-[60vh] min-h-[400px] bg-gray-100">
-      <Skeleton className="w-full h-full rounded-none opacity-50" />
+      <Skeleton className="w-full h-full rounded-lg opacity-50" />
       <div className="absolute inset-0 flex flex-col justify-end pb-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 w-full space-y-6">
           <Skeleton className="h-4 w-32 bg-gray-200/50" />
@@ -134,12 +134,12 @@ export const ArticleSkeleton = () => (
 export const ProfileSkeleton = () => (
   <div className="bg-neutral-bg min-h-screen pb-20 space-y-8">
     <div className="h-64 md:h-80 bg-gray-200">
-      <Skeleton className="w-full h-full rounded-none opacity-50" />
+      <Skeleton className="w-full h-full rounded-lg opacity-50" />
     </div>
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-24 relative z-10">
       <div className="flex flex-col lg:flex-row gap-8">
         <aside className="lg:w-1/3 space-y-6">
-          <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-8 flex flex-col items-center space-y-4">
+          <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8 flex flex-col items-center space-y-4">
             <Skeleton className="w-32 h-32 rounded-2xl -mt-24 border-4 border-white opacity-50" />
             <Skeleton className="h-8 w-3/4 mt-4" />
             <Skeleton className="h-4 w-1/2" />
@@ -148,7 +148,7 @@ export const ProfileSkeleton = () => (
           </div>
         </aside>
         <div className="flex-1 space-y-8">
-          <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 space-y-4">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 space-y-4">
             <Skeleton className="h-8 w-1/3 mb-8" />
             <Skeleton className="h-4 w-full" />
             <Skeleton className="h-4 w-5/6" />
@@ -165,9 +165,9 @@ export const ProfileSkeleton = () => (
 );
 
 export const BlogCardSkeleton = () => (
-  <div className="bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 flex flex-col animate-pulse">
+  <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 flex flex-col animate-pulse">
     <div className="h-48 bg-gray-200">
-      <Skeleton className="w-full h-full rounded-none opacity-50" />
+      <Skeleton className="w-full h-full rounded-lg opacity-50" />
     </div>
     <div className="p-6 flex flex-col flex-1 space-y-4">
       <div className="flex space-x-2">
@@ -194,7 +194,7 @@ export const ProductDetailSkeleton = () => (
       <Skeleton className="h-4 w-32 mb-8" />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
         <div className="space-y-6">
-          <Skeleton className="aspect-square w-full rounded-3xl" />
+          <Skeleton className="aspect-square w-full rounded-2xl" />
           <div className="grid grid-cols-3 gap-4">
             {[1,2,3].map(i => <Skeleton key={i} className="aspect-square rounded-2xl" />)}
           </div>
@@ -205,7 +205,7 @@ export const ProductDetailSkeleton = () => (
             <Skeleton className="h-10 w-3/4" />
             <Skeleton className="h-4 w-1/2" />
           </div>
-          <Skeleton className="h-64 w-full rounded-3xl" />
+          <Skeleton className="h-64 w-full rounded-2xl" />
           <div className="grid grid-cols-2 gap-6">
             <Skeleton className="h-20 w-full rounded-2xl" />
             <Skeleton className="h-20 w-full rounded-2xl" />
@@ -223,11 +223,11 @@ export const ProductDetailSkeleton = () => (
 export const ProductSkeleton: React.FC<{ view?: 'grid' | 'list' }> = ({ view = 'grid' }) => (
 
   <div className={cn(
-    "bg-white rounded-[32px] border border-gray-100 overflow-hidden animate-pulse",
+    "bg-white rounded-2xl border border-gray-100 overflow-hidden animate-pulse",
     view === 'list' && "flex md:flex-row"
   )}>
     <div className={cn("relative bg-gray-50", view === 'grid' ? "aspect-[4/3]" : "md:w-72 aspect-square")}>
-      <Skeleton className="w-full h-full rounded-none opacity-50" />
+      <Skeleton className="w-full h-full rounded-lg opacity-50" />
     </div>
     <div className="p-6 flex flex-col justify-between flex-1 space-y-6">
       <div className="space-y-4">

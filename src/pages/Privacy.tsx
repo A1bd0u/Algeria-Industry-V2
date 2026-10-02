@@ -23,13 +23,13 @@ const Privacy = () => {
             className="inline-flex items-center space-x-3 mb-6 bg-white/10 px-4 py-2 rounded-xl backdrop-blur-md border border-white/10"
           >
             <Lock className="h-5 w-5 text-secondary" />
-            <span className="text-[10px] font-black uppercase tracking-[0.2em]">{lang === 'ar' ? 'خصوصية البيانات' : lang === 'en' ? 'Data Privacy' : 'Confidentialité des Données'}</span>
+            <span className="text-xs font-black uppercase tracking-wider">{lang === 'ar' ? 'خصوصية البيانات' : lang === 'en' ? 'Data Privacy' : 'Confidentialité des Données'}</span>
           </motion.div>
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-3xl md:text-5xl font-black mb-6 uppercase tracking-tighter leading-tight"
+            className="text-3xl md:text-5xl font-black mb-6 tracking-tighter leading-tight"
           >
             {content.title}
           </motion.h1>
@@ -37,7 +37,7 @@ const Privacy = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
-            className="text-white/60 text-sm font-bold uppercase tracking-widest"
+            className="text-white/60 text-sm font-bold tracking-widest"
           >
             {content.lastUpdated}
           </motion.p>
@@ -62,7 +62,7 @@ const Privacy = () => {
                     <div className="w-12 h-12 bg-primary/5 flex items-center justify-center text-primary shrink-0">
                       <Icon className="h-6 w-6" />
                     </div>
-                    <h2 className="text-xl font-black text-primary uppercase tracking-tight">{section.subtitle}</h2>
+                    <h2 className="text-xl font-black text-primary tracking-tight">{section.subtitle}</h2>
                   </div>
                   <div className={cn("text-gray-600 leading-relaxed text-sm font-medium", lang === 'ar' ? 'pe-16' : 'ps-16')}>
                     <p>{section.text}</p>
@@ -76,7 +76,7 @@ const Privacy = () => {
 
         {/* Footer info */}
         <div className="mt-12 text-center pb-8">
-          <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.4em]">
+          <p className="text-xs font-black text-gray-500 uppercase tracking-wider">
             {lang === 'ar' ? 'متوافق مع القوانين' : lang === 'en' ? 'Compliant with Laws' : 'Certifié Conforme - Conformité Légale'}
           </p>
         </div>

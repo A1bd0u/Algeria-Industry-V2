@@ -26,7 +26,9 @@
     "closeMenu": "Close menu",
     "suppliers": "Suppliers",
     "adminConsole": "Admin console",
-    "console_pro": "Admin area"
+    "mobileTabs": "Main navigation",
+    "console_pro": "Admin area",
+    "language": "Language: {{name}}"
   },
   "hero": {
     "title": "Connect to the industry",
@@ -113,6 +115,30 @@
       "browseSuppliers": "Browse suppliers",
       "listCompany": "List my company for free",
       "founder": "Premium free for 12 months for the first 100 verified suppliers."
+    },
+    "how": {
+      "title": "How it works",
+      "subtitle": "Two simple paths, free to start.",
+      "buyer": {
+        "title": "You are looking for a supplier",
+        "step1": "Search",
+        "step1Text": "By product, category or province, in French or Arabic.",
+        "step2": "Compare",
+        "step2Text": "Up to 4 products side by side, with each supplier's verification status.",
+        "step3": "Get in touch",
+        "step3Text": "Ask for a quote through messaging or WhatsApp.",
+        "cta": "Browse the catalogue"
+      },
+      "supplier": {
+        "title": "You are a supplier",
+        "step1": "Create your account",
+        "step1Text": "Free, in two minutes.",
+        "step2": "Get your company verified",
+        "step2Text": "Upload your trade register and tax ID to get the “verified” badge.",
+        "step3": "Publish your products",
+        "step3Text": "Receive buyers' requests in your inbox.",
+        "cta": "List my company"
+      }
     }
   },
   "directory": {
@@ -180,9 +206,28 @@
       "reportReasonRequired": "Please give a reason for the report.",
       "reportSent": "Report sent. Thank you, our team will review it.",
       "reportError": "The report could not be sent.",
-      "favoriteError": "Unable to update your favourites."
+      "favoriteError": "Unable to update your favourites.",
+      "quoteMessage": "Hello, I would like a quote for “{{name}}” (ref. {{ref}}). Quantity: … Delivery place: … Desired lead time: …",
+      "whatsappMessage": "Hello, I am contacting you via Algeria Industry about “{{name}}”.",
+      "requestQuoteShort": "Request a quote",
+      "zoom": "Enlarge image"
     },
-    "searchPlaceholder": "Search a machine, a brand…"
+    "searchPlaceholder": "Search a machine, a brand…",
+    "sort": {
+      "label": "Sort by",
+      "recent": "Newest",
+      "price_asc": "Price: low to high",
+      "price_desc": "Price: high to low"
+    },
+    "results": "{{formatted}} product(s)",
+    "removeFilter": "Remove filter {{name}}",
+    "oneSupplier": "One supplier",
+    "companyProducts": "Products from {{name}}",
+    "emptyTitle": "No matching product",
+    "emptyText": "Try another category or remove some filters. You can also look for a supplier in the directory.",
+    "pagination": "Pagination",
+    "pageOf": "Page {{page}} of {{total}}",
+    "showResults": "Show {{count}} result(s)"
   },
   "blog": {
     "title": "Industrial News",
@@ -525,7 +570,8 @@
     "WHATSAPP_INVALID": "Invalid WhatsApp number. Use an Algerian mobile (05, 06, 07) or the international format.",
     "COMPANY_LEGAL_LOCKED": "The verified trade register and tax ID can no longer be changed. Please contact support.",
     "QUOTE_NO_SUPPLIER": "No supplier to contact for these products.",
-    "QUOTE_RATE_LIMIT": "Too many quote requests sent. Please try again later."
+    "QUOTE_RATE_LIMIT": "Too many quote requests sent. Please try again later.",
+    "COMPANY_IMAGE_INVALID": "Invalid image: upload it from your dashboard."
   },
   "mfa": {
     "title": "Two-factor authentication",
@@ -781,7 +827,9 @@
       "save": "Update the profile",
       "whatsapp": "WhatsApp number",
       "whatsappPlaceholder": "e.g. +213 550 12 34 56",
-      "whatsappHelp": "Shown on your public profile once your company is verified. Leave empty to hide it."
+      "whatsappHelp": "Shown on your public profile once your company is verified. Leave empty to hide it.",
+      "changeLogo": "Change logo",
+      "changeBanner": "Change banner"
     },
     "menu": {
       "overview": "Overview",
@@ -828,6 +876,16 @@
       "duration3m": "3 months",
       "cancel": "Cancel",
       "submit": "Submit the request"
+    },
+    "completion": {
+      "title": "Profile completion",
+      "logo": "Add a logo",
+      "banner": "Add a banner (factory, premises…)",
+      "description": "Describe the company (at least 80 characters)",
+      "whatsapp": "Add a WhatsApp number",
+      "wilaya": "Add the province (wilaya)",
+      "kyc": "Get the company verified (trade register, tax ID)",
+      "products": "Publish at least 10 products"
     }
   },
   "help": {
@@ -934,7 +992,8 @@
     "send": "Send",
     "select": "Select a conversation",
     "uploadError": "The file upload failed.",
-    "sendError": "The message could not be sent. Please try again."
+    "sendError": "The message could not be sent. Please try again.",
+    "title": "Messages"
   },
   "events": {
     "titleStart": "Industry",
@@ -1136,7 +1195,8 @@
     "cataloguesCtaText": "View the catalogues published by {{name}}.",
     "cataloguesCtaButton": "View catalogues",
     "whatsapp": "WhatsApp",
-    "whatsappMessage": "Hello, I am contacting you via Algeria Industry about {{name}}."
+    "whatsappMessage": "Hello, I am contacting you via Algeria Industry about {{name}}.",
+    "verifiedOn": "Trade register and tax ID checked on {{date}}"
   },
   "pricing": {
     "eyebrow": "Transparent pricing",

@@ -1,6 +1,6 @@
 import { useEffect, lazy, Suspense } from "react";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { AnimatePresence } from 'motion/react';
+import { AnimatePresence, MotionConfig } from 'motion/react';
 import { Route, Routes, useLocation } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import BackToTop from './components/BackToTop';
@@ -45,7 +45,9 @@ const Terms = lazy(() => import('./pages/Terms'));
 const Catalogues = lazy(() => import('./pages/Catalogues'));
 
 import { useTranslation } from 'react-i18next';
+import { cn } from './lib/utils';
 import ComparisonBar from './components/ComparisonBar';
+import MobileTabBar from './components/MobileTabBar';
 import { AuthProvider } from './context/AuthContext';
 import { ComparisonProvider } from './context/ComparisonContext';
 import { CurrencyProvider } from './context/CurrencyContext';
@@ -98,12 +100,13 @@ export default function App() {
       <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
       <ToastProvider>
+      <MotionConfig reducedMotion="user">
       <AuthProvider>
           <CurrencyProvider>
             <ComparisonProvider>
               <VerifyAccountModal />
               <ScrollToTop />
-              <div className="flex flex-col min-h-screen">
+              <div className={cn("flex flex-col min-h-screen", !isExtranet && "pb-16 lg:pb-0")}>
               {!isExtranet && <Navbar />}
               {!hideHeroSlider && <HeroSlider slides={currentSlides} />}
               <main className="flex-grow">
@@ -177,10 +180,12 @@ export default function App() {
                 <CookieBanner />
                 <BackToTop />
                 {!isExtranet && <ComparisonBar />}
+                {!isExtranet && <MobileTabBar />}
               </div>
             </ComparisonProvider>
           </CurrencyProvider>
       </AuthProvider>
+      </MotionConfig>
       </ToastProvider>
     </QueryClientProvider>
     </ErrorBoundary>

@@ -28,9 +28,15 @@
   body {
     @apply bg-neutral-bg text-gray-900 font-sans antialiased;
   }
-  
+
   h1, h2, h3, h4, h5, h6 {
     @apply tracking-tight font-bold;
+  }
+
+  /* Focus clavier toujours visible (accessibilité). */
+  :focus-visible {
+    outline: 2px solid var(--color-secondary);
+    outline-offset: 2px;
   }
 
   .tech-mono {
@@ -38,25 +44,48 @@
   }
 }
 
+/*
+ * Charte : 3 tailles de texte minimum (12 / 14 / 16 px), 2 arrondis
+ * (8 px pour champs et boutons, 16 px pour les cartes), majuscules réservées
+ * aux petites étiquettes.
+ */
 @layer components {
   .nav-link {
-    @apply text-[13px] font-bold tracking-wider transition-all hover:text-secondary uppercase;
+    @apply text-sm font-bold tracking-wide transition-all hover:text-secondary;
   }
 
   .btn-primary {
-    @apply bg-primary text-white px-5 py-2.5 rounded-none font-bold text-xs uppercase tracking-widest hover:bg-secondary transition-all border border-transparent;
+    @apply inline-flex items-center justify-center gap-2 bg-primary text-white px-5 py-2.5 rounded-lg font-bold text-sm transition-colors border border-transparent hover:bg-secondary disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
   .btn-secondary {
-    @apply bg-secondary text-white px-5 py-2.5 rounded-none font-bold text-xs uppercase tracking-widest hover:bg-secondary/90 transition-all border border-transparent;
+    @apply inline-flex items-center justify-center gap-2 bg-secondary text-white px-5 py-2.5 rounded-lg font-bold text-sm transition-colors border border-transparent hover:bg-secondary/90 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 bg-white text-primary px-5 py-2.5 rounded-lg font-bold text-sm transition-colors border border-gray-200 hover:border-primary;
   }
 
   .tech-card {
-    @apply bg-white border border-border-tech rounded-none shadow-sm hover:shadow-md transition-all;
+    @apply bg-white border border-border-tech rounded-2xl shadow-sm hover:shadow-md transition-shadow;
   }
 
   .tech-label {
-    @apply text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-1 block;
+    @apply text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 block;
+  }
+
+  .field {
+    @apply w-full bg-white border border-gray-200 rounded-lg px-4 py-3 text-sm outline-none transition-colors focus:border-secondary focus:ring-2 focus:ring-secondary/20;
+  }
+}
+
+/* Respect du réglage système « réduire les animations ». */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 

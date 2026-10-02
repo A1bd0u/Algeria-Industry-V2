@@ -58,14 +58,14 @@ export default function VerifyAccountModal() {
       <motion.div 
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-white max-w-lg w-full rounded-none shadow-2xl overflow-hidden"
+        className="bg-white max-w-lg w-full rounded-lg shadow-2xl overflow-hidden"
       >
         <div className="bg-secondary p-8 text-center relative overflow-hidden">
            <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-6 backdrop-blur-md">
              <Smartphone className="h-8 w-8 text-white" />
            </div>
-           <h2 className="text-2xl font-black text-white uppercase tracking-tighter mb-2">{t('auth.verify.title')}</h2>
-           <p className="text-white/80 text-xs font-bold leading-relaxed uppercase tracking-widest">
+           <h2 className="text-2xl font-black text-white tracking-tighter mb-2">{t('auth.verify.title')}</h2>
+           <p className="text-white/80 text-xs font-bold leading-relaxed tracking-widest">
               {t('auth.verify.subtitle')}
            </p>
         </div>
@@ -90,7 +90,7 @@ export default function VerifyAccountModal() {
 
            <form onSubmit={handleSubmit} className="space-y-6">
              <div className="space-y-2">
-                <label htmlFor="code_input" className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{t('auth.verify.code')}</label>
+                <label htmlFor="code_input" className="text-xs font-black text-gray-500 uppercase tracking-widest">{t('auth.verify.code')}</label>
                 <input 
                   id="code_input"
                   type="text" 
@@ -99,7 +99,7 @@ export default function VerifyAccountModal() {
                   autoComplete="one-time-code"
                   value={code}
                   onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
-                  className="w-full bg-gray-50 border border-gray-100 px-6 py-4 text-2xl tracking-[0.5em] font-mono text-center outline-none focus:border-secondary transition-all"
+                  className="w-full bg-gray-50 border border-gray-100 px-6 py-4 text-2xl tracking-wider font-mono text-center outline-none focus:border-secondary transition-all"
                   placeholder="000000"
                   required
                 />
@@ -129,7 +129,7 @@ export default function VerifyAccountModal() {
                     onExpire={() => setCaptchaToken(null)}
                   />
                 ) : (
-                  <p className="text-red-500 text-[10px] font-bold">{t('auth.captchaMissingConfig')}</p>
+                  <p className="text-red-500 text-xs font-bold">{t('auth.captchaMissingConfig')}</p>
                 )}
              </div>
 
@@ -137,7 +137,7 @@ export default function VerifyAccountModal() {
                <button 
                  onClick={handleResend} 
                  disabled={resendLoading}
-                 className="text-[10px] font-black text-secondary hover:text-primary uppercase tracking-widest flex items-center transition-colors disabled:opacity-50"
+                 className="text-xs font-black text-secondary hover:text-primary uppercase tracking-widest flex items-center transition-colors disabled:opacity-50"
                >
                  <RefreshCw className={`h-3 w-3 me-2 ${resendLoading ? 'animate-spin' : ''}`} />
                  {resendLoading ? t('auth.verify.resending') : t('auth.verify.resend')}
@@ -145,7 +145,7 @@ export default function VerifyAccountModal() {
 
                <button 
                  onClick={logout} 
-                 className="text-[10px] font-black text-gray-400 hover:text-primary uppercase tracking-widest transition-colors"
+                 className="text-xs font-black text-gray-500 hover:text-primary uppercase tracking-widest transition-colors"
                >
                  {t('auth.verify.logout')}
                </button>

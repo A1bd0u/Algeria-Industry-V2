@@ -62,8 +62,8 @@ export default function GovAnalytics({ state }: { state: any }) {
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8 pb-10">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-3xl border border-gray-100 shadow-sm">
-        <h3 className="text-xl font-black text-primary uppercase italic px-4">Synthèse Analytique</h3>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
+        <h3 className="text-xl font-black text-primary px-4">Synthèse Analytique</h3>
         <div className="flex items-center gap-4">
           <div className="flex bg-gray-50 p-1 rounded-lg">
             {[
@@ -75,7 +75,7 @@ export default function GovAnalytics({ state }: { state: any }) {
               <button 
                 key={tf.id}
                 onClick={() => setChartTimeframe(tf.id)}
-                className={cn("px-4 py-2 rounded-md text-[10px] font-black uppercase transition-all", chartTimeframe === tf.id ? "bg-white shadow-sm text-primary" : "text-gray-400 hover:text-primary")}
+                className={cn("px-4 py-2 rounded-md text-xs font-black uppercase transition-all", chartTimeframe === tf.id ? "bg-white shadow-sm text-primary" : "text-gray-500 hover:text-primary")}
               >
                 {tf.label}
               </button>
@@ -85,7 +85,7 @@ export default function GovAnalytics({ state }: { state: any }) {
           <button
             onClick={handleExportCSV}
             disabled={isLoading || !data}
-            className="px-4 py-2 bg-secondary/10 text-secondary hover:bg-secondary hover:text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-colors flex items-center gap-2"
+            className="px-4 py-2 bg-secondary/10 text-secondary hover:bg-secondary hover:text-white rounded-xl text-xs font-black uppercase tracking-widest transition-colors flex items-center gap-2"
           >
             <Download className="w-4 h-4" />
             <span className="hidden sm:inline">Exporter en CSV</span>
@@ -100,7 +100,7 @@ export default function GovAnalytics({ state }: { state: any }) {
       ) : (
         <>
           {/* New Inscriptions Chart */}
-          <div className="bg-white/70 backdrop-blur-md p-8 rounded-[40px] border border-white shadow-sm font-sans text-primary">
+          <div className="bg-white/70 backdrop-blur-md p-8 rounded-2xl border border-white shadow-sm font-sans text-primary">
             <h3 className="text-xs font-black uppercase tracking-widest mb-8 italic">Inscriptions par mois</h3>
             <div className="h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
@@ -125,14 +125,14 @@ export default function GovAnalytics({ state }: { state: any }) {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div className="bg-white/70 backdrop-blur-md p-8 rounded-[40px] border border-white shadow-sm font-sans text-primary">
+            <div className="bg-white/70 backdrop-blur-md p-8 rounded-2xl border border-white shadow-sm font-sans text-primary">
               <h3 className="text-xs font-black uppercase tracking-widest mb-8 italic">Intensité par Wilaya (Top 5)</h3>
               <div className="space-y-6">
                 {data?.wilayas?.map((wilaya: any, i: number) => (
                   <div key={i}>
                     <div className="flex justify-between items-end mb-2">
-                      <span className="text-[10px] font-black uppercase">{wilaya.name}</span>
-                      <span className="text-[10px] font-bold text-gray-400">
+                      <span className="text-xs font-black uppercase">{wilaya.name}</span>
+                      <span className="text-xs font-bold text-gray-500">
                         {((wilaya.value / (data.totalIntents || 1)) * 100).toFixed(1)}%
                       </span>
                     </div>
@@ -149,7 +149,7 @@ export default function GovAnalytics({ state }: { state: any }) {
               </div>
             </div>
 
-            <div className="bg-white/70 backdrop-blur-md p-8 rounded-[40px] border border-white shadow-sm font-sans text-primary">
+            <div className="bg-white/70 backdrop-blur-md p-8 rounded-2xl border border-white shadow-sm font-sans text-primary">
               <h3 className="text-xs font-black uppercase tracking-widest mb-8 italic">Tendances de Sourcing (Search)</h3>
               <div className="h-[300px]">
                 <ResponsiveContainer width="100%" height="100%">
@@ -168,22 +168,6 @@ export default function GovAnalytics({ state }: { state: any }) {
             </div>
           </div>
           
-          <div className="bg-primary p-12 rounded-[48px] text-white relative overflow-hidden">
-              <div className="max-w-2xl relative z-10">
-                 <h3 className="text-3xl font-black uppercase tracking-tighter mb-4 italic">Algorithme de Matching IA</h3>
-                 <p className="text-sm font-medium text-white/60 leading-relaxed mb-8">Nous analysons actuellement plus de 1.2M de points de données pour optimiser les recommandations entre les acheteurs industriels et les fournisseurs certifiés.</p>
-                 <div className="flex items-center space-x-12">
-                    <div>
-                      <p className="text-[10px] font-black uppercase tracking-[0.2em] opacity-40 mb-2 text-white">Précision Recom.</p>
-                      <p className="text-2xl font-black italic">94.2%</p>
-                    </div>
-                    <div>
-                      <p className="text-[10px] font-black uppercase tracking-[0.2em] opacity-40 mb-2 text-white">Temps Moyen Rep.</p>
-                      <p className="text-2xl font-black italic text-secondary">2.4 Jours</p>
-                    </div>
-                 </div>
-              </div>
-          </div>
         </>
       )}
     </motion.div>
