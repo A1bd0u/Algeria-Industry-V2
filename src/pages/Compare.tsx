@@ -17,9 +17,12 @@ import { useToast } from '../context/ToastContext';
 import { apiErrorMessage } from '../lib/apiError';
 import { cn, generateSlugUrl } from '../lib/utils';
 import ProductImage from '../components/ui/ProductImage';
+import { useAdCategories } from '../context/AdTargetingContext';
+import { categoryGroupId } from '../data/productCategories';
 
 const Compare = () => {
   const { comparedProducts: items, removeFromCompare, clearCompare } = useComparison();
+  useAdCategories(items.map((p: any) => categoryGroupId(p.category)));
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const { isAuthenticated } = useAuth();

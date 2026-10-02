@@ -273,6 +273,29 @@ describe('Régressions de sécurité P0', () => {
     expect(select?.columns).not.toMatch(/contact_|message|clicks/);
   });
 
+  it('cible les annonces par groupe de pages et par catégorie produit', async () => {
+    const mock = createSupabaseMock({
+      ads: () => ({
+        data: [
+          { id: 'all', title: 'Partout', placements: [], categories: [] },
+          { id: 'home', title: 'Accueil', placements: ['home'], categories: [] },
+          { id: 'cat-b', title: 'Machines', placements: ['catalog', 'suppliers'], categories: ['B'] },
+          { id: 'cat-e', title: 'EPI', placements: [], categories: ['E'] },
+        ],
+      }),
+    });
+    vi.mocked(getSupabase).mockReturnValue(mock.client as any);
+
+    const ids = async (query: string) => (await request(app).get(`/api/campaigns${query}`)).body.map((ad: any) => ad.id);
+    expect(await ids('')).toEqual(['all', 'home']);
+    expect(await ids('?placement=catalog')).toEqual(['all']);
+    expect(await ids('?placement=catalog&categories=B,C')).toEqual(['all', 'cat-b']);
+    expect(await ids('?placement=content&categories=B')).toEqual(['all']);
+    expect(await ids('?placement=suppliers&categories=E,x')).toEqual(['all', 'cat-e']);
+    const res = await request(app).get('/api/campaigns?placement=catalog&categories=B');
+    expect(res.body[1]).not.toHaveProperty('placements');
+  });
+
   it('compte un clic seulement sur une annonce publiée', async () => {
     const AD = '77777777-7777-4777-8777-777777777777';
     const mock = createSupabaseMock({

@@ -7,7 +7,7 @@ import { ProductSkeleton } from '../components/Skeleton';
 import { useAuth } from '../context/AuthContext';
 import { useCurrency } from '../context/CurrencyContext';
 import { useToast } from '../context/ToastContext';
-import { categoryLabel, productCategories } from '../data/productCategories';
+import { categoryLabel, productCategories, categoryGroupId } from '../data/productCategories';
 import { WILAYAS } from '../data/wilayas';
 import { formatNumber } from '../lib/format';
 import { cn, generateSlugUrl } from '../lib/utils';
@@ -15,6 +15,7 @@ import AddProduct from './AddProduct';
 import SEO from '../components/SEO';
 import { absoluteUrl } from '../config/site';
 import ProductImage from '../components/ui/ProductImage';
+import { useAdCategories } from '../context/AdTargetingContext';
 
 const PAGE_SIZE = 12;
 const SORTS = ['recent', 'price_asc', 'price_desc'] as const;
@@ -104,6 +105,7 @@ const Products = () => {
   const navigate = useNavigate();
 
   const category = searchParams.get('category') || '';
+  useAdCategories([categoryGroupId(category)]);
   const region = searchParams.get('region') || '';
   const search = searchParams.get('search') || '';
   const sort = (SORTS as readonly string[]).includes(searchParams.get('sort') || '') ? searchParams.get('sort')! : 'recent';

@@ -7,6 +7,7 @@ import { formLimiter } from '../middlewares/rateLimiter';
 import { requireUuidParams } from '../middlewares/validateParams';
 import { verifyCaptcha } from '../utils/captcha';
 import { logger } from '../utils/logger';
+import { AD_CATEGORY_GROUPS, AD_PLACEMENTS, adMatches, type AdPlacement } from '../../src/data/adPlacements';
 
 const router = express.Router();
 
@@ -15,7 +16,7 @@ const PUBLISHED_STATUSES = ['published', 'Actif', 'approuvée', 'Approuvé'];
 // Colonnes publiques : ni user_id ni coordonnées du demandeur.
 const PUBLIC_AD_COLUMNS = 'id, title, type, url, status, created_at';
 // Contenu affiché dans le bandeau de l'accueil.
-const SLIDE_COLUMNS = 'id, title, subtitle, image_url, logo_url, brand_name, cta_label, url, starts_at, ends_at';
+const SLIDE_COLUMNS = 'id, title, subtitle, image_url, logo_url, brand_name, cta_label, url, starts_at, ends_at, placements, categories';
 const MAX_SLIDES = 8;
 
 const isLive = (ad: { starts_at?: string | null; ends_at?: string | null }, now: number) =>
@@ -38,9 +39,15 @@ const adRequestSchema = z.object({
   captchaToken: z.string().optional(),
 });
 
-// GET /api/campaigns - Annonces publiées et en cours de diffusion, dans
-// l'ordre choisi par l'admin.
+// GET /api/campaigns?placement=catalog&categories=B,C - Annonces publiées, en
+// cours de diffusion et ciblant cette page, dans l'ordre choisi par l'admin.
 router.get('/', async (req, res) => {
+  const placement: AdPlacement = (AD_PLACEMENTS as readonly string[]).includes(String(req.query.placement))
+    ? (req.query.placement as AdPlacement)
+    : 'home';
+  const pageCategories = String(req.query.categories || '')
+    .split(',')
+    .filter((c) => (AD_CATEGORY_GROUPS as readonly string[]).includes(c));
   try {
     const supabase = getSupabase();
     const { data: ads, error } = await supabase
@@ -54,9 +61,9 @@ router.get('/', async (req, res) => {
     if (error) throw error;
     const now = Date.now();
     const live = (ads || [])
-      .filter((ad: any) => isLive(ad, now))
+      .filter((ad: any) => isLive(ad, now) && adMatches(ad, placement, pageCategories))
       .slice(0, MAX_SLIDES)
-      .map(({ starts_at, ends_at, ...ad }: any) => ad);
+      .map(({ starts_at, ends_at, placements, categories, ...ad }: any) => ad);
     res.set('Cache-Control', 'public, max-age=60');
     return res.json(live);
   } catch (err: any) {

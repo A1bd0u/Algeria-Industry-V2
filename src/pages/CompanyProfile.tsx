@@ -28,13 +28,14 @@ import { ProfileSkeleton } from '../components/Skeleton';
 import { cn, generateSlugUrl, extractIdFromSlug } from '../lib/utils';
 import SEO from '../components/SEO';
 import { absoluteUrl } from '../config/site';
-import { categoryLabel } from '../data/productCategories';
+import { categoryGroupId, categoryLabel } from '../data/productCategories';
 import { useTranslation } from 'react-i18next';
 import { ApiError } from '../lib/apiError';
 import { whatsappHref } from '../config/site';
 import { formatDate, currentLocale } from '../lib/format';
 import { CompanyAvatar } from '../components/ui/ProductImage';
 import { useToast } from '../context/ToastContext';
+import { useAdCategories } from '../context/AdTargetingContext';
 
 const CompanyProfile = () => {
   const { t } = useTranslation();
@@ -46,6 +47,8 @@ const CompanyProfile = () => {
   const [isFavorite, setIsFavorite] = useState(false);
   
   const [company, setCompany] = useState<any>(null);
+  // Catégories des produits de l'entreprise : ciblage des annonces.
+  useAdCategories((company?.products || []).map((p: any) => categoryGroupId(p.category)));
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   const { user } = useAuth();

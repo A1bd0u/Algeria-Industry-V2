@@ -24,11 +24,12 @@ import { useCurrency } from '../context/CurrencyContext';
 import { useAuth } from '../context/AuthContext';
 import { cn, extractIdFromSlug, generateSlugUrl } from '../lib/utils';
 import axios from 'axios';
-import { categoryLabel } from '../data/productCategories';
+import { categoryGroupId, categoryLabel } from '../data/productCategories';
 import { useToast } from '../context/ToastContext';
 import { whatsappHref } from '../config/site';
 import { apiErrorMessage } from '../lib/apiError';
 import ProductImage from '../components/ui/ProductImage';
+import { useAdCategories } from '../context/AdTargetingContext';
 
 const ProductDetail = () => {
   const { t } = useTranslation();
@@ -42,6 +43,7 @@ const ProductDetail = () => {
   const [isLoading, setIsLoading] = useState(true);
   const { isAuthenticated, user } = useAuth();
   const [product, setProduct] = useState<any>(null);
+  useAdCategories([categoryGroupId(product?.category)]);
   const [similarProducts, setSimilarProducts] = useState<any[]>([]);
   const [favoriteId, setFavoriteId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
