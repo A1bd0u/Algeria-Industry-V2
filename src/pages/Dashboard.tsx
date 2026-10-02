@@ -136,7 +136,33 @@ const Dashboard = () => {
     setTimeout(() => setNotification(null), 3000);
   };
 
-  const [companyInfo, setCompanyInfo] = useState({ name: '', bio: '', wilaya: '', whatsapp: '', logo_url: '', banner_url: '' });
+  const [companyInfo, setCompanyInfo] = useState({
+    name: '', bio: '', wilaya: '', whatsapp: '', logo_url: '', banner_url: '',
+    founded_year: '', employees: '', website: '', certifications: '', gallery: [] as string[],
+  });
+  const [uploadingGallery, setUploadingGallery] = useState(false);
+  const GALLERY_MAX = 8;
+
+  // Galerie de la fiche (usine, ateliers, réalisations).
+  const uploadGallery = async (files: FileList | null) => {
+    const list = Array.from(files || []).slice(0, GALLERY_MAX - companyInfo.gallery.length);
+    if (!list.length) return;
+    setUploadingGallery(true);
+    try {
+      for (const file of list) {
+        const form = new FormData();
+        form.append('file', file);
+        const res = await fetch('/api/upload?bucket=product-images', { method: 'POST', body: form });
+        const d = await res.json().catch(() => ({}));
+        if (!res.ok) throw new ApiError(d, 'dashboard.updateError');
+        setCompanyInfo((prev) => ({ ...prev, gallery: [...prev.gallery, d.url].slice(0, GALLERY_MAX) }));
+      }
+    } catch (err: any) {
+      showNotify(err.message, 'error');
+    } finally {
+      setUploadingGallery(false);
+    }
+  };
   const [uploadingImage, setUploadingImage] = useState<'logo_url' | 'banner_url' | null>(null);
 
   // Dépose le logo ou la bannière ; l'URL est enregistrée avec le formulaire.
@@ -164,7 +190,12 @@ const Dashboard = () => {
         const res = await fetch(`/api/companies/${user.company_id}`);
         if (res.ok) {
           const c = await res.json();
-          setCompanyInfo({ name: c.name || '', bio: c.description || '', wilaya: c.wilaya || '', whatsapp: c.whatsapp ? `+${c.whatsapp}` : '', logo_url: c.logo_url || '', banner_url: c.banner_url || '' });
+          setCompanyInfo({
+            name: c.name || '', bio: c.description || '', wilaya: c.wilaya || '', whatsapp: c.whatsapp ? `+${c.whatsapp}` : '',
+            logo_url: c.logo_url || '', banner_url: c.banner_url || '',
+            founded_year: c.founded_year ? String(c.founded_year) : '', employees: c.employees || '', website: c.website || '',
+            certifications: (c.certifications || []).join(', '), gallery: c.gallery || [],
+          });
         }
       } catch (e) {
         console.error('Erreur chargement entreprise', e);
@@ -184,7 +215,13 @@ const Dashboard = () => {
       const res = await fetch(`/api/companies/${user.company_id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: companyInfo.name, description: companyInfo.bio, wilaya: companyInfo.wilaya || undefined, whatsapp: companyInfo.whatsapp.trim(), logo_url: companyInfo.logo_url, banner_url: companyInfo.banner_url })
+        body: JSON.stringify({
+          name: companyInfo.name, description: companyInfo.bio, wilaya: companyInfo.wilaya || undefined,
+          whatsapp: companyInfo.whatsapp.trim(), logo_url: companyInfo.logo_url, banner_url: companyInfo.banner_url,
+          founded_year: companyInfo.founded_year.trim(), employees: companyInfo.employees, website: companyInfo.website.trim(),
+          certifications: companyInfo.certifications.split(',').map((c) => c.trim()).filter((c) => c.length >= 2).slice(0, 10),
+          gallery: companyInfo.gallery,
+        })
       });
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
@@ -331,6 +368,63 @@ const Dashboard = () => {
             exit={{ opacity: 0, y: -10 }}
             className="space-y-8"
           >
+            {/* Démarrage fournisseur : les 4 étapes pour être visible et contacté */}
+            {(user.role === 'fournisseur' || user.role === 'exposant') && (() => {
+              const steps = [
+                { key: 'account', done: true, action: null },
+                { key: 'company', done: Boolean(companyInfo.name && companyInfo.logo_url && companyInfo.bio.trim().length >= 80), action: () => setActiveTab('company') },
+                { key: 'kyc', done: user.kycStatus === 'approved', pending: user.kycStatus === 'pending', action: () => navigate('/kyc-upload') },
+                { key: 'product', done: products.length > 0, action: () => setShowAddProduct(true) },
+              ];
+              const doneCount = steps.filter((s) => s.done).length;
+              if (doneCount === steps.length) return null;
+              const next = steps.find((s) => !s.done && !(s as any).pending);
+              return (
+                <section className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8" aria-labelledby="onboarding-title">
+                  <div className="flex flex-col md:flex-row md:items-end justify-between gap-3 mb-6">
+                    <div>
+                      <h2 id="onboarding-title" className="text-xl font-black text-primary">{t('dashboard.onboarding.title')}</h2>
+                      <p className="text-sm text-gray-500 mt-1">{t('dashboard.onboarding.subtitle')}</p>
+                    </div>
+                    <span className="text-sm font-black text-secondary">{t('dashboard.onboarding.progress', { done: doneCount, total: steps.length })}</span>
+                  </div>
+                  <div className="h-2 bg-gray-100 rounded-full overflow-hidden mb-6" role="progressbar" aria-valuenow={doneCount} aria-valuemin={0} aria-valuemax={steps.length} aria-label={t('dashboard.onboarding.title')}>
+                    <div className="h-full bg-secondary transition-all" style={{ width: `${(doneCount / steps.length) * 100}%` }} />
+                  </div>
+                  <ol className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                    {steps.map((step, i) => {
+                      const isNext = next?.key === step.key;
+                      const pending = (step as any).pending && !step.done;
+                      return (
+                        <li key={step.key} className={cn(
+                          'rounded-xl border p-4 flex flex-col',
+                          step.done ? 'border-success/30 bg-success/5' : isNext ? 'border-secondary bg-secondary/5' : 'border-gray-100',
+                        )}>
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className={cn(
+                              'flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-black',
+                              step.done ? 'bg-success text-white' : isNext ? 'bg-secondary text-white' : 'bg-gray-100 text-gray-500',
+                            )}>
+                              {step.done ? <CheckCircle className="h-4 w-4" /> : i + 1}
+                            </span>
+                            <p className="font-bold text-primary text-sm">{t(`dashboard.onboarding.${step.key}.title`)}</p>
+                          </div>
+                          <p className="text-xs text-gray-500 mb-3">
+                            {pending ? t('dashboard.onboarding.kyc.pending') : t(`dashboard.onboarding.${step.key}.text`)}
+                          </p>
+                          {!step.done && !pending && step.action && (
+                            <button type="button" onClick={step.action} className={cn('mt-auto w-fit', isNext ? 'btn-primary !py-2' : 'text-sm font-bold text-secondary hover:underline')}>
+                              {t(`dashboard.onboarding.${step.key}.cta`)}
+                            </button>
+                          )}
+                        </li>
+                      );
+                    })}
+                  </ol>
+                </section>
+              );
+            })()}
+
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {stats.map((stat, i) => (
@@ -746,6 +840,7 @@ const Dashboard = () => {
                 { done: Boolean(companyInfo.wilaya.trim()), label: t('dashboard.completion.wilaya') },
                 { done: user?.kycStatus === 'approved', label: t('dashboard.completion.kyc') },
                 { done: products.length >= 10, label: t('dashboard.completion.products') },
+                { done: companyInfo.gallery.length >= 3, label: t('dashboard.completion.gallery') },
               ];
               const percent = Math.round((checks.filter((c) => c.done).length / checks.length) * 100);
               return (
@@ -838,8 +933,59 @@ const Dashboard = () => {
                         className="w-full bg-gray-50 border-none px-8 py-6 rounded-2xl text-sm font-medium outline-none resize-none"
                      />
                   </div>
+                  <fieldset className="grid grid-cols-1 md:grid-cols-3 gap-6 border-t border-gray-100 pt-8">
+                     <legend className="text-sm font-black text-primary mb-4">{t('dashboard.company.showcase')}</legend>
+                     <div className="space-y-2">
+                        <label htmlFor="company_year" className="text-xs font-bold text-gray-600">{t('company.foundedYear')}</label>
+                        <input id="company_year" type="number" min={1900} max={new Date().getFullYear()} inputMode="numeric"
+                          value={companyInfo.founded_year} onChange={(e) => setCompanyInfo({ ...companyInfo, founded_year: e.target.value })}
+                          className="w-full bg-gray-50 border-none px-5 py-3 rounded-xl text-sm font-bold outline-none" />
+                     </div>
+                     <div className="space-y-2">
+                        <label htmlFor="company_employees" className="text-xs font-bold text-gray-600">{t('company.employees')}</label>
+                        <select id="company_employees" value={companyInfo.employees} onChange={(e) => setCompanyInfo({ ...companyInfo, employees: e.target.value })}
+                          className="w-full bg-gray-50 border-none px-5 py-3 rounded-xl text-sm font-bold outline-none">
+                          <option value="">—</option>
+                          {['1-9', '10-49', '50-249', '250+'].map((v) => <option key={v} value={v}>{t('company.employeesValue', { value: v })}</option>)}
+                        </select>
+                     </div>
+                     <div className="space-y-2">
+                        <label htmlFor="company_website" className="text-xs font-bold text-gray-600">{t('company.website')}</label>
+                        <input id="company_website" type="text" dir="ltr" placeholder="www.exemple.dz" value={companyInfo.website}
+                          onChange={(e) => setCompanyInfo({ ...companyInfo, website: e.target.value })}
+                          className="w-full bg-gray-50 border-none px-5 py-3 rounded-xl text-sm font-bold outline-none" />
+                     </div>
+                     <div className="space-y-2 md:col-span-3">
+                        <label htmlFor="company_certs" className="text-xs font-bold text-gray-600">{t('company.certifications')}</label>
+                        <input id="company_certs" type="text" placeholder="ISO 9001, ISO 14001, CE…" value={companyInfo.certifications}
+                          onChange={(e) => setCompanyInfo({ ...companyInfo, certifications: e.target.value })}
+                          className="w-full bg-gray-50 border-none px-5 py-3 rounded-xl text-sm font-bold outline-none" />
+                        <p className="text-xs text-gray-500">{t('dashboard.company.certificationsHelp')}</p>
+                     </div>
+                     <div className="space-y-2 md:col-span-3">
+                        <p className="text-xs font-bold text-gray-600">{t('company.gallery')} ({companyInfo.gallery.length}/{GALLERY_MAX})</p>
+                        <div className="grid grid-cols-4 sm:grid-cols-8 gap-2">
+                          {companyInfo.gallery.map((url) => (
+                            <div key={url} className="relative aspect-square overflow-hidden rounded-lg border border-gray-100">
+                              <img src={url} alt="" className="h-full w-full object-cover" />
+                              <button type="button" aria-label={t('addProduct.removePhoto')}
+                                onClick={() => setCompanyInfo((prev) => ({ ...prev, gallery: prev.gallery.filter((g) => g !== url) }))}
+                                className="absolute top-1 end-1 rounded bg-white/90 p-0.5 text-red-500 shadow"><X className="h-3.5 w-3.5" /></button>
+                            </div>
+                          ))}
+                          {companyInfo.gallery.length < GALLERY_MAX && (
+                            <label className="aspect-square rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center text-gray-500 cursor-pointer hover:border-secondary hover:text-secondary">
+                              {uploadingGallery ? <Loader2 className="h-5 w-5 animate-spin" /> : <Upload className="h-5 w-5" />}
+                              <input type="file" multiple accept="image/jpeg,image/png,image/webp" className="sr-only" aria-label={t('company.gallery')}
+                                onChange={(e) => { uploadGallery(e.target.files); e.target.value = ''; }} />
+                            </label>
+                          )}
+                        </div>
+                        <p className="text-xs text-gray-500">{t('dashboard.company.galleryHelp')}</p>
+                     </div>
+                  </fieldset>
                   <div className="pt-4">
-                     <button type="submit" disabled={isLoading} className="bg-primary text-white px-10 py-4 rounded-2xl text-xs font-black uppercase tracking-widest shadow-xl hover:bg-secondary transition-all flex items-center space-x-2">
+                     <button type="submit" disabled={isLoading || uploadingGallery} className="bg-primary text-white px-10 py-4 rounded-2xl text-xs font-black uppercase tracking-widest shadow-xl hover:bg-secondary transition-all flex items-center space-x-2">
                         {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
                         <span>{t('dashboard.company.save')}</span>
                      </button>

@@ -28,6 +28,7 @@
     "adminConsole": "Admin console",
     "mobileTabs": "Main navigation",
     "language": "Language: {{name}}",
+    "megaHint": "Five sectors, from raw materials to industrial services.",
     "console_pro": "Admin area"
   },
   "hero": {
@@ -205,6 +206,13 @@
     },
     "latest": {
       "label": "New"
+    },
+    "reviews": {
+      "label": "Reviews",
+      "title": "What buyers say",
+      "subtitle": "Reviews left on verified suppliers' profiles.",
+      "rating": "{{rating}} out of 5 stars",
+      "about": "about"
     }
   },
   "directory": {
@@ -293,7 +301,18 @@
     "emptyText": "Try another category or remove some filters. You can also look for a supplier in the directory.",
     "pagination": "Pagination",
     "pageOf": "Page {{page}} of {{total}}",
-    "showResults": "Show {{count}} result(s)"
+    "showResults": "Show {{count}} result(s)",
+    "badges": {
+      "new": "New",
+      "verified": "Verified"
+    },
+    "quickView": "Quick view",
+    "view": {
+      "label": "Display",
+      "grid": "Grid view",
+      "list": "List view"
+    },
+    "quickViewOpen": "See the full page"
   },
   "blog": {
     "title": "Industrial News",
@@ -637,7 +656,10 @@
     "COMPANY_LEGAL_LOCKED": "The verified trade register and tax ID can no longer be changed. Please contact support.",
     "QUOTE_NO_SUPPLIER": "No supplier to contact for these products.",
     "QUOTE_RATE_LIMIT": "Too many quote requests sent. Please try again later.",
-    "COMPANY_IMAGE_INVALID": "Invalid image: upload it from your dashboard."
+    "COMPANY_IMAGE_INVALID": "Invalid image: upload it from your dashboard.",
+    "PRODUCT_IMAGE_INVALID": "Invalid image: upload it from your dashboard.",
+    "PLAN_IMAGE_LIMIT": "Number of photos limited by your plan. Upgrade your plan.",
+    "WEBSITE_INVALID": "Invalid website address."
   },
   "mfa": {
     "title": "Two-factor authentication",
@@ -768,13 +790,13 @@
   "addProduct": {
     "titleNew": "New product",
     "titleEdit": "Edit product",
-    "subtitle": "Catalogue listing (draft saved)",
+    "subtitle": "Draft saved automatically on this device",
     "close": "Close",
     "name": "Product name",
     "namePlaceholder": "e.g. HP-300 gear pump",
     "category": "Category",
     "selectCategory": "Select...",
-    "price": "Price range (DZD)",
+    "price": "Price (DZD)",
     "pricePlaceholder": "e.g. 50,000",
     "description": "Technical description",
     "descriptionPlaceholder": "Specifications, dimensions, use...",
@@ -787,7 +809,19 @@
     "cancel": "Cancel",
     "uploadParseError": "Error processing the server response.",
     "uploadError": "The file upload failed.",
-    "saveError": "Error while saving the product."
+    "saveError": "Error while saving the product.",
+    "photos": "Product photos",
+    "photosCount": "{{count}} / {{max}} photos",
+    "morePhotos": "More photos",
+    "addPhotos": "Add photos",
+    "mainPhoto": "Main",
+    "moveBefore": "Move earlier",
+    "moveAfter": "Move later",
+    "removePhoto": "Remove photo",
+    "photoRequired": "Add at least one product photo.",
+    "imagesLimit": "Your plan allows {{count}} photos per product.",
+    "photoTips": "Tips: whole product, neutral background and good light. Photos are made square automatically, without cropping. The first one is the main photo.",
+    "priceHint": "Leave empty for “On quote”."
   },
   "dashboard": {
     "planBadge": {
@@ -895,7 +929,10 @@
       "whatsappPlaceholder": "e.g. +213 550 12 34 56",
       "whatsappHelp": "Shown on your public profile once your company is verified. Leave empty to hide it.",
       "changeLogo": "Change logo",
-      "changeBanner": "Change banner"
+      "changeBanner": "Change banner",
+      "showcase": "Company showcase",
+      "certificationsHelp": "Comma-separated (up to 10). Shown on your profile.",
+      "galleryHelp": "Up to 8 photos: plant, workshops, team, projects. The first one is highlighted."
     },
     "menu": {
       "overview": "Overview",
@@ -951,7 +988,33 @@
       "whatsapp": "Add a WhatsApp number",
       "wilaya": "Add the province (wilaya)",
       "kyc": "Get the company verified (trade register, tax ID)",
-      "products": "Publish at least 10 products"
+      "products": "Publish at least 10 products",
+      "gallery": "At least 3 photos in the gallery"
+    },
+    "onboarding": {
+      "title": "Getting started on Algeria Industry",
+      "subtitle": "Four steps to be visible and receive quote requests.",
+      "progress": "{{done}} / {{total}} steps",
+      "account": {
+        "title": "Account created",
+        "text": "Your supplier space is ready."
+      },
+      "company": {
+        "title": "Company profile",
+        "text": "Logo, description of 80+ characters, contact details.",
+        "cta": "Complete my profile"
+      },
+      "kyc": {
+        "title": "Verification",
+        "text": "Send your trade register and tax ID to get the “verified” badge.",
+        "pending": "Documents received: our team is reviewing them.",
+        "cta": "Send my documents"
+      },
+      "product": {
+        "title": "First product",
+        "text": "Publish a product with good photos.",
+        "cta": "Add a product"
+      }
     }
   },
   "help": {
@@ -1262,7 +1325,13 @@
     "cataloguesCtaButton": "View catalogues",
     "whatsapp": "WhatsApp",
     "whatsappMessage": "Hello, I am contacting you via Algeria Industry about {{name}}.",
-    "verifiedOn": "Trade register and tax ID checked on {{date}}"
+    "verifiedOn": "Trade register and tax ID checked on {{date}}",
+    "foundedYear": "Founded",
+    "employees": "Employees",
+    "employeesValue": "{{value}} employees",
+    "website": "Website",
+    "certifications": "Certifications",
+    "gallery": "Gallery"
   },
   "pricing": {
     "eyebrow": "Transparent pricing",
@@ -1400,5 +1469,37 @@
       "subtitle": "For the first 100 verified suppliers.",
       "cta": "See the offer"
     }
+  },
+  "sector": {
+    "seoTitle": "{{name}}: suppliers and products in Algeria",
+    "breadcrumb": "Breadcrumb",
+    "seeProducts": "See the {{count}} products",
+    "seeCatalog": "See the catalogue",
+    "listCompany": "Supplier in this sector?",
+    "subcategories": "Subcategories",
+    "latest": "Latest products in this sector",
+    "seeAll": "See all",
+    "empty": "No products published in this sector yet.",
+    "suppliers": "Active suppliers in this sector",
+    "others": "Other sectors",
+    "A": {
+      "intro": "Metals, basic chemicals, building materials, textiles and raw agricultural products: find raw-material suppliers in Algeria."
+    },
+    "B": {
+      "intro": "Machine tools, production lines, construction and agricultural machinery, handling equipment, from verified suppliers."
+    },
+    "C": {
+      "intro": "Electronic components, mechanical and automotive parts, hydraulics and pneumatics: the parts your production needs."
+    },
+    "D": {
+      "intro": "Maintenance, engineering, logistics, consulting, subcontracting and industrial IT: service providers for your projects."
+    },
+    "E": {
+      "intro": "Tools, cleaning products, protective equipment, packaging and supplies: the consumables of your business."
+    }
+  },
+  "emptyStates": {
+    "directoryText": "Try another province or sector, or list your company.",
+    "messagesText": "Contact a supplier from a product or company page: the conversation will appear here."
   }
 }

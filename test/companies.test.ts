@@ -99,6 +99,53 @@ describe('Companies Ownership', () => {
     }
   });
 
+  it('enregistre la vitrine : année, effectif, certifications, site et galerie', async () => {
+    process.env.SUPABASE_URL = 'https://proj.supabase.co';
+    const mock = mockWith(sessionRow({ id: OWNER_ID, role: 'fournisseur' }));
+    const photo = `https://proj.supabase.co/storage/v1/object/public/product-images/${OWNER_ID}/usine.jpg`;
+
+    const ok = await request(app).put(`/api/companies/${COMPANY_ID}`).set('Cookie', ['token=t']).send({
+      name: 'Acme', founded_year: '1998', employees: '50-249', website: 'www.acme.dz',
+      certifications: ['ISO 9001', 'ISO 9001', 'CE'], gallery: [photo],
+    });
+    expect(ok.status).toBe(200);
+    const update = mock.queries.find((q) => q.table === 'companies' && q.op === 'update');
+    expect(update?.payload).toMatchObject({
+      founded_year: 1998, employees: '50-249', website: 'https://www.acme.dz',
+      certifications: ['ISO 9001', 'CE'], gallery: [photo],
+    });
+
+    const badSite = await request(app).put(`/api/companies/${COMPANY_ID}`).set('Cookie', ['token=t'])
+      .send({ name: 'Acme', website: 'javascript:alert(1)' });
+    expect(badSite.status).toBe(400);
+
+    const badGallery = await request(app).put(`/api/companies/${COMPANY_ID}`).set('Cookie', ['token=t'])
+      .send({ name: 'Acme', gallery: ['https://evil.example/x.jpg'] });
+    expect(badGallery.body.code).toBe('COMPANY_IMAGE_INVALID');
+  });
+
+  it('met en avant des avis réels : 4 ou 5 étoiles, entreprise vérifiée, auteur abrégé', async () => {
+    const long = 'Livraison rapide et matériel conforme, je recommande ce fournisseur.';
+    const mock = createSupabaseMock({
+      reviews: () => ({
+        data: [
+          { id: 'r1', rating: 5, comment: long, users: { name: 'Karim Benali' }, company: { id: 'c1', name: 'Acme', status: 'approved' } },
+          { id: 'r2', rating: 5, comment: long, users: { name: 'Sara' }, company: { id: 'c1', name: 'Acme', status: 'approved' } },
+          { id: 'r3', rating: 4, comment: 'Trop court', users: { name: 'Ali' }, company: { id: 'c2', name: 'Beta', status: 'approved' } },
+          { id: 'r4', rating: 5, comment: long, users: { name: 'Nadia' }, company: { id: 'c3', name: 'Gamma', status: 'unverified' } },
+        ],
+      }),
+    });
+    vi.mocked(getSupabase).mockReturnValue(mock.client as any);
+
+    const res = await request(app).get('/api/companies/reviews/featured');
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveLength(1);
+    expect(res.body[0]).toMatchObject({ id: 'r1', author: 'Karim B.', company: { id: 'c1', name: 'Acme' } });
+    const q = mock.queries.find((x) => x.table === 'reviews');
+    expect(q?.columns).not.toContain('email');
+  });
+
   it('devrait rejeter un identifiant qui n\'est pas un UUID', async () => {
     mockWith(sessionRow({ role: 'admin' }));
 

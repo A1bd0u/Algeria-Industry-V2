@@ -87,3 +87,17 @@ export const categoryGroupId = (value?: string | null): string | null => {
   const id = idByName.get(value) || (productCategories.some((g) => g.id === value) ? value : undefined);
   return id ? id.charAt(0) : null;
 };
+
+// Adresses lisibles des pages secteurs (/secteurs/:slug).
+export const SECTOR_SLUGS: Record<string, string> = {
+  A: 'matieres-premieres',
+  B: 'machines-equipements',
+  C: 'composants-pieces',
+  D: 'services-industriels',
+  E: 'consommables-fournitures',
+};
+
+export const sectorPath = (groupId: string) => `/secteurs/${SECTOR_SLUGS[groupId]}`;
+
+export const sectorBySlug = (slug?: string | null) =>
+  productCategories.find((g) => SECTOR_SLUGS[g.id] === slug) || null;

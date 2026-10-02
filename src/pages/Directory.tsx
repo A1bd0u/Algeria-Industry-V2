@@ -16,6 +16,7 @@ import SEO from '../components/SEO';
 import { absoluteUrl } from '../config/site';
 import { formatNumber } from '../lib/format';
 import { CompanyAvatar } from '../components/ui/ProductImage';
+import EmptyState from '../components/ui/EmptyState';
 
 const Directory = () => {
   const { t, i18n } = useTranslation();
@@ -287,9 +288,9 @@ const Directory = () => {
               <p className="text-red-500 font-bold">{error}</p>
             </div>
           ) : filteredExhibitors.length === 0 ? (
-            <div className="col-span-full text-center py-12 bg-white rounded-2xl p-8 border border-gray-100">
-              <p className="text-gray-500 font-bold">{t('exhibitor.list.none')}</p>
-            </div>
+            <EmptyState className="col-span-full" illustration="search" title={t('exhibitor.list.none')} text={t('emptyStates.directoryText')}>
+              <Link to="/register?role=fournisseur" className="btn-primary">{t('home.supplierCard.cta')}</Link>
+            </EmptyState>
           ) : (
             paginatedExhibitors.map((exhibitor: any, idx) => (
               <motion.div 

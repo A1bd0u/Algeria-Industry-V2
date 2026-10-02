@@ -17,6 +17,7 @@ import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from 'react-router-dom';
 import { cn, generateSlugUrl } from '../lib/utils';
 import ProductImage from '../components/ui/ProductImage';
+import EmptyState from '../components/ui/EmptyState';
 
 const SearchResults = () => {
   const [searchParams] = useSearchParams();
@@ -229,13 +230,10 @@ const SearchResults = () => {
 
                    {/* Empty State / No more results */}
                    {totalResults === 0 && (
-                     <div className="bg-white p-12 text-center border border-dashed border-gray-200">
-                        <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                           <Inbox className="h-6 w-6 text-gray-300" />
-                        </div>
-                        <p className="text-xs font-black text-gray-500 uppercase tracking-wider">{t('search.no_results')}</p>
-                        <p className="text-xs text-gray-500 font-medium mt-2">{t('search.no_results_desc')} <Link to="/contact" className="text-secondary underline">{t('search.contact_support')}</Link></p>
-                     </div>
+                     <EmptyState illustration="search" title={t('search.no_results')} text={t('search.no_results_desc')}>
+                        <Link to="/products" className="btn-primary">{t('home.final.buyer')}</Link>
+                        <Link to="/contact" className="btn-ghost">{t('search.contact_support')}</Link>
+                     </EmptyState>
                    )}
                 </>
              )}

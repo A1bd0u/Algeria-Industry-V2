@@ -1,21 +1,22 @@
-import { ArrowRight, ChevronLeft, ChevronRight, MapPin, Search, ShieldCheck, SlidersHorizontal, Star, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, LayoutGrid, List, Search, SlidersHorizontal, X } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { ProductSkeleton } from '../components/Skeleton';
 import { useAuth } from '../context/AuthContext';
-import { useCurrency } from '../context/CurrencyContext';
 import { useToast } from '../context/ToastContext';
 import { categoryLabel, productCategories, categoryGroupId } from '../data/productCategories';
 import { WILAYAS } from '../data/wilayas';
 import { formatNumber } from '../lib/format';
-import { cn, generateSlugUrl } from '../lib/utils';
+import { cn } from '../lib/utils';
 import AddProduct from './AddProduct';
 import SEO from '../components/SEO';
 import { absoluteUrl } from '../config/site';
-import ProductImage from '../components/ui/ProductImage';
 import { useAdCategories } from '../context/AdTargetingContext';
+import ProductCard from '../components/ui/ProductCard';
+import QuickView from '../components/ui/QuickView';
+import EmptyState from '../components/ui/EmptyState';
 
 const PAGE_SIZE = 12;
 const SORTS = ['recent', 'price_asc', 'price_desc'] as const;
@@ -100,7 +101,6 @@ const Products = () => {
   const { t, i18n } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const { isAuthenticated, user } = useAuth();
-  const { formatPrice } = useCurrency();
   const toast = useToast();
   const navigate = useNavigate();
 
@@ -117,6 +117,15 @@ const Products = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [favorites, setFavorites] = useState<any[]>([]);
+  const [quickView, setQuickView] = useState<any | null>(null);
+  // Vue grille ou liste, mémorisée sur cet appareil.
+  const [view, setViewState] = useState<'grid' | 'list'>(() => {
+    try { return localStorage.getItem('catalogView') === 'list' ? 'list' : 'grid'; } catch { return 'grid'; }
+  });
+  const setView = (v: 'grid' | 'list') => {
+    setViewState(v);
+    try { localStorage.setItem('catalogView', v); } catch { /* stockage indisponible */ }
+  };
 
   useEffect(() => setSearchInput(search), [search]);
 
@@ -239,6 +248,17 @@ const Products = () => {
               <select id="sort" value={sort} onChange={(e) => update({ sort: e.target.value === 'recent' ? '' : e.target.value })} className="field !w-auto flex-1 sm:flex-none">
                 {SORTS.map((s) => <option key={s} value={s}>{t(`products.sort.${s}`)}</option>)}
               </select>
+              <div className="hidden sm:flex rounded-lg border border-gray-200 bg-white p-1" role="group" aria-label={t('products.view.label')}>
+                {(['grid', 'list'] as const).map((v) => {
+                  const Icon = v === 'grid' ? LayoutGrid : List;
+                  return (
+                    <button key={v} type="button" onClick={() => setView(v)} aria-pressed={view === v} aria-label={t(`products.view.${v}`)}
+                      className={cn('rounded-md p-2', view === v ? 'bg-primary text-white' : 'text-gray-500 hover:text-primary')}>
+                      <Icon className="h-4 w-4" />
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </form>
 
@@ -282,7 +302,7 @@ const Products = () => {
 
             <section className="flex-1 min-w-0" aria-busy={isFetching}>
               {isLoading ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                <div className="grid grid-cols-2 xl:grid-cols-3 gap-3 md:gap-5">
                   {Array.from({ length: 6 }).map((_, i) => <ProductSkeleton key={i} />)}
                 </div>
               ) : isError ? (
@@ -292,62 +312,26 @@ const Products = () => {
                   <button type="button" onClick={() => refetch()} className="btn-primary">{t('common.retry')}</button>
                 </div>
               ) : products.length === 0 ? (
-                <div className="tech-card p-10 text-center">
-                  <Search className="h-10 w-10 text-gray-300 mx-auto mb-4" aria-hidden="true" />
-                  <h2 className="text-xl font-bold text-primary mb-2">{t('products.emptyTitle')}</h2>
-                  <p className="text-gray-500 text-sm mb-6 max-w-md mx-auto">{t('products.emptyText')}</p>
-                  <div className="flex flex-wrap justify-center gap-3">
-                    {chips.length > 0 && <button type="button" onClick={clearAll} className="btn-primary">{t('common.clear_filters')}</button>}
-                    <Link to="/directory" className="btn-ghost">{t('home.hero.browseSuppliers')}</Link>
-                  </div>
-                </div>
+                <EmptyState illustration="search" title={t('products.emptyTitle')} text={t('products.emptyText')}>
+                  {chips.length > 0 && <button type="button" onClick={clearAll} className="btn-primary">{t('common.clear_filters')}</button>}
+                  <Link to="/directory" className="btn-ghost">{t('home.hero.browseSuppliers')}</Link>
+                </EmptyState>
               ) : (
                 <>
-                  <div className={cn('grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 transition-opacity', isFetching && 'opacity-60')}>
-                    {products.map((product) => {
-                      const url = `/products/${generateSlugUrl(product.name, product.id)}`;
-                      const isFav = favorites.some((f) => f.item_id === product.id);
-                      return (
-                        <article key={product.id} className="tech-card overflow-hidden flex flex-col group">
-                          <Link to={url} className="block aspect-[4/3] overflow-hidden relative">
-                            <ProductImage src={product.file_url} alt={product.name} category={product.category} imgClassName="group-hover:scale-105 transition-transform duration-500" />
-                            <button
-                              type="button"
-                              onClick={(e) => toggleFavorite(e, product.id)}
-                              aria-label={t('products.detail.favorite')}
-                              aria-pressed={isFav}
-                              className={cn('absolute top-3 end-3 w-9 h-9 rounded-full bg-white/90 backdrop-blur flex items-center justify-center shadow-sm', isFav ? 'text-secondary' : 'text-gray-500 hover:text-secondary')}
-                            >
-                              <Star className="h-4 w-4" fill={isFav ? 'currentColor' : 'none'} />
-                            </button>
-                          </Link>
-                          <div className="p-5 flex flex-col flex-1">
-                            <p className="text-xs text-gray-500 mb-1 line-clamp-1">{categoryLabel(t, product.category)}</p>
-                            <h2 className="font-bold text-primary leading-snug mb-3 line-clamp-2">
-                              <Link to={url} className="hover:text-secondary">{product.name}</Link>
-                            </h2>
-                            {product.company_name && (
-                              <p className="text-sm text-gray-600 flex items-center gap-1.5 mb-1">
-                                <span className="truncate">{product.company_name}</span>
-                                {product.company_verified && <ShieldCheck className="h-4 w-4 text-success shrink-0" aria-label={t('compare.verified')} />}
-                              </p>
-                            )}
-                            {product.region && (
-                              <p className="text-xs text-gray-500 flex items-center gap-1 mb-3"><MapPin className="h-3.5 w-3.5" />{product.region}</p>
-                            )}
-                            <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between gap-3">
-                              <span className="font-black text-primary">
-                                {Number(product.price) > 0 ? formatPrice(Number(product.price)) : t('common.onQuote')}
-                              </span>
-                              <Link to={url} className="text-sm font-bold text-secondary inline-flex items-center gap-1 hover:underline">
-                                {t('common.see_details')}
-                                <ArrowRight className="h-4 w-4 rtl:rotate-180" />
-                              </Link>
-                            </div>
-                          </div>
-                        </article>
-                      );
-                    })}
+                  <div className={cn(
+                    'transition-opacity',
+                    view === 'list' ? 'flex flex-col gap-3' : 'grid grid-cols-2 xl:grid-cols-3 gap-3 md:gap-5',
+                    isFetching && 'opacity-60',
+                  )}>
+                    {products.map((product) => (
+                      <ProductCard
+                        key={product.id}
+                        product={product}
+                        layout={view}
+                        onQuickView={setQuickView}
+                        favorite={{ active: favorites.some((f) => f.item_id === product.id), onToggle: (e) => toggleFavorite(e, product.id) }}
+                      />
+                    ))}
                   </div>
 
                   {totalPages > 1 && (
@@ -379,6 +363,8 @@ const Products = () => {
           </div>
         </div>
       </div>
+
+      {quickView && <QuickView product={quickView} onClose={() => setQuickView(null)} />}
 
       {/* Tiroir de filtres (mobile) */}
       {drawerOpen && (

@@ -9,6 +9,7 @@ describe('Emplacements du bandeau publicitaire', () => {
     expect(adPlacementForPath('/products/pompe--abc')).toBe('catalog');
     expect(adPlacementForPath('/search')).toBe('catalog');
     expect(adPlacementForPath('/compare')).toBe('catalog');
+    expect(adPlacementForPath('/secteurs/machines-equipements')).toBe('catalog');
     expect(adPlacementForPath('/directory/sarl--abc')).toBe('suppliers');
     expect(adPlacementForPath('/blog/article--abc')).toBe('content');
     expect(adPlacementForPath('/events')).toBe('content');

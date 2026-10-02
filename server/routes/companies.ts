@@ -8,7 +8,7 @@ import { validate } from '../middlewares/validateMiddleware';
 import { generateReferenceId } from '../utils/reference';
 import { requireAuth, requireEmailVerified, getOptionalUser } from '../middlewares/authMiddleware';
 import { requireUuidParams } from '../middlewares/validateParams';
-import { isAllowedImageUrl } from '../utils/storageUrl';
+import { isAllowedImageUrl, isSafeLinkUrl } from '../utils/storageUrl';
 
 const router = express.Router();
 
@@ -24,6 +24,12 @@ const companySchema = z.object({
   // Images déposées via /api/upload?bucket=product-images ; chaîne vide : retire l'image.
   logo_url: z.string().trim().max(500).optional(),
   banner_url: z.string().trim().max(500).optional(),
+  // Vitrine : null ou chaîne vide efface la valeur.
+  founded_year: z.coerce.number().int().min(1900).max(new Date().getFullYear()).nullable().optional().or(z.literal('')),
+  employees: z.enum(['1-9', '10-49', '50-249', '250+']).nullable().optional().or(z.literal('')),
+  certifications: z.array(z.string().trim().min(2).max(60)).max(10).optional(),
+  gallery: z.array(z.string().trim().max(500)).max(8).optional(),
+  website: z.string().trim().max(300).optional(),
 });
 
 // Une image d'entreprise doit venir du stockage public de la plateforme,
@@ -36,7 +42,7 @@ const reviewSchema = z.object({
 // Colonnes publiques d'une entreprise : ni NIF/RC bruts ni motifs KYC.
 const PUBLISHED_PRODUCT_STATUSES = ['Actif', 'active'];
 
-const PUBLIC_COMPANY_COLUMNS = 'id, reference_id, name, description, activity_sector, wilaya, status, certified, logo_url, banner_url, verified_at, created_at';
+const PUBLIC_COMPANY_COLUMNS = 'id, reference_id, name, description, activity_sector, wilaya, status, certified, logo_url, banner_url, verified_at, founded_year, employees, certifications, gallery, website, created_at';
 
 
 // GET /api/companies - Liste toutes les entreprises (pour l'annuaire)
@@ -84,6 +90,45 @@ router.get('/', async (req, res, next) => {
   } catch (err: any) {
     logger.error("Supabase Error GET /companies:", err);
     next(err);
+  }
+});
+
+// GET /api/companies/reviews/featured - Avis réels mis en avant sur l'accueil :
+// note de 4 ou 5, commentaire développé, entreprise vérifiée, un par entreprise.
+// L'auteur n'apparaît que par son prénom et l'initiale de son nom.
+router.get('/reviews/featured', async (req, res) => {
+  try {
+    const supabase = getSupabase();
+    const { data, error } = await supabase
+      .from('reviews')
+      .select('id, rating, comment, created_at, users:user_id(name), company:companies(id, name, status)')
+      .gte('rating', 4)
+      .not('comment', 'is', null)
+      .order('created_at', { ascending: false })
+      .limit(40);
+    if (error) throw error;
+
+    const seen = new Set<string>();
+    const featured = (data || [])
+      .filter((r: any) => r.company?.status === 'approved' && typeof r.comment === 'string' && r.comment.trim().length >= 30)
+      .filter((r: any) => (seen.has(r.company.id) ? false : (seen.add(r.company.id), true)))
+      .slice(0, 6)
+      .map((r: any) => {
+        const [first = '', last = ''] = String(r.users?.name || '').trim().split(/\s+/);
+        return {
+          id: r.id,
+          rating: r.rating,
+          comment: r.comment.trim().slice(0, 400),
+          created_at: r.created_at,
+          author: first ? `${first}${last ? ` ${last.charAt(0)}.` : ''}` : null,
+          company: { id: r.company.id, name: r.company.name },
+        };
+      });
+    res.set('Cache-Control', 'public, max-age=300');
+    return res.json(featured);
+  } catch (err: any) {
+    logger.error('Error GET /companies/reviews/featured:', err);
+    return res.json([]);
   }
 });
 
@@ -196,8 +241,27 @@ router.post('/', requireAuth, validate(companySchema), async (req, res) => {
 
 // PUT /api/companies/:id - Mettre à jour une entreprise spécifique
 router.put('/:id', requireAuth, requireUuidParams('id'), validate(companySchema), async (req, res) => {
-  const { name, nif, rc, description, activity_sector, wilaya, whatsapp, logo_url, banner_url } = req.body;
+  const { name, nif, rc, description, activity_sector, wilaya, whatsapp, logo_url, banner_url, founded_year, employees, certifications, gallery, website } = req.body;
   const user = (req as any).user;
+
+  if (gallery && gallery.some((url: string) => !isAllowedImageUrl(url, user))) {
+    return res.status(400).json({ error: 'Image invalide : déposez-la depuis votre tableau de bord.', code: 'COMPANY_IMAGE_INVALID' });
+  }
+  let websiteValue: string | null | undefined;
+  if (website !== undefined) {
+    const candidate = website && !/^https?:\/\//i.test(website) ? `https://${website}` : website;
+    websiteValue = candidate ? (isSafeLinkUrl(candidate) && !candidate.startsWith('/') ? candidate : undefined) : null;
+    if (websiteValue === undefined) {
+      return res.status(400).json({ error: 'Adresse de site web invalide.', code: 'WEBSITE_INVALID' });
+    }
+  }
+  const showcase = {
+    ...(founded_year !== undefined && { founded_year: founded_year === '' ? null : founded_year }),
+    ...(employees !== undefined && { employees: employees || null }),
+    ...(certifications !== undefined && { certifications: [...new Set(certifications as string[])] }),
+    ...(gallery !== undefined && { gallery }),
+    ...(websiteValue !== undefined && { website: websiteValue }),
+  };
 
   const images: Record<string, string | null> = {};
   for (const [key, value] of Object.entries({ logo_url, banner_url })) {
@@ -239,7 +303,7 @@ router.put('/:id', requireAuth, requireUuidParams('id'), validate(companySchema)
 
     const { data, error } = await supabase
       .from('companies')
-      .update({ name, nif, rc, description, activity_sector, wilaya, whatsapp: whatsappValue, ...images })
+      .update({ name, nif, rc, description, activity_sector, wilaya, whatsapp: whatsappValue, ...images, ...showcase })
       .eq('id', req.params.id)
       .select()
       .single();

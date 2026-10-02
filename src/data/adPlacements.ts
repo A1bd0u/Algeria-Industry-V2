@@ -8,7 +8,7 @@ export const AD_CATEGORY_GROUPS = ['A', 'B', 'C', 'D', 'E'] as const;
 // Groupe de pages d'une URL du site ; null = pas de bandeau sur cette page.
 export const adPlacementForPath = (pathname: string): AdPlacement | null => {
   if (pathname === '/') return 'home';
-  if (/^\/(products(\/|$)|search$|compare$)/.test(pathname)) return 'catalog';
+  if (/^\/(products(\/|$)|search$|compare$|secteurs\/)/.test(pathname)) return 'catalog';
   if (/^\/directory(\/|$)/.test(pathname)) return 'suppliers';
   if (/^\/(blog(\/|$)|events$|catalogues$|resources$)/.test(pathname)) return 'content';
   return null;

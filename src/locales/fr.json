@@ -28,6 +28,7 @@
     "adminConsole": "Console d'administration",
     "mobileTabs": "Navigation principale",
     "language": "Langue : {{name}}",
+    "megaHint": "Cinq secteurs, de la matière première aux services industriels.",
     "console_pro": "Espace administrateur"
   },
   "hero": {
@@ -205,6 +206,13 @@
     },
     "latest": {
       "label": "Nouveautés"
+    },
+    "reviews": {
+      "label": "Avis",
+      "title": "Ce que disent les acheteurs",
+      "subtitle": "Avis laissés sur les fiches des fournisseurs vérifiés.",
+      "rating": "{{rating}} étoiles sur 5",
+      "about": "à propos de"
     }
   },
   "directory": {
@@ -293,7 +301,18 @@
     "emptyText": "Essayez une autre catégorie ou retirez des filtres. Vous pouvez aussi chercher directement un fournisseur dans l'annuaire.",
     "pagination": "Pagination",
     "pageOf": "Page {{page}} sur {{total}}",
-    "showResults": "Voir {{count}} résultat(s)"
+    "showResults": "Voir {{count}} résultat(s)",
+    "badges": {
+      "new": "Nouveau",
+      "verified": "Vérifié"
+    },
+    "quickView": "Aperçu",
+    "view": {
+      "label": "Affichage",
+      "grid": "Vue en grille",
+      "list": "Vue en liste"
+    },
+    "quickViewOpen": "Voir la fiche complète"
   },
   "blog": {
     "title": "Actualités Industrielles",
@@ -637,7 +656,10 @@
     "COMPANY_LEGAL_LOCKED": "Le RC et le NIF vérifiés ne peuvent plus être modifiés. Contactez le support.",
     "QUOTE_NO_SUPPLIER": "Aucun fournisseur à contacter pour ces produits.",
     "QUOTE_RATE_LIMIT": "Trop de demandes de devis envoyées. Réessayez plus tard.",
-    "COMPANY_IMAGE_INVALID": "Image invalide : déposez-la depuis votre tableau de bord."
+    "COMPANY_IMAGE_INVALID": "Image invalide : déposez-la depuis votre tableau de bord.",
+    "PRODUCT_IMAGE_INVALID": "Image invalide : déposez-la depuis votre tableau de bord.",
+    "PLAN_IMAGE_LIMIT": "Nombre de photos limité par votre offre. Passez à une offre supérieure.",
+    "WEBSITE_INVALID": "Adresse de site web invalide."
   },
   "mfa": {
     "title": "Double authentification",
@@ -768,13 +790,13 @@
   "addProduct": {
     "titleNew": "Nouveau produit",
     "titleEdit": "Modifier le produit",
-    "subtitle": "Référencement au catalogue (brouillon sauvegardé)",
+    "subtitle": "Brouillon enregistré automatiquement sur cet appareil",
     "close": "Fermer",
     "name": "Nom du produit",
     "namePlaceholder": "Ex : Pompe à engrenages HP-300",
     "category": "Catégorie",
     "selectCategory": "Sélectionner...",
-    "price": "Gamme de prix (DZD)",
+    "price": "Prix (DA)",
     "pricePlaceholder": "Ex : 50 000",
     "description": "Description technique",
     "descriptionPlaceholder": "Spécifications, dimensions, usage...",
@@ -787,7 +809,19 @@
     "cancel": "Annuler",
     "uploadParseError": "Erreur lors du traitement de la réponse du serveur.",
     "uploadError": "L'envoi du fichier a échoué.",
-    "saveError": "Erreur lors de la sauvegarde du produit."
+    "saveError": "Erreur lors de la sauvegarde du produit.",
+    "photos": "Photos du produit",
+    "photosCount": "{{count}} / {{max}} photos",
+    "morePhotos": "Plus de photos",
+    "addPhotos": "Ajouter des photos",
+    "mainPhoto": "Principale",
+    "moveBefore": "Déplacer avant",
+    "moveAfter": "Déplacer après",
+    "removePhoto": "Retirer la photo",
+    "photoRequired": "Ajoutez au moins une photo du produit.",
+    "imagesLimit": "Votre offre permet {{count}} photos par produit.",
+    "photoTips": "Conseils : produit entier, fond neutre et bonne lumière. Les photos sont mises au carré automatiquement, sans être coupées. La première est la photo principale.",
+    "priceHint": "Laissez vide pour « Sur devis »."
   },
   "dashboard": {
     "planBadge": {
@@ -895,7 +929,10 @@
       "whatsappPlaceholder": "Ex : 0550 12 34 56",
       "whatsappHelp": "Affiché sur votre fiche publique une fois votre entreprise vérifiée. Laissez vide pour ne pas l'afficher.",
       "changeLogo": "Changer le logo",
-      "changeBanner": "Changer la bannière"
+      "changeBanner": "Changer la bannière",
+      "showcase": "Vitrine de l'entreprise",
+      "certificationsHelp": "Séparées par des virgules (10 au plus). Affichées sur votre fiche.",
+      "galleryHelp": "Jusqu'à 8 photos : usine, ateliers, équipe, réalisations. La première est mise en avant."
     },
     "menu": {
       "overview": "Vue d'ensemble",
@@ -951,7 +988,33 @@
       "whatsapp": "Renseigner un numéro WhatsApp",
       "wilaya": "Indiquer la wilaya",
       "kyc": "Faire vérifier l'entreprise (RC et NIF)",
-      "products": "Publier au moins 10 produits"
+      "products": "Publier au moins 10 produits",
+      "gallery": "Au moins 3 photos dans la galerie"
+    },
+    "onboarding": {
+      "title": "Bien démarrer sur Algeria Industry",
+      "subtitle": "Quatre étapes pour être visible et recevoir des demandes de devis.",
+      "progress": "{{done}} / {{total}} étapes",
+      "account": {
+        "title": "Compte créé",
+        "text": "Votre espace fournisseur est prêt."
+      },
+      "company": {
+        "title": "Fiche entreprise",
+        "text": "Logo, description de 80 caractères ou plus, coordonnées.",
+        "cta": "Compléter ma fiche"
+      },
+      "kyc": {
+        "title": "Vérification",
+        "text": "Envoyez votre RC et votre NIF pour obtenir le badge « vérifiée ».",
+        "pending": "Documents reçus : vérification en cours par notre équipe.",
+        "cta": "Envoyer mes documents"
+      },
+      "product": {
+        "title": "Premier produit",
+        "text": "Publiez un produit avec de bonnes photos.",
+        "cta": "Ajouter un produit"
+      }
     }
   },
   "help": {
@@ -1262,7 +1325,13 @@
     "cataloguesCtaButton": "Voir les catalogues",
     "whatsapp": "WhatsApp",
     "whatsappMessage": "Bonjour, je vous contacte via Algeria Industry au sujet de {{name}}.",
-    "verifiedOn": "RC et NIF contrôlés le {{date}}"
+    "verifiedOn": "RC et NIF contrôlés le {{date}}",
+    "foundedYear": "Année de création",
+    "employees": "Effectif",
+    "employeesValue": "{{value}} salariés",
+    "website": "Site web",
+    "certifications": "Certifications",
+    "gallery": "Galerie"
   },
   "pricing": {
     "eyebrow": "Tarification transparente",
@@ -1400,5 +1469,37 @@
       "subtitle": "Pour les 100 premiers fournisseurs vérifiés.",
       "cta": "Voir l'offre"
     }
+  },
+  "sector": {
+    "seoTitle": "{{name}} : fournisseurs et produits en Algérie",
+    "breadcrumb": "Fil d'Ariane",
+    "seeProducts": "Voir les {{count}} produits",
+    "seeCatalog": "Voir le catalogue",
+    "listCompany": "Vous êtes fournisseur de ce secteur ?",
+    "subcategories": "Sous-catégories",
+    "latest": "Derniers produits du secteur",
+    "seeAll": "Tout voir",
+    "empty": "Aucun produit publié dans ce secteur pour le moment.",
+    "suppliers": "Fournisseurs actifs dans ce secteur",
+    "others": "Autres secteurs",
+    "A": {
+      "intro": "Métaux, chimie de base, matériaux de construction, textiles et produits agricoles bruts : trouvez vos fournisseurs de matières premières en Algérie."
+    },
+    "B": {
+      "intro": "Machines-outils, lignes de production, engins de chantier, matériel agricole et de manutention, auprès de fournisseurs vérifiés."
+    },
+    "C": {
+      "intro": "Composants électroniques, pièces mécaniques et automobiles, hydraulique et pneumatique : les pièces dont votre production a besoin."
+    },
+    "D": {
+      "intro": "Maintenance, ingénierie, logistique, conseil, sous-traitance et informatique industrielle : des prestataires pour vos projets."
+    },
+    "E": {
+      "intro": "Outillage, produits d'entretien, équipements de protection, emballages et fournitures : les consommables de votre activité."
+    }
+  },
+  "emptyStates": {
+    "directoryText": "Essayez une autre wilaya ou un autre secteur, ou référencez votre entreprise.",
+    "messagesText": "Contactez un fournisseur depuis une fiche produit ou entreprise : la conversation apparaîtra ici."
   }
 }

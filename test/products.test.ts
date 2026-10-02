@@ -131,3 +131,53 @@ describe('Catalogue public : filtres et tri côté serveur', () => {
     expect(res.body.data[0].company).toBeUndefined();
   });
 });
+
+describe('Galerie produit', () => {
+  let app: express.Express;
+  const IMG = (n: number) => `https://proj.supabase.co/storage/v1/object/public/product-images/${sessionRow().id}/p${n}.jpg`;
+
+  beforeEach(async () => {
+    process.env.SUPABASE_URL = 'https://proj.supabase.co';
+    app = await createApp();
+    vi.mocked(jwt.verify).mockReturnValue({ id: 'x', token_version: 1 } as any);
+  });
+
+  it('enregistre les images dans l\'ordre, la première servant de vignette', async () => {
+    const mock = createSupabaseMock({
+      users: usersHandler(sessionRow()),
+      companies: () => ({ data: { plan: 'free', plan_ends_at: null } }),
+      products: (q) => (q.op === 'insert' ? { data: { id: 'p1', ...q.payload[0] } } : { data: [], count: 0 }),
+    });
+    vi.mocked(getSupabase).mockReturnValue(mock.client as any);
+
+    const res = await request(app).post('/api/products').set('Cookie', ['token=valid-token'])
+      .send({ name: 'Pompe', images: [IMG(1), IMG(2)] });
+    expect(res.status).toBe(201);
+    const insert = mock.queries.find((q) => q.table === 'products' && q.op === 'insert');
+    expect(insert?.payload[0]).toMatchObject({ images: [IMG(1), IMG(2)], file_url: IMG(1) });
+  });
+
+  it('refuse plus d\'images que l\'offre ne le permet', async () => {
+    const mock = createSupabaseMock({
+      users: usersHandler(sessionRow()),
+      companies: () => ({ data: { plan: 'free', plan_ends_at: null } }),
+    });
+    vi.mocked(getSupabase).mockReturnValue(mock.client as any);
+
+    const res = await request(app).post('/api/products').set('Cookie', ['token=valid-token'])
+      .send({ name: 'Pompe', images: [IMG(1), IMG(2), IMG(3)] });
+    expect(res.status).toBe(403);
+    expect(res.body).toMatchObject({ code: 'PLAN_IMAGE_LIMIT', limit: 2 });
+    expect(mock.queries.some((q) => q.table === 'products' && q.op === 'insert')).toBe(false);
+  });
+
+  it('refuse une image hors du dossier de l\'utilisateur', async () => {
+    const mock = createSupabaseMock({ users: usersHandler(sessionRow()) });
+    vi.mocked(getSupabase).mockReturnValue(mock.client as any);
+
+    const res = await request(app).post('/api/products').set('Cookie', ['token=valid-token'])
+      .send({ name: 'Pompe', images: ['https://proj.supabase.co/storage/v1/object/public/product-images/autre/x.jpg'] });
+    expect(res.status).toBe(400);
+    expect(res.body.code).toBe('PRODUCT_IMAGE_INVALID');
+  });
+});

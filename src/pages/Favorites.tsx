@@ -4,6 +4,7 @@ import { motion } from 'motion/react';
 import { useAuth } from '../context/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import EmptyState from '../components/ui/EmptyState';
 
 
 const Favorites = () => {
@@ -72,16 +73,9 @@ const Favorites = () => {
         </div>
 
         {favorites.length === 0 ? (
-          <div className="bg-white rounded-2xl p-16 text-center shadow-sm border border-gray-100 flex flex-col items-center">
-            <Heart className="h-16 w-16 text-gray-200 mb-6" />
-            <h2 className="text-xl font-black text-primary mb-2">{t('favorites.emptyTitle')}</h2>
-            <p className="text-gray-500 mb-8 max-w-md mx-auto">
-              {t('favorites.emptyText')}
-            </p>
-            <Link to="/products" className="bg-primary text-white px-8 py-4 rounded-xl font-black uppercase tracking-widest text-xs hover:bg-secondary transition-all">
-              Explorer le catalogue
-            </Link>
-          </div>
+          <EmptyState illustration="heart" title={t('favorites.emptyTitle')} text={t('favorites.emptyText')}>
+            <Link to="/products" className="btn-primary">{t('home.final.buyer')}</Link>
+          </EmptyState>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {favorites.map((fav) => (

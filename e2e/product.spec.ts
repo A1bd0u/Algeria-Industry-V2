@@ -22,9 +22,17 @@ test.describe('Vendor Product Creation', () => {
       });
     });
 
+    // Envoi de photo : le stockage renvoie l'URL publique du fichier déposé.
+    const PHOTO_URL = 'http://localhost:3000/placeholder.svg?e2e=photo';
+    await page.route('**/api/upload**', async (route) => {
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ url: PHOTO_URL }) });
+    });
+
     // Intercepter la requête de création de produit
+    let createdPayload: any = null;
     await page.route('**/api/products', async (route) => {
       if (route.request().method() === 'POST') {
+        createdPayload = route.request().postDataJSON();
         await route.fulfill({
           status: 201,
           contentType: 'application/json',
@@ -57,9 +65,20 @@ test.describe('Vendor Product Creation', () => {
 
     // Remplir le formulaire
     await page.fill('input[name="name"]', 'Nouveau Produit B2B');
+    await page.selectOption('select[name="category"]', { index: 1 });
     await page.fill('input[name="price"]', '500');
     await page.fill('textarea[name="description"]', 'Description de mon super produit B2B pour le test e2e.');
     
+    // Sans photo, le formulaire refuse l'envoi.
+    await page.click('button:has-text("Ajouter au catalogue")');
+    await expect(page.getByRole('alert')).toContainText('photo');
+    expect(createdPayload).toBeNull();
+
+    // Ajouter une photo (PNG 1 × 1), mise au carré puis déposée.
+    const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==', 'base64');
+    await page.setInputFiles('input[type="file"]', { name: 'pompe.png', mimeType: 'image/png', buffer: png });
+    await expect(page.getByText('Principale')).toBeVisible();
+
     // Soumettre le formulaire
     await page.click('button:has-text("Ajouter au catalogue")');
 
@@ -68,5 +87,6 @@ test.describe('Vendor Product Creation', () => {
     // Par exemple, on peut vérifier que le texte "Nouveau Produit B2B" apparait dans la page
     // Ou si la modale se ferme
     await expect(page.locator('text=Nouveau Produit B2B').first()).toBeVisible();
+    expect(createdPayload).toMatchObject({ name: 'Nouveau Produit B2B', images: [PHOTO_URL], file_url: PHOTO_URL });
   });
 });

@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { X, Upload, Loader2, CheckCircle2 } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { ArrowLeft, ArrowRight, ImagePlus, Lightbulb, Loader2, Star, Trash2, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import { productCategories } from '../data/productCategories';
 import { ApiError, apiErrorMessage } from '../lib/apiError';
+import { cn } from '../lib/utils';
 
 interface AddProductProps {
   initialData?: any;
@@ -13,300 +15,285 @@ interface AddProductProps {
 }
 
 const STORAGE_KEY = 'addProductFormDraft';
+const EMPTY = { name: '', category: '', price: '', description: '' };
+const SQUARE = 1200;
 
+// Mise au carré sans rogner : l'image est centrée sur un fond blanc de
+// 1200 × 1200 px, pour des vignettes homogènes dans tout le catalogue.
+const toSquare = (file: File): Promise<Blob> => new Promise((resolve, reject) => {
+  const url = URL.createObjectURL(file);
+  const img = new Image();
+  img.onload = () => {
+    const scale = Math.min(SQUARE / img.width, SQUARE / img.height, 1);
+    const w = Math.round(img.width * scale);
+    const h = Math.round(img.height * scale);
+    const side = Math.max(w, h, 600);
+    const canvas = document.createElement('canvas');
+    canvas.width = side;
+    canvas.height = side;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) { URL.revokeObjectURL(url); reject(new Error('canvas')); return; }
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, side, side);
+    ctx.drawImage(img, (side - w) / 2, (side - h) / 2, w, h);
+    URL.revokeObjectURL(url);
+    canvas.toBlob((blob) => (blob ? resolve(blob) : reject(new Error('blob'))), 'image/jpeg', 0.88);
+  };
+  img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('image')); };
+  img.src = url;
+});
 
 const AddProduct: React.FC<AddProductProps> = ({ isOpen, onClose, onSuccess, initialData }) => {
   const { t } = useTranslation();
-  const [formData, setFormData] = useState(initialData || {
-    name: '',
-    category: '',
-    price: '',
-    description: ''
-  });
-  const [fileUrl, setFileUrl] = useState<string | null>(initialData?.file_url || initialData?.image || null);
-  
-  const [isUploading, setIsUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
+  const [formData, setFormData] = useState(EMPTY);
+  const [images, setImages] = useState<string[]>([]);
+  const [maxImages, setMaxImages] = useState(2);
+  const [uploading, setUploading] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Charger le brouillon
+  // Ouverture : produit à modifier, sinon brouillon local.
   useEffect(() => {
-    if (isOpen) {
-      if (initialData) {
-         setFormData({ name: initialData.name || '', category: initialData.category || '', price: initialData.price || '', description: initialData.description || '' });
-         setFileUrl(initialData.file_url || initialData.image || null);
-      } else {
-         const saved = localStorage.getItem(STORAGE_KEY);
-         if (saved) {
-           setFormData(JSON.parse(saved));
-         } else {
-           setFormData({ name: '', category: '', price: '', description: '' });
-         }
-         setFileUrl(null);
+    if (!isOpen) return;
+    setError('');
+    if (initialData) {
+      setFormData({
+        name: initialData.name || '',
+        category: initialData.category || '',
+        price: initialData.price ?? '',
+        description: initialData.description || '',
+      });
+      const gallery = Array.isArray(initialData.images) && initialData.images.length
+        ? initialData.images
+        : [initialData.file_url || initialData.image].filter(Boolean);
+      setImages(gallery);
+    } else {
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+        setFormData(saved?.formData || EMPTY);
+        setImages(Array.isArray(saved?.images) ? saved.images : []);
+      } catch {
+        setFormData(EMPTY);
+        setImages([]);
       }
     }
+    // Nombre d'images autorisé par l'offre (2, 5 ou 10).
+    fetch('/api/subscriptions/me')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => { if (d?.limits?.imagesPerProduct) setMaxImages(d.limits.imagesPerProduct); })
+      .catch(() => {});
   }, [isOpen, initialData]);
 
+  // Brouillon d'un nouveau produit.
   useEffect(() => {
-    if (!initialData) {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        try {
-          const parsed = JSON.parse(saved);
-          if (parsed && typeof parsed === 'object') {
-             setFormData(parsed.formData || { name: '', category: '', price: '', description: '' });
-             if (parsed.fileUrl) setFileUrl(parsed.fileUrl);
-          }
-        } catch(e) {}
-      }
+    if (isOpen && !initialData) {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ formData, images })); } catch { /* stockage indisponible */ }
     }
-  }, [initialData]);
-
-  // Sauvegarder le brouillon
-  useEffect(() => {
-    if (isOpen) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ formData, fileUrl }));
-    }
-  }, [formData, fileUrl, isOpen]);
+  }, [formData, images, isOpen, initialData]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files || e.target.files.length === 0) return;
-    const file = e.target.files[0];
-    
-    setIsUploading(true);
-    setUploadProgress(0);
-    setError('');
-
-    const xhr = new XMLHttpRequest();
+  const uploadOne = async (file: File): Promise<string> => {
+    const square = await toSquare(file).catch(() => file);
     const data = new FormData();
-    data.append('file', file);
-
-    xhr.upload.addEventListener('progress', (event) => {
-      if (event.lengthComputable) {
-        const percentCompleted = Math.round((event.loaded * 100) / event.total);
-        setUploadProgress(percentCompleted);
-      }
-    });
-
-    xhr.addEventListener('load', () => {
-      setIsUploading(false);
-      if (xhr.status >= 200 && xhr.status < 300) {
-        try {
-          const response = JSON.parse(xhr.responseText);
-          setFileUrl(response.url);
-          setUploadProgress(100);
-        } catch(err) {
-          setError(t('addProduct.uploadParseError'));
-        }
-      } else {
-        try {
-          const response = JSON.parse(xhr.responseText);
-          setError(apiErrorMessage(response, 'addProduct.uploadError'));
-        } catch {
-          setError(t('addProduct.uploadError'));
-        }
-      }
-    });
-
-    xhr.addEventListener('error', () => {
-      setIsUploading(false);
-      setError(t('auth.networkError'));
-    });
-
-    xhr.open('POST', '/api/upload?bucket=product-images');
-    // Assuming auth is handled via cookies which are sent automatically, if JWT in header is needed, add it here.
-    xhr.send(data);
+    data.append('file', square, file.name.replace(/\.[^.]+$/, '') + '.jpg');
+    const res = await fetch('/api/upload?bucket=product-images', { method: 'POST', body: data });
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok || !body.url) throw new ApiError(body, 'addProduct.uploadError');
+    return body.url;
   };
+
+  const handleFiles = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []).filter((f: File) => f.type.startsWith('image/')) as File[];
+    e.target.value = '';
+    if (!files.length) return;
+    const room = maxImages - images.length;
+    if (room <= 0) {
+      setError(t('addProduct.imagesLimit', { count: maxImages }));
+      return;
+    }
+    if (files.length > room) setError(t('addProduct.imagesLimit', { count: maxImages }));
+    else setError('');
+    const batch = files.slice(0, room);
+    setUploading(batch.length);
+    for (const file of batch) {
+      try {
+        const url = await uploadOne(file);
+        setImages((prev) => (prev.length < maxImages ? [...prev, url] : prev));
+      } catch (err: any) {
+        setError(err.message || t('addProduct.uploadError'));
+      } finally {
+        setUploading((n) => n - 1);
+      }
+    }
+  };
+
+  const move = (index: number, delta: number) => setImages((prev) => {
+    const next = [...prev];
+    const target = index + delta;
+    if (target < 0 || target >= next.length) return prev;
+    [next[index], next[target]] = [next[target], next[index]];
+    return next;
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (images.length === 0) {
+      setError(t('addProduct.photoRequired'));
+      return;
+    }
     setIsLoading(true);
     setError('');
-
+    const price = String(formData.price).replace(/\s/g, '');
     const payload = {
       ...formData,
-      file_url: fileUrl,
+      price: price === '' ? null : price,
+      images,
+      file_url: images[0],
     };
-
     try {
-      const url = initialData ? `/api/products/${initialData.id}` : '/api/products';
-      const method = initialData ? 'PUT' : 'POST';
-      const res = await fetch(url, {
-        method,
+      const res = await fetch(initialData ? `/api/products/${initialData.id}` : '/api/products', {
+        method: initialData ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
       });
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new ApiError(data, 'addProduct.saveError');
-      }
-      const addedProd = await res.json();
-      
-      // Clear draft on success
-      localStorage.removeItem(STORAGE_KEY);
-      setFormData({ name: '', category: '', price: '', description: '' });
-      setFileUrl(null);
-      
-      onSuccess(addedProd);
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new ApiError(data, 'addProduct.saveError');
+      try { localStorage.removeItem(STORAGE_KEY); } catch { /* rien */ }
+      setFormData(EMPTY);
+      setImages([]);
+      onSuccess(data);
       onClose();
     } catch (err: any) {
-      setError(err.message);
+      setError(err.message || apiErrorMessage({}, 'addProduct.saveError'));
     } finally {
       setIsLoading(false);
     }
   };
 
+  const field = 'w-full rounded-xl border border-border-tech bg-white px-4 py-3 text-sm outline-none focus:border-secondary';
+  const label = 'text-sm font-bold text-primary';
+
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-primary/40 backdrop-blur-sm">
-      <motion.div 
-        initial={{ opacity: 0, scale: 0.95, y: 20 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.95, y: 20 }}
-        className="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="p-10 overflow-y-auto">
-          <div className="flex justify-between items-center mb-8">
-            <div>
-              <h3 className="text-2xl font-black text-primary tracking-tighter">{initialData ? t('addProduct.titleEdit') : t('addProduct.titleNew')}</h3>
-              <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mt-1">{t('addProduct.subtitle')}</p>
-            </div>
-            <button type="button" onClick={onClose} aria-label={t('addProduct.close')} className="p-3 text-gray-500 hover:text-primary transition-all">
-              <X className="h-6 w-6" />
-            </button>
-          </div>
-          
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {error && (
-              <div className="p-4 bg-red-50 text-red-600 rounded-xl text-sm font-medium">
-                {error}
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-primary/40 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="add-product-title">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.97, y: 16 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.97, y: 16 }}
+            className="relative w-full max-w-3xl bg-white rounded-2xl shadow-2xl overflow-hidden max-h-[92vh] flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-border-tech px-6 py-4">
+              <div>
+                <h3 id="add-product-title" className="text-xl font-black text-primary">{initialData ? t('addProduct.titleEdit') : t('addProduct.titleNew')}</h3>
+                <p className="text-xs text-gray-500 mt-0.5">{t('addProduct.subtitle')}</p>
               </div>
-            )}
-            
-            <div className="space-y-2">
-              <label htmlFor="product_name" className="text-xs font-black text-primary uppercase tracking-widest italic">{t('addProduct.name')}</label>
-              <input 
-                id="product_name"
-                name="name"
-                required
-                type="text" 
-                value={formData.name}
-                onChange={handleChange}
-                placeholder={t('addProduct.namePlaceholder')} 
-                className="w-full bg-gray-50 border-none px-8 py-5 rounded-2xl text-sm font-bold outline-none ring-2 ring-transparent focus:ring-secondary/20 transition-all" 
-              />
+              <button type="button" onClick={onClose} aria-label={t('addProduct.close')} className="p-2 text-gray-500 hover:text-primary">
+                <X className="h-5 w-5" />
+              </button>
             </div>
 
-            <div className="grid grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label htmlFor="product_category" className="text-xs font-black text-primary uppercase tracking-widest italic">{t('addProduct.category')}</label>
-                <select 
-                  id="product_category"
-                  name="category" 
-                  value={formData.category}
-                  onChange={handleChange}
-                  className="w-full bg-gray-50 border-none px-6 py-5 rounded-2xl text-xs font-black uppercase tracking-widest outline-none cursor-pointer"
-                >
-                  <option value="" disabled>{t('addProduct.selectCategory')}</option>
-                  {productCategories.map(group => (
-                    <optgroup key={group.id} label={t(`productCategories.${group.id}`)}>
-                      {group.subCategories.map((sub: any) => (
-                        <option key={sub.id} value={sub.name}>{t(`productCategories.${sub.id}`)}</option>
-                      ))}
-                    </optgroup>
+            <form onSubmit={handleSubmit} className="overflow-y-auto p-6 space-y-6">
+              {error && <div className="p-3 bg-red-50 text-red-600 rounded-xl text-sm font-medium" role="alert">{error}</div>}
+
+              {/* Photos */}
+              <section>
+                <div className="flex items-baseline justify-between gap-3 mb-2">
+                  <p className={label}>{t('addProduct.photos')} *</p>
+                  <p className="text-xs text-gray-500">
+                    {t('addProduct.photosCount', { count: images.length, max: maxImages })}
+                    {maxImages < 10 && <> · <Link to="/tarifs" className="text-secondary font-bold hover:underline">{t('addProduct.morePhotos')}</Link></>}
+                  </p>
+                </div>
+                <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
+                  {images.map((url, i) => (
+                    <div key={url} className={cn('group relative aspect-square overflow-hidden rounded-xl border bg-white', i === 0 ? 'border-secondary ring-2 ring-secondary/30' : 'border-border-tech')}>
+                      <img src={url} alt="" className="h-full w-full object-contain" />
+                      {i === 0 && (
+                        <span className="absolute top-1.5 start-1.5 inline-flex items-center gap-1 rounded bg-secondary px-1.5 py-0.5 text-[10px] font-bold text-white">
+                          <Star className="h-3 w-3" aria-hidden="true" /> {t('addProduct.mainPhoto')}
+                        </span>
+                      )}
+                      <div className="absolute inset-x-1 bottom-1 flex justify-between gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100 transition-opacity">
+                        <button type="button" onClick={() => move(i, -1)} disabled={i === 0} aria-label={t('addProduct.moveBefore')} className="rounded bg-white/90 p-1 shadow disabled:opacity-30">
+                          <ArrowLeft className="h-3.5 w-3.5 rtl:rotate-180" />
+                        </button>
+                        <button type="button" onClick={() => setImages((prev) => prev.filter((_, j) => j !== i))} aria-label={t('addProduct.removePhoto')} className="rounded bg-white/90 p-1 text-red-500 shadow">
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                        <button type="button" onClick={() => move(i, 1)} disabled={i === images.length - 1} aria-label={t('addProduct.moveAfter')} className="rounded bg-white/90 p-1 shadow disabled:opacity-30">
+                          <ArrowRight className="h-3.5 w-3.5 rtl:rotate-180" />
+                        </button>
+                      </div>
+                    </div>
                   ))}
-                </select>
-              </div>
-              <div className="space-y-2">
-                <label htmlFor="product_price" className="text-xs font-black text-primary uppercase tracking-widest italic">{t('addProduct.price')}</label>
-                <input 
-                  id="product_price"
-                  name="price" 
-                  required 
-                  type="text" 
-                  value={formData.price}
-                  onChange={handleChange}
-                  placeholder={t('addProduct.pricePlaceholder')} 
-                  className="w-full bg-gray-50 border-none px-6 py-5 rounded-2xl text-sm font-bold outline-none" 
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <label htmlFor="product_description" className="text-xs font-black text-primary uppercase tracking-widest italic">{t('addProduct.description')}</label>
-              <textarea 
-                id="product_description"
-                name="description"
-                rows={4} 
-                value={formData.description}
-                onChange={handleChange}
-                placeholder={t('addProduct.descriptionPlaceholder')} 
-                className="w-full bg-gray-50 border-none px-8 py-6 rounded-2xl text-sm font-medium outline-none resize-none" 
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-xs font-black text-primary uppercase tracking-widest italic">{t('addProduct.file')}</label>
-              <div className="p-6 bg-gray-50 rounded-2xl border border-dashed border-gray-200 text-center relative hover:bg-gray-100 transition-colors">
-                <input 
-                  type="file" 
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" 
-                  onChange={handleFileUpload} 
-                  disabled={isUploading || isLoading} 
-                />
-                
-                {isUploading ? (
-                  <div className="flex flex-col items-center">
-                    <Loader2 className="h-6 w-6 text-primary mb-3 animate-spin" />
-                    <div className="w-full max-w-xs bg-gray-200 rounded-full h-2.5">
-                      <div className="bg-secondary h-2.5 rounded-full transition-all duration-300" style={{ width: `${uploadProgress}%` }}></div>
+                  {Array.from({ length: uploading }).map((_, i) => (
+                    <div key={`up-${i}`} className="aspect-square rounded-xl border border-dashed border-gray-300 flex items-center justify-center">
+                      <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
                     </div>
-                    <span className="text-xs font-black text-gray-500 uppercase tracking-widest mt-2">{uploadProgress}%</span>
-                  </div>
-                ) : fileUrl ? (
-                  <div className="flex flex-col items-center">
-                    <CheckCircle2 className="h-8 w-8 text-emerald-500 mb-2" />
-                    <div className="text-emerald-600 font-black text-sm tracking-widest break-all">
-                      {t('addProduct.fileAdded', { name: fileUrl.split('-').pop() })}
-                    </div>
-                    <p className="text-xs text-gray-500 uppercase tracking-widest mt-2">{t('addProduct.clickToReplace')}</p>
-                  </div>
-                ) : (
-                  <>
-                    <Upload className="h-6 w-6 text-gray-300 mx-auto mb-2" />
-                    <p className="text-xs font-black text-gray-500 uppercase tracking-widest">{t('addProduct.dropHere')}</p>
-                  </>
-                )}
-              </div>
-            </div>
+                  ))}
+                  {images.length + uploading < maxImages && (
+                    <label className="aspect-square rounded-xl border-2 border-dashed border-gray-300 bg-neutral-bg flex flex-col items-center justify-center gap-1 text-gray-500 cursor-pointer hover:border-secondary hover:text-secondary transition-colors">
+                      <ImagePlus className="h-6 w-6" aria-hidden="true" />
+                      <span className="text-xs font-bold text-center px-1">{t('addProduct.addPhotos')}</span>
+                      <input type="file" accept="image/jpeg,image/png,image/webp" multiple className="sr-only" onChange={handleFiles} disabled={isLoading} />
+                    </label>
+                  )}
+                </div>
+                <div className="mt-3 flex gap-2 rounded-xl bg-amber-50 p-3 text-xs text-amber-800">
+                  <Lightbulb className="h-4 w-4 shrink-0" aria-hidden="true" />
+                  <p>{t('addProduct.photoTips')}</p>
+                </div>
+              </section>
 
-            <div className="flex space-x-4 pt-4">
-              <button 
-                type="submit"
-                disabled={isLoading || isUploading}
-                className="flex-1 bg-primary text-white py-4 rounded-2xl text-xs font-black uppercase tracking-widest shadow-xl hover:bg-secondary transition-all flex items-center justify-center space-x-3 disabled:opacity-50"
-              >
-                {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <span>{initialData ? t('addProduct.update') : t('addProduct.add')}</span>}
-              </button>
-              <button 
-                type="button"
-                onClick={onClose}
-                className="px-8 border border-gray-100 text-gray-500 py-4 rounded-2xl text-xs font-black uppercase tracking-widest hover:text-primary transition-all"
-              >
-                {t('addProduct.cancel')}
-              </button>
-            </div>
-          </form>
-        </div>
-      </motion.div>
+              <div className="space-y-1.5">
+                <label htmlFor="product_name" className={label}>{t('addProduct.name')} *</label>
+                <input id="product_name" name="name" required minLength={2} maxLength={200} type="text" value={formData.name} onChange={handleChange}
+                  placeholder={t('addProduct.namePlaceholder')} className={field} />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label htmlFor="product_category" className={label}>{t('addProduct.category')} *</label>
+                  <select id="product_category" name="category" required value={formData.category} onChange={handleChange} className={cn(field, 'cursor-pointer')}>
+                    <option value="" disabled>{t('addProduct.selectCategory')}</option>
+                    {productCategories.map((group) => (
+                      <optgroup key={group.id} label={t(`productCategories.${group.id}`)}>
+                        {group.subCategories.map((sub) => (
+                          <option key={sub.id} value={sub.name}>{t(`productCategories.${sub.id}`)}</option>
+                        ))}
+                      </optgroup>
+                    ))}
+                  </select>
+                </div>
+                <div className="space-y-1.5">
+                  <label htmlFor="product_price" className={label}>{t('addProduct.price')}</label>
+                  <input id="product_price" name="price" type="text" inputMode="numeric" value={formData.price} onChange={handleChange}
+                    placeholder={t('addProduct.pricePlaceholder')} className={field} />
+                  <p className="text-xs text-gray-500">{t('addProduct.priceHint')}</p>
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label htmlFor="product_description" className={label}>{t('addProduct.description')}</label>
+                <textarea id="product_description" name="description" rows={5} maxLength={10000} value={formData.description} onChange={handleChange}
+                  placeholder={t('addProduct.descriptionPlaceholder')} className={cn(field, 'resize-y')} />
+              </div>
+
+              <div className="flex flex-col-reverse sm:flex-row gap-3 pt-2">
+                <button type="button" onClick={onClose} className="btn-ghost sm:w-auto">{t('addProduct.cancel')}</button>
+                <button type="submit" disabled={isLoading || uploading > 0} className="btn-primary flex-1 py-3">
+                  {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+                  {initialData ? t('addProduct.update') : t('addProduct.add')}
+                </button>
+              </div>
+            </form>
+          </motion.div>
         </div>
       )}
     </AnimatePresence>

@@ -1,6 +1,6 @@
 import {
   ArrowRight, BadgeCheck, Building2, CheckCircle2, Globe2, Megaphone, MessageSquare, Package, Search,
-  ShieldCheck, Sparkles, MapPin,
+  ShieldCheck, Star, Sparkles, MapPin,
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import type React from 'react';
@@ -8,13 +8,14 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import { Skeleton } from '../components/Skeleton';
-import { useCurrency } from '../context/CurrencyContext';
 import { formatNumber } from '../lib/format';
 import { cn, generateSlugUrl } from '../lib/utils';
 import SEO from '../components/SEO';
 import { SITE_NAME, absoluteUrl } from '../config/site';
-import ProductImage, { CompanyAvatar, GROUP_STYLE } from '../components/ui/ProductImage';
-import { productCategories } from '../data/productCategories';
+import { CompanyAvatar, GROUP_STYLE } from '../components/ui/ProductImage';
+import { productCategories, sectorPath } from '../data/productCategories';
+import ProductCard from '../components/ui/ProductCard';
+import SectorArt from '../components/ui/SectorArt';
 
 interface PublicStats {
   verifiedCompanies: number;
@@ -49,9 +50,9 @@ const SectionHeader = ({ label, title, subtitle, action }: {
 
 const Home = () => {
   const { t, i18n } = useTranslation();
-  const { formatPrice } = useCurrency();
   const [products, setProducts] = useState<any[]>([]);
   const [companies, setCompanies] = useState<any[]>([]);
+  const [reviews, setReviews] = useState<any[]>([]);
   const [stats, setStats] = useState<PublicStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [query, setQuery] = useState('');
@@ -76,11 +77,13 @@ const Home = () => {
       setIsLoading(true);
       // Uniquement des données réelles : chaque bloc se masque ou affiche un
       // état vide si l'API ne renvoie rien.
-      const [prod, comp, st] = await Promise.all([
+      const [prod, comp, st, rev] = await Promise.all([
         json('/api/products?limit=8'),
         json('/api/companies?certified=true&limit=8'),
         json('/api/stats/public'),
+        json('/api/companies/reviews/featured'),
       ]);
+      setReviews(Array.isArray(rev) ? rev.slice(0, 3) : []);
       const list = (v: any) => (Array.isArray(v) ? v : Array.isArray(v?.data) ? v.data : []);
       // Rangées complètes : 4, puis 8 produits.
       const latest = list(prod).slice(0, 8);
@@ -237,9 +240,10 @@ const Home = () => {
               return (
                 <Link
                   key={group.id}
-                  to={`/products?category=${encodeURIComponent(group.name)}`}
-                  className="group flex h-full flex-col rounded-2xl border border-border-tech bg-white p-4 md:p-6 hover:border-secondary hover:shadow-xl hover:-translate-y-0.5 transition-all max-lg:last:col-span-2"
+                  to={sectorPath(group.id)}
+                  className="group relative overflow-hidden flex h-full flex-col rounded-2xl border border-border-tech bg-white p-4 md:p-6 hover:border-secondary hover:shadow-xl hover:-translate-y-0.5 transition-all max-lg:last:col-span-2"
                 >
+                  <SectorArt group={group.id} className={cn('absolute -end-6 -bottom-4 w-32 md:w-36 opacity-[0.13] group-hover:opacity-25 transition-opacity', style.tint.split(' ').find((c) => c.startsWith('text-')))} />
                   <span className={cn('flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-xl mb-3 md:mb-5', style.tint)}>
                     <Icon className="h-6 w-6" aria-hidden="true" />
                   </span>
@@ -289,33 +293,7 @@ const Home = () => {
                 <p className="text-gray-600 mb-4">{t('home.noProducts')}</p>
                 <Link to="/register?role=fournisseur" className="btn-primary">{t('home.beFirst')}</Link>
               </div>
-            ) : products.map((product) => {
-              const href = `/products/${generateSlugUrl(product.name, product.id)}`;
-              const company = product.company_name || (typeof product.company === 'string' ? product.company : product.company?.name);
-              return (
-                <Link
-                  key={product.id}
-                  to={href}
-                  className="group flex flex-col rounded-2xl bg-white border border-border-tech p-3 hover:border-secondary hover:shadow-xl transition-all"
-                >
-                  <div className="aspect-square overflow-hidden rounded-xl mb-4">
-                    <ProductImage src={product.file_url || product.image} alt={product.name} category={product.category} imgClassName="group-hover:scale-105 transition-transform duration-500" />
-                  </div>
-                  <div className="px-1 flex flex-col flex-1">
-                    {company && (
-                      <p className="text-xs text-gray-500 truncate mb-1 flex items-center gap-1">
-                        {product.company_verified && <BadgeCheck className="h-3.5 w-3.5 text-success shrink-0" aria-label={t('home.suppliers.verified')} />}
-                        {company}
-                      </p>
-                    )}
-                    <h3 className="text-sm font-bold text-primary line-clamp-2 min-h-[2.5rem] group-hover:text-secondary transition-colors">{product.name}</h3>
-                    <p className="mt-auto pt-3 text-sm font-black text-primary">
-                      {Number(product.price) > 0 ? formatPrice(Number(product.price)) : <span className="text-secondary">{t('common.onQuote')}</span>}
-                    </p>
-                  </div>
-                </Link>
-              );
-            })}
+            ) : products.map((product) => <ProductCard key={product.id} product={product} />)}
           </div>
         </div>
       </section>
@@ -396,6 +374,32 @@ const Home = () => {
           </div>
         </div>
       </section>
+
+      {/* Avis réels d'acheteurs (masqué tant qu'il n'y en a pas) */}
+      {reviews.length > 0 && (
+        <section className="py-16 md:py-20 bg-white border-t border-border-tech">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <SectionHeader label={t('home.reviews.label')} title={t('home.reviews.title')} subtitle={t('home.reviews.subtitle')} />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              {reviews.map((r) => (
+                <figure key={r.id} className="flex flex-col rounded-2xl border border-border-tech bg-neutral-bg p-6">
+                  <div className="flex gap-0.5 text-amber-500 mb-4" aria-label={t('home.reviews.rating', { rating: r.rating })}>
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <Star key={i} className="h-4 w-4" fill={i < r.rating ? 'currentColor' : 'none'} aria-hidden="true" />
+                    ))}
+                  </div>
+                  <blockquote className="text-gray-700 leading-relaxed flex-1">« {r.comment} »</blockquote>
+                  <figcaption className="mt-5 pt-4 border-t border-border-tech text-sm">
+                    {r.author && <span className="font-bold text-primary">{r.author}</span>}
+                    <span className="text-gray-500"> {t('home.reviews.about')} </span>
+                    <Link to={`/directory/${generateSlugUrl(r.company.name, r.company.id)}`} className="font-bold text-secondary hover:underline">{r.company.name}</Link>
+                  </figcaption>
+                </figure>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* 6. Fournisseurs : bénéfices et appel à l'action */}
       <section className="relative overflow-hidden bg-primary text-white py-16 md:py-20">

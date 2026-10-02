@@ -44,6 +44,7 @@ const SearchResults = lazy(() => import('./pages/SearchResults'));
 const Tarifs = lazy(() => import('./pages/Tarifs'));
 const Terms = lazy(() => import('./pages/Terms'));
 const Catalogues = lazy(() => import('./pages/Catalogues'));
+const Sector = lazy(() => import('./pages/Sector'));
 
 import { useTranslation } from 'react-i18next';
 import { cn } from './lib/utils';
@@ -170,6 +171,7 @@ export default function App() {
                       <Route path="/privacy" element={<PageTransition><Privacy /></PageTransition>} />
                       <Route path="/compare" element={<PageTransition><Compare /></PageTransition>} />
                       <Route path="/catalogues" element={<PageTransition><Catalogues /></PageTransition>} />
+                      <Route path="/secteurs/:slug" element={<PageTransition><Sector /></PageTransition>} />
                       <Route path="/messages" element={<Navigate to="/dashboard?tab=messages" replace />} />
                       <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
                     </Routes>
