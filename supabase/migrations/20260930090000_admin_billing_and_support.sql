@@ -64,8 +64,13 @@ CREATE INDEX IF NOT EXISTS idx_transactions_status_created ON public.transaction
 
 -- Messages de contact : suivi du traitement par l'équipe.
 ALTER TABLE public.contact_messages DROP CONSTRAINT IF EXISTS contact_messages_status_check;
-ALTER TABLE public.contact_messages ADD CONSTRAINT contact_messages_status_check
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'contact_messages_status_check') THEN
+    ALTER TABLE public.contact_messages ADD CONSTRAINT contact_messages_status_check
   CHECK (status IN ('new', 'in_progress', 'closed'));
+  END IF;
+END $$;
 ALTER TABLE public.contact_messages ADD COLUMN IF NOT EXISTS admin_note TEXT;
 ALTER TABLE public.contact_messages ADD COLUMN IF NOT EXISTS handled_by UUID REFERENCES public.users(id) ON DELETE SET NULL;
 ALTER TABLE public.contact_messages ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW();
@@ -88,4 +93,9 @@ ALTER TABLE public.articles DROP CONSTRAINT IF EXISTS articles_status_check;
 UPDATE public.articles
 SET status = CASE WHEN status IS NULL THEN 'published' ELSE 'draft' END
 WHERE status IS NULL OR status NOT IN ('published', 'draft');
-ALTER TABLE public.articles ADD CONSTRAINT articles_status_check CHECK (status IN ('published', 'draft'));
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'articles_status_check') THEN
+    ALTER TABLE public.articles ADD CONSTRAINT articles_status_check CHECK (status IN ('published', 'draft'));
+  END IF;
+END $$;

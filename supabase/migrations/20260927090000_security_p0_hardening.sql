@@ -21,8 +21,13 @@ ALTER TABLE public.users ADD COLUMN IF NOT EXISTS email_verified BOOLEAN NOT NUL
 ALTER TABLE public.users ADD COLUMN IF NOT EXISTS kyc_status TEXT NOT NULL DEFAULT 'none';
 
 ALTER TABLE public.users DROP CONSTRAINT IF EXISTS users_kyc_status_check;
-ALTER TABLE public.users ADD CONSTRAINT users_kyc_status_check
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'users_kyc_status_check') THEN
+    ALTER TABLE public.users ADD CONSTRAINT users_kyc_status_check
   CHECK (kyc_status IN ('none', 'pending', 'approved', 'rejected'));
+  END IF;
+END $$;
 
 -- Reprise des données existantes : l'ancien drapeau isVerified servait aux deux usages.
 -- On considère l'e-mail vérifié s'il était à true, et le KYC approuvé seulement si
@@ -69,11 +74,13 @@ CREATE POLICY "Users read own row or admin" ON public.users
 
 -- Un utilisateur peut modifier sa ligne, mais ni son rôle ni ses statuts de
 -- vérification (contrôlés par le trigger ci-dessous).
+DROP POLICY IF EXISTS "Users update own row or admin" ON public.users;
 CREATE POLICY "Users update own row or admin" ON public.users
   FOR UPDATE USING (
     (public.get_current_user_id() IS NOT NULL AND id = public.get_current_user_id())
     OR public.get_current_user_role() = 'admin'
   );
+DROP POLICY IF EXISTS "Admins insert or delete users" ON public.users;
 
 CREATE POLICY "Admins insert or delete users" ON public.users
   FOR ALL USING (public.get_current_user_role() = 'admin')

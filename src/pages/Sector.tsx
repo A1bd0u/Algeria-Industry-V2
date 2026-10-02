@@ -5,8 +5,6 @@ import { Link, Navigate, useParams } from 'react-router-dom';
 import SEO from '../components/SEO';
 import { Skeleton } from '../components/Skeleton';
 import ProductCard, { companyNameOf } from '../components/ui/ProductCard';
-import { GROUP_STYLE } from '../components/ui/ProductImage';
-import SectorArt from '../components/ui/SectorArt';
 import { absoluteUrl } from '../config/site';
 import { useAdCategories } from '../context/AdTargetingContext';
 import { productCategories, sectorBySlug, sectorPath } from '../data/productCategories';
@@ -34,8 +32,6 @@ const Sector = () => {
 
   if (!group) return <Navigate to="/products" replace />;
 
-  const style = GROUP_STYLE[group.id];
-  const tint = style.tint.split(' ').find((c) => c.startsWith('text-'));
   const products: any[] = data?.data || [];
   const latest = products.length >= 4 ? products.slice(0, products.length - (products.length % 4)).slice(0, 8) : products;
 
@@ -61,7 +57,6 @@ const Sector = () => {
       <div className="bg-neutral-bg">
         {/* Héros du secteur */}
         <section className="relative overflow-hidden bg-white border-b border-border-tech">
-          <SectorArt group={group.id} className={cn('absolute -end-10 top-1/2 -translate-y-1/2 w-[28rem] max-w-[70%] opacity-[0.12]', tint)} />
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
             <nav aria-label={t('sector.breadcrumb')} className="flex items-center gap-1.5 text-sm text-gray-500 mb-6">
               <Link to="/" className="hover:text-secondary">{t('nav.home')}</Link>
@@ -71,9 +66,11 @@ const Sector = () => {
               <span className="text-primary font-medium">{name}</span>
             </nav>
             <div className="max-w-2xl">
-              <span className={cn('inline-flex h-14 w-14 items-center justify-center rounded-2xl mb-5', style.tint)}>
-                <style.icon className="h-7 w-7" aria-hidden="true" />
-              </span>
+              <p className="flex items-center gap-3 text-xs font-bold uppercase tracking-[0.18em] text-gray-500 mb-4">
+                <span className="text-secondary">{t('sector.code', { code: group.id })}</span>
+                <span className="h-px w-8 bg-gray-300" aria-hidden="true" />
+                {t('sector.label')}
+              </p>
               <h1 className="text-3xl md:text-5xl font-black text-primary tracking-tight leading-tight mb-4">{name}</h1>
               <p className="text-lg text-gray-600 mb-8">{t(`sector.${group.id}.intro`)}</p>
               <div className="flex flex-wrap gap-3">
@@ -102,7 +99,7 @@ const Sector = () => {
                     to={`/products?category=${encodeURIComponent(sub.name)}`}
                     className="group flex items-center gap-4 rounded-xl bg-white border border-border-tech p-4 hover:border-secondary hover:shadow-md transition-all"
                   >
-                    <span className={cn('flex h-10 w-10 shrink-0 items-center justify-center rounded-lg font-black text-sm', style.tint)}>{sub.id}</span>
+                    <span className="w-8 shrink-0 text-xs font-bold text-gray-400 tabular-nums tracking-wider">{sub.id}</span>
                     <span className="min-w-0 flex-1">
                       <span className="block font-bold text-primary group-hover:text-secondary transition-colors">{title}</span>
                       {detail && <span className="block text-xs text-gray-500 truncate">{detail.replace(/\.$/, '')}</span>}
@@ -165,13 +162,10 @@ const Sector = () => {
             <h2 className="text-lg font-black text-primary mb-4">{t('sector.others')}</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {productCategories.filter((g) => g.id !== group.id).map((g) => {
-                const st = GROUP_STYLE[g.id];
                 return (
                   <Link key={g.id} to={sectorPath(g.id)}
-                    className="flex items-center gap-3 rounded-xl bg-white border border-border-tech p-3 hover:border-secondary transition-colors">
-                    <span className={cn('flex h-9 w-9 shrink-0 items-center justify-center rounded-lg', st.tint)}>
-                      <st.icon className="h-5 w-5" aria-hidden="true" />
-                    </span>
+                    className="flex items-baseline gap-3 rounded-lg bg-white border border-border-tech p-3 hover:border-secondary transition-colors">
+                    <span className="text-xs font-bold text-gray-400 tabular-nums">{g.id}</span>
                     <span className="text-sm font-bold text-primary leading-snug">{t(`productCategories.${g.id}`)}</span>
                   </Link>
                 );

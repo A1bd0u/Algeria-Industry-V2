@@ -160,10 +160,13 @@
     "trust": {
       "free": "Inscription gratuite",
       "wilayas": "58 wilayas",
-      "wilayasText": "Recherche par wilaya",
+      "wilayasText": "wilayas couvertes par la recherche",
       "languages": "FR · AR · EN",
-      "languagesText": "Site en trois langues",
-      "freeText": "Pour acheteurs et fournisseurs"
+      "languagesText": "langues : français, العربية, English",
+      "freeText": "pour s'inscrire, acheteur ou fournisseur",
+      "kycValue": "RC + NIF",
+      "kycText": "contrôlés avant le badge « vérifiée »",
+      "freeValue": "0 DA"
     },
     "categories": {
       "label": "Secteurs",
@@ -316,7 +319,7 @@
   },
   "blog": {
     "title": "Actualités Industrielles",
-    "subtitle": "Restez informé des dernières tendances, innovations et évolutions réglementaires du secteur industriel algérien.",
+    "subtitle": "Réglementation, marchés, salons et vie des entreprises industrielles en Algérie.",
     "newsletter_title": "Ne manquez aucune actualité",
     "newsletter_subtitle": "Inscrivez-vous à notre newsletter hebdomadaire pour recevoir le meilleur de l'industrie algérienne directement dans votre boîte mail.",
     "subscribe": "S'abonner gratuitement",
@@ -332,7 +335,16 @@
     "latest": "Derniers articles",
     "ctaTitle": "Trouvez vos fournisseurs industriels",
     "ctaText": "Consultez l'annuaire des entreprises algériennes vérifiées et contactez-les directement.",
-    "ctaButton": "Voir l'annuaire"
+    "ctaButton": "Voir l'annuaire",
+    "kicker": "Industrie algérienne",
+    "rubrics": "Rubriques",
+    "allRubrics": "Toutes les rubriques",
+    "noneInRubric": "Aucune autre publication dans cette rubrique pour le moment.",
+    "emptyTitle": "Aucune publication pour le moment",
+    "emptyText": "Les premiers articles de la rédaction arrivent bientôt.",
+    "agenda": "Agenda",
+    "noEvents": "Aucun événement annoncé pour le moment.",
+    "allEvents": "Tous les événements"
   },
   "catalogues": {
     "title": "Catalogues Industriels",
@@ -1140,13 +1152,13 @@
   },
   "resources": {
     "title": "Centre de ressources",
-    "subtitle": "Articles de l'équipe et liens vers les sources officielles pour vos démarches industrielles.",
+    "subtitle": "Les organismes à consulter pour vos démarches, et nos guides pour bien utiliser la plateforme.",
     "latest": "Dernières publications",
     "seeAll": "Voir tout",
     "noArticles": "Aucun article publié pour le moment.",
     "readMore": "Lire la suite",
     "officialTitle": "Sources officielles",
-    "officialText": "Textes de loi et démarches à jour, directement auprès des organismes publics.",
+    "officialText": "Les textes et formulaires à jour se trouvent chez les organismes publics : nous vous indiquons qui contacter, selon votre démarche.",
     "links": {
       "joradp": {
         "name": "Journal officiel (JORADP)",
@@ -1167,11 +1179,57 @@
       "cnrc": {
         "name": "CNRC",
         "text": "Centre national du registre du commerce"
+      },
+      "dgi": {
+        "name": "Direction générale des impôts",
+        "text": "NIF, déclarations et fiscalité des entreprises"
+      },
+      "algex": {
+        "name": "ALGEX",
+        "text": "Agence nationale de promotion du commerce extérieur"
+      },
+      "caci": {
+        "name": "CACI",
+        "text": "Chambre algérienne de commerce et d'industrie, certificats d'origine"
+      },
+      "ianor": {
+        "name": "IANOR",
+        "text": "Normes algériennes et certification"
+      },
+      "ons": {
+        "name": "ONS",
+        "text": "Statistiques économiques et industrielles"
       }
     },
     "customTitle": "Besoin d'une information précise ?",
     "customText": "Posez-nous votre question : nous vous orientons vers le bon interlocuteur.",
-    "customButton": "Nous contacter"
+    "customButton": "Nous contacter",
+    "kicker": "Démarches et guides",
+    "groups": {
+      "company": "Créer et immatriculer",
+      "invest": "Investir et se développer",
+      "trade": "Importer et exporter",
+      "standards": "Normes, chiffres et textes"
+    },
+    "guidesTitle": "Guides de la plateforme",
+    "guides": {
+      "listing": {
+        "title": "Référencer votre entreprise",
+        "text": "Créer le compte, compléter la fiche et publier vos produits."
+      },
+      "verification": {
+        "title": "Obtenir le badge « vérifiée »",
+        "text": "Documents demandés (RC, NIF) et délais de contrôle."
+      },
+      "pricing": {
+        "title": "Choisir une offre",
+        "text": "Gratuit, Basic ou Pro : produits, photos et visibilité."
+      },
+      "advertising": {
+        "title": "Annoncer sur le site",
+        "text": "Bandeaux sur l'accueil, le catalogue et les pages secteurs."
+      }
+    }
   },
   "exhibitor": {
     "eyebrow": "Fournisseurs industriels",
@@ -1496,7 +1554,9 @@
     },
     "E": {
       "intro": "Outillage, produits d'entretien, équipements de protection, emballages et fournitures : les consommables de votre activité."
-    }
+    },
+    "code": "Secteur {{code}}",
+    "label": "Nomenclature Algeria Industry"
   },
   "emptyStates": {
     "directoryText": "Essayez une autre wilaya ou un autre secteur, ou référencez votre entreprise.",

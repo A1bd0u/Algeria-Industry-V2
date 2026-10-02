@@ -1,20 +1,46 @@
-import { ChevronRight, Clock, ExternalLink, Gavel, Newspaper, Tag } from 'lucide-react';
-import { motion } from 'motion/react';
+import { ArrowRight, ArrowUpRight } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import SEO from '../components/SEO';
+import { absoluteUrl } from '../config/site';
 import { generateSlugUrl } from '../lib/utils';
 import { formatDate } from '../lib/format';
 
-// Sources officielles : textes et démarches à jour, plutôt que des copies
-// qui vieilliraient sur la plateforme.
-const OFFICIAL_LINKS = [
-  { key: 'joradp', url: 'https://www.joradp.dz' },
-  { key: 'aapi', url: 'https://aapi.dz' },
-  { key: 'industry', url: 'https://www.industrie.gov.dz' },
-  { key: 'customs', url: 'https://www.douane.gov.dz' },
-  { key: 'cnrc', url: 'https://www.cnrc.dz' },
-];
+// Centre de ressources : sources officielles classées par démarche (les
+// textes à jour restent chez les organismes publics), guides pratiques de la
+// plateforme et dernières publications de l'équipe.
+
+const OFFICIAL_GROUPS = [
+  { key: 'company', links: [
+    { key: 'cnrc', url: 'https://www.cnrc.dz' },
+    { key: 'dgi', url: 'https://www.mfdgi.gov.dz' },
+  ] },
+  { key: 'invest', links: [
+    { key: 'aapi', url: 'https://aapi.dz' },
+    { key: 'industry', url: 'https://www.industrie.gov.dz' },
+  ] },
+  { key: 'trade', links: [
+    { key: 'customs', url: 'https://www.douane.gov.dz' },
+    { key: 'algex', url: 'https://www.algex.dz' },
+    { key: 'caci', url: 'https://www.caci.dz' },
+  ] },
+  { key: 'standards', links: [
+    { key: 'ianor', url: 'https://www.ianor.dz' },
+    { key: 'ons', url: 'https://www.ons.dz' },
+    { key: 'joradp', url: 'https://www.joradp.dz' },
+  ] },
+] as const;
+
+// Guides de la plateforme : pages réelles du site.
+const GUIDES = [
+  { key: 'listing', to: '/register?role=fournisseur' },
+  { key: 'verification', to: '/faq' },
+  { key: 'pricing', to: '/tarifs' },
+  { key: 'advertising', to: '/ads-request' },
+] as const;
+
+const domainOf = (url: string) => url.replace(/^https?:\/\//, '').replace(/\/$/, '');
 
 const Resources = () => {
   const { t } = useTranslation();
@@ -26,119 +52,115 @@ const Resources = () => {
       return res.json();
     },
   });
-  const latest = (articles as any[]).slice(0, 4);
+  const latest = (articles as any[]).slice(0, 5);
 
   return (
-    <div className="bg-neutral-bg min-h-screen pb-20">
-      <div className="bg-primary py-16 text-white overflow-hidden relative">
-        <div className="absolute top-0 end-0 w-1/3 h-full bg-white/5 -skew-x-12 transform translate-x-1/2"></div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="max-w-2xl">
-            <h1 className="text-4xl font-bold mb-4">{t('resources.title')}</h1>
-            <p className="text-white/80 text-lg">{t('resources.subtitle')}</p>
+    <>
+      <SEO title={t('resources.title')} description={t('resources.subtitle')} url={absoluteUrl('/resources')} />
+      <div className="bg-white min-h-screen pb-24">
+        <header className="border-b border-border-tech">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-secondary mb-3">{t('resources.kicker')}</p>
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+              <h1 className="text-4xl md:text-5xl font-black text-primary tracking-tight">{t('resources.title')}</h1>
+              <p className="text-gray-600 max-w-md md:text-end">{t('resources.subtitle')}</p>
+            </div>
+          </div>
+        </header>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Sources officielles, par démarche */}
+          <section className="py-12 border-b border-border-tech" aria-labelledby="official-title">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-8">
+              <h2 id="official-title" className="lg:col-span-4 text-2xl font-black text-primary">{t('resources.officialTitle')}</h2>
+              <p className="lg:col-span-8 text-gray-600">{t('resources.officialText')}</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-x-8 gap-y-10">
+              {OFFICIAL_GROUPS.map((group, gi) => (
+                <div key={group.key}>
+                  <p className="text-xs font-bold uppercase tracking-[0.18em] text-gray-500 pb-3 mb-1 border-b-2 border-primary">
+                    <span className="text-secondary me-2">{String(gi + 1).padStart(2, '0')}</span>
+                    {t(`resources.groups.${group.key}`)}
+                  </p>
+                  <ul className="divide-y divide-border-tech">
+                    {group.links.map((link) => (
+                      <li key={link.key}>
+                        <a href={link.url} target="_blank" rel="noopener noreferrer" className="group flex items-start justify-between gap-3 py-4">
+                          <span className="min-w-0">
+                            <span className="block font-bold text-primary group-hover:text-secondary transition-colors">{t(`resources.links.${link.key}.name`)}</span>
+                            <span className="block text-sm text-gray-600 mt-0.5">{t(`resources.links.${link.key}.text`)}</span>
+                            <span className="block text-xs text-gray-400 mt-1" dir="ltr">{domainOf(link.url)}</span>
+                          </span>
+                          <ArrowUpRight className="h-4 w-4 mt-1 shrink-0 text-gray-400 group-hover:text-secondary rtl:-scale-x-100" aria-hidden="true" />
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 py-12">
+            {/* Guides de la plateforme */}
+            <section className="lg:col-span-5" aria-labelledby="guides-title">
+              <h2 id="guides-title" className="text-2xl font-black text-primary mb-6">{t('resources.guidesTitle')}</h2>
+              <ol className="space-y-px bg-border-tech border border-border-tech rounded-lg overflow-hidden">
+                {GUIDES.map((guide, i) => (
+                  <li key={guide.key} className="bg-white">
+                    <Link to={guide.to} className="group flex gap-5 p-5 hover:bg-neutral-bg transition-colors">
+                      <span className="text-sm font-black text-gray-300 tabular-nums pt-0.5">{String(i + 1).padStart(2, '0')}</span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block font-bold text-primary group-hover:text-secondary transition-colors">{t(`resources.guides.${guide.key}.title`)}</span>
+                        <span className="block text-sm text-gray-600 mt-1">{t(`resources.guides.${guide.key}.text`)}</span>
+                      </span>
+                      <ArrowRight className="h-4 w-4 mt-1 shrink-0 text-gray-400 group-hover:text-secondary rtl:rotate-180" aria-hidden="true" />
+                    </Link>
+                  </li>
+                ))}
+              </ol>
+            </section>
+
+            {/* Dernières publications */}
+            <section className="lg:col-span-7" aria-labelledby="latest-title">
+              <div className="flex items-end justify-between gap-4 mb-6">
+                <h2 id="latest-title" className="text-2xl font-black text-primary">{t('resources.latest')}</h2>
+                <Link to="/blog" className="text-sm font-bold text-primary hover:text-secondary inline-flex items-center gap-1">
+                  {t('resources.seeAll')} <ArrowRight className="h-4 w-4 rtl:rotate-180" aria-hidden="true" />
+                </Link>
+              </div>
+              {isLoading ? (
+                <div className="space-y-4">{[1, 2, 3].map((i) => <div key={i} className="h-16 bg-neutral-bg rounded animate-pulse" />)}</div>
+              ) : latest.length === 0 ? (
+                <p className="text-gray-500 border-t border-border-tech pt-6">{t('resources.noArticles')}</p>
+              ) : (
+                <ul className="divide-y divide-border-tech border-t border-border-tech">
+                  {latest.map((a: any) => (
+                    <li key={a.id}>
+                      <Link to={`/blog/${generateSlugUrl(a.title, a.id)}`} className="group grid grid-cols-[88px_1fr] gap-4 py-4">
+                        <time dateTime={a.created_at} className="text-xs text-gray-500 pt-1">{formatDate(a.created_at)}</time>
+                        <span className="min-w-0">
+                          {a.category && <span className="block text-xs font-bold uppercase tracking-[0.18em] text-gray-500 mb-1">{a.category}</span>}
+                          <span className="block font-bold text-primary group-hover:text-secondary transition-colors leading-snug">{a.title}</span>
+                        </span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              <div className="mt-10 rounded-lg bg-neutral-bg p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <p className="font-bold text-primary">{t('resources.customTitle')}</p>
+                  <p className="text-sm text-gray-600 mt-1">{t('resources.customText')}</p>
+                </div>
+                <Link to="/contact" className="btn-primary shrink-0">{t('resources.customButton')}</Link>
+              </div>
+            </section>
           </div>
         </div>
       </div>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-          <section className="lg:col-span-2">
-            <div className="flex items-center justify-between mb-8">
-              <h2 className="text-2xl font-bold text-primary flex items-center gap-2">
-                <Newspaper className="h-6 w-6 text-secondary" />
-                <span>{t('resources.latest')}</span>
-              </h2>
-              <Link to="/blog" className="text-sm font-bold text-secondary hover:underline flex items-center gap-1">
-                <span>{t('resources.seeAll')}</span>
-                <ChevronRight className="h-4 w-4 rtl:rotate-180" />
-              </Link>
-            </div>
-
-            {isLoading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {[1, 2].map((i) => <div key={i} className="h-72 bg-white rounded-2xl animate-pulse" />)}
-              </div>
-            ) : latest.length === 0 ? (
-              <p className="bg-white rounded-2xl border border-dashed border-gray-200 p-10 text-center text-gray-500">{t('resources.noArticles')}</p>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {latest.map((article: any, i: number) => {
-                  const to = `/blog/${generateSlugUrl(article.title, article.id)}`;
-                  return (
-                    <motion.article
-                      key={article.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: i * 0.05 }}
-                      className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 group"
-                    >
-                      <Link to={to} className="block h-48 overflow-hidden relative">
-                        <img src={article.image_url || '/placeholder.svg'} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                        {article.category && (
-                          <span className="absolute top-4 start-4 bg-white/90 text-primary px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">{article.category}</span>
-                        )}
-                      </Link>
-                      <div className="p-6">
-                        <p className="flex items-center gap-2 text-xs font-bold text-gray-500 mb-2 uppercase">
-                          <Clock className="h-3 w-3" />
-                          <span>{formatDate(article.created_at)}</span>
-                        </p>
-                        <h3 className="text-lg font-bold text-primary mb-3 group-hover:text-secondary transition-colors leading-tight">
-                          <Link to={to}>{article.title}</Link>
-                        </h3>
-                        {article.excerpt && <p className="text-sm text-gray-600 line-clamp-2 mb-6">{article.excerpt}</p>}
-                        <Link to={to} className="text-primary font-bold text-sm flex items-center gap-1">
-                          <span>{t('resources.readMore')}</span>
-                          <ChevronRight className="h-4 w-4 rtl:rotate-180" />
-                        </Link>
-                      </div>
-                    </motion.article>
-                  );
-                })}
-              </div>
-            )}
-          </section>
-
-          <aside className="space-y-8">
-            <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm">
-              <h2 className="font-bold text-primary text-lg mb-2 flex items-center gap-2">
-                <Gavel className="h-5 w-5 text-secondary" />
-                <span>{t('resources.officialTitle')}</span>
-              </h2>
-              <p className="text-xs text-gray-500 mb-6">{t('resources.officialText')}</p>
-              <ul className="space-y-3">
-                {OFFICIAL_LINKS.map((link) => (
-                  <li key={link.key}>
-                    <a
-                      href={link.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-full flex items-center justify-between gap-3 p-3 rounded-xl hover:bg-gray-50 group"
-                    >
-                      <span>
-                        <span className="block text-sm text-primary font-bold">{t(`resources.links.${link.key}.name`)}</span>
-                        <span className="block text-xs text-gray-500">{t(`resources.links.${link.key}.text`)}</span>
-                      </span>
-                      <ExternalLink className="h-4 w-4 text-gray-300 group-hover:text-secondary shrink-0" />
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="p-8 rounded-2xl border border-gray-200 border-dashed text-center">
-              <Tag className="h-8 w-8 text-gray-300 mx-auto mb-4" />
-              <h2 className="font-bold text-gray-600 mb-2">{t('resources.customTitle')}</h2>
-              <p className="text-xs text-gray-500 mb-6">{t('resources.customText')}</p>
-              <Link to="/contact" className="text-secondary font-bold text-sm inline-flex items-center gap-1">
-                <span>{t('resources.customButton')}</span>
-                <ChevronRight className="h-4 w-4 rtl:rotate-180" />
-              </Link>
-            </div>
-          </aside>
-        </div>
-      </div>
-    </div>
+    </>
   );
 };
 

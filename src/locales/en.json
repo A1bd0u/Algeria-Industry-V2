@@ -160,10 +160,13 @@
     "trust": {
       "free": "Free sign-up",
       "wilayas": "58 provinces",
-      "wilayasText": "Search by province",
+      "wilayasText": "provinces covered by search",
       "languages": "FR · AR · EN",
-      "languagesText": "Site in three languages",
-      "freeText": "For buyers and suppliers"
+      "languagesText": "languages: français, العربية, English",
+      "freeText": "to sign up, as a buyer or supplier",
+      "kycValue": "Register + tax ID",
+      "kycText": "checked before the “verified” badge",
+      "freeValue": "DZD 0"
     },
     "categories": {
       "label": "Sectors",
@@ -316,7 +319,7 @@
   },
   "blog": {
     "title": "Industrial News",
-    "subtitle": "Stay informed about the latest trends, innovations and regulatory developments in the Algerian industrial sector.",
+    "subtitle": "Regulation, markets, trade fairs and news from industrial companies in Algeria.",
     "newsletter_title": "Don't miss any news",
     "newsletter_subtitle": "Subscribe to our weekly newsletter to receive the best of Algerian industry directly in your mailbox.",
     "subscribe": "Subscribe for free",
@@ -332,7 +335,16 @@
     "latest": "Latest articles",
     "ctaTitle": "Find your industrial suppliers",
     "ctaText": "Browse the directory of verified Algerian companies and contact them directly.",
-    "ctaButton": "View the directory"
+    "ctaButton": "View the directory",
+    "kicker": "Algerian industry",
+    "rubrics": "Sections",
+    "allRubrics": "All sections",
+    "noneInRubric": "No other articles in this section yet.",
+    "emptyTitle": "No articles yet",
+    "emptyText": "The first articles from our team are coming soon.",
+    "agenda": "Calendar",
+    "noEvents": "No upcoming events announced yet.",
+    "allEvents": "All events"
   },
   "catalogues": {
     "title": "Industrial Catalogues",
@@ -1140,13 +1152,13 @@
   },
   "resources": {
     "title": "Resource centre",
-    "subtitle": "Articles from our team and links to official sources for your industrial procedures.",
+    "subtitle": "Where to go for your procedures, and our guides to get the most out of the platform.",
     "latest": "Latest articles",
     "seeAll": "See all",
     "noArticles": "No articles published yet.",
     "readMore": "Read more",
     "officialTitle": "Official sources",
-    "officialText": "Up-to-date laws and procedures, straight from public bodies.",
+    "officialText": "Up-to-date texts and forms are published by public bodies: here is who to contact for each procedure.",
     "links": {
       "joradp": {
         "name": "Official Journal (JORADP)",
@@ -1167,11 +1179,57 @@
       "cnrc": {
         "name": "CNRC",
         "text": "National Trade Register Centre"
+      },
+      "dgi": {
+        "name": "Directorate General of Taxes",
+        "text": "Tax ID, returns and business taxation"
+      },
+      "algex": {
+        "name": "ALGEX",
+        "text": "National agency for foreign trade promotion"
+      },
+      "caci": {
+        "name": "CACI",
+        "text": "Algerian chamber of commerce and industry, certificates of origin"
+      },
+      "ianor": {
+        "name": "IANOR",
+        "text": "Algerian standards and certification"
+      },
+      "ons": {
+        "name": "ONS",
+        "text": "Economic and industrial statistics"
       }
     },
     "customTitle": "Need specific information?",
     "customText": "Ask us your question: we will point you to the right contact.",
-    "customButton": "Contact us"
+    "customButton": "Contact us",
+    "kicker": "Procedures and guides",
+    "groups": {
+      "company": "Set up and register",
+      "invest": "Invest and grow",
+      "trade": "Import and export",
+      "standards": "Standards, data and law"
+    },
+    "guidesTitle": "Platform guides",
+    "guides": {
+      "listing": {
+        "title": "List your company",
+        "text": "Create the account, complete the profile and publish your products."
+      },
+      "verification": {
+        "title": "Get the “verified” badge",
+        "text": "Required documents (trade register, tax ID) and review times."
+      },
+      "pricing": {
+        "title": "Choose a plan",
+        "text": "Free, Basic or Pro: products, photos and visibility."
+      },
+      "advertising": {
+        "title": "Advertise on the site",
+        "text": "Banners on the home page, catalogue and sector pages."
+      }
+    }
   },
   "exhibitor": {
     "eyebrow": "Industrial suppliers",
@@ -1496,7 +1554,9 @@
     },
     "E": {
       "intro": "Tools, cleaning products, protective equipment, packaging and supplies: the consumables of your business."
-    }
+    },
+    "code": "Sector {{code}}",
+    "label": "Algeria Industry classification"
   },
   "emptyStates": {
     "directoryText": "Try another province or sector, or list your company.",

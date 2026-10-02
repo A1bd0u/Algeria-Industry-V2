@@ -36,7 +36,7 @@ END $$;
 
 -- Colonnes générées recréées avec la nouvelle configuration.
 ALTER TABLE public.companies DROP COLUMN IF EXISTS fts;
-ALTER TABLE public.companies ADD COLUMN fts tsvector GENERATED ALWAYS AS (
+ALTER TABLE public.companies ADD COLUMN IF NOT EXISTS fts tsvector GENERATED ALWAYS AS (
     setweight(to_tsvector('public.fr_unaccent', coalesce(name, '')), 'A') ||
     setweight(to_tsvector('public.fr_unaccent', coalesce(description, '')), 'B') ||
     setweight(to_tsvector('public.fr_unaccent', coalesce(activity_sector, '')), 'C') ||
@@ -44,7 +44,7 @@ ALTER TABLE public.companies ADD COLUMN fts tsvector GENERATED ALWAYS AS (
 ) STORED;
 
 ALTER TABLE public.products DROP COLUMN IF EXISTS fts;
-ALTER TABLE public.products ADD COLUMN fts tsvector GENERATED ALWAYS AS (
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS fts tsvector GENERATED ALWAYS AS (
     setweight(to_tsvector('public.fr_unaccent', coalesce(name, '')), 'A') ||
     setweight(to_tsvector('public.fr_unaccent', coalesce(description, '')), 'B') ||
     setweight(to_tsvector('public.fr_unaccent', coalesce(category, '')), 'C')
@@ -59,5 +59,10 @@ CREATE INDEX IF NOT EXISTS idx_products_fts ON public.products USING GIN (fts);
 -- ==============================================================================
 ALTER TABLE public.companies ADD COLUMN IF NOT EXISTS whatsapp TEXT;
 ALTER TABLE public.companies DROP CONSTRAINT IF EXISTS companies_whatsapp_format;
-ALTER TABLE public.companies ADD CONSTRAINT companies_whatsapp_format
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'companies_whatsapp_format') THEN
+    ALTER TABLE public.companies ADD CONSTRAINT companies_whatsapp_format
   CHECK (whatsapp IS NULL OR whatsapp ~ '^[0-9]{9,15}$');
+  END IF;
+END $$;
