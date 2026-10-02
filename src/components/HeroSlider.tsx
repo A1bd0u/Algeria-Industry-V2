@@ -10,9 +10,9 @@ import type { AdPlacement } from '../data/adPlacements';
 import { cn } from '../lib/utils';
 
 // Bandeau publicitaire : annonces publiées depuis la console admin et ciblant
-// la page (groupe de pages et catégories produit). Grand format sur l'accueil,
-// qui présente la plateforme quand aucune annonce n'est en ligne ; format
-// compact ailleurs, masqué sans annonce.
+// la page (groupe de pages et catégories produit). Sans annonce, il présente la
+// plateforme (inscription, offre fondateur, emplacement publicitaire). Grand
+// format sur l'accueil, compact ailleurs.
 
 interface Ad {
   id: string;
@@ -92,7 +92,7 @@ const HeroSlider: React.FC<{ placement: AdPlacement }> = ({ placement }) => {
         href: ad.url || undefined,
         tint: 'from-primary to-accent',
       }))
-    : compact ? [] : [
+    : [
         { key: 'listing', title: t('slides.listing.title'), subtitle: t('slides.listing.subtitle'), cta: t('slides.listing.cta'), href: '/register', icon: Building2, tint: 'from-primary to-accent' },
         { key: 'founder', title: t('slides.founder.title'), subtitle: t('slides.founder.subtitle'), cta: t('slides.founder.cta'), href: '/tarifs', icon: Sparkles, tint: 'from-primary to-[#3a1d00]' },
         { key: 'advertise', title: t('slides.advertise.title'), subtitle: t('slides.advertise.subtitle'), cta: t('slides.advertise.cta'), href: '/ads-request', icon: Megaphone, tint: 'from-accent to-primary' },

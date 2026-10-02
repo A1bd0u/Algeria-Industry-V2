@@ -109,12 +109,20 @@
     "hero": {
       "eyebrow": "Fournisseurs industriels vérifiés",
       "title": "Trouvez le bon fournisseur industriel en Algérie",
-      "subtitle": "Entreprises dont le registre du commerce et le NIF sont contrôlés, catalogue de produits et contact direct par messagerie ou WhatsApp.",
+      "subtitle": "Des entreprises vérifiées (registre du commerce et NIF contrôlés), leurs catalogues et un contact direct pour demander un devis.",
       "searchLabel": "Rechercher un produit ou une entreprise",
       "searchPlaceholder": "Produit, machine, entreprise…",
       "browseSuppliers": "Parcourir les fournisseurs",
       "listCompany": "Référencer mon entreprise gratuitement",
-      "founder": "Premium offert 12 mois aux 100 premiers fournisseurs vérifiés."
+      "founder": "Premium offert 12 mois aux 100 premiers fournisseurs vérifiés.",
+      "popular": "Recherches fréquentes",
+      "chips": {
+        "c1": "Compresseur",
+        "c2": "Groupe électrogène",
+        "c3": "Pompe",
+        "c4": "Acier",
+        "c5": "EPI"
+      }
     },
     "how": {
       "title": "Comment ça marche",
@@ -139,6 +147,64 @@
         "step3Text": "Recevez les demandes des acheteurs dans votre messagerie.",
         "cta": "Référencer mon entreprise"
       }
+    },
+    "supplierCard": {
+      "label": "Vous êtes fournisseur ?",
+      "title": "Vendez aux acheteurs industriels de toute l'Algérie",
+      "p1": "Fiche entreprise vérifiée et catalogue produits",
+      "p2": "Demandes de devis par messagerie et WhatsApp",
+      "p3": "Inscription gratuite, sans engagement",
+      "cta": "Référencer mon entreprise"
+    },
+    "trust": {
+      "free": "Inscription gratuite",
+      "wilayas": "58 wilayas",
+      "wilayasText": "Recherche par wilaya",
+      "languages": "FR · AR · EN",
+      "languagesText": "Site en trois langues",
+      "freeText": "Pour acheteurs et fournisseurs"
+    },
+    "categories": {
+      "label": "Secteurs",
+      "title": "Explorer par secteur",
+      "subtitle": "Cinq grands univers industriels, de la matière première aux services.",
+      "count": "{{count}} sous-catégories",
+      "all": "Tout le catalogue"
+    },
+    "suppliers": {
+      "label": "Annuaire",
+      "title": "Fournisseurs vérifiés",
+      "subtitle": "Registre du commerce et NIF contrôlés par notre équipe.",
+      "cta": "Voir l'annuaire",
+      "verified": "Vérifiée"
+    },
+    "supplierBand": {
+      "title": "Votre catalogue devant les acheteurs industriels",
+      "text": "Créez votre fiche en quelques minutes, faites vérifier votre entreprise et recevez des demandes de devis.",
+      "s1": "Compte gratuit",
+      "s1Text": "Fiche entreprise et 5 produits sans frais.",
+      "s2": "Badge vérifié",
+      "s2Text": "Après contrôle du RC et du NIF : la confiance des acheteurs.",
+      "s3": "Contacts directs",
+      "s3Text": "Demandes de devis par messagerie et WhatsApp.",
+      "cta": "Créer ma fiche gratuitement",
+      "pricing": "Voir les offres"
+    },
+    "advertise": {
+      "label": "Publicité",
+      "title": "Faites connaître votre marque",
+      "text": "Un bandeau en haut de l'accueil, du catalogue et des fiches produits, ciblé par secteur.",
+      "cta": "Demander une proposition"
+    },
+    "final": {
+      "title": "Prêt à trouver votre prochain fournisseur ?",
+      "text": "Cherchez parmi les entreprises vérifiées, ou référencez la vôtre gratuitement.",
+      "buyer": "Explorer le catalogue",
+      "supplier": "Référencer mon entreprise",
+      "help": "Une question ? Consultez la FAQ ou contactez-nous."
+    },
+    "latest": {
+      "label": "Nouveautés"
     }
   },
   "directory": {

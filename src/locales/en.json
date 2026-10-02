@@ -109,12 +109,20 @@
     "hero": {
       "eyebrow": "Verified industrial suppliers",
       "title": "Find the right industrial supplier in Algeria",
-      "subtitle": "Companies with checked trade register and tax ID, a product catalogue and direct contact by messaging or WhatsApp.",
+      "subtitle": "Verified companies (trade register and tax ID checked), their catalogues and direct contact to request a quote.",
       "searchLabel": "Search a product or a company",
       "searchPlaceholder": "Product, machine, company…",
       "browseSuppliers": "Browse suppliers",
       "listCompany": "List my company for free",
-      "founder": "Premium free for 12 months for the first 100 verified suppliers."
+      "founder": "Premium free for 12 months for the first 100 verified suppliers.",
+      "popular": "Popular searches",
+      "chips": {
+        "c1": "Compressor",
+        "c2": "Generator",
+        "c3": "Pump",
+        "c4": "Steel",
+        "c5": "PPE"
+      }
     },
     "how": {
       "title": "How it works",
@@ -139,6 +147,64 @@
         "step3Text": "Receive buyers' requests in your inbox.",
         "cta": "List my company"
       }
+    },
+    "supplierCard": {
+      "label": "Are you a supplier?",
+      "title": "Sell to industrial buyers across Algeria",
+      "p1": "Verified company profile and product catalogue",
+      "p2": "Quote requests by messaging and WhatsApp",
+      "p3": "Free sign-up, no commitment",
+      "cta": "List my company"
+    },
+    "trust": {
+      "free": "Free sign-up",
+      "wilayas": "58 provinces",
+      "wilayasText": "Search by province",
+      "languages": "FR · AR · EN",
+      "languagesText": "Site in three languages",
+      "freeText": "For buyers and suppliers"
+    },
+    "categories": {
+      "label": "Sectors",
+      "title": "Browse by sector",
+      "subtitle": "Five industrial families, from raw materials to services.",
+      "count": "{{count}} subcategories",
+      "all": "Full catalogue"
+    },
+    "suppliers": {
+      "label": "Directory",
+      "title": "Verified suppliers",
+      "subtitle": "Trade register and tax ID checked by our team.",
+      "cta": "See the directory",
+      "verified": "Verified"
+    },
+    "supplierBand": {
+      "title": "Your catalogue in front of industrial buyers",
+      "text": "Create your profile in minutes, get your company verified and receive quote requests.",
+      "s1": "Free account",
+      "s1Text": "Company profile and 5 products at no cost.",
+      "s2": "Verified badge",
+      "s2Text": "After checking your trade register and tax ID: buyers' trust.",
+      "s3": "Direct contacts",
+      "s3Text": "Quote requests by messaging and WhatsApp.",
+      "cta": "Create my profile for free",
+      "pricing": "See the plans"
+    },
+    "advertise": {
+      "label": "Advertising",
+      "title": "Promote your brand",
+      "text": "A banner at the top of the home page, catalogue and product pages, targeted by sector.",
+      "cta": "Request a proposal"
+    },
+    "final": {
+      "title": "Ready to find your next supplier?",
+      "text": "Search verified companies, or list yours for free.",
+      "buyer": "Explore the catalogue",
+      "supplier": "List my company",
+      "help": "A question? Read the FAQ or contact us."
+    },
+    "latest": {
+      "label": "New"
     }
   },
   "directory": {

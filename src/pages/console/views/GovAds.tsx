@@ -289,7 +289,7 @@ export default function GovAds({ state }: { state: any }) {
         <div>
           <h3 className="text-2xl font-black text-primary">Gestion des publicités</h3>
           <p className="text-gray-500 mt-2 text-sm">
-            Une campagne publiée apparaît dans le bandeau des pages choisies (accueil, catalogue, fournisseurs, contenus), pendant sa période de diffusion. Sans campagne, l'accueil présente la plateforme et les autres pages n'affichent pas de bandeau.
+            Une campagne publiée apparaît dans le bandeau des pages choisies (accueil, catalogue, fournisseurs, contenus), pendant sa période de diffusion. Sans campagne, le bandeau présente la plateforme (inscription, offre fondateur, « Votre annonce ici »).
           </p>
         </div>
         <button type="button" onClick={() => setEditing(null)} className="btn-primary shrink-0">
