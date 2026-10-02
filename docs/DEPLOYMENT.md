@@ -131,7 +131,26 @@ gcloud run deploy algeria-industry \
         --headers "Authorization=Bearer <CRON_SECRET>"
       ```
 
-## 7. Mises à jour
+## 7. Mesure d'audience (Plausible)
+
+Avec `VITE_PLAUSIBLE_DOMAIN` renseigné au build, le site envoie ces
+événements. Les déclarer dans Plausible > Site settings > Goals > Custom event,
+avec exactement ces noms :
+
+| Objectif | Déclenché quand |
+|---|---|
+| `Inscription` | un compte est créé (propriété `role`) |
+| `Contact fournisseur` | premier message d'une conversation |
+| `Clic WhatsApp` | clic sur le bouton WhatsApp d'une fiche entreprise ou produit |
+| `Souscription` | une facture d'abonnement est émise (propriété `plan`) |
+| `Paiement en ligne` | redirection vers le paiement CIB / Edahabia |
+| `Telechargement catalogue` | ouverture d'un catalogue PDF |
+
+Les statistiques des fournisseurs (vues, clics, téléchargements) sont
+mesurées par l'application elle-même (table `audience_events`), sans cookie et
+indépendamment de Plausible.
+
+## 8. Mises à jour
 
 Chaque fusion sur `main` : appliquer les nouvelles migrations **avant** de
 déployer l'image qui en dépend, puis reconstruire et redéployer (section 4).

@@ -32,6 +32,7 @@ import { categoryGroupId, categoryLabel } from '../data/productCategories';
 import { useTranslation } from 'react-i18next';
 import { ApiError } from '../lib/apiError';
 import { whatsappHref } from '../config/site';
+import { goal, trackAudience } from '../lib/analytics';
 import { formatDate, currentLocale } from '../lib/format';
 import { CompanyAvatar } from '../components/ui/ProductImage';
 import { useToast } from '../context/ToastContext';
@@ -158,7 +159,7 @@ const CompanyProfile = () => {
   const fetchCatalogues = async () => {
     try {
       setCataloguesLoading(true);
-      const res = await fetch(`/api/catalogues`);
+      const res = await fetch(`/api/catalogues?company=${id}`);
       if (res.ok) {
         const data = await res.json();
         const filtered = data.filter((cat: any) => cat.company_id === id);
@@ -238,6 +239,7 @@ const CompanyProfile = () => {
         };
 
         setCompany(data);
+        trackAudience('company_view', data.id);
         fetchCatalogues();
         fetchArticles(data.name, data.fullName || data.name);
         fetchEvents(data.name, data.fullName || data.name);
@@ -324,6 +326,7 @@ const CompanyProfile = () => {
           {company.whatsapp && !(user && company.owner_id === user.id) && (
             <a
               href={`${whatsappHref(company.whatsapp)}?text=${encodeURIComponent(t('company.whatsappMessage', { name: company.name }))}`}
+                onClick={() => { trackAudience('whatsapp_click', company.id); goal('Clic WhatsApp'); }}
               target="_blank"
               rel="noopener noreferrer"
               className="btn-secondary !bg-[#25D366] hover:!bg-[#1ebe5b] shrink-0"
@@ -513,6 +516,7 @@ const CompanyProfile = () => {
                       {company.whatsapp && !(user && company.owner_id === user.id) && (
                         <a
                           href={`${whatsappHref(company.whatsapp)}?text=${encodeURIComponent(t('company.whatsappMessage', { name: company.name }))}`}
+                onClick={() => { trackAudience('whatsapp_click', company.id); goal('Clic WhatsApp'); }}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="w-full sm:w-auto py-3.5 px-6 rounded-lg flex items-center justify-center gap-2 shadow-lg text-sm font-black tracking-wider bg-[#25D366] text-white hover:opacity-90"
@@ -658,7 +662,9 @@ const CompanyProfile = () => {
                           <p className="text-sm text-gray-500 font-medium mb-4 line-clamp-2 leading-relaxed">{catalogue.description}</p>
                         </div>
                         <a 
+ 
                           href={catalogue.pdf_url} 
+                          onClick={() => { trackAudience('catalogue_download', catalogue.id); goal('Telechargement catalogue'); }}
                           target="_blank" 
                           rel="noopener noreferrer" 
                           className="flex items-center justify-center space-x-2 py-3 px-4 bg-gray-50 border border-gray-100 text-primary font-bold text-xs uppercase tracking-wider rounded-lg hover:bg-secondary hover:text-white hover:border-secondary transition-all"

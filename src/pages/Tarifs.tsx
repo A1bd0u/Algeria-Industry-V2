@@ -20,6 +20,7 @@ const Tarifs = () => {
       features: [
         { text: t('pricing.features.products', { count: 5 }) },
         { text: t('pricing.features.images', { count: 2 }) },
+        { text: t('pricing.features.catalogues', { count: 1 }) },
         { text: t('pricing.features.messaging') },
         { text: t('pricing.features.supportStandard') }
       ],
@@ -37,6 +38,7 @@ const Tarifs = () => {
       features: [
         { text: t('pricing.features.products', { count: 15 }) },
         { text: t('pricing.features.images', { count: 5 }) },
+        { text: t('pricing.features.catalogues', { count: 5 }) },
         { text: t('pricing.features.messaging') },
         { text: t('pricing.features.statsBasic') },
         { text: t('pricing.features.support48') }
@@ -55,7 +57,7 @@ const Tarifs = () => {
       features: [
         { text: t('pricing.features.unlimitedProducts'), isBold: true },
         { text: t('pricing.features.images', { count: 10 }) },
-        { text: t('pricing.features.featured') },
+        { text: t('pricing.features.unlimitedCatalogues') },
         { text: t('pricing.features.statsAdvanced') },
         { text: t('pricing.features.support24') },
         { text: t('pricing.features.messaging') }
@@ -75,12 +77,10 @@ const Tarifs = () => {
     [t('pricing.table.price'), `0 ${t('common.dzd')}`, `18 000 ${t('common.dzd')}${t('pricing.perYear')}`, `29 900 ${t('common.dzd')}${t('pricing.perYear')}`],
     [t('pricing.table.products'), '5', '15', t('subscription.unlimited')],
     [t('pricing.table.images'), '2', '5', '10'],
-    [t('pricing.table.featured'), no, no, t('pricing.table.featuredPro')],
     [t('pricing.table.stats'), no, t('pricing.table.statsBasic'), t('pricing.table.statsAdvanced')],
     [t('pricing.table.support'), t('pricing.table.supportStandard'), t('pricing.table.support48'), t('pricing.table.support24')],
     [t('pricing.table.messaging'), yes, yes, yes],
     [t('pricing.table.catalogues'), '1', '5', t('subscription.unlimited')],
-    [t('pricing.table.visibility'), t('pricing.table.supportStandard'), t('pricing.table.sectorHighlight'), t('pricing.table.sectorHighlight')],
   ];
   const cellClass = [
     'bg-gray-100/30 text-gray-800',
@@ -252,7 +252,7 @@ const Tarifs = () => {
               {t('pricing.payment.text')}
             </p>
             <p className="text-xs text-gray-500 mt-4">
-              {t('pricing.payment.termsBefore')} <Link to="/terms" className="font-bold text-primary hover:underline">{t('pricing.payment.termsLink')}</Link>.
+              {t('pricing.payment.termsBefore')} <Link to="/cgv" className="font-bold text-primary hover:underline">{t('pricing.payment.termsLink')}</Link>.
             </p>
           </div>
         </div>

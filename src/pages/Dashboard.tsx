@@ -32,6 +32,8 @@ import {
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import Messages from './Messages';
+import SupplierStats from '../components/SupplierStats';
+import CataloguesPanel from '../components/CataloguesPanel';
 import AddProduct from './AddProduct';
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
@@ -733,13 +735,18 @@ const Dashboard = () => {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="bg-white p-12 rounded-2xl border border-gray-100 shadow-sm text-center"
           >
-            <BarChart3 className="h-12 w-12 text-gray-300 mx-auto mb-6" />
-            <h3 className="text-xl font-black text-primary mb-2">{t('dashboard.statsSoon.title')}</h3>
-            <p className="text-sm text-gray-500 max-w-md mx-auto">
-              {t('dashboard.statsSoon.text')}
-            </p>
+            <SupplierStats />
+          </motion.div>
+        );
+      case 'catalogues':
+        return (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+          >
+            <CataloguesPanel notify={showNotify} />
           </motion.div>
         );
       case 'products':
@@ -1006,7 +1013,8 @@ const Dashboard = () => {
     { id: 'favorites', name: t('dashboard.menu.favorites'), icon: Heart, roles: ['acheteur'] },
     { id: 'ads', name: t('dashboard.menu.ads'), icon: Zap },
     { id: 'subscription', name: t('dashboard.menu.subscription'), icon: CreditCard },
-    { id: 'stats', name: t('dashboard.menu.stats'), icon: BarChart3 },
+    { id: 'catalogues', name: t('dashboard.menu.catalogues'), icon: FileText, roles: ['fournisseur', 'exposant'] },
+    { id: 'stats', name: t('dashboard.menu.stats'), icon: BarChart3, roles: ['fournisseur', 'exposant'] },
     { id: 'admin', name: t('dashboard.menu.admin'), icon: ShieldCheck, isExternal: true, roles: ['admin'] },
   ].filter(item => !item.roles || item.roles.includes(user?.role || ''));
 
@@ -1066,7 +1074,7 @@ const Dashboard = () => {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-8">
+      <main className="flex-1 min-w-0 p-4 sm:p-8">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-6">

@@ -48,7 +48,7 @@ describe('Abonnements client', () => {
       },
     });
 
-    const res = await request(app).post('/api/subscriptions').set('Cookie', ['token=t']).send({ plan: 'pro' });
+    const res = await request(app).post('/api/subscriptions').set('Cookie', ['token=t']).send({ plan: 'pro', acceptTerms: true });
     expect(res.status).toBe(403);
     expect(res.body.code).toBe('COMPANY_REQUIRED');
   });
@@ -70,7 +70,7 @@ describe('Abonnements client', () => {
     const res = await request(app)
       .post('/api/subscriptions')
       .set('Cookie', ['token=t'])
-      .send({ plan: 'basic', amount_dzd: 1, status: 'active' });
+      .send({ plan: 'basic', amount_dzd: 1, status: 'active', acceptTerms: true });
 
     expect(res.status).toBe(201);
     const insert = mock.queries.find((q) => q.table === 'subscriptions' && q.op === 'insert');
@@ -81,7 +81,16 @@ describe('Abonnements client', () => {
       source: 'self_service',
       company_id: COMPANY_ID,
       user_id: USER_ID,
+      terms_version: '2026-10',
     });
+    expect(insert?.payload[0].terms_accepted_at).toBeTruthy();
+  });
+
+  it('refuse la souscription sans acceptation des CGV', async () => {
+    const mock = setup({ companies: ownedCompany });
+    const res = await request(app).post('/api/subscriptions').set('Cookie', ['token=t']).send({ plan: 'basic' });
+    expect(res.status).toBe(400);
+    expect(mock.queries.some((q) => q.table === 'subscriptions' && q.op === 'insert')).toBe(false);
   });
 
   it('renvoie la facture en attente existante au lieu d\'en créer une seconde', async () => {
@@ -94,7 +103,7 @@ describe('Abonnements client', () => {
       },
     });
 
-    const res = await request(app).post('/api/subscriptions').set('Cookie', ['token=t']).send({ plan: 'pro' });
+    const res = await request(app).post('/api/subscriptions').set('Cookie', ['token=t']).send({ plan: 'pro', acceptTerms: true });
     expect(res.status).toBe(200);
     expect(res.body.id).toBe(SUB_ID);
     expect(mock.queries.some((q) => q.table === 'subscriptions' && q.op === 'insert')).toBe(false);

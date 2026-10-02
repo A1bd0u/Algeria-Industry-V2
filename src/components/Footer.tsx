@@ -92,6 +92,7 @@ const Footer = () => {
           <div className="flex flex-wrap justify-center gap-x-8 gap-y-3">
             <Link to="/terms" className="hover:text-white transition-colors">{t('footer.legal')}</Link>
             <Link to="/privacy" className="hover:text-white transition-colors">{t('footer.privacy')}</Link>
+            <Link to="/cgv" className="hover:text-white transition-colors">{t('footer.cgv')}</Link>
             <button type="button" onClick={() => window.dispatchEvent(new Event(OPEN_COOKIE_SETTINGS_EVENT))} className="hover:text-white transition-colors uppercase">{t('footer.cookies')}</button>
           </div>
         </div>

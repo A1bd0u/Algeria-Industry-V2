@@ -7,6 +7,7 @@ import { AlertTriangle, CheckCircle, Copy, CreditCard, FileText, Landmark, Loade
 import { cn } from '../lib/utils';
 import { ApiError } from '../lib/apiError';
 import { formatDate as date, formatDzd as dzd } from '../lib/format';
+import { goal } from '../lib/analytics';
 
 const STATUS_CLASSES: Record<string, string> = {
   pending: 'bg-orange-50 text-orange-600',
@@ -31,6 +32,7 @@ export default function SubscriptionPanel({ notify }: { notify: (message: string
   const paymentReturn = searchParams.get('payment');
   const fileInputs = useRef<Record<string, HTMLInputElement | null>>({});
   const [uploadingId, setUploadingId] = useState<string | null>(null);
+  const [acceptTerms, setAcceptTerms] = useState(false);
   const planName = (plan: string) => t(`subscription.plans.${plan}`, { defaultValue: plan });
 
   const { data, isLoading, error } = useQuery({
@@ -43,8 +45,9 @@ export default function SubscriptionPanel({ notify }: { notify: (message: string
   const refresh = () => queryClient.invalidateQueries({ queryKey: ['my-subscription'] });
 
   const subscribe = useMutation({
-    mutationFn: (plan: 'basic' | 'pro') => api('/api/subscriptions', { method: 'POST', body: JSON.stringify({ plan }) }),
+    mutationFn: (plan: 'basic' | 'pro') => api('/api/subscriptions', { method: 'POST', body: JSON.stringify({ plan, acceptTerms: true }) }),
     onSuccess: (sub: any) => {
+      goal('Souscription', { plan: String(sub.plan || '') });
       notify(t(data?.payment?.online ? 'subscription.invoiceReadyOnline' : 'subscription.invoiceReady', { invoice: sub.invoice_number }), 'success');
       refresh();
     },
@@ -54,6 +57,7 @@ export default function SubscriptionPanel({ notify }: { notify: (message: string
   const checkout = useMutation({
     mutationFn: (id: string) => api<{ checkoutUrl: string }>(`/api/subscriptions/${id}/checkout`, { method: 'POST' }),
     onSuccess: ({ checkoutUrl }) => {
+      goal('Paiement en ligne');
       window.location.href = checkoutUrl;
     },
     onError: (err: Error) => notify(err.message, 'error'),
@@ -146,6 +150,21 @@ export default function SubscriptionPanel({ notify }: { notify: (message: string
       {/* Souscrire */}
       {data.plan !== 'pro' && data.plan !== 'founder' && (
         <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {data.canSubscribe && (
+            <label className="md:col-span-2 flex items-start gap-3 text-sm text-gray-700 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={acceptTerms}
+                onChange={(e) => setAcceptTerms(e.target.checked)}
+                className="mt-0.5 h-4 w-4 rounded border-gray-300 text-secondary focus:ring-secondary"
+              />
+              <span>
+                {t('subscription.acceptTermsBefore')}{' '}
+                <Link to="/cgv" target="_blank" className="font-bold text-secondary underline">{t('subscription.acceptTermsLink')}</Link>
+                {t('subscription.acceptTermsAfter')}
+              </span>
+            </label>
+          )}
           {(['basic', 'pro'] as const).filter((p) => p !== data.plan).map((plan) => (
             <div key={plan} className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm flex flex-col">
               <h4 className="text-xl font-black text-primary">{planName(plan)}</h4>
@@ -153,7 +172,7 @@ export default function SubscriptionPanel({ notify }: { notify: (message: string
               <p className="text-sm text-gray-600 mt-3 flex-1">{t(`subscription.features.${plan}`)}</p>
               <button
                 onClick={() => subscribe.mutate(plan)}
-                disabled={!data.canSubscribe || subscribe.isPending}
+                disabled={!data.canSubscribe || !acceptTerms || subscribe.isPending}
                 className="mt-6 w-full btn-secondary py-4 rounded-2xl text-xs font-black uppercase tracking-widest disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {subscribe.isPending && <Loader2 className="h-4 w-4 animate-spin" />}

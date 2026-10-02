@@ -371,7 +371,8 @@
     "contactTitle": "Contact",
     "legal": "Legal notice",
     "privacy": "Privacy",
-    "cookies": "Cookies"
+    "cookies": "Cookies",
+    "cgv": "Terms of sale"
   },
   "common": {
     "compare": "Compare",
@@ -671,7 +672,9 @@
     "COMPANY_IMAGE_INVALID": "Invalid image: upload it from your dashboard.",
     "PRODUCT_IMAGE_INVALID": "Invalid image: upload it from your dashboard.",
     "PLAN_IMAGE_LIMIT": "Number of photos limited by your plan. Upgrade your plan.",
-    "WEBSITE_INVALID": "Invalid website address."
+    "WEBSITE_INVALID": "Invalid website address.",
+    "CATALOGUE_LIMIT_REACHED": "Your plan limits the number of PDF catalogues. Upgrade to a higher plan.",
+    "CATALOGUE_FILE_INVALID": "Invalid file: upload a PDF from your dashboard."
   },
   "mfa": {
     "title": "Two-factor authentication",
@@ -731,8 +734,8 @@
     "unlimited": "unlimited",
     "perYearVat": "incl. VAT / year",
     "features": {
-      "basic": "15 products, 5 images per product, basic statistics, support within 48 h.",
-      "pro": "Unlimited products, 10 images per product, 3 featured listings, advanced statistics, support within 24 h."
+      "basic": "15 products, 5 images per product, 5 PDF catalogues, view statistics, support within 48 h.",
+      "pro": "Unlimited products and PDF catalogues, 10 images per product, advanced statistics (views, WhatsApp clicks, contacts), support within 24 h."
     },
     "choose": "Choose {{plan}}",
     "ownerRequired": "To subscribe, you must own a company profile.",
@@ -764,7 +767,10 @@
       "amount": "Amount",
       "period": "Period",
       "status": "Status"
-    }
+    },
+    "acceptTermsBefore": "I have read and accept the",
+    "acceptTermsLink": "terms of sale",
+    "acceptTermsAfter": "."
   },
   "productCategories": {
     "A": "Raw materials & semi-finished products",
@@ -914,10 +920,6 @@
       "why1": "Reach targeted industrial buyers",
       "why3": "Banner shown on the home page"
     },
-    "statsSoon": {
-      "title": "Statistics coming soon",
-      "text": "Tracking of visits and clicks on your listings is being set up. Meanwhile, the overview shows your real products and messages."
-    },
     "products": {
       "title": "My products",
       "add": "Add",
@@ -956,7 +958,8 @@
       "ads": "Advertising",
       "subscription": "Subscription",
       "stats": "Statistics",
-      "admin": "Pro console"
+      "admin": "Pro console",
+      "catalogues": "My PDF catalogues"
     },
     "logout": "Sign out",
     "title": "Dashboard",
@@ -1419,7 +1422,9 @@
       "statsAdvanced": "Advanced statistics",
       "support48": "Support within 48 h",
       "support24": "Support within 24 h",
-      "featured": "3 featured listings"
+      "featured": "3 featured listings",
+      "catalogues": "{{count}} PDF catalogue(s)",
+      "unlimitedCatalogues": "Unlimited PDF catalogues"
     },
     "popular": "Popular",
     "recommended": "Recommended",
@@ -1435,8 +1440,6 @@
       "price": "Annual price incl. VAT",
       "products": "Products",
       "images": "Images per product",
-      "featured": "Featured listings",
-      "featuredPro": "3 products (home page)",
       "stats": "Statistics",
       "statsBasic": "Basic (views)",
       "statsAdvanced": "Advanced (views, clicks, leads)",
@@ -1446,6 +1449,8 @@
       "support24": "24 h, priority",
       "messaging": "Messaging",
       "catalogues": "PDF catalogues",
+      "featured": "Featured listings",
+      "featuredPro": "3 products (home page)",
       "visibility": "Visibility",
       "sectorHighlight": "Highlighted in sector"
     },
@@ -1561,5 +1566,62 @@
   "emptyStates": {
     "directoryText": "Try another province or sector, or list your company.",
     "messagesText": "Contact a supplier from a product or company page: the conversation will appear here."
+  },
+  "cgv": {
+    "kicker": "Supplier subscriptions",
+    "sellerTitle": "Seller",
+    "pricingLink": "See pricing",
+    "termsLink": "Terms of use",
+    "privacyLink": "Privacy policy"
+  },
+  "supplierStats": {
+    "title": "Your profile statistics",
+    "subtitle": "Unique visitors per day, excluding bots and your own visits.",
+    "period": "Period",
+    "days": "{{count}} days",
+    "companyViews": "Profile views",
+    "productViews": "Product views",
+    "whatsappClicks": "WhatsApp clicks",
+    "catalogueDownloads": "Catalogues opened",
+    "contacts": "Contacts",
+    "contactsHint": "buyers who messaged you",
+    "chartTitle": "Views per day",
+    "noViews": "No visits yet in this period. Complete your profile and publish products to gain visibility.",
+    "topProducts": "Most viewed products",
+    "noTopProducts": "No product views in this period.",
+    "views": "{{count}} views",
+    "advancedHint": "With the Pro plan: WhatsApp clicks, catalogues opened, contacts received and most viewed products.",
+    "upgradePro": "Upgrade to Pro",
+    "lockedTitle": "Statistics available on Basic and Pro",
+    "lockedText": "See how many buyers view your profile and products every day.",
+    "upgrade": "See plans",
+    "companyRequired": "Create your company profile first to track its statistics.",
+    "completeCompany": "Complete my profile",
+    "loadError": "Unable to load statistics.",
+    "privacy": "Anonymous, cookie-free measurement: no personal visitor data is stored."
+  },
+  "cataloguesPanel": {
+    "title": "PDF catalogues",
+    "subtitle": "Published on your profile and on the Catalogues page. PDF, 10 MB max.",
+    "usage": "{{used}} / {{limit}} catalogue(s)",
+    "usageUnlimited": "{{count}} catalogue(s), unlimited",
+    "limitReached": "You have reached your plan's catalogue limit. Remove one or upgrade.",
+    "upgrade": "See plans",
+    "choose": "Choose a PDF file",
+    "fileHint": "Product catalogue, data sheet, brochure… 10 MB max",
+    "titleLabel": "Title",
+    "descriptionLabel": "Description (optional)",
+    "publish": "Publish catalogue",
+    "published": "Catalogue published.",
+    "deleted": "Catalogue removed.",
+    "deleteConfirm": "Remove this catalogue?",
+    "delete": "Remove",
+    "open": "Open PDF",
+    "empty": "No catalogue published yet.",
+    "invalidFile": "Choose a PDF file of 10 MB max.",
+    "fileRequired": "Choose a PDF file.",
+    "uploadFailed": "File upload failed.",
+    "saveFailed": "Unable to publish the catalogue.",
+    "deleteFailed": "Unable to remove the catalogue."
   }
 }

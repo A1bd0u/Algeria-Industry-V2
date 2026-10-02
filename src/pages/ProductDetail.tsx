@@ -32,6 +32,7 @@ import { whatsappHref } from '../config/site';
 import { apiErrorMessage } from '../lib/apiError';
 import ProductImage from '../components/ui/ProductImage';
 import { useAdCategories } from '../context/AdTargetingContext';
+import { goal, trackAudience } from '../lib/analytics';
 
 const ProductDetail = () => {
   const { t } = useTranslation();
@@ -93,6 +94,7 @@ const ProductDetail = () => {
         setError(null);
         const res = await axios.get(`/api/products/${id}`);
         setProduct(res.data.product);
+        trackAudience('product_view', res.data.product?.id);
         setSimilarProducts(res.data.similar || []);
       } catch (err: any) {
         console.error(err);
@@ -166,6 +168,10 @@ const ProductDetail = () => {
       return;
     }
     navigate(`/contact?subject=${encodeURIComponent(t('products.detail.quoteSubject', { name: product.name }))}`);
+  };
+  const onWhatsapp = () => {
+    trackAudience('whatsapp_click', product?.companyId);
+    goal('Clic WhatsApp');
   };
   const whatsappLink = product?.companyWhatsapp
     ? `${whatsappHref(product.companyWhatsapp)}?text=${encodeURIComponent(t('products.detail.whatsappMessage', { name: product.name }))}`
@@ -376,7 +382,7 @@ const ProductDetail = () => {
                   <ArrowRight className="h-5 w-5 rtl:rotate-180" />
                 </button>
                 {whatsappLink && (
-                  <a href={whatsappLink} target="_blank" rel="noopener noreferrer" className="w-full btn-secondary !bg-[#25D366] hover:!bg-[#1ebe5b] !py-3">
+                  <a href={whatsappLink} onClick={onWhatsapp} target="_blank" rel="noopener noreferrer" className="w-full btn-secondary !bg-[#25D366] hover:!bg-[#1ebe5b] !py-3">
                     {t('company.whatsapp')}
                   </a>
                 )}
@@ -472,7 +478,7 @@ const ProductDetail = () => {
           {t('products.detail.requestQuoteShort')}
         </button>
         {whatsappLink && (
-          <a href={whatsappLink} target="_blank" rel="noopener noreferrer" className="btn-secondary !bg-[#25D366] !py-3">WhatsApp</a>
+          <a href={whatsappLink} onClick={onWhatsapp} target="_blank" rel="noopener noreferrer" className="btn-secondary !bg-[#25D366] !py-3">WhatsApp</a>
         )}
       </div>
 

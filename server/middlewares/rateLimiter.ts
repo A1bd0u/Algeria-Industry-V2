@@ -109,3 +109,14 @@ export const quoteRequestLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
 });
+
+// Mesure d'audience (vues, clics) : généreux, mais borne les scripts.
+export const trackLimiter = rateLimit({
+  store: sharedStore('track'),
+  windowMs: 60 * 1000,
+  max: 60,
+  keyGenerator: ipKey,
+  message: { error: 'Trop de requêtes.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});

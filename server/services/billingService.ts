@@ -15,11 +15,20 @@ export type CompanyPlan = 'free' | PlanId;
 export type PaymentMethod = 'virement' | 'cheque' | 'gratuit' | 'cib_edahabia';
 
 // Limites par offre (null = illimité). Le membre fondateur a les droits Pro.
-export const PLAN_LIMITS: Record<CompanyPlan, { products: number | null; imagesPerProduct: number }> = {
-  free: { products: 5, imagesPerProduct: 2 },
-  basic: { products: 15, imagesPerProduct: 5 },
-  pro: { products: null, imagesPerProduct: 10 },
-  founder: { products: null, imagesPerProduct: 10 },
+export type StatsLevel = 'none' | 'basic' | 'advanced';
+
+export const PLAN_LIMITS: Record<CompanyPlan, {
+  products: number | null;
+  imagesPerProduct: number;
+  catalogues: number | null;
+  // Statistiques fournisseur : basic = vues ; advanced = vues, clics WhatsApp,
+  // téléchargements de catalogues, contacts et produits les plus vus.
+  stats: StatsLevel;
+}> = {
+  free: { products: 5, imagesPerProduct: 2, catalogues: 1, stats: 'none' },
+  basic: { products: 15, imagesPerProduct: 5, catalogues: 5, stats: 'basic' },
+  pro: { products: null, imagesPerProduct: 10, catalogues: null, stats: 'advanced' },
+  founder: { products: null, imagesPerProduct: 10, catalogues: null, stats: 'advanced' },
 };
 
 export const DURATION_MONTHS = 12;
