@@ -1,7 +1,4 @@
-import {
-  ArrowRight, BadgeCheck, Building2, CheckCircle2, Globe2, Megaphone, MessageSquare, Package, Search,
-  ShieldCheck, Star, Sparkles, MapPin,
-} from 'lucide-react';
+import { ArrowRight, BadgeCheck, Package, Search, Star } from 'lucide-react';
 import { motion } from 'motion/react';
 import type React from 'react';
 import { useEffect, useState } from 'react';
@@ -12,10 +9,9 @@ import { formatNumber } from '../lib/format';
 import { cn, generateSlugUrl } from '../lib/utils';
 import SEO from '../components/SEO';
 import { SITE_NAME, absoluteUrl } from '../config/site';
-import { CompanyAvatar, GROUP_STYLE } from '../components/ui/ProductImage';
+import { CompanyAvatar } from '../components/ui/ProductImage';
 import { productCategories, sectorPath } from '../data/productCategories';
 import ProductCard from '../components/ui/ProductCard';
-import SectorArt from '../components/ui/SectorArt';
 
 interface PublicStats {
   verifiedCompanies: number;
@@ -94,15 +90,16 @@ const Home = () => {
     })();
   }, []);
 
+  // Bande de faits : chiffres réels si disponibles, sinon engagements vérifiables.
   const trust = [
     stats && stats.verifiedCompanies > 0
-      ? { icon: ShieldCheck, value: formatNumber(stats.verifiedCompanies), label: t('home.stats.verifiedCompanies') }
-      : { icon: ShieldCheck, value: 'KYC', label: t('home.promise.verificationTitle') },
+      ? { value: formatNumber(stats.verifiedCompanies), label: t('home.stats.verifiedCompanies') }
+      : { value: t('home.trust.kycValue'), label: t('home.trust.kycText') },
     stats && stats.publishedProducts > 0
-      ? { icon: Package, value: formatNumber(stats.publishedProducts), label: t('home.stats.publishedProducts') }
-      : { icon: CheckCircle2, value: t('home.trust.free'), label: t('home.trust.freeText') },
-    { icon: MapPin, value: t('home.trust.wilayas'), label: t('home.trust.wilayasText') },
-    { icon: Globe2, value: t('home.trust.languages'), label: t('home.trust.languagesText') },
+      ? { value: formatNumber(stats.publishedProducts), label: t('home.stats.publishedProducts') }
+      : { value: t('home.trust.freeValue'), label: t('home.trust.freeText') },
+    { value: '58', label: t('home.trust.wilayasText') },
+    { value: '3', label: t('home.trust.languagesText') },
   ];
 
   return (
@@ -127,14 +124,12 @@ const Home = () => {
 
       {/* 1. Héros : recherche acheteur à gauche, appel aux fournisseurs à droite */}
       <section className="relative overflow-hidden bg-neutral-bg border-b border-border-tech">
-        <div className="absolute -top-32 -end-32 h-96 w-96 rounded-full bg-secondary/10 blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-40 -start-40 h-[28rem] w-[28rem] rounded-full bg-accent/10 blur-3xl pointer-events-none" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 md:py-20 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
           <motion.div {...reveal} className="lg:col-span-7">
-            <span className="inline-flex items-center gap-2 rounded-full bg-white border border-border-tech px-3 py-1.5 text-xs font-bold text-primary shadow-sm mb-6">
-              <BadgeCheck className="h-4 w-4 text-success" aria-hidden="true" />
+            <p className="flex items-center gap-3 text-xs font-bold uppercase tracking-[0.18em] text-gray-600 mb-6">
+              <span className="h-px w-8 bg-secondary" aria-hidden="true" />
               {t('home.hero.eyebrow')}
-            </span>
+            </p>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-primary tracking-tight leading-[1.05] mb-5">
               {t('home.hero.title')}
             </h1>
@@ -173,16 +168,14 @@ const Home = () => {
           </motion.div>
 
           <motion.aside {...reveal} transition={{ duration: 0.5, delay: 0.1 }} className="lg:col-span-5">
-            <div className="relative rounded-3xl bg-primary text-white p-7 md:p-8 shadow-2xl overflow-hidden">
-              <div className="absolute inset-0 opacity-[0.06] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#fff 1px, transparent 1px)', backgroundSize: '22px 22px' }} />
-              <div className="absolute -top-20 -end-20 h-56 w-56 rounded-full bg-secondary/30 blur-3xl" />
+            <div className="relative rounded-xl bg-primary text-white p-7 md:p-8 overflow-hidden">
               <div className="relative">
                 <p className="text-xs font-black uppercase tracking-wider text-secondary mb-3">{t('home.supplierCard.label')}</p>
                 <h2 className="text-2xl md:text-3xl font-black leading-tight mb-6">{t('home.supplierCard.title')}</h2>
                 <ul className="space-y-3 mb-7">
                   {(['p1', 'p2', 'p3'] as const).map((p) => (
-                    <li key={p} className="flex items-start gap-3 text-white/85">
-                      <CheckCircle2 className="h-5 w-5 text-secondary shrink-0 mt-0.5" aria-hidden="true" />
+                    <li key={p} className="flex items-baseline gap-3 text-white/85 border-t border-white/10 pt-3 first:border-0 first:pt-0">
+                      <span className="text-xs font-bold text-secondary tabular-nums">0{['p1', 'p2', 'p3'].indexOf(p) + 1}</span>
                       <span>{t(`home.supplierCard.${p}`)}</span>
                     </li>
                   ))}
@@ -191,9 +184,8 @@ const Home = () => {
                   {t('home.supplierCard.cta')}
                   <ArrowRight className="h-4 w-4 rtl:rotate-180" aria-hidden="true" />
                 </Link>
-                <Link to="/tarifs" className="mt-4 flex items-start gap-3 rounded-xl border border-secondary/40 bg-white/5 px-4 py-3 text-sm hover:border-secondary transition-colors">
-                  <Sparkles className="h-4 w-4 text-secondary shrink-0 mt-0.5" aria-hidden="true" />
-                  <span><span className="font-bold text-secondary">{t('pricing.founder.label')} · </span>{t('home.hero.founder')}</span>
+                <Link to="/tarifs" className="mt-4 block border-t border-white/10 pt-4 text-sm text-white/75 hover:text-white transition-colors">
+                  <span className="font-bold text-secondary">{t('pricing.founder.label')}</span> — {t('home.hero.founder')}
                 </Link>
               </div>
             </div>
@@ -204,15 +196,9 @@ const Home = () => {
         <div className="relative border-t border-border-tech bg-white">
           <dl className="max-w-7xl mx-auto grid grid-cols-2 lg:grid-cols-4 gap-px bg-border-tech">
             {trust.map((item, i) => (
-              <div key={i} className="flex items-center gap-3 bg-white py-5 px-4 md:px-6">
-                <span className="hidden sm:flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-secondary/10 text-secondary">
-                  <item.icon className="h-5 w-5" aria-hidden="true" />
-                </span>
-                <div className="min-w-0">
-                  <dt className="sr-only">{item.label}</dt>
-                  <dd className="text-lg md:text-xl font-black text-primary leading-tight truncate">{item.value}</dd>
-                  <dd className="text-xs text-gray-500 truncate">{item.label}</dd>
-                </div>
+              <div key={i} className="flex flex-col-reverse justify-end bg-white py-6 px-4 md:px-8">
+                <dt className="text-sm text-gray-600 leading-snug mt-1">{item.label}</dt>
+                <dd className="text-2xl md:text-3xl font-black text-primary tracking-tight tabular-nums">{item.value}</dd>
               </div>
             ))}
           </dl>
@@ -233,33 +219,28 @@ const Home = () => {
               </Link>
             }
           />
-          <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 md:gap-4">
-            {productCategories.map((group) => {
-              const style = GROUP_STYLE[group.id];
-              const Icon = style.icon;
-              return (
-                <Link
-                  key={group.id}
-                  to={sectorPath(group.id)}
-                  className="group relative overflow-hidden flex h-full flex-col rounded-2xl border border-border-tech bg-white p-4 md:p-6 hover:border-secondary hover:shadow-xl hover:-translate-y-0.5 transition-all max-lg:last:col-span-2"
-                >
-                  <SectorArt group={group.id} className={cn('absolute -end-6 -bottom-4 w-32 md:w-36 opacity-[0.13] group-hover:opacity-25 transition-opacity', style.tint.split(' ').find((c) => c.startsWith('text-')))} />
-                  <span className={cn('flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-xl mb-3 md:mb-5', style.tint)}>
-                    <Icon className="h-6 w-6" aria-hidden="true" />
-                  </span>
-                  <h3 className="text-sm md:text-base font-black text-primary leading-snug mb-2 group-hover:text-secondary transition-colors">
-                    {t(`productCategories.${group.id}`)}
-                  </h3>
-                  <p className="max-sm:hidden text-sm text-gray-500 line-clamp-2 mb-4">
-                    {group.subCategories.slice(0, 3).map((s) => t(`productCategories.${s.id}`).split(/[:(]/)[0].trim()).join(' · ')}
-                  </p>
-                  <span className="mt-auto inline-flex items-center gap-1.5 text-xs font-bold text-gray-500 group-hover:text-secondary">
-                    {t('home.categories.count', { count: group.subCategories.length })}
-                    <ArrowRight className="h-3.5 w-3.5 rtl:rotate-180" aria-hidden="true" />
-                  </span>
-                </Link>
-              );
-            })}
+          {/* Index des secteurs, à la manière d'un catalogue industriel */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 border-t-2 border-primary">
+            {productCategories.map((group) => (
+              <Link
+                key={group.id}
+                to={sectorPath(group.id)}
+                className="group flex flex-col border-b border-border-tech sm:border-e lg:last:border-e-0 px-0 sm:px-5 py-6 lg:first:ps-0 hover:bg-neutral-bg transition-colors"
+              >
+                <div className="flex items-baseline justify-between gap-3 mb-3">
+                  <span className="text-xs font-bold text-gray-400 tabular-nums tracking-[0.18em]">{group.id}</span>
+                  <ArrowRight className="h-4 w-4 text-gray-300 group-hover:text-secondary rtl:rotate-180 transition-colors" aria-hidden="true" />
+                </div>
+                <h3 className="text-base font-black text-primary leading-snug mb-4 group-hover:text-secondary transition-colors">
+                  {t(`productCategories.${group.id}`)}
+                </h3>
+                <ul className="space-y-1.5 text-sm text-gray-600">
+                  {group.subCategories.map((sub) => (
+                    <li key={sub.id} className="leading-snug">{t(`productCategories.${sub.id}`).split(/[:(]/)[0].trim().replace(/\.$/, '')}</li>
+                  ))}
+                </ul>
+              </Link>
+            ))}
           </div>
         </div>
       </section>
@@ -344,17 +325,12 @@ const Home = () => {
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {(['buyer', 'supplier'] as const).map((role) => (
-              <div key={role} className={cn('rounded-3xl p-8 md:p-10 border', role === 'buyer' ? 'bg-white border-border-tech' : 'bg-primary text-white border-primary')}>
-                <div className="flex items-center gap-3 mb-8">
-                  <span className={cn('flex h-11 w-11 items-center justify-center rounded-xl', role === 'buyer' ? 'bg-accent/10 text-accent' : 'bg-secondary/20 text-secondary')}>
-                    {role === 'buyer' ? <Search className="h-5 w-5" /> : <Building2 className="h-5 w-5" />}
-                  </span>
-                  <h3 className="text-xl font-black">{t(`home.how.${role}.title`)}</h3>
-                </div>
-                <ol className="relative space-y-7 ps-1">
+              <div key={role} className={cn('rounded-xl p-8 md:p-10 border', role === 'buyer' ? 'bg-white border-border-tech' : 'bg-primary text-white border-primary')}>
+                <h3 className="text-xl font-black mb-8">{t(`home.how.${role}.title`)}</h3>
+                <ol className="space-y-6">
                   {[1, 2, 3].map((n) => (
-                    <li key={n} className="flex gap-4">
-                      <span className="w-9 h-9 shrink-0 rounded-full bg-secondary text-white font-black flex items-center justify-center">{n}</span>
+                    <li key={n} className={cn('flex gap-5 border-t pt-5 first:border-0 first:pt-0', role === 'buyer' ? 'border-border-tech' : 'border-white/10')}>
+                      <span className="text-sm font-black text-secondary tabular-nums pt-0.5">0{n}</span>
                       <div>
                         <p className="font-bold">{t(`home.how.${role}.step${n}`)}</p>
                         <p className={cn('text-sm mt-1', role === 'buyer' ? 'text-gray-600' : 'text-white/70')}>{t(`home.how.${role}.step${n}Text`)}</p>
@@ -403,32 +379,24 @@ const Home = () => {
 
       {/* 6. Fournisseurs : bénéfices et appel à l'action */}
       <section className="relative overflow-hidden bg-primary text-white py-16 md:py-20">
-        <div className="absolute inset-0 opacity-[0.05] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#fff 1px, transparent 1px)', backgroundSize: '26px 26px' }} />
-        <div className="absolute -bottom-32 -end-24 h-80 w-80 rounded-full bg-secondary/25 blur-3xl" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
           <div>
             <h2 className="text-3xl md:text-5xl font-black tracking-tight leading-tight mb-5">{t('home.supplierBand.title')}</h2>
             <p className="text-lg text-white/70 mb-8 max-w-xl">{t('home.supplierBand.text')}</p>
             <div className="flex flex-wrap gap-3">
-              <Link to="/register?role=fournisseur" className="inline-flex items-center gap-2 rounded-xl bg-secondary px-6 py-3.5 font-bold hover:bg-white hover:text-primary transition-colors">
+              <Link to="/register?role=fournisseur" className="inline-flex items-center gap-2 rounded-lg bg-secondary px-6 py-3.5 font-bold hover:bg-white hover:text-primary transition-colors">
                 {t('home.supplierBand.cta')}
                 <ArrowRight className="h-4 w-4 rtl:rotate-180" aria-hidden="true" />
               </Link>
-              <Link to="/tarifs" className="inline-flex items-center gap-2 rounded-xl border border-white/20 px-6 py-3.5 font-bold hover:bg-white/10 transition-colors">
+              <Link to="/tarifs" className="inline-flex items-center gap-2 rounded-lg border border-white/20 px-6 py-3.5 font-bold hover:bg-white/10 transition-colors">
                 {t('home.supplierBand.pricing')}
               </Link>
             </div>
           </div>
-          <ul className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-4">
-            {[
-              { icon: CheckCircle2, key: 's1' },
-              { icon: BadgeCheck, key: 's2' },
-              { icon: MessageSquare, key: 's3' },
-            ].map(({ icon: Icon, key }) => (
-              <li key={key} className="flex items-start gap-4 rounded-2xl bg-white/5 border border-white/10 p-5">
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-secondary/20 text-secondary">
-                  <Icon className="h-5 w-5" aria-hidden="true" />
-                </span>
+          <ul className="divide-y divide-white/10 border-y border-white/10">
+            {(['s1', 's2', 's3'] as const).map((key, i) => (
+              <li key={key} className="flex items-baseline gap-5 py-5">
+                <span className="text-sm font-black text-secondary tabular-nums">0{i + 1}</span>
                 <div>
                   <p className="font-bold">{t(`home.supplierBand.${key}`)}</p>
                   <p className="text-sm text-white/65 mt-0.5">{t(`home.supplierBand.${key}Text`)}</p>
@@ -442,10 +410,7 @@ const Home = () => {
       {/* 7. Publicité */}
       <section className="py-12 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row md:items-center gap-6 rounded-3xl border border-border-tech bg-gradient-to-r rtl:bg-gradient-to-l from-secondary/10 via-white to-white p-7 md:p-10">
-            <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-secondary text-white">
-              <Megaphone className="h-7 w-7" aria-hidden="true" />
-            </span>
+          <div className="flex flex-col md:flex-row md:items-center gap-6 border-y border-border-tech py-8">
             <div className="flex-1">
               <p className="text-xs font-black uppercase tracking-wider text-secondary mb-1">{t('home.advertise.label')}</p>
               <h2 className="text-2xl font-black text-primary">{t('home.advertise.title')}</h2>

@@ -1,4 +1,4 @@
-import { Award, BookOpen, ChevronDown, ChevronRight, Component, FileText, Globe, HardHat, Library, LogOut, Menu, Newspaper, Package, Search, Settings, ShieldCheck, Truck, UserCircle, Wrench, X, Zap, Beaker, Pill, Recycle, Shirt, Cpu, Car, Leaf } from 'lucide-react';
+import { Award, BookOpen, ChevronDown, ChevronRight, Library, LogOut, Menu, Newspaper, Package, Search, ShieldCheck, UserCircle, X, Zap } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -76,8 +76,6 @@ const Navbar = () => {
     { name: t('nav.pricing'), path: '/tarifs', icon: Award },
   ];
 
-  // Groupes de la nomenclature des produits (même libellé que le filtre du catalogue).
-  const groupIcons: Record<string, React.ElementType> = { A: Package, B: Wrench, C: Cpu, D: Truck, E: HardHat };
 
   return (
     <nav className={cn("bg-[#1a1a1a] text-white sticky top-0 z-50 border-b border-white/[0.05] shadow-2xl", i18n.language?.startsWith('ar') && "font-arabic")}>
@@ -141,7 +139,6 @@ const Navbar = () => {
                       <div className="bg-[#222] text-white shadow-2xl border border-white/10 overflow-hidden rounded-2xl">
                       <div className="grid grid-cols-5 gap-1 p-3">
                         {productCategories.map((group) => {
-                          const Icon = groupIcons[group.id] || Package;
                           return (
                             <div key={group.id} className="rounded-xl p-3 hover:bg-white/[0.03] transition-colors">
                               <Link
@@ -149,9 +146,7 @@ const Navbar = () => {
                                 onClick={() => setShowMegaMenu(false)}
                                 className="group/sector flex items-start gap-2.5 mb-3"
                               >
-                                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-secondary/15 text-secondary group-hover/sector:bg-secondary group-hover/sector:text-white transition-colors">
-                                  <Icon className="h-4 w-4" />
-                                </span>
+                                <span className="text-xs font-bold text-white/40 tabular-nums pt-0.5 w-4 shrink-0 group-hover/sector:text-secondary">{group.id}</span>
                                 <span className="text-sm font-bold leading-snug text-white group-hover/sector:text-secondary normal-case tracking-normal">
                                   {t(`productCategories.${group.id}`)}
                                 </span>
