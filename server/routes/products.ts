@@ -2,7 +2,8 @@ import { logger } from '../utils/logger';
 import express from 'express';
 import { getSupabase } from '../db/supabaseClient';
 import { requireAuth, verifyRole, requireKyc } from '../middlewares/authMiddleware';
-import { requireUuidParams } from '../middlewares/validateParams';
+import { requireUuidParams, isUuid } from '../middlewares/validateParams';
+import { productCategories } from '../../src/data/productCategories';
 import { createReport, reportSchema } from '../utils/reports';
 import { PLAN_LIMITS, getCompanyPlan } from '../services/billingService';
 import { generateReferenceId } from '../utils/reference';
@@ -48,21 +49,48 @@ router.get('/', async (req, res, next) => {
     const to = from + limit - 1;
 
     const supabase = getSupabase();
-    let query = supabase.from('products').select('*', { count: 'exact' }).in('status', PUBLISHED_STATUSES);
+    // Nom et statut de l'entreprise joints : la carte produit affiche le
+    // fournisseur et son badge « vérifiée » sans requête supplémentaire.
+    let query = supabase
+      .from('products')
+      .select('*, company:companies(name, status)', { count: 'exact' })
+      .in('status', PUBLISHED_STATUSES);
 
-    if (typeof req.query.category === 'string' && req.query.category !== 'Tous') {
-      query = query.eq('category', req.query.category);
+    // Catégorie : une sous-catégorie, ou un groupe entier de la nomenclature.
+    if (typeof req.query.category === 'string' && req.query.category && req.query.category !== 'Tous') {
+      const group = productCategories.find((g) => g.name === req.query.category);
+      query = group
+        ? query.in('category', group.subCategories.map((sub) => sub.name))
+        : query.eq('category', req.query.category);
     }
     if (typeof req.query.search === 'string' && req.query.search) {
       query = query.ilike('name', `%${escapeLike(req.query.search)}%`);
     }
+    if (typeof req.query.region === 'string' && req.query.region) {
+      query = query.ilike('region', escapeLike(req.query.region));
+    }
+    if (typeof req.query.company_id === 'string' && isUuid(req.query.company_id)) {
+      query = query.eq('company_id', req.query.company_id);
+    }
 
-    const { data: products, count, error } = await query.range(from, to).order('created_at', { ascending: false });
+    const sort = req.query.sort;
+    query = sort === 'price_asc'
+      ? query.order('price', { ascending: true, nullsFirst: false })
+      : sort === 'price_desc'
+        ? query.order('price', { ascending: false, nullsFirst: false })
+        : query.order('created_at', { ascending: false });
+
+    const { data: products, count, error } = await query.range(from, to);
 
     if (error) throw error;
     
     return res.json({
-      data: (products || []).map(formatProduct),
+      data: (products || []).map((p: any) => ({
+        ...formatProduct(p),
+        company_name: p.company?.name || null,
+        company_verified: p.company?.status === 'approved',
+        company: undefined,
+      })),
       total: count || 0,
       page,
       totalPages: Math.ceil((count || 0) / limit)
@@ -113,7 +141,7 @@ router.get('/:id', requireUuidParams('id'), async (req, res, next) => {
     if (product.company_id) {
       const { data } = await supabase
         .from('companies')
-        .select('id, name, status, wilaya')
+        .select('id, name, status, wilaya, whatsapp')
         .eq('id', product.company_id)
         .maybeSingle();
       company = data;
@@ -129,7 +157,7 @@ router.get('/:id', requireUuidParams('id'), async (req, res, next) => {
       if (!company && owner?.company_id) {
         const { data: c } = await supabase
           .from('companies')
-          .select('id, name, status, wilaya')
+          .select('id, name, status, wilaya, whatsapp')
           .eq('id', owner.company_id)
           .maybeSingle();
         company = c;
@@ -153,6 +181,8 @@ router.get('/:id', requireUuidParams('id'), async (req, res, next) => {
       companyName,
       companyId: company?.id || null,
       companyVerified: company?.status === 'approved',
+      // WhatsApp public seulement pour une entreprise vérifiée (comme sa fiche).
+      companyWhatsapp: company?.status === 'approved' ? company?.whatsapp || null : null,
       sellerId: product.owner_id || null,
       priceValue: Number.isFinite(priceValue) ? priceValue : null,
       features: Array.isArray(product.features) ? product.features : [],

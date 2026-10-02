@@ -93,3 +93,41 @@ describe('Products Roles', () => {
     });
   });
 });
+
+describe('Catalogue public : filtres et tri côté serveur', () => {
+  let app: express.Express;
+
+  beforeEach(async () => {
+    app = await createApp();
+  });
+
+  const listWith = async (query: string) => {
+    const mock = createSupabaseMock({
+      products: () => ({ data: [{ id: 'p1', name: 'Pompe', status: 'Actif', company: { name: 'Acme', status: 'approved' } }], count: 1 }),
+    });
+    vi.mocked(getSupabase).mockReturnValue(mock.client as any);
+    const res = await request(app).get(`/api/products?${query}`);
+    return { res, q: mock.queries.find((q) => q.table === 'products')! };
+  };
+
+  it('développe un groupe de catégories en ses sous-catégories', async () => {
+    const { res, q } = await listWith(`category=${encodeURIComponent('Composants & Pièces Détachées')}`);
+    expect(res.status).toBe(200);
+    const inFilter = q.filters.find((f) => f.method === 'in' && f.args[0] === 'category');
+    expect(inFilter?.args[1]).toContain('Pièces mécaniques : Engrenages, roulements, joints.');
+  });
+
+  it('trie par prix et filtre par wilaya et par entreprise', async () => {
+    const companyId = '55555555-5555-4555-8555-555555555555';
+    const { q } = await listWith(`sort=price_asc&region=Oran&company_id=${companyId}`);
+    expect(q.filters.find((f) => f.method === 'order')?.args).toEqual(['price', { ascending: true, nullsFirst: false }]);
+    expect(q.filters.find((f) => f.method === 'ilike' && f.args[0] === 'region')?.args[1]).toBe('Oran');
+    expect(q.filters.find((f) => f.method === 'eq' && f.args[0] === 'company_id')?.args[1]).toBe(companyId);
+  });
+
+  it('expose le nom et le statut du fournisseur', async () => {
+    const { res } = await listWith('');
+    expect(res.body.data[0]).toMatchObject({ company_name: 'Acme', company_verified: true });
+    expect(res.body.data[0].company).toBeUndefined();
+  });
+});

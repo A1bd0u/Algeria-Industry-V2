@@ -204,9 +204,28 @@
       "reportReasonRequired": "Indiquez le motif du signalement.",
       "reportSent": "Signalement envoyé. Merci, notre équipe va l'examiner.",
       "reportError": "Le signalement n'a pas pu être envoyé.",
-      "favoriteError": "Impossible de mettre à jour vos favoris."
+      "favoriteError": "Impossible de mettre à jour vos favoris.",
+      "quoteMessage": "Bonjour, je souhaite recevoir un devis pour « {{name}} » (réf. {{ref}}). Quantité : … Lieu de livraison : … Délai souhaité : …",
+      "whatsappMessage": "Bonjour, je vous contacte via Algeria Industry au sujet de « {{name}} ».",
+      "requestQuoteShort": "Demander un devis",
+      "zoom": "Agrandir l'image"
     },
-    "searchPlaceholder": "Rechercher une machine, une marque…"
+    "searchPlaceholder": "Rechercher une machine, une marque…",
+    "sort": {
+      "label": "Trier par",
+      "recent": "Plus récents",
+      "price_asc": "Prix croissant",
+      "price_desc": "Prix décroissant"
+    },
+    "results": "{{formatted}} produit(s)",
+    "removeFilter": "Retirer le filtre {{name}}",
+    "oneSupplier": "Un fournisseur",
+    "companyProducts": "Produits de {{name}}",
+    "emptyTitle": "Aucun produit ne correspond",
+    "emptyText": "Essayez une autre catégorie ou retirez des filtres. Vous pouvez aussi chercher directement un fournisseur dans l'annuaire.",
+    "pagination": "Pagination",
+    "pageOf": "Page {{page}} sur {{total}}",
+    "showResults": "Voir {{count}} résultat(s)"
   },
   "blog": {
     "title": "Actualités Industrielles",

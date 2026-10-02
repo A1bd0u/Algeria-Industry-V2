@@ -204,9 +204,28 @@
       "reportReasonRequired": "Please give a reason for the report.",
       "reportSent": "Report sent. Thank you, our team will review it.",
       "reportError": "The report could not be sent.",
-      "favoriteError": "Unable to update your favourites."
+      "favoriteError": "Unable to update your favourites.",
+      "quoteMessage": "Hello, I would like a quote for “{{name}}” (ref. {{ref}}). Quantity: … Delivery place: … Desired lead time: …",
+      "whatsappMessage": "Hello, I am contacting you via Algeria Industry about “{{name}}”.",
+      "requestQuoteShort": "Request a quote",
+      "zoom": "Enlarge image"
     },
-    "searchPlaceholder": "Search a machine, a brand…"
+    "searchPlaceholder": "Search a machine, a brand…",
+    "sort": {
+      "label": "Sort by",
+      "recent": "Newest",
+      "price_asc": "Price: low to high",
+      "price_desc": "Price: high to low"
+    },
+    "results": "{{formatted}} product(s)",
+    "removeFilter": "Remove filter {{name}}",
+    "oneSupplier": "One supplier",
+    "companyProducts": "Products from {{name}}",
+    "emptyTitle": "No matching product",
+    "emptyText": "Try another category or remove some filters. You can also look for a supplier in the directory.",
+    "pagination": "Pagination",
+    "pageOf": "Page {{page}} of {{total}}",
+    "showResults": "Show {{count}} result(s)"
   },
   "blog": {
     "title": "Industrial News",

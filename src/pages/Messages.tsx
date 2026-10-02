@@ -27,7 +27,8 @@ export default function Messages() {
   const [selectedContact, setSelectedContact] = useState<string | null>(
     initialContact && UUID_RE.test(initialContact) ? initialContact : null
   );
-  const [inputText, setInputText] = useState('');
+  // ?text=… : message pré-rempli (demande de devis depuis une fiche produit).
+  const [inputText, setInputText] = useState((searchParams.get('text') || '').slice(0, 1000));
   const [filter, setFilter] = useState('');
   const [sendError, setSendError] = useState('');
   const [isUploading, setIsUploading] = useState(false);

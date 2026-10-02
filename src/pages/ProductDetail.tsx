@@ -11,7 +11,8 @@ import {
   Share2,
   ShieldCheck,
   Star,
-  Truck
+  Truck,
+  X
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import React, { useEffect, useState } from 'react';
@@ -25,6 +26,7 @@ import { cn, extractIdFromSlug, generateSlugUrl } from '../lib/utils';
 import axios from 'axios';
 import { categoryLabel } from '../data/productCategories';
 import { useToast } from '../context/ToastContext';
+import { whatsappHref } from '../config/site';
 import { apiErrorMessage } from '../lib/apiError';
 import ProductImage from '../components/ui/ProductImage';
 
@@ -129,6 +131,24 @@ const ProductDetail = () => {
     }
   };
 
+  const [zoomOpen, setZoomOpen] = useState(false);
+
+  // Demande de devis : message pré-rempli au fournisseur s'il a un compte,
+  // sinon formulaire de contact de la plateforme.
+  const requestQuote = () => {
+    if (!product) return;
+    if (product.sellerId && product.sellerId !== user?.id) {
+      const text = t('products.detail.quoteMessage', { name: product.name, ref: product.reference_id || '' });
+      const target = `/dashboard?tab=messages&to=${product.sellerId}&text=${encodeURIComponent(text)}`;
+      navigate(isAuthenticated ? target : `/login?redirect=${encodeURIComponent(target)}`);
+      return;
+    }
+    navigate(`/contact?subject=${encodeURIComponent(t('products.detail.quoteSubject', { name: product.name }))}`);
+  };
+  const whatsappLink = product?.companyWhatsapp
+    ? `${whatsappHref(product.companyWhatsapp)}?text=${encodeURIComponent(t('products.detail.whatsappMessage', { name: product.name }))}`
+    : null;
+
   const isCompared = product && comparedProducts.find(p => p.id === product.id);
 
   const toggleCompare = () => {
@@ -186,15 +206,17 @@ const ProductDetail = () => {
           <div className="space-y-6">
             <div className="aspect-square bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm relative group">
               {product.images.length > 0 ? (
-                <motion.img 
-                  key={activeImage}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  src={product.images[activeImage]} 
-                  alt={product.name} 
-                  className="w-full h-full object-contain p-12"
-                  referrerPolicy="no-referrer"
-                />
+                <button type="button" onClick={() => setZoomOpen(true)} className="w-full h-full cursor-zoom-in" aria-label={t('products.detail.zoom')}>
+                  <motion.img
+                    key={activeImage}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    src={product.images[activeImage]}
+                    alt={product.name}
+                    className="w-full h-full object-contain p-8"
+                    referrerPolicy="no-referrer"
+                  />
+                </button>
               ) : (
                 <ProductImage alt={product.name} category={product.category} iconClassName="h-20 w-20" />
               )}
@@ -289,14 +311,20 @@ const ProductDetail = () => {
               </div>
 
               <div className="space-y-4">
-                <button 
-                  onClick={() => navigate(`/contact?subject=${encodeURIComponent(t('products.detail.quoteSubject', { name: product.name }))}`)}
-                  className="w-full btn-primary py-4 rounded-2xl flex items-center justify-center space-x-3 text-lg group"
+                <button
+                  type="button"
+                  onClick={requestQuote}
+                  className="w-full btn-primary !py-4 !text-base group"
                 >
-                  <FileText className="h-6 w-6" />
-                  <span className="uppercase">{t('products.detail.requestQuote')}</span>
-                  <ArrowRight className="h-5 w-5 opacity-0 group-hover:opacity-100 group-hover:translate-x-2 transition-all rtl:rotate-180" />
+                  <FileText className="h-5 w-5" />
+                  <span>{t('products.detail.requestQuote')}</span>
+                  <ArrowRight className="h-5 w-5 rtl:rotate-180" />
                 </button>
+                {whatsappLink && (
+                  <a href={whatsappLink} target="_blank" rel="noopener noreferrer" className="w-full btn-secondary !bg-[#25D366] hover:!bg-[#1ebe5b] !py-3">
+                    {t('company.whatsapp')}
+                  </a>
+                )}
                 <div className="grid grid-cols-2 gap-4">
                   <button 
                     onClick={toggleCompare}
@@ -382,6 +410,27 @@ const ProductDetail = () => {
             </div>
           </div>
         )}
+      {/* Barre d'action fixe sur mobile : le devis reste toujours à portée de pouce. */}
+      <div className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur border-t border-gray-200 p-3 flex gap-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+        <button type="button" onClick={requestQuote} className="btn-primary flex-1 !py-3">
+          <FileText className="h-4 w-4" />
+          {t('products.detail.requestQuoteShort')}
+        </button>
+        {whatsappLink && (
+          <a href={whatsappLink} target="_blank" rel="noopener noreferrer" className="btn-secondary !bg-[#25D366] !py-3">WhatsApp</a>
+        )}
+      </div>
+
+      {/* Image agrandie */}
+      {zoomOpen && product.images.length > 0 && (
+        <div className="fixed inset-0 z-[95] bg-black/90 flex items-center justify-center p-4" role="dialog" aria-modal="true" onClick={() => setZoomOpen(false)}>
+          <button type="button" className="absolute top-4 end-4 text-white p-2" aria-label={t('common.close')} onClick={() => setZoomOpen(false)}>
+            <X className="h-7 w-7" />
+          </button>
+          <img src={product.images[activeImage]} alt={product.name} className="max-w-full max-h-full object-contain" referrerPolicy="no-referrer" />
+        </div>
+      )}
+
           {/* Report Modal */}
       {showReport && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">

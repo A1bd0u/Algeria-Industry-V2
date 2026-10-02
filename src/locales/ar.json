@@ -204,9 +204,28 @@
       "reportReasonRequired": "يرجى ذكر سبب الإبلاغ.",
       "reportSent": "تم إرسال البلاغ. شكرًا، سيراجعه فريقنا.",
       "reportError": "تعذّر إرسال البلاغ.",
-      "favoriteError": "تعذّر تحديث المفضلة."
+      "favoriteError": "تعذّر تحديث المفضلة.",
+      "quoteMessage": "مرحبًا، أرغب في الحصول على عرض سعر لـ «{{name}}» (المرجع {{ref}}). الكمية: … مكان التسليم: … الأجل المطلوب: …",
+      "whatsappMessage": "مرحبًا، أتواصل معكم عبر Algeria Industry بخصوص «{{name}}».",
+      "requestQuoteShort": "طلب عرض سعر",
+      "zoom": "تكبير الصورة"
     },
-    "searchPlaceholder": "ابحث عن آلة أو علامة تجارية…"
+    "searchPlaceholder": "ابحث عن آلة أو علامة تجارية…",
+    "sort": {
+      "label": "ترتيب حسب",
+      "recent": "الأحدث",
+      "price_asc": "السعر تصاعديًا",
+      "price_desc": "السعر تنازليًا"
+    },
+    "results": "{{formatted}} منتج",
+    "removeFilter": "إزالة عامل التصفية {{name}}",
+    "oneSupplier": "مورد واحد",
+    "companyProducts": "منتجات {{name}}",
+    "emptyTitle": "لا توجد منتجات مطابقة",
+    "emptyText": "جرّب فئة أخرى أو أزل بعض عوامل التصفية. يمكنك أيضًا البحث عن مورد في الدليل.",
+    "pagination": "التنقل بين الصفحات",
+    "pageOf": "الصفحة {{page}} من {{total}}",
+    "showResults": "عرض {{count}} نتيجة"
   },
   "blog": {
     "title": "الأخبار الصناعية",
