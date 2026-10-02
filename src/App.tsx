@@ -12,7 +12,6 @@ import PageTransition from './components/PageTransition';
 import ErrorBoundary from './components/ErrorBoundary';
 import ProtectedRoute from './components/ProtectedRoute';
 import ScrollToTop from './components/ScrollToTop';
-import type { Slide } from './constants/slides';
 const BecomeExhibitor = lazy(() => import('./pages/BecomeExhibitor'));
 const AdsRequest = lazy(() => import('./pages/AdsRequest'));
 const Blog = lazy(() => import('./pages/Blog'));
@@ -67,8 +66,6 @@ const queryClient = new QueryClient();
 export default function App() {
   const { i18n } = useTranslation();
   const location = useLocation();
-  // Plus de slides éditoriaux : le bandeau n'affiche que les annonces réelles.
-  const currentSlides: Slide[] = [];
   const isExtranet = location.pathname.startsWith('/extranet');
   // Carrousel limité à l'accueil (LCP mobile).
   const hideHeroSlider = isExtranet || location.pathname !== '/';
@@ -108,7 +105,7 @@ export default function App() {
               <ScrollToTop />
               <div className={cn("flex flex-col min-h-screen", !isExtranet && "pb-16 lg:pb-0")}>
               {!isExtranet && <Navbar />}
-              {!hideHeroSlider && <HeroSlider slides={currentSlides} />}
+              {!hideHeroSlider && <HeroSlider />}
               <main className="flex-grow">
                 <Suspense fallback={<div className="flex items-center justify-center min-h-[50vh]"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
                   <AnimatePresence mode="wait">

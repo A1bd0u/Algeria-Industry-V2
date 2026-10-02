@@ -27,8 +27,8 @@
     "suppliers": "Suppliers",
     "adminConsole": "Admin console",
     "mobileTabs": "Main navigation",
-    "console_pro": "Admin area",
-    "language": "Language: {{name}}"
+    "language": "Language: {{name}}",
+    "console_pro": "Admin area"
   },
   "hero": {
     "title": "Connect to the industry",
@@ -1312,17 +1312,27 @@
   },
   "slides": {
     "sponsored": "Sponsored",
-    "suppliers": {
-      "title": "Verified industrial suppliers",
-      "subtitle": "Find the right partner",
-      "description": "Contact them directly and ask for a quote",
-      "tagline": "The Algerian B2B marketplace"
+    "label": "Announcements",
+    "prev": "Previous slide",
+    "next": "Next slide",
+    "goTo": "Go to slide {{n}}",
+    "pause": "Pause",
+    "play": "Resume",
+    "learnMore": "Learn more",
+    "advertise": {
+      "title": "Your ad here",
+      "subtitle": "Put your brand in front of Algerian industrial buyers.",
+      "cta": "Book this space"
+    },
+    "listing": {
+      "title": "List your company for free",
+      "subtitle": "Verified profile, product catalogue and quote requests from buyers.",
+      "cta": "Create my profile"
     },
     "founder": {
-      "title": "Founding member",
-      "subtitle": "Premium free for 12 months",
-      "description": "For the first 100 verified suppliers",
-      "tagline": "Launch offer"
+      "title": "Premium free for 12 months",
+      "subtitle": "For the first 100 verified suppliers.",
+      "cta": "See the offer"
     }
   }
 }

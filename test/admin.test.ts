@@ -190,6 +190,72 @@ describe('Console admin', () => {
     });
   });
 
+  describe('Annonces du bandeau', () => {
+    const IMG = 'https://proj.supabase.co/storage/v1/object/public/product-images/admin/banner.webp';
+
+    beforeEach(() => { process.env.SUPABASE_URL = 'https://proj.supabase.co'; });
+
+    it('refuse un lien javascript: et une image hors du stockage', async () => {
+      const mock = createSupabaseMock({ users: usersHandler(admin) });
+      vi.mocked(getSupabase).mockReturnValue(mock.client as any);
+
+      const badLink = await request(app).put(`/api/admin/ads/${SUB_ID}`).set('Cookie', ['token=t'])
+        .send({ title: 'Promo', url: 'javascript:alert(1)' });
+      expect(badLink.status).toBe(400);
+      expect(badLink.body.code).toBe('AD_URL_INVALID');
+
+      const badImage = await request(app).put(`/api/admin/ads/${SUB_ID}`).set('Cookie', ['token=t'])
+        .send({ title: 'Promo', image_url: 'https://evil.example/x.png' });
+      expect(badImage.status).toBe(400);
+      expect(badImage.body.code).toBe('AD_IMAGE_INVALID');
+
+      expect(mock.queries.some((q) => q.table === 'ads')).toBe(false);
+    });
+
+    it('enregistre le visuel, le lien et la période', async () => {
+      const mock = createSupabaseMock({
+        users: usersHandler(admin),
+        ads: (q) => (q.op === 'update' ? { data: { id: SUB_ID, ...q.payload } } : undefined),
+      });
+      vi.mocked(getSupabase).mockReturnValue(mock.client as any);
+
+      const res = await request(app).put(`/api/admin/ads/${SUB_ID}`).set('Cookie', ['token=t']).send({
+        title: 'Compresseurs 2026', subtitle: '', image_url: IMG, url: '/directory',
+        starts_at: '2026-10-10T00:00:00.000Z', ends_at: '2026-11-10T23:59:59.000Z', sort_order: 2,
+      });
+
+      expect(res.status).toBe(200);
+      const update = mock.queries.find((q) => q.table === 'ads' && q.op === 'update');
+      expect(update?.payload).toMatchObject({
+        title: 'Compresseurs 2026', subtitle: null, image_url: IMG, url: '/directory', sort_order: 2,
+      });
+    });
+
+    it('refuse une fin de diffusion avant le début', async () => {
+      const mock = createSupabaseMock({ users: usersHandler(admin) });
+      vi.mocked(getSupabase).mockReturnValue(mock.client as any);
+
+      const res = await request(app).post('/api/admin/ads').set('Cookie', ['token=t']).send({
+        title: 'Promo', starts_at: '2026-11-10T00:00:00.000Z', ends_at: '2026-10-10T00:00:00.000Z',
+      });
+      expect(res.status).toBe(400);
+      expect(res.body.code).toBe('AD_DATES_INVALID');
+    });
+
+    it('une annonce créée par l\'équipe reste en attente de publication', async () => {
+      const mock = createSupabaseMock({
+        users: usersHandler(admin),
+        ads: (q) => (q.op === 'insert' ? { data: { id: SUB_ID, ...q.payload[0] } } : undefined),
+      });
+      vi.mocked(getSupabase).mockReturnValue(mock.client as any);
+
+      const res = await request(app).post('/api/admin/ads').set('Cookie', ['token=t']).send({ title: 'Promo' });
+      expect(res.status).toBe(201);
+      const insert = mock.queries.find((q) => q.table === 'ads' && q.op === 'insert');
+      expect(insert?.payload[0]).toMatchObject({ title: 'Promo', status: 'en_attente', type: 'homepage_banner' });
+    });
+  });
+
   describe('Support', () => {
     it('liste les messages du formulaire de contact filtrés par statut', async () => {
       const mock = createSupabaseMock({

@@ -9,6 +9,7 @@ import { requireUuidParams } from '../middlewares/validateParams';
 import { PUBLIC_USER_COLUMNS } from '../utils/userFields';
 import { z } from 'zod';
 import { validate } from '../middlewares/validateMiddleware';
+import { isAllowedImageUrl, isSafeLinkUrl } from '../utils/storageUrl';
 
 const router = express.Router();
 
@@ -305,13 +306,15 @@ router.get('/products', verifyRole(['admin']), async (req, res) => {
   }
 });
 
+const ADMIN_AD_COLUMNS = 'id, title, subtitle, type, objective, url, duration, status, company, contact_email, contact_phone, message, rejection_reason, image_url, logo_url, brand_name, cta_label, starts_at, ends_at, sort_order, clicks, created_at';
+
 // GET /api/admin/ads - Toutes les demandes de publicité (y compris en attente)
 router.get('/ads', verifyRole(['admin']), async (req, res) => {
   try {
     const supabase = getSupabase();
     const { data, error } = await supabase
       .from('ads')
-      .select('id, title, type, objective, url, duration, status, company, contact_email, contact_phone, message, rejection_reason, created_at, user:users(name, email)')
+      .select(`${ADMIN_AD_COLUMNS}, user:users(name, email)`)
       .order('created_at', { ascending: false })
       .limit(200);
     if (error) throw error;
@@ -325,6 +328,97 @@ router.get('/ads', verifyRole(['admin']), async (req, res) => {
 const adStatusSchema = z.object({
   status: z.enum(['published', 'rejected', 'en_attente', 'ended']),
   reason: z.string().trim().max(500).optional(),
+});
+
+// Contenu du bandeau : textes, visuels déposés via /api/upload, lien, période.
+const optionalText = (max: number) => z.string().trim().max(max).optional().or(z.literal(''));
+const optionalDate = z.string().datetime({ offset: true }).optional().or(z.literal('')).or(z.null());
+const adCreativeSchema = z.object({
+  title: z.string().trim().min(2, 'Titre requis').max(120),
+  subtitle: optionalText(200),
+  brand_name: optionalText(80),
+  cta_label: optionalText(40),
+  url: optionalText(1000),
+  image_url: optionalText(1000),
+  logo_url: optionalText(1000),
+  company: optionalText(200),
+  starts_at: optionalDate,
+  ends_at: optionalDate,
+  sort_order: z.coerce.number().int().min(0).max(999).optional(),
+});
+
+const buildCreative = (body: z.infer<typeof adCreativeSchema>, user: { id: string; role: string }) => {
+  for (const key of ['image_url', 'logo_url'] as const) {
+    const value = body[key];
+    if (value && !isAllowedImageUrl(value, user)) {
+      return { error: 'Image invalide : déposez-la depuis la console.', code: 'AD_IMAGE_INVALID' };
+    }
+  }
+  if (body.url && !isSafeLinkUrl(body.url)) {
+    return { error: 'Lien invalide : adresse http(s) ou chemin interne (/tarifs).', code: 'AD_URL_INVALID' };
+  }
+  if (body.starts_at && body.ends_at && Date.parse(body.ends_at) <= Date.parse(body.starts_at)) {
+    return { error: 'La date de fin doit suivre la date de début.', code: 'AD_DATES_INVALID' };
+  }
+  const orNull = (v?: string | null) => (v ? v : null);
+  return {
+    values: {
+      title: body.title,
+      subtitle: orNull(body.subtitle),
+      brand_name: orNull(body.brand_name),
+      cta_label: orNull(body.cta_label),
+      url: orNull(body.url),
+      image_url: orNull(body.image_url),
+      logo_url: orNull(body.logo_url),
+      starts_at: orNull(body.starts_at),
+      ends_at: orNull(body.ends_at),
+      ...(body.company !== undefined && { company: orNull(body.company) }),
+      ...(body.sort_order !== undefined && { sort_order: body.sort_order }),
+    },
+  };
+};
+
+// POST /api/admin/ads - Annonce créée directement par l'équipe (brouillon)
+router.post('/ads', verifyRole(['admin']), validate(adCreativeSchema), async (req, res) => {
+  const user = (req as any).user;
+  const built = buildCreative(req.body, user);
+  if ('error' in built) return res.status(400).json(built);
+  try {
+    const supabase = getSupabase();
+    const { data, error } = await supabase
+      .from('ads')
+      .insert([{ ...built.values, type: 'homepage_banner', objective: 'homepage_banner', status: 'en_attente', user_id: user.id }])
+      .select(ADMIN_AD_COLUMNS)
+      .single();
+    if (error) throw error;
+    await logAdminAction(req, 'ad_create', { adId: data.id, title: data.title });
+    res.status(201).json({ success: true, data });
+  } catch (error: any) {
+    logger.error('Error POST /api/admin/ads', error);
+    res.status(500).json({ error: 'Une erreur interne est survenue.' });
+  }
+});
+
+// PUT /api/admin/ads/:id - Modifier le contenu affiché d'une annonce
+router.put('/ads/:id', verifyRole(['admin']), requireUuidParams('id'), validate(adCreativeSchema), async (req, res) => {
+  const built = buildCreative(req.body, (req as any).user);
+  if ('error' in built) return res.status(400).json(built);
+  try {
+    const supabase = getSupabase();
+    const { data, error } = await supabase
+      .from('ads')
+      .update(built.values)
+      .eq('id', req.params.id)
+      .select(ADMIN_AD_COLUMNS)
+      .maybeSingle();
+    if (error) throw error;
+    if (!data) return res.status(404).json({ error: 'Publicité introuvable' });
+    await logAdminAction(req, 'ad_update', { adId: data.id, title: data.title });
+    res.json({ success: true, data });
+  } catch (error: any) {
+    logger.error('Error PUT /api/admin/ads/:id', error);
+    res.status(500).json({ error: 'Une erreur interne est survenue.' });
+  }
 });
 
 // PATCH /api/admin/ads/:id/status - Publier, refuser ou terminer une campagne

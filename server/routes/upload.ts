@@ -4,6 +4,7 @@ import crypto from 'crypto';
 import { requireAuth } from '../middlewares/authMiddleware';
 import { getSupabase } from '../db/supabaseClient';
 import { logger } from '../utils/logger';
+import { PRODUCT_BUCKET } from '../utils/storageUrl';
 
 const router = express.Router();
 
@@ -18,7 +19,7 @@ const upload = multer({
 const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
 
 export const KYC_BUCKET = 'kyc-documents';
-export const PRODUCT_BUCKET = 'product-images';
+export { PRODUCT_BUCKET };
 
 // kyc-documents est privé : RC, NIF et pièces d'identité ne sont jamais
 // accessibles par URL publique. Le fichier est rangé sous <userId>/ et

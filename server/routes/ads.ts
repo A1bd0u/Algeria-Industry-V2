@@ -4,6 +4,7 @@ import { getSupabase } from '../db/supabaseClient';
 import { requireAuth } from '../middlewares/authMiddleware';
 import { validate } from '../middlewares/validateMiddleware';
 import { formLimiter } from '../middlewares/rateLimiter';
+import { requireUuidParams } from '../middlewares/validateParams';
 import { verifyCaptcha } from '../utils/captcha';
 import { logger } from '../utils/logger';
 
@@ -13,6 +14,12 @@ const PUBLISHED_STATUSES = ['published', 'Actif', 'approuvée', 'Approuvé'];
 
 // Colonnes publiques : ni user_id ni coordonnées du demandeur.
 const PUBLIC_AD_COLUMNS = 'id, title, type, url, status, created_at';
+// Contenu affiché dans le bandeau de l'accueil.
+const SLIDE_COLUMNS = 'id, title, subtitle, image_url, logo_url, brand_name, cta_label, url, starts_at, ends_at';
+const MAX_SLIDES = 8;
+
+const isLive = (ad: { starts_at?: string | null; ends_at?: string | null }, now: number) =>
+  (!ad.starts_at || Date.parse(ad.starts_at) <= now) && (!ad.ends_at || Date.parse(ad.ends_at) > now);
 
 const campaignSchema = z.object({
   name: z.string().trim().min(2, 'Nom requis').max(200),
@@ -31,22 +38,51 @@ const adRequestSchema = z.object({
   captchaToken: z.string().optional(),
 });
 
-// GET /api/campaigns - Publicités publiées uniquement
+// GET /api/campaigns - Annonces publiées et en cours de diffusion, dans
+// l'ordre choisi par l'admin.
 router.get('/', async (req, res) => {
   try {
     const supabase = getSupabase();
     const { data: ads, error } = await supabase
       .from('ads')
-      .select(PUBLIC_AD_COLUMNS)
+      .select(SLIDE_COLUMNS)
       .in('status', PUBLISHED_STATUSES)
-      .order('created_at', { ascending: false });
+      .order('sort_order', { ascending: true })
+      .order('created_at', { ascending: false })
+      .limit(50);
 
     if (error) throw error;
-    return res.json(ads || []);
+    const now = Date.now();
+    const live = (ads || [])
+      .filter((ad: any) => isLive(ad, now))
+      .slice(0, MAX_SLIDES)
+      .map(({ starts_at, ends_at, ...ad }: any) => ad);
+    res.set('Cache-Control', 'public, max-age=60');
+    return res.json(live);
   } catch (err: any) {
     logger.error('Error GET /api/campaigns', err);
     return res.status(500).json({ error: 'Une erreur interne est survenue.' });
   }
+});
+
+// POST /api/campaigns/:id/click - Clic sur une annonce du bandeau (statistique
+// remise à l'annonceur). Toujours 204 : rien à divulguer au visiteur.
+router.post('/:id/click', requireUuidParams('id'), async (req, res) => {
+  try {
+    const supabase = getSupabase();
+    const { data: ad } = await supabase
+      .from('ads')
+      .select('id, clicks')
+      .eq('id', req.params.id)
+      .in('status', PUBLISHED_STATUSES)
+      .maybeSingle();
+    if (ad) {
+      await supabase.from('ads').update({ clicks: (ad.clicks || 0) + 1 }).eq('id', ad.id);
+    }
+  } catch (err: any) {
+    logger.warn('Error POST /api/campaigns/:id/click', err);
+  }
+  return res.status(204).end();
 });
 
 // POST /api/campaigns - Demande de campagne depuis le tableau de bord
@@ -93,7 +129,7 @@ router.post('/request', formLimiter, validate(adRequestSchema), async (req, res)
     const { error } = await supabase
       .from('ads')
       .insert([{
-        title: `${companyName} — ${placement}`,
+        title: companyName,
         type: placement,
         objective: placement,
         status: 'en_attente',

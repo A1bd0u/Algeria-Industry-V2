@@ -139,6 +139,9 @@ export default function GovSecurity({ state }: { state: any }) {
         return { label: 'Abonnement Activé', color: 'text-teal-600 bg-teal-50 border-teal-100', icon: CheckCircle };
       case 'subscription_cancel':
         return { label: 'Abonnement Annulé', color: 'text-red-600 bg-red-50 border-red-100', icon: AlertTriangle };
+      case 'ad_create':
+        return { label: 'Annonce Créée', color: 'text-gray-600 bg-gray-50 border-gray-100', icon: CheckCircle };
+      case 'ad_update':
       case 'ad_status_change':
         return { label: 'Publicité Mise à Jour', color: 'text-gray-600 bg-gray-50 border-gray-100', icon: CheckCircle };
       case 'support_message_update':
