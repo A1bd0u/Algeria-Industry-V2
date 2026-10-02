@@ -26,7 +26,9 @@
     "closeMenu": "Close menu",
     "suppliers": "Suppliers",
     "adminConsole": "Admin console",
-    "console_pro": "Admin area"
+    "mobileTabs": "Main navigation",
+    "console_pro": "Admin area",
+    "language": "Language: {{name}}"
   },
   "hero": {
     "title": "Connect to the industry",
@@ -990,7 +992,8 @@
     "send": "Send",
     "select": "Select a conversation",
     "uploadError": "The file upload failed.",
-    "sendError": "The message could not be sent. Please try again."
+    "sendError": "The message could not be sent. Please try again.",
+    "title": "Messages"
   },
   "events": {
     "titleStart": "Industry",

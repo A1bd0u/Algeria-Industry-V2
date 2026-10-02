@@ -55,7 +55,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   return (
     <ToastContext.Provider value={api}>
       {children}
-      <div className="fixed bottom-6 inset-x-4 sm:inset-x-auto sm:end-6 z-[100] flex flex-col gap-3 sm:w-96 pointer-events-none">
+      <div className="fixed bottom-20 lg:bottom-6 inset-x-4 sm:inset-x-auto sm:end-6 z-[100] flex flex-col gap-3 sm:w-96 pointer-events-none">
         {toasts.map((toast) => {
           const { box, icon: Icon } = STYLES[toast.kind];
           return (

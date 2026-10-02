@@ -29,7 +29,7 @@ const HelpWidget = () => {
   ].filter(Boolean) as { icon: typeof Phone; label: string; value: string; href: string }[];
 
   return (
-    <div className="fixed bottom-6 end-4 sm:bottom-8 sm:end-8 z-[9999]">
+    <div className="hidden lg:block fixed bottom-8 end-8 z-[9999]">
       <AnimatePresence>
         {isOpen && (
           <motion.div

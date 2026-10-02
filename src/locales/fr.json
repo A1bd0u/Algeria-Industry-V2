@@ -26,7 +26,9 @@
     "closeMenu": "Fermer le menu",
     "suppliers": "Fournisseurs",
     "adminConsole": "Console d'administration",
-    "console_pro": "Espace administrateur"
+    "mobileTabs": "Navigation principale",
+    "console_pro": "Espace administrateur",
+    "language": "Langue : {{name}}"
   },
   "hero": {
     "title": "Connectez-vous à l'industrie",
@@ -990,7 +992,8 @@
     "send": "Envoyer",
     "select": "Sélectionnez une conversation",
     "uploadError": "L'envoi du fichier a échoué.",
-    "sendError": "Le message n'a pas pu être envoyé. Réessayez."
+    "sendError": "Le message n'a pas pu être envoyé. Réessayez.",
+    "title": "Messages"
   },
   "events": {
     "titleStart": "Agenda des",

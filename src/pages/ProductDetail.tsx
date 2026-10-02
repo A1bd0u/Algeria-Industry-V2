@@ -190,7 +190,7 @@ const ProductDetail = () => {
   }
 
   return (
-    <div className="bg-neutral-bg min-h-screen pb-20">
+    <div className="bg-neutral-bg min-h-screen pb-24 lg:pb-20">
       <div className="w-full max-w-none px-4 sm:px-8 md:px-12 lg:px-16 py-8">
         {/* Breadcrumbs / Back */}
         <button 
@@ -411,7 +411,7 @@ const ProductDetail = () => {
           </div>
         )}
       {/* Barre d'action fixe sur mobile : le devis reste toujours à portée de pouce. */}
-      <div className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur border-t border-gray-200 p-3 flex gap-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+      <div className="lg:hidden fixed bottom-16 inset-x-0 z-40 bg-white/95 backdrop-blur border-t border-gray-200 p-3 flex gap-3">
         <button type="button" onClick={requestQuote} className="btn-primary flex-1 !py-3">
           <FileText className="h-4 w-4" />
           {t('products.detail.requestQuoteShort')}

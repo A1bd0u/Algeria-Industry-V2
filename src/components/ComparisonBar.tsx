@@ -13,7 +13,7 @@ const ComparisonBar = () => {
   if (comparedProducts.length === 0) return null;
 
   return (
-    <div className="fixed bottom-24 start-1/2 -translate-x-1/2 z-[9999] w-full max-w-4xl px-4">
+    <div className="fixed bottom-20 lg:bottom-24 start-1/2 -translate-x-1/2 z-[9999] w-full max-w-4xl px-4">
       <AnimatePresence>
         {isExpanded ? (
           <motion.div

@@ -316,7 +316,7 @@ const CompanyProfile = () => {
               {company.wilaya && <span className="inline-flex items-center gap-1"><MapPin className="h-4 w-4" />{company.wilaya}</span>}
             </p>
           </div>
-          {company.whatsapp && company.owner_id !== user?.id && (
+          {company.whatsapp && !(user && company.owner_id === user.id) && (
             <a
               href={`${whatsappHref(company.whatsapp)}?text=${encodeURIComponent(t('company.whatsappMessage', { name: company.name }))}`}
               target="_blank"
@@ -475,7 +475,7 @@ const CompanyProfile = () => {
                         <MessageSquare className="h-5 w-5" />
                         <span>{t('company.contact')}</span>
                       </button>}
-                      {company.whatsapp && company.owner_id !== user?.id && (
+                      {company.whatsapp && !(user && company.owner_id === user.id) && (
                         <a
                           href={`${whatsappHref(company.whatsapp)}?text=${encodeURIComponent(t('company.whatsappMessage', { name: company.name }))}`}
                           target="_blank"

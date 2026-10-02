@@ -199,8 +199,11 @@ const Navbar = () => {
                 onMouseEnter={handleLangMouseEnter}
                 onMouseLeave={handleLangMouseLeave}
               >
-                <button 
+                <button
                   onClick={() => setShowLang(!showLang)}
+                  aria-label={t('nav.language', { name: currentLang.name })}
+                  aria-expanded={showLang}
+                  aria-haspopup="menu"
                   className="flex items-center space-x-2 transition-all text-xs font-black uppercase tracking-widest text-white/40 hover:text-white cursor-pointer"
                 >
                   <span className="text-xs font-black text-white/70" aria-label={currentLang.name}>{currentLang.short}</span>
@@ -241,6 +244,9 @@ const Navbar = () => {
                 <button 
                   onClick={() => setIsProfileOpen(!isProfileOpen)}
                   onBlur={() => setTimeout(() => setIsProfileOpen(false), 200)}
+                  aria-label={t('nav.memberSpace')}
+                  aria-expanded={isProfileOpen}
+                  aria-haspopup="menu"
                   className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 border border-white/5 hover:bg-secondary/10 hover:border-secondary/20 hover:text-secondary transition-all group/profile ms-2"
                 >
                   <UserCircle className={cn("h-5 w-5 transition-colors", isProfileOpen ? "text-secondary" : "text-white/40 group-hover/profile:text-secondary")} />

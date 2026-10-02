@@ -45,7 +45,9 @@ const Terms = lazy(() => import('./pages/Terms'));
 const Catalogues = lazy(() => import('./pages/Catalogues'));
 
 import { useTranslation } from 'react-i18next';
+import { cn } from './lib/utils';
 import ComparisonBar from './components/ComparisonBar';
+import MobileTabBar from './components/MobileTabBar';
 import { AuthProvider } from './context/AuthContext';
 import { ComparisonProvider } from './context/ComparisonContext';
 import { CurrencyProvider } from './context/CurrencyContext';
@@ -104,7 +106,7 @@ export default function App() {
             <ComparisonProvider>
               <VerifyAccountModal />
               <ScrollToTop />
-              <div className="flex flex-col min-h-screen">
+              <div className={cn("flex flex-col min-h-screen", !isExtranet && "pb-16 lg:pb-0")}>
               {!isExtranet && <Navbar />}
               {!hideHeroSlider && <HeroSlider slides={currentSlides} />}
               <main className="flex-grow">
@@ -178,6 +180,7 @@ export default function App() {
                 <CookieBanner />
                 <BackToTop />
                 {!isExtranet && <ComparisonBar />}
+                {!isExtranet && <MobileTabBar />}
               </div>
             </ComparisonProvider>
           </CurrencyProvider>
