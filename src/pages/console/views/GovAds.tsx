@@ -44,17 +44,17 @@ export default function GovAds({ state }: { state: any }) {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
       <div>
-        <h3 className="text-2xl font-black text-primary uppercase italic">Gestion des publicités</h3>
+        <h3 className="text-2xl font-black text-primary">Gestion des publicités</h3>
         <p className="text-gray-500 mt-2 text-sm">
           Demandes reçues depuis la page « Publicité » et le tableau de bord. Une campagne publiée apparaît dans le carrousel de l'accueil.
         </p>
       </div>
 
       {isLoading ? (
-        <div className="py-16 text-center"><Loader2 className="h-6 w-6 animate-spin inline text-gray-400" /></div>
+        <div className="py-16 text-center"><Loader2 className="h-6 w-6 animate-spin inline text-gray-500" /></div>
       ) : (
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-          <section className="xl:col-span-2 bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm">
+          <section className="xl:col-span-2 bg-white p-8 rounded-2xl border border-gray-100 shadow-sm">
             <h4 className="font-bold text-primary mb-6">Demandes en attente ({pending.length})</h4>
             {pending.length === 0 ? (
               <p className="text-sm text-gray-500">Aucune demande en attente.</p>
@@ -106,11 +106,11 @@ export default function GovAds({ state }: { state: any }) {
           </section>
 
           <div className="space-y-8">
-            <section className="bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm">
+            <section className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm">
               <h4 className="font-bold text-primary mb-6">Campagnes en ligne ({active.length})</h4>
               {active.length === 0 ? (
                 <div className="bg-gray-50 p-6 text-center rounded-2xl border border-dashed border-gray-200">
-                  <Zap className="h-6 w-6 text-gray-400 mx-auto mb-2" />
+                  <Zap className="h-6 w-6 text-gray-500 mx-auto mb-2" />
                   <p className="text-xs text-gray-500">Aucune campagne en ligne.</p>
                 </div>
               ) : (
@@ -119,7 +119,7 @@ export default function GovAds({ state }: { state: any }) {
                     <li key={ad.id} className="p-4 border border-gray-100 rounded-2xl flex items-center justify-between gap-3">
                       <div>
                         <p className="font-bold text-sm text-gray-900">{ad.title}</p>
-                        <p className="text-[11px] text-gray-500">{ad.company || ad.user?.name}</p>
+                        <p className="text-xs text-gray-500">{ad.company || ad.user?.name}</p>
                       </div>
                       <button
                         onClick={() => statusMutation.mutate({ id: ad.id, status: 'ended' })}
@@ -135,7 +135,7 @@ export default function GovAds({ state }: { state: any }) {
             </section>
 
             {closed.length > 0 && (
-              <section className="bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm">
+              <section className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm">
                 <h4 className="font-bold text-primary mb-4">Historique</h4>
                 <ul className="space-y-2 text-xs">
                   {closed.slice(0, 20).map((ad: any) => (

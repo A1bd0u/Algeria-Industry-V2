@@ -90,7 +90,7 @@ const Contact = () => {
           
           {/* Contact Info Cards */}
           <div className="lg:col-span-1 space-y-6">
-            <div className="bg-white p-8 rounded-3xl shadow-lg border border-gray-100">
+            <div className="bg-white p-8 rounded-2xl shadow-lg border border-gray-100">
               <h3 className="text-xl font-bold text-primary mb-8 flex items-center space-x-2">
                 <MessageSquare className="h-6 w-6 text-secondary" />
                 <span>{t('contact.details')}</span>
@@ -130,7 +130,7 @@ const Contact = () => {
             </div>
 
             {/* Support SLA Card */}
-            <div className="bg-secondary p-8 rounded-3xl text-white shadow-xl relative overflow-hidden">
+            <div className="bg-secondary p-8 rounded-2xl text-white shadow-xl relative overflow-hidden">
               <div className="absolute -end-4 -bottom-4 opacity-10">
                 <Clock className="h-32 w-32" />
               </div>
@@ -147,7 +147,7 @@ const Contact = () => {
 
           {/* Contact Form */}
           <div className="lg:col-span-2">
-            <div className="bg-white p-8 md:p-12 rounded-3xl shadow-lg border border-gray-100 h-full">
+            <div className="bg-white p-8 md:p-12 rounded-2xl shadow-lg border border-gray-100 h-full">
               {submitted ? (
                 <motion.div 
                   initial={{ opacity: 0, scale: 0.9 }}
@@ -177,7 +177,7 @@ const Contact = () => {
                     )}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
-                        <label htmlFor="name" className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">{t('contact.name')}</label>
+                        <label htmlFor="name" className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">{t('contact.name')}</label>
                         <input 
                           id="name"
                           type="text" 
@@ -189,7 +189,7 @@ const Contact = () => {
                         />
                       </div>
                       <div>
-                        <label htmlFor="email" className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">{t('contact.proEmail')}</label>
+                        <label htmlFor="email" className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">{t('contact.proEmail')}</label>
                         <input 
                           id="email"
                           type="email" 
@@ -202,7 +202,7 @@ const Contact = () => {
                       </div>
                     </div>
                     <div>
-                      <label htmlFor="subject" className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">{t('contact.subject')}</label>
+                      <label htmlFor="subject" className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">{t('contact.subject')}</label>
                       <select 
                         id="subject"
                         required
@@ -218,7 +218,7 @@ const Contact = () => {
                       </select>
                     </div>
                     <div>
-                      <label htmlFor="message" className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">{t('contact.message')}</label>
+                      <label htmlFor="message" className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">{t('contact.message')}</label>
                       <textarea 
                         id="message"
                         required
@@ -282,7 +282,7 @@ const Contact = () => {
                   className="w-full px-6 py-5 text-start flex items-center justify-between hover:bg-gray-50 transition-colors"
                 >
                   <span className="font-bold text-primary">{faq.question}</span>
-                  {openFaq === index ? <ChevronUp className="h-5 w-5 text-secondary" /> : <ChevronDown className="h-5 w-5 text-gray-400" />}
+                  {openFaq === index ? <ChevronUp className="h-5 w-5 text-secondary" /> : <ChevronDown className="h-5 w-5 text-gray-500" />}
                 </button>
                 <AnimatePresence>
                   {openFaq === index && (

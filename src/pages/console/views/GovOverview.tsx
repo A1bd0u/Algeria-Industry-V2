@@ -71,7 +71,7 @@ export default function GovOverview({ state }: { state: any }) {
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
       
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <h2 className="text-xl font-black uppercase italic tracking-widest text-primary">Vue d'Ensemble</h2>
+        <h2 className="text-xl font-black tracking-widest text-primary">Vue d'Ensemble</h2>
         <div className="flex items-center gap-3">
           <button 
             onClick={handleExportPDF}
@@ -91,7 +91,7 @@ export default function GovOverview({ state }: { state: any }) {
           <div 
             key={i} 
             onClick={() => stat.link && setActiveTab(stat.link)}
-            className="bg-white/70 backdrop-blur-md p-7 rounded-[32px] border border-white shadow-sm hover:shadow-xl transition-all group cursor-pointer relative"
+            className="bg-white/70 backdrop-blur-md p-7 rounded-2xl border border-white shadow-sm hover:shadow-xl transition-all group cursor-pointer relative"
             title={stat.tooltip}
           >
             {isDashboardLoading ? (
@@ -111,14 +111,14 @@ export default function GovOverview({ state }: { state: any }) {
                   <div className={cn("p-3 rounded-2xl transition-transform group-hover:scale-110", stat.bg, stat.color)}>
                     <stat.icon className="h-6 w-6" />
                   </div>
-                  <span className={cn("flex items-center text-[9px] font-black px-2.5 py-1 rounded-lg uppercase tracking-widest", 
+                  <span className={cn("flex items-center text-xs font-black px-2.5 py-1 rounded-lg uppercase tracking-widest", 
                     isPositive ? "bg-green-100 text-green-700" : isNegative ? "bg-red-100 text-red-700" : "bg-gray-100 text-gray-700")}>
                     {isPositive && <TrendingUp className="w-3 h-3 me-1" />}
                     {isNegative && <ArrowUpDown className="w-3 h-3 me-1" />}
                     {stat.trend}
                   </span>
                 </div>
-                <p className="text-[9px] text-primary/30 font-black uppercase tracking-[0.2em] leading-none mb-3">{stat.label}</p>
+                <p className="text-xs text-primary/30 font-black uppercase tracking-wider leading-none mb-3">{stat.label}</p>
                 <h3 className="text-3xl font-black text-primary leading-none tracking-tight">{stat.value}</h3>
               </>
             )}
@@ -128,11 +128,11 @@ export default function GovOverview({ state }: { state: any }) {
       
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 font-sans">
         <div className="lg:col-span-8 space-y-8">
-          <div className="bg-white/70 backdrop-blur-md p-8 rounded-[40px] border border-white shadow-sm">
+          <div className="bg-white/70 backdrop-blur-md p-8 rounded-2xl border border-white shadow-sm">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4 text-primary">
               <div>
                 <h3 className="text-xs font-black uppercase tracking-widest italic">Inscriptions</h3>
-                <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mt-1 italic">Nouveaux utilisateurs et entreprises</p>
+                <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mt-1 italic">Nouveaux utilisateurs et entreprises</p>
               </div>
               <div className="bg-white/70 backdrop-blur-md rounded-2xl p-1 border border-white shadow-sm flex items-center">
                 {[
@@ -145,7 +145,7 @@ export default function GovOverview({ state }: { state: any }) {
                     key={tf.id}
                     onClick={() => setChartTimeframe(tf.id)}
                     className={cn(
-                      "px-4 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all",
+                      "px-4 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all",
                       chartTimeframe === tf.id ? "bg-primary text-white shadow-md" : "text-gray-500 hover:bg-gray-100"
                     )}
                   >
@@ -177,11 +177,11 @@ export default function GovOverview({ state }: { state: any }) {
             </div>
           </div>
 
-          <div className="bg-white/70 backdrop-blur-md p-8 rounded-[40px] border border-white shadow-sm">
+          <div className="bg-white/70 backdrop-blur-md p-8 rounded-2xl border border-white shadow-sm">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4 text-primary">
               <div>
                 <h3 className="text-xs font-black uppercase tracking-widest italic">Revenus</h3>
-                <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mt-1 italic">Évolution des transactions sur la plateforme</p>
+                <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mt-1 italic">Évolution des transactions sur la plateforme</p>
               </div>
               <div className="bg-white/70 backdrop-blur-md rounded-2xl p-1 border border-white shadow-sm flex items-center">
                 {[
@@ -194,7 +194,7 @@ export default function GovOverview({ state }: { state: any }) {
                     key={tf.id}
                     onClick={() => setChartTimeframe(tf.id)}
                     className={cn(
-                      "px-4 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all",
+                      "px-4 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all",
                       chartTimeframe === tf.id ? "bg-primary text-white shadow-md" : "text-gray-500 hover:bg-gray-100"
                     )}
                   >
@@ -222,8 +222,8 @@ export default function GovOverview({ state }: { state: any }) {
         </div>
 
         <div className="lg:col-span-4 space-y-8">
-          <div className="bg-white/70 backdrop-blur-md p-8 rounded-[40px] border border-white shadow-sm text-primary">
-            <h3 className="text-sm font-black uppercase mb-6 flex items-center italic">
+          <div className="bg-white/70 backdrop-blur-md p-8 rounded-2xl border border-white shadow-sm text-primary">
+            <h3 className="text-sm font-black mb-6 flex items-center">
               <Activity className="h-4 w-4 me-2 text-secondary" />
               Flux d'activité
             </h3>
@@ -237,11 +237,11 @@ export default function GovOverview({ state }: { state: any }) {
                       <ShieldCheck className="h-4 w-4 text-primary" />
                     </div>
                     <div className="min-w-0">
-                      <p className="text-[11px] font-black text-primary">{ACTION_LABELS[log.action] || log.action}</p>
-                      <p className="text-[10px] text-gray-500 truncate">
+                      <p className="text-xs font-black text-primary">{ACTION_LABELS[log.action] || log.action}</p>
+                      <p className="text-xs text-gray-500 truncate">
                         {[log.details?.targetCompanyName || log.details?.targetUserEmail || log.details?.invoiceNumber || log.details?.title, log.admin_email].filter(Boolean).join(' · ')}
                       </p>
-                      <p className="text-[10px] text-gray-400">{new Date(log.created_at).toLocaleString('fr-DZ', { dateStyle: 'short', timeStyle: 'short' })}</p>
+                      <p className="text-xs text-gray-500">{new Date(log.created_at).toLocaleString('fr-DZ', { dateStyle: 'short', timeStyle: 'short' })}</p>
                     </div>
                   </li>
                 ))}

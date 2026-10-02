@@ -96,10 +96,10 @@ export default function SubscriptionPanel({ notify }: { notify: (message: string
   };
 
   if (isLoading) {
-    return <div className="py-20 text-center"><Loader2 className="h-6 w-6 animate-spin inline text-gray-400" /></div>;
+    return <div className="py-20 text-center"><Loader2 className="h-6 w-6 animate-spin inline text-gray-500" /></div>;
   }
   if (error || !data) {
-    return <div className="bg-red-50 text-red-600 p-6 rounded-3xl text-sm">{t('subscription.loadError')}</div>;
+    return <div className="bg-red-50 text-red-600 p-6 rounded-2xl text-sm">{t('subscription.loadError')}</div>;
   }
 
   const pending = data.subscriptions.filter((s: any) => s.status === 'pending');
@@ -124,14 +124,14 @@ export default function SubscriptionPanel({ notify }: { notify: (message: string
       )}
 
       {/* Offre en cours */}
-      <section className="bg-primary p-8 sm:p-12 rounded-[40px] text-white">
-        <span className="text-[10px] font-black uppercase tracking-widest opacity-60">{t('subscription.currentPlan')}</span>
-        <h3 className="text-4xl font-black uppercase italic tracking-tighter mt-3">{planName(data.plan)}</h3>
+      <section className="bg-primary p-8 sm:p-12 rounded-2xl text-white">
+        <span className="text-xs font-black uppercase tracking-widest opacity-60">{t('subscription.currentPlan')}</span>
+        <h3 className="text-4xl font-black tracking-tighter mt-3">{planName(data.plan)}</h3>
         <p className="text-white/70 mt-2">
           {isPaidPlan && data.planEndsAt ? t('subscription.validUntil', { date: date(data.planEndsAt) }) : t('subscription.freePlanText')}
         </p>
         <div className="mt-8 max-w-md">
-          <div className="flex justify-between text-[11px] font-bold text-white/80 mb-2">
+          <div className="flex justify-between text-xs font-bold text-white/80 mb-2">
             <span>{t('subscription.publishedProducts')}</span>
             <span>{data.usage.products}{limit ? ` / ${limit}` : ` (${t('subscription.unlimited')})`}</span>
           </div>
@@ -147,14 +147,14 @@ export default function SubscriptionPanel({ notify }: { notify: (message: string
       {data.plan !== 'pro' && data.plan !== 'founder' && (
         <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {(['basic', 'pro'] as const).filter((p) => p !== data.plan).map((plan) => (
-            <div key={plan} className="bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm flex flex-col">
-              <h4 className="text-xl font-black text-primary uppercase italic">{planName(plan)}</h4>
+            <div key={plan} className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm flex flex-col">
+              <h4 className="text-xl font-black text-primary">{planName(plan)}</h4>
               <p className="text-2xl font-black text-primary mt-2">{dzd(data.prices[plan])} <span className="text-xs font-bold text-gray-500">{t('subscription.perYearVat')}</span></p>
               <p className="text-sm text-gray-600 mt-3 flex-1">{t(`subscription.features.${plan}`)}</p>
               <button
                 onClick={() => subscribe.mutate(plan)}
                 disabled={!data.canSubscribe || subscribe.isPending}
-                className="mt-6 w-full btn-secondary py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest disabled:opacity-50 flex items-center justify-center gap-2"
+                className="mt-6 w-full btn-secondary py-4 rounded-2xl text-xs font-black uppercase tracking-widest disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {subscribe.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
                 {t('subscription.choose', { plan: planName(plan) })}
@@ -171,14 +171,14 @@ export default function SubscriptionPanel({ notify }: { notify: (message: string
 
       {/* Factures à régler */}
       {pending.map((sub: any) => (
-        <section key={sub.id} className="bg-white p-8 rounded-[32px] border-2 border-orange-200 shadow-sm space-y-6">
+        <section key={sub.id} className="bg-white p-8 rounded-2xl border-2 border-orange-200 shadow-sm space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
             <div>
-              <p className="text-[10px] font-black text-orange-600 uppercase tracking-widest">{t('subscription.invoiceToPay')}</p>
+              <p className="text-xs font-black text-orange-600 uppercase tracking-widest">{t('subscription.invoiceToPay')}</p>
               <h4 className="text-xl font-black text-primary mt-1">{sub.invoice_number} — {planName(sub.plan)}</h4>
               <p className="text-sm text-gray-600">{t('subscription.invoiceMeta', { amount: dzd(sub.amount_dzd), date: date(sub.created_at) })}</p>
             </div>
-            <a href={`/api/subscriptions/${sub.id}/invoice`} target="_blank" rel="noopener" className="px-5 py-3 rounded-xl border border-gray-200 text-[10px] font-black uppercase tracking-widest text-primary flex items-center gap-2 self-start">
+            <a href={`/api/subscriptions/${sub.id}/invoice`} target="_blank" rel="noopener" className="px-5 py-3 rounded-xl border border-gray-200 text-xs font-black uppercase tracking-widest text-primary flex items-center gap-2 self-start">
               <FileText className="h-4 w-4" /> {t('subscription.viewInvoice')}
             </a>
           </div>
@@ -189,17 +189,17 @@ export default function SubscriptionPanel({ notify }: { notify: (message: string
               <h5 className="font-black text-primary flex items-center gap-2"><Landmark className="h-5 w-5" /> {t('subscription.byTransfer')}</h5>
               {data.payment.rib ? (
                 <dl className="text-sm space-y-2">
-                  {data.payment.beneficiary && <div><dt className="text-[10px] font-black uppercase text-gray-500">{t('subscription.beneficiary')}</dt><dd className="font-bold">{data.payment.beneficiary}</dd></div>}
+                  {data.payment.beneficiary && <div><dt className="text-xs font-black uppercase text-gray-500">{t('subscription.beneficiary')}</dt><dd className="font-bold">{data.payment.beneficiary}</dd></div>}
                   <div>
-                    <dt className="text-[10px] font-black uppercase text-gray-500">{t('subscription.rib')}</dt>
+                    <dt className="text-xs font-black uppercase text-gray-500">{t('subscription.rib')}</dt>
                     <dd className="font-mono font-bold flex items-center gap-2 break-all" dir="ltr">{data.payment.rib}
-                      <button onClick={() => copy(data.payment.rib)} aria-label={t('subscription.copyRib')} className="text-gray-400 hover:text-primary shrink-0"><Copy className="h-4 w-4" /></button>
+                      <button onClick={() => copy(data.payment.rib)} aria-label={t('subscription.copyRib')} className="text-gray-500 hover:text-primary shrink-0"><Copy className="h-4 w-4" /></button>
                     </dd>
                   </div>
                   <div>
-                    <dt className="text-[10px] font-black uppercase text-gray-500">{t('subscription.reference')}</dt>
+                    <dt className="text-xs font-black uppercase text-gray-500">{t('subscription.reference')}</dt>
                     <dd className="font-mono font-bold flex items-center gap-2" dir="ltr">{sub.invoice_number}
-                      <button onClick={() => copy(sub.invoice_number)} aria-label={t('subscription.copyReference')} className="text-gray-400 hover:text-primary"><Copy className="h-4 w-4" /></button>
+                      <button onClick={() => copy(sub.invoice_number)} aria-label={t('subscription.copyReference')} className="text-gray-500 hover:text-primary"><Copy className="h-4 w-4" /></button>
                     </dd>
                   </div>
                 </dl>
@@ -220,7 +220,7 @@ export default function SubscriptionPanel({ notify }: { notify: (message: string
                 <button
                   onClick={() => fileInputs.current[sub.id]?.click()}
                   disabled={uploadingId === sub.id}
-                  className="mt-3 w-full px-5 py-3 rounded-xl bg-white border border-gray-200 text-[10px] font-black uppercase tracking-widest text-primary flex items-center justify-center gap-2 disabled:opacity-50"
+                  className="mt-3 w-full px-5 py-3 rounded-xl bg-white border border-gray-200 text-xs font-black uppercase tracking-widest text-primary flex items-center justify-center gap-2 disabled:opacity-50"
                 >
                   {uploadingId === sub.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
                   {sub.transfer_proof_uploaded_at ? t('subscription.replaceProof') : t('subscription.sendProof')}
@@ -237,7 +237,7 @@ export default function SubscriptionPanel({ notify }: { notify: (message: string
                   <button
                     onClick={() => checkout.mutate(sub.id)}
                     disabled={checkout.isPending}
-                    className="w-full btn-secondary py-4 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 disabled:opacity-50"
+                    className="w-full btn-secondary py-4 rounded-xl text-xs font-black uppercase tracking-widest flex items-center justify-center gap-2 disabled:opacity-50"
                   >
                     {checkout.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <CreditCard className="h-4 w-4" />}
                     {t('subscription.payOnline', { amount: dzd(sub.amount_dzd) })}
@@ -251,7 +251,7 @@ export default function SubscriptionPanel({ notify }: { notify: (message: string
 
           <button
             onClick={() => window.confirm(t('subscription.cancelConfirm', { invoice: sub.invoice_number })) && cancel.mutate(sub.id)}
-            className="text-[10px] font-black uppercase tracking-widest text-gray-500 hover:text-red-500 flex items-center gap-1"
+            className="text-xs font-black uppercase tracking-widest text-gray-500 hover:text-red-500 flex items-center gap-1"
           >
             <XCircle className="h-4 w-4" /> {t('subscription.cancelInvoice')}
           </button>
@@ -260,10 +260,10 @@ export default function SubscriptionPanel({ notify }: { notify: (message: string
 
       {/* Historique */}
       {history.length > 0 && (
-        <section className="bg-white rounded-[32px] border border-gray-100 shadow-sm overflow-x-auto">
+        <section className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-x-auto">
           <h4 className="p-6 font-black text-primary">{t('subscription.history')}</h4>
           <table className="w-full text-xs">
-            <thead className="bg-gray-50 text-[10px] font-black uppercase tracking-widest text-gray-500">
+            <thead className="bg-gray-50 text-xs font-black uppercase tracking-widest text-gray-500">
               <tr>
                 <th className="p-4 text-start">{t('subscription.col.invoice')}</th>
                 <th className="p-4 text-start">{t('subscription.col.plan')}</th>
@@ -280,7 +280,7 @@ export default function SubscriptionPanel({ notify }: { notify: (message: string
                   <td className="p-4">{planName(sub.plan)}</td>
                   <td className="p-4">{dzd(sub.amount_dzd)}</td>
                   <td className="p-4">{sub.starts_at ? `${date(sub.starts_at)} → ${date(sub.ends_at)}` : '—'}</td>
-                  <td className="p-4"><span className={cn('px-2.5 py-1 rounded-full text-[10px] font-black', STATUS_CLASSES[sub.status])}>{t(`subscription.status.${sub.status}`, { defaultValue: sub.status })}</span></td>
+                  <td className="p-4"><span className={cn('px-2.5 py-1 rounded-full text-xs font-black', STATUS_CLASSES[sub.status])}>{t(`subscription.status.${sub.status}`, { defaultValue: sub.status })}</span></td>
                   <td className="p-4 text-end">
                     <a href={`/api/subscriptions/${sub.id}/invoice`} target="_blank" rel="noopener" className="text-secondary font-bold hover:underline">{t('subscription.col.invoice')}</a>
                   </td>

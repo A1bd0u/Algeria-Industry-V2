@@ -13,7 +13,7 @@ const NotFound = () => {
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="bg-white p-12 rounded-[48px] border border-gray-100 shadow-2xl relative overflow-hidden"
+          className="bg-white p-12 rounded-2xl border border-gray-100 shadow-2xl relative overflow-hidden"
         >
           <div className="absolute top-0 end-0 w-32 h-32 bg-secondary/5 rounded-full -translate-y-16 translate-x-16" />
 
@@ -22,27 +22,27 @@ const NotFound = () => {
               <AlertCircle className="h-10 w-10 text-red-500" />
             </div>
 
-            <h1 className="text-8xl font-black text-primary uppercase tracking-tighter mb-4 leading-none italic">
+            <h1 className="text-8xl font-black text-primary tracking-tighter mb-4 leading-none">
               404
             </h1>
-            <h2 className="text-2xl font-black text-primary uppercase tracking-tighter mb-6">
+            <h2 className="text-2xl font-black text-primary tracking-tighter mb-6">
               {t('notFound.title')}
             </h2>
-            <p className="text-gray-400 font-bold uppercase tracking-widest text-[10px] mb-12 leading-relaxed">
+            <p className="text-gray-500 font-bold tracking-widest text-xs mb-12 leading-relaxed">
               {t('notFound.text')}
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Link
                 to="/"
-                className="flex items-center justify-center gap-3 bg-primary py-4 px-8 rounded-2xl text-[10px] font-black text-white uppercase tracking-widest hover:bg-secondary transition-all shadow-lg"
+                className="flex items-center justify-center gap-3 bg-primary py-4 px-8 rounded-2xl text-xs font-black text-white uppercase tracking-widest hover:bg-secondary transition-all shadow-lg"
               >
                 <Home className="h-4 w-4" />
                 <span>{t('notFound.home')}</span>
               </Link>
               <Link
                 to="/products"
-                className="flex items-center justify-center gap-3 bg-gray-50 py-4 px-8 rounded-2xl text-[10px] font-black text-primary border border-gray-100 uppercase tracking-widest hover:border-secondary transition-all"
+                className="flex items-center justify-center gap-3 bg-gray-50 py-4 px-8 rounded-2xl text-xs font-black text-primary border border-gray-100 uppercase tracking-widest hover:border-secondary transition-all"
               >
                 <Search className="h-4 w-4" />
                 <span>{t('notFound.catalog')}</span>

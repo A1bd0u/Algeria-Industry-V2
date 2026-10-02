@@ -53,12 +53,12 @@ const EmailCodeStep = ({ initialEmail }: { initialEmail: string }) => {
 
   return (
     <div className="min-h-screen bg-neutral-bg flex items-center justify-center px-4 py-20">
-      <div className="max-w-lg w-full bg-white rounded-[32px] shadow-2xl border border-gray-100 overflow-hidden">
+      <div className="max-w-lg w-full bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
         <div className="bg-primary p-8 text-center text-white">
           <div className="w-16 h-16 bg-secondary rounded-2xl flex items-center justify-center mx-auto mb-6">
             <Mail className="h-8 w-8 text-white" />
           </div>
-          <h1 className="text-2xl font-black uppercase tracking-tight mb-2">{t('registerSuccess.verifyTitle')}</h1>
+          <h1 className="text-2xl font-black tracking-tight mb-2">{t('registerSuccess.verifyTitle')}</h1>
           <p className="text-white/70 text-sm">
             {t('registerSuccess.verifyText')}
           </p>
@@ -69,7 +69,7 @@ const EmailCodeStep = ({ initialEmail }: { initialEmail: string }) => {
           {info && <div role="status" className="bg-blue-50 text-blue-600 p-3 text-xs font-bold border border-blue-100 rounded-xl">{info}</div>}
 
           <div className="space-y-2">
-            <label htmlFor="verify_email" className="text-[10px] font-black text-gray-500 uppercase tracking-widest">{t('registerSuccess.email')}</label>
+            <label htmlFor="verify_email" className="text-xs font-black text-gray-500 uppercase tracking-widest">{t('registerSuccess.email')}</label>
             <input
               id="verify_email"
               type="email"
@@ -81,7 +81,7 @@ const EmailCodeStep = ({ initialEmail }: { initialEmail: string }) => {
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="verify_code" className="text-[10px] font-black text-gray-500 uppercase tracking-widest">{t('registerSuccess.code')}</label>
+            <label htmlFor="verify_code" className="text-xs font-black text-gray-500 uppercase tracking-widest">{t('registerSuccess.code')}</label>
             <input
               id="verify_code"
               type="text"
@@ -90,7 +90,7 @@ const EmailCodeStep = ({ initialEmail }: { initialEmail: string }) => {
               maxLength={6}
               value={code}
               onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
-              className="w-full bg-gray-50 border border-gray-100 px-6 py-4 text-2xl tracking-[0.5em] font-mono text-center rounded-xl outline-none focus:border-secondary"
+              className="w-full bg-gray-50 border border-gray-100 px-6 py-4 text-2xl tracking-wider font-mono text-center rounded-xl outline-none focus:border-secondary"
               placeholder="000000"
               required
             />
@@ -115,14 +115,14 @@ const EmailCodeStep = ({ initialEmail }: { initialEmail: string }) => {
                   onExpire={() => setCaptchaToken(null)}
                 />
               ) : (
-                <p className="text-red-500 text-[10px] font-bold">{t('registerSuccess.captchaUnavailable')}</p>
+                <p className="text-red-500 text-xs font-bold">{t('registerSuccess.captchaUnavailable')}</p>
               )}
             </div>
             <button
               type="button"
               onClick={handleResend}
               disabled={resending || !email}
-              className="w-full text-[10px] font-black text-secondary hover:text-primary uppercase tracking-widest flex items-center justify-center disabled:opacity-50"
+              className="w-full text-xs font-black text-secondary hover:text-primary uppercase tracking-widest flex items-center justify-center disabled:opacity-50"
             >
               <RefreshCw className={cn('h-3 w-3 me-2', resending && 'animate-spin')} />
               {resending ? t('compare.sending') : t('registerSuccess.resend')}
@@ -181,17 +181,17 @@ const RegisterSuccess = () => {
   return (
     <div className={cn("min-h-screen bg-neutral-bg flex items-center justify-center px-4 py-20", isAr && "font-arabic")}>
       <div className="max-w-4xl w-full">
-        <div className="bg-white rounded-[40px] shadow-2xl border border-gray-100 overflow-hidden">
+        <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
           <div className="flex flex-col md:flex-row">
             <div className="md:w-1/2 bg-primary p-12 text-white flex flex-col items-center justify-center text-center">
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                className="w-24 h-24 bg-secondary rounded-3xl flex items-center justify-center shadow-2xl mb-8"
+                className="w-24 h-24 bg-secondary rounded-2xl flex items-center justify-center shadow-2xl mb-8"
               >
                 <CheckCircle2 className="h-12 w-12 text-white" />
               </motion.div>
-              <h1 className="text-4xl font-black uppercase tracking-tighter leading-none mb-6">
+              <h1 className="text-4xl font-black tracking-tighter leading-none mb-6">
                 {t('registerSuccess.createdTitle')}
               </h1>
               <p className="text-white/60 text-sm font-medium leading-relaxed">
@@ -200,14 +200,14 @@ const RegisterSuccess = () => {
             </div>
 
             <div className="md:w-1/2 p-12">
-              <h2 className="text-xs font-black text-secondary uppercase tracking-[0.3em] mb-4">
+              <h2 className="text-xs font-black text-secondary uppercase tracking-wider mb-4">
                 {t('registerSuccess.nextSteps')}
               </h2>
 
               {isSupplier ? (
                 <>
                   <div className="mb-8" aria-label={t('registerSuccess.progressLabel', { done: completed, total: 3 })}>
-                    <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-gray-500 mb-2">
+                    <div className="flex justify-between text-xs font-black uppercase tracking-widest text-gray-500 mb-2">
                       <span>{t('registerSuccess.progress')}</span>
                       <span>{completed}/3</span>
                     </div>
@@ -223,8 +223,8 @@ const RegisterSuccess = () => {
                             <step.icon className="h-5 w-5" />
                           </div>
                           <div className="flex-1">
-                            <h3 className="text-sm font-black text-primary uppercase tracking-tight">{idx + 1}. {step.title}</h3>
-                            <p className="text-[11px] text-gray-500 font-medium leading-normal mt-1">{step.desc}</p>
+                            <h3 className="text-sm font-black text-primary tracking-tight">{idx + 1}. {step.title}</h3>
+                            <p className="text-xs text-gray-500 font-medium leading-normal mt-1">{step.desc}</p>
                           </div>
                           {step.link && <ArrowRight className="h-4 w-4 text-gray-300 rtl:rotate-180" />}
                         </div>
@@ -250,8 +250,8 @@ const RegisterSuccess = () => {
                           <step.icon className="h-5 w-5" />
                         </div>
                         <div className="flex-1">
-                          <h3 className="text-sm font-black text-primary uppercase tracking-tight group-hover:text-secondary">{step.title}</h3>
-                          <p className="text-[11px] text-gray-500 font-medium leading-normal mt-1">{step.desc}</p>
+                          <h3 className="text-sm font-black text-primary tracking-tight group-hover:text-secondary">{step.title}</h3>
+                          <p className="text-xs text-gray-500 font-medium leading-normal mt-1">{step.desc}</p>
                         </div>
                         <ArrowRight className="h-4 w-4 text-gray-300 rtl:rotate-180" />
                       </div>
@@ -275,9 +275,9 @@ const RegisterSuccess = () => {
         <div className="mt-12 flex flex-col md:flex-row items-center justify-between text-gray-500 px-8">
           <div className="flex items-center space-x-2 mb-4 md:mb-0">
             <Settings className="h-4 w-4" />
-            <span className="text-[10px] font-bold uppercase tracking-widest">{t('registerSuccess.needHelp')}</span>
+            <span className="text-xs font-bold uppercase tracking-widest">{t('registerSuccess.needHelp')}</span>
           </div>
-          <Link to="/contact" className="text-[10px] font-bold uppercase tracking-widest text-primary hover:text-secondary border-b border-primary/20 pb-0.5">
+          <Link to="/contact" className="text-xs font-bold uppercase tracking-widest text-primary hover:text-secondary border-b border-primary/20 pb-0.5">
             {t('registerSuccess.contactSupport')}
           </Link>
         </div>

@@ -22,7 +22,7 @@ const api = async <T,>(url: string, body?: unknown): Promise<T> => {
 };
 
 const inputClass = 'w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none';
-const codeInputClass = `${inputClass} text-center font-mono text-xl tracking-[0.4em]`;
+const codeInputClass = `${inputClass} text-center font-mono text-xl tracking-wider`;
 
 function RecoveryCodes({ codes, onDone }: { codes: string[]; onDone: () => void }) {
   const { t } = useTranslation();
@@ -105,8 +105,8 @@ export default function TwoFactorSettings({ onChange }: { onChange?: () => void 
 
   if (recoveryCodes) {
     return (
-      <section className="bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm space-y-6">
-        <h3 className="text-lg font-black text-primary uppercase italic">{t('mfa.enabledTitle')}</h3>
+      <section className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm space-y-6">
+        <h3 className="text-lg font-black text-primary">{t('mfa.enabledTitle')}</h3>
         <RecoveryCodes codes={recoveryCodes} onDone={() => { setRecoveryCodes(null); onChange?.(); }} />
       </section>
     );
@@ -115,13 +115,13 @@ export default function TwoFactorSettings({ onChange }: { onChange?: () => void 
   const errorBox = error && <p className="p-3 bg-red-50 border border-red-200 text-red-600 text-xs font-bold rounded-xl" role="alert">{error}</p>;
 
   return (
-    <section className="bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm space-y-6">
+    <section className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm space-y-6">
       <div className="flex items-start gap-4">
         <div className={`p-3 rounded-2xl ${status.enabled ? 'bg-emerald-50 text-emerald-600' : 'bg-gray-100 text-gray-500'}`}>
           {status.enabled ? <ShieldCheck className="h-6 w-6" /> : <ShieldOff className="h-6 w-6" />}
         </div>
         <div>
-          <h3 className="text-lg font-black text-primary uppercase italic">{t('mfa.title')}</h3>
+          <h3 className="text-lg font-black text-primary">{t('mfa.title')}</h3>
           <p className="text-sm text-gray-500">
             {status.enabled
               ? t('mfa.activeStatus', { count: status.recoveryCodesLeft })
@@ -166,7 +166,7 @@ export default function TwoFactorSettings({ onChange }: { onChange?: () => void 
               <li>{t('mfa.step3')}</li>
             </ol>
             <div>
-              <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">{t('mfa.manualKey')}</span>
+              <span className="text-xs font-black text-gray-500 uppercase tracking-widest">{t('mfa.manualKey')}</span>
               <div className="flex items-center gap-2">
                 <code className="font-mono text-sm break-all bg-gray-50 px-3 py-2 rounded-lg">{setup.secret.match(/.{1,4}/g)?.join(' ')}</code>
                 <button type="button" aria-label={t('mfa.copyKey')} onClick={() => navigator.clipboard?.writeText(setup.secret)} className="p-2 rounded-lg hover:bg-gray-100">
@@ -218,11 +218,11 @@ export default function TwoFactorSettings({ onChange }: { onChange?: () => void 
               {status.required && (
                 <p className="text-sm font-bold text-amber-700">{t('mfa.disableAdminWarning')}</p>
               )}
-              <label htmlFor="mfa-password" className="text-[10px] font-black text-gray-500 uppercase tracking-widest">{t('auth.password')}</label>
+              <label htmlFor="mfa-password" className="text-xs font-black text-gray-500 uppercase tracking-widest">{t('auth.password')}</label>
               <input id="mfa-password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" className={inputClass} />
             </>
           )}
-          <label htmlFor="mfa-current-code" className="text-[10px] font-black text-gray-500 uppercase tracking-widest">{t('mfa.currentCode')}</label>
+          <label htmlFor="mfa-current-code" className="text-xs font-black text-gray-500 uppercase tracking-widest">{t('mfa.currentCode')}</label>
           <input id="mfa-current-code" value={code} onChange={(e) => setCode(e.target.value)} autoComplete="one-time-code" placeholder="000000" className={codeInputClass} />
           {errorBox}
           <div className="flex gap-2">

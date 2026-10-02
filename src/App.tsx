@@ -1,6 +1,6 @@
 import { useEffect, lazy, Suspense } from "react";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { AnimatePresence } from 'motion/react';
+import { AnimatePresence, MotionConfig } from 'motion/react';
 import { Route, Routes, useLocation } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import BackToTop from './components/BackToTop';
@@ -98,6 +98,7 @@ export default function App() {
       <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
       <ToastProvider>
+      <MotionConfig reducedMotion="user">
       <AuthProvider>
           <CurrencyProvider>
             <ComparisonProvider>
@@ -181,6 +182,7 @@ export default function App() {
             </ComparisonProvider>
           </CurrencyProvider>
       </AuthProvider>
+      </MotionConfig>
       </ToastProvider>
     </QueryClientProvider>
     </ErrorBoundary>

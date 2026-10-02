@@ -117,7 +117,7 @@ const Blog = () => {
           ) : error ? (
             <div className="py-20 flex flex-col items-center justify-center">
                <AlertCircle className="h-10 w-10 text-red-500 mb-4" />
-               <p className="text-[10px] font-black uppercase text-red-500 tracking-widest">{error}</p>
+               <p className="text-xs font-black uppercase text-red-500 tracking-widest">{error}</p>
             </div>
           ) : (
             <>
@@ -128,7 +128,7 @@ const Blog = () => {
               animate={{ opacity: 1, y: 0 }}
               className="mb-16"
             >
-              <div className={cn("bg-white rounded-[40px] overflow-hidden shadow-xl border border-gray-100 flex flex-col lg:flex-row group")}>
+              <div className={cn("bg-white rounded-2xl overflow-hidden shadow-xl border border-gray-100 flex flex-col lg:flex-row group")}>
                 <Link to={`/blog/${generateSlugUrl(featuredPost.title, featuredPost.id)}`} className="lg:w-3/5 h-64 lg:h-auto overflow-hidden">
                   {featuredPost.image ? (
                     <img
@@ -168,7 +168,7 @@ const Blog = () => {
                       </div>
                       <div>
                         <p className="text-sm font-bold text-primary">{featuredPost.author}</p>
-                        <p className="text-xs text-gray-400">{featuredPost.date}</p>
+                        <p className="text-xs text-gray-500">{featuredPost.date}</p>
                       </div>
                     </div>
                     <Link to={`/blog/${generateSlugUrl(featuredPost.title, featuredPost.id)}`} className="btn-primary p-3 rounded-xl">
@@ -188,7 +188,7 @@ const Blog = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1 }}
-                className={cn("bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-xl transition-all group flex flex-col")}
+                className={cn("bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-xl transition-all group flex flex-col")}
               >
                 <Link to={`/blog/${generateSlugUrl(post.title, post.id)}`} className="h-48 overflow-hidden relative block">
                   {post.image ? (
@@ -203,13 +203,13 @@ const Blog = () => {
                     <div className="w-full h-full bg-gray-50 flex items-center justify-center"><img src="/favicon.svg" alt="" className="h-12 w-12 opacity-20" /></div>
                   )}
                   <div className={cn("absolute top-4", "start-4")}>
-                    <span className="bg-white/90 backdrop-blur-sm text-primary px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">
+                    <span className="bg-white/90 backdrop-blur-sm text-primary px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
                       {post.category}
                     </span>
                   </div>
                 </Link>
                 <div className="p-6 flex flex-col flex-1">
-                  <div className={cn("flex items-center space-x-3 text-[10px] font-bold text-gray-400 mb-3 uppercase")}>
+                  <div className={cn("flex items-center space-x-3 text-xs font-bold text-gray-500 mb-3 uppercase")}>
                     <span className="flex items-center space-x-1">
                       <Calendar className="h-3 w-3" />
                       <span>{post.date}</span>
@@ -257,7 +257,7 @@ const Blog = () => {
           )}
 
           {/* Appel à l'action : pas de newsletter tant qu'aucun envoi n'existe. */}
-          <section className="mt-24 bg-primary p-12 rounded-[40px] text-white text-center">
+          <section className="mt-24 bg-primary p-12 rounded-2xl text-white text-center">
             <div className="max-w-2xl mx-auto">
               <h2 className="text-3xl font-bold mb-4">{t('blog.ctaTitle')}</h2>
               <p className="text-white/70 mb-8">{t('blog.ctaText')}</p>

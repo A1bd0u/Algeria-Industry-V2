@@ -24,6 +24,7 @@ import { cn, generateSlugUrl } from '../lib/utils';
 import AddProduct from './AddProduct';
 import SEO from '../components/SEO';
 import { absoluteUrl } from '../config/site';
+import ProductImage from '../components/ui/ProductImage';
 
 const Products = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -131,7 +132,7 @@ const Products = () => {
           price: p.price,
           category: p.category || '',
           region: p.region || '',
-          image: p.file_url || p.image_url || '/placeholder.svg',
+          image: p.file_url || p.image_url || null,
           features: p.features || [],
           verified: p.verified || false,
           owner_id: p.owner_id || p.company_id
@@ -233,7 +234,7 @@ const Products = () => {
               className="flex items-center space-x-2 text-secondary mb-4"
             >
               <Box className="h-4 w-4" />
-              <span className="text-[10px] font-black uppercase tracking-[0.4em]">{t('products.sourcing')}</span>
+              <span className="text-xs font-black uppercase tracking-wider">{t('products.sourcing')}</span>
             </motion.div>
             {companyNameParam && (
               <button 
@@ -245,7 +246,7 @@ const Products = () => {
                 ← Voir tout le catalogue Algeria Industry
               </button>
             )}
-            <h1 className="text-4xl md:text-5xl font-black text-primary uppercase tracking-tighter leading-none mb-6">
+            <h1 className="text-4xl md:text-5xl font-black text-primary tracking-tighter leading-none mb-6">
               {companyNameParam ? (
                 <>
                   Tous les produits <span className="text-secondary">{companyNameParam}</span>
@@ -264,13 +265,13 @@ const Products = () => {
           <div className="flex bg-white p-1 rounded-2xl border border-gray-100 shadow-sm">
             <button 
               onClick={() => setView('grid')}
-              className={cn("p-3 rounded-xl transition-all", view === 'grid' ? "bg-primary text-white shadow-lg" : "text-gray-400 hover:text-primary")}
+              className={cn("p-3 rounded-xl transition-all", view === 'grid' ? "bg-primary text-white shadow-lg" : "text-gray-500 hover:text-primary")}
             >
               <Grid className="h-5 w-5" />
             </button>
             <button 
               onClick={() => setView('list')}
-              className={cn("p-3 rounded-xl transition-all", view === 'list' ? "bg-primary text-white shadow-lg" : "text-gray-400 hover:text-primary")}
+              className={cn("p-3 rounded-xl transition-all", view === 'list' ? "bg-primary text-white shadow-lg" : "text-gray-500 hover:text-primary")}
             >
               <ListIcon className="h-5 w-5" />
             </button>
@@ -283,19 +284,19 @@ const Products = () => {
           <aside className="w-full lg:w-72 space-y-8">
             <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-sm font-black text-primary uppercase tracking-widest">{t('products.filters')}</h3>
-                <SlidersHorizontal className="h-4 w-4 text-gray-400" />
+                <h3 className="text-sm font-black text-primary tracking-widest">{t('products.filters')}</h3>
+                <SlidersHorizontal className="h-4 w-4 text-gray-500" />
               </div>
               
               <div className="space-y-6">
                 <div className="relative" ref={categoryRef}>
-                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 block">{t('products.category')}</label>
+                  <label className="text-xs font-black text-gray-500 uppercase tracking-widest mb-3 block">{t('products.category')}</label>
                   <button
                     onClick={() => setIsCategoryOpen(!isCategoryOpen)}
                     className="w-full flex items-center justify-between bg-gray-50 px-5 py-3 rounded-xl border border-transparent focus:ring-2 focus:ring-primary/20 focus:border-primary focus:bg-white transition-all cursor-pointer text-gray-800 hover:bg-gray-100 text-start"
                   >
                     <span className="text-xs font-black uppercase tracking-widest truncate">{activeCategory === 'Tous' ? t('products.all_categories') : categoryLabel(t, activeCategory)}</span>
-                    <ChevronDown className={cn("w-4 h-4 text-gray-400 transition-transform ms-4 shrink-0", isCategoryOpen && "rotate-180")} />
+                    <ChevronDown className={cn("w-4 h-4 text-gray-500 transition-transform ms-4 shrink-0", isCategoryOpen && "rotate-180")} />
                   </button>
                   
                   {isCategoryOpen && (
@@ -316,12 +317,12 @@ const Products = () => {
                       
                       {productCategories.map(group => (
                         <div key={group.id} className="py-2">
-                          <div className="px-4 py-2 text-[10px] font-black text-gray-400 uppercase tracking-widest bg-gray-50/50">{t(`productCategories.${group.id}`)}</div>
+                          <div className="px-4 py-2 text-xs font-black text-gray-500 uppercase tracking-widest bg-gray-50/50">{t(`productCategories.${group.id}`)}</div>
                           {group.subCategories.map(sub => (
                             <button
                               key={sub.id}
                               className={cn(
-                                "w-full text-start px-4 py-2.5 text-[11px] font-bold tracking-wide hover:bg-gray-50 transition-colors flex items-center justify-between group",
+                                "w-full text-start px-4 py-2.5 text-xs font-bold tracking-wide hover:bg-gray-50 transition-colors flex items-center justify-between group",
                                 activeCategory === sub.name ? "text-primary bg-primary/5" : "text-gray-600"
                               )}
                               onClick={() => {
@@ -340,13 +341,13 @@ const Products = () => {
                 </div>
 
                 <div className="relative" ref={regionRef}>
-                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 block">{t('products.wilaya')}</label>
+                  <label className="text-xs font-black text-gray-500 uppercase tracking-widest mb-3 block">{t('products.wilaya')}</label>
                   <button
                     onClick={() => setIsRegionOpen(!isRegionOpen)}
                     className="w-full flex items-center justify-between bg-gray-50 px-5 py-3 rounded-xl border border-transparent focus:ring-2 focus:ring-primary/20 focus:border-primary focus:bg-white transition-all cursor-pointer text-gray-800 hover:bg-gray-100 text-start"
                   >
                     <span className="text-xs font-black uppercase tracking-widest truncate">{selectedRegion || t('exhibitor.list.allWilayas')}</span>
-                    <ChevronDown className={cn("w-4 h-4 text-gray-400 transition-transform ms-4 shrink-0", isRegionOpen && "rotate-180")} />
+                    <ChevronDown className={cn("w-4 h-4 text-gray-500 transition-transform ms-4 shrink-0", isRegionOpen && "rotate-180")} />
                   </button>
                   
                   {isRegionOpen && (
@@ -375,8 +376,8 @@ const Products = () => {
 
             <div className="bg-primary rounded-2xl p-8 text-white relative overflow-hidden">
               <Zap className="absolute -end-4 -bottom-4 w-24 h-24 text-white/10" />
-              <h4 className="text-xl font-black mb-4 leading-tight uppercase">{t('products.sell_machines')}</h4>
-              <p className="text-white/60 text-[10px] font-medium mb-6 uppercase tracking-widest">{t('products.join_suppliers')}</p>
+              <h4 className="text-xl font-black mb-4 leading-tight">{t('products.sell_machines')}</h4>
+              <p className="text-white/60 text-xs font-medium mb-6 tracking-widest">{t('products.join_suppliers')}</p>
               <button onClick={() => setShowAddModal(true)} className="w-full py-4 bg-secondary rounded-xl text-xs font-black uppercase tracking-widest shadow-xl hover:scale-105 transition-all text-center block text-white">{t('products.add_product')}</button>
             </div>
           </aside>
@@ -384,7 +385,7 @@ const Products = () => {
           {/* Product Grid */}
           <main className="flex-1">
             <div className="mb-6 flex items-center bg-white p-2 rounded-2xl border border-gray-100 shadow-sm focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary transition-all">
-              <Search className="h-5 w-5 text-gray-400 ms-3 shrink-0" aria-hidden="true" />
+              <Search className="h-5 w-5 text-gray-500 ms-3 shrink-0" aria-hidden="true" />
               <input 
                 type="search"
                 aria-label={t('products.searchPlaceholder')}
@@ -398,7 +399,7 @@ const Products = () => {
                 }}
                 className="flex-1 min-w-0 bg-transparent px-3 sm:px-4 py-3 text-sm font-medium focus:outline-none"
               />
-              <button className="shrink-0 px-4 sm:px-6 py-3 bg-primary rounded-xl text-[10px] font-black uppercase tracking-widest text-white hover:bg-secondary transition-all" onClick={(e) => { e.preventDefault(); setSearchQuery(searchInput); }}>
+              <button className="shrink-0 px-4 sm:px-6 py-3 bg-primary rounded-xl text-xs font-black uppercase tracking-widest text-white hover:bg-secondary transition-all" onClick={(e) => { e.preventDefault(); setSearchQuery(searchInput); }}>
                 {t('common.search')}
               </button>
             </div>
@@ -436,13 +437,9 @@ const Products = () => {
                   )}
                 >
                   <div className={cn("relative overflow-hidden", view === 'grid' ? "aspect-video" : "md:w-72 aspect-square")}>
-                    <img 
-                      src={product.image} 
-                      alt={product.name}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                    />
+                    <ProductImage src={product.image} alt={product.name} category={product.category} imgClassName="group-hover:scale-105 transition-transform duration-700" />
                     <div className="absolute top-4 start-4 flex gap-2">
-                      <span className="bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-[9px] font-black uppercase text-primary border border-white/20">
+                      <span className="bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-black uppercase text-primary border border-white/20">
                         {categoryLabel(t, product.category)}
                       </span>
                       {product.verified && (
@@ -472,14 +469,14 @@ const Products = () => {
                         </button>
                       </div>
                       {product.reference_id && (
-                        <p className="text-[10px] font-mono text-gray-400 tracking-wider">
+                        <p className="text-xs font-mono text-gray-500 tracking-wider">
                           REF: {product.reference_id}
                         </p>
                       )}
                     </div>
 
                     <div className="pt-4 mt-4 border-t border-gray-50">
-                      <Link to={`/products/${generateSlugUrl(product.name, product.id)}`} className="w-full py-2.5 rounded-xl bg-primary/5 text-primary text-[10px] font-black uppercase tracking-widest flex items-center justify-center hover:bg-primary hover:text-white transition-all group-hover:bg-primary group-hover:text-white">
+                      <Link to={`/products/${generateSlugUrl(product.name, product.id)}`} className="w-full py-2.5 rounded-xl bg-primary/5 text-primary text-xs font-black uppercase tracking-widest flex items-center justify-center hover:bg-primary hover:text-white transition-all group-hover:bg-primary group-hover:text-white">
                         {t('common.see_details')}
                         <ArrowRight className="h-3.5 w-3.5 ms-2 rtl:rotate-180 transition-transform group-hover:translate-x-1" />
                       </Link>
@@ -532,7 +529,7 @@ const Products = () => {
                   return rangeWithDots.map((page, index) => {
                     if (page === '...') {
                       return (
-                        <span key={`dots-${index}`} className="px-3 py-2 text-gray-400 font-bold select-none">
+                        <span key={`dots-${index}`} className="px-3 py-2 text-gray-500 font-bold select-none">
                           .....
                         </span>
                       );

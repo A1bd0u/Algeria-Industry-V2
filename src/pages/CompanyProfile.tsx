@@ -256,7 +256,7 @@ const CompanyProfile = () => {
     return (
       <div className="min-h-screen bg-neutral-bg flex flex-col items-center justify-center p-4">
          <AlertCircle className="h-12 w-12 text-red-500 mb-4" />
-         <p className="text-[10px] font-black uppercase text-red-500 tracking-widest mb-6">{t('company.notFound')}</p>
+         <p className="text-xs font-black uppercase text-red-500 tracking-widest mb-6">{t('company.notFound')}</p>
          <button onClick={() => navigate('/directory')} className="btn-primary">{t('company.backToDirectory')}</button>
       </div>
     );
@@ -345,7 +345,7 @@ const CompanyProfile = () => {
                           <h1 className="text-2xl font-bold text-primary">{company.name}</h1>
                           {company.certified && <ShieldCheck className="h-6 w-6 text-success" />}
                         </div>
-                        <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">{company.sector}</p>
+                        <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">{company.sector}</p>
                       </div>
 
                       <div className="flex items-center space-x-4">
@@ -354,7 +354,7 @@ const CompanyProfile = () => {
                           <span className="text-sm font-bold ms-1 text-gray-700">{avgRating}</span>
                         </div>
                         <span className="text-gray-300">|</span>
-                        <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">{t('company.reviewsCount', { count: totalReviews })}</span>
+                        <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">{t('company.reviewsCount', { count: totalReviews })}</span>
                       </div>
                     </div>
 
@@ -425,7 +425,7 @@ const CompanyProfile = () => {
                       {/* Certifications inside presentation block */}
                       <div className="flex flex-wrap gap-1.5 justify-center sm:justify-start">
                         {company.certifications && company.certifications.map(cert => (
-                          <span key={cert} className="bg-success/10 text-success px-2.5 py-1 rounded-lg text-[10px] font-black border border-success/20 uppercase tracking-wider">
+                          <span key={cert} className="bg-success/10 text-success px-2.5 py-1 rounded-lg text-xs font-black border border-success/20 uppercase tracking-wider">
                             {cert}
                           </span>
                         ))}
@@ -435,7 +435,7 @@ const CompanyProfile = () => {
                         e.preventDefault();
                         const target = `/dashboard?tab=messages&to=${company.owner_id}`;
                         navigate(user ? target : `/login?redirect=${encodeURIComponent(target)}`);
-                      }} className="w-full sm:w-auto btn-primary py-3.5 px-6 rounded-lg flex items-center justify-center space-x-2 shadow-lg text-sm font-black uppercase tracking-wider cursor-pointer">
+                      }} className="w-full sm:w-auto btn-primary py-3.5 px-6 rounded-lg flex items-center justify-center space-x-2 shadow-lg text-sm font-black tracking-wider cursor-pointer">
                         <MessageSquare className="h-5 w-5" />
                         <span>{t('company.contact')}</span>
                       </button>}
@@ -444,7 +444,7 @@ const CompanyProfile = () => {
                           href={`${whatsappHref(company.whatsapp)}?text=${encodeURIComponent(t('company.whatsappMessage', { name: company.name }))}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="w-full sm:w-auto py-3.5 px-6 rounded-lg flex items-center justify-center gap-2 shadow-lg text-sm font-black uppercase tracking-wider bg-[#25D366] text-white hover:opacity-90"
+                          className="w-full sm:w-auto py-3.5 px-6 rounded-lg flex items-center justify-center gap-2 shadow-lg text-sm font-black tracking-wider bg-[#25D366] text-white hover:opacity-90"
                         >
                           <MessageCircle className="h-5 w-5" />
                           <span>{t('company.whatsapp')}</span>
@@ -472,7 +472,7 @@ const CompanyProfile = () => {
                     <table className="w-full text-sm">
                       <tbody>
                         <tr className="border-b border-gray-50">
-                          <td className="px-6 py-4 font-bold text-gray-400 w-1/3">{t('company.legalName')}</td>
+                          <td className="px-6 py-4 font-bold text-gray-500 w-1/3">{t('company.legalName')}</td>
                           <td className="px-6 py-4 text-gray-700 font-medium">{company.fullName || company.name}</td>
                         </tr>
                         <tr className="border-b border-gray-50">
@@ -509,15 +509,15 @@ const CompanyProfile = () => {
  
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {!company.products || company.products.length === 0 ? (
-                    <div className="py-12 text-center text-gray-400 border border-dashed border-gray-200 rounded-xl bg-gray-50/20 col-span-full">
+                    <div className="py-12 text-center text-gray-500 border border-dashed border-gray-200 rounded-xl bg-gray-50/20 col-span-full">
                       <Package className="h-8 w-8 mx-auto text-gray-300 mb-3" />
-                      <p className="text-sm font-bold uppercase tracking-widest">{t('company.noProducts')}</p>
+                      <p className="text-sm font-bold tracking-widest">{t('company.noProducts')}</p>
                       <p className="text-xs text-gray-500 mt-1">{t('company.noProductsText')}</p>
                     </div>
                   ) : (
                     company.products.map((product: any) => (
                       <Link to={`/products/${generateSlugUrl(product.name, product.id)}`} key={product.id} className="flex items-center p-5 rounded-xl border border-gray-100 hover:border-secondary/20 hover:shadow-md transition-all group bg-white relative">
-                        <div className="w-20 h-20 bg-gray-50 rounded-lg flex-shrink-0 flex items-center justify-center text-gray-400 border border-gray-100 group-hover:scale-105 transition-transform overflow-hidden">
+                        <div className="w-20 h-20 bg-gray-50 rounded-lg flex-shrink-0 flex items-center justify-center text-gray-500 border border-gray-100 group-hover:scale-105 transition-transform overflow-hidden">
                           {product.file_url ? (
                             <img src={product.file_url} alt={product.name} className="w-full h-full object-cover" />
                           ) : (
@@ -526,11 +526,11 @@ const CompanyProfile = () => {
                         </div>
                         <div className="ms-5 flex-1 pr-6">
                           <h4 className="font-bold text-primary group-hover:text-secondary transition-colors text-base line-clamp-1">{product.name}</h4>
-                          <span className="inline-block bg-gray-100 text-gray-500 text-[10px] font-bold px-2 py-0.5 rounded-full mt-1 uppercase tracking-wider">{categoryLabel(t, product.category)}</span>
+                          <span className="inline-block bg-gray-100 text-gray-500 text-xs font-bold px-2 py-0.5 rounded-full mt-1 uppercase tracking-wider">{categoryLabel(t, product.category)}</span>
                           {product.price ? (
                             <p className="text-sm font-black text-primary mt-2">{product.price} {t('common.dzd')}</p>
                           ) : (
-                            <p className="text-xs text-gray-400 font-bold mt-2">{t('company.onQuote')}</p>
+                            <p className="text-xs text-gray-500 font-bold mt-2">{t('company.onQuote')}</p>
                           )}
                         </div>
                         <ChevronRight className="h-5 w-5 text-gray-200 group-hover:text-primary transition-colors absolute end-4 top-1/2 -translate-y-1/2 rtl:rotate-180" />
@@ -552,11 +552,11 @@ const CompanyProfile = () => {
                 </div>
  
                 {cataloguesLoading ? (
-                  <div className="py-12 text-center text-gray-400 font-bold uppercase tracking-widest text-xs">{t('company.cataloguesLoading')}</div>
+                  <div className="py-12 text-center text-gray-500 font-bold uppercase tracking-widest text-xs">{t('company.cataloguesLoading')}</div>
                 ) : catalogues.length === 0 ? (
-                  <div className="py-12 text-center text-gray-400 border border-dashed border-gray-200 rounded-xl bg-gray-50/20">
+                  <div className="py-12 text-center text-gray-500 border border-dashed border-gray-200 rounded-xl bg-gray-50/20">
                     <BookOpen className="h-8 w-8 mx-auto text-gray-300 mb-3" />
-                    <p className="text-sm font-bold uppercase tracking-widest">{t('company.noCatalogues')}</p>
+                    <p className="text-sm font-bold tracking-widest">{t('company.noCatalogues')}</p>
                     <p className="text-xs text-gray-500 mt-1">{t('company.noCataloguesText')}</p>
                   </div>
                 ) : (
@@ -599,11 +599,11 @@ const CompanyProfile = () => {
                   </div>
  
                   {articlesLoading ? (
-                    <div className="py-12 text-center text-gray-400 font-bold uppercase tracking-widest text-xs">{t('company.loading')}</div>
+                    <div className="py-12 text-center text-gray-500 font-bold uppercase tracking-widest text-xs">{t('company.loading')}</div>
                   ) : articles.length === 0 ? (
-                    <div className="py-12 text-center text-gray-400 border border-dashed border-gray-200 rounded-xl bg-gray-50/20">
+                    <div className="py-12 text-center text-gray-500 border border-dashed border-gray-200 rounded-xl bg-gray-50/20">
                       <FileText className="h-8 w-8 mx-auto text-gray-300 mb-3" />
-                      <p className="text-sm font-bold uppercase tracking-widest">{t('company.noNews')}</p>
+                      <p className="text-sm font-bold tracking-widest">{t('company.noNews')}</p>
                     </div>
                   ) : (
                     <div className="space-y-6">
@@ -624,13 +624,13 @@ const CompanyProfile = () => {
                           </div>
                           <div className="p-5 flex-1 flex flex-col justify-between space-y-3 bg-white">
                             <div>
-                              <span className="text-[10px] font-black uppercase text-secondary tracking-widest block mb-1">
+                              <span className="text-xs font-black uppercase text-secondary tracking-widest block mb-1">
                                 {formatDate(article.created_at)}
                               </span>
                               <h4 className="font-bold text-primary text-sm group-hover:text-secondary transition-colors line-clamp-2">{article.title}</h4>
                               <p className="text-xs text-gray-500 font-medium line-clamp-2 mt-1 leading-relaxed">{article.content}</p>
                             </div>
-                            <span className="text-[11px] font-bold text-primary group-hover:text-secondary transition-colors inline-flex items-center gap-1">
+                            <span className="text-xs font-bold text-primary group-hover:text-secondary transition-colors inline-flex items-center gap-1">
                               <span>{t('company.readMore')}</span>
                               <ChevronRight className="h-3.5 w-3.5 rtl:rotate-180" />
                             </span>
@@ -652,11 +652,11 @@ const CompanyProfile = () => {
                   </div>
 
                   {eventsLoading ? (
-                    <div className="py-12 text-center text-gray-400 font-bold uppercase tracking-widest text-xs">{t('company.loading')}</div>
+                    <div className="py-12 text-center text-gray-500 font-bold uppercase tracking-widest text-xs">{t('company.loading')}</div>
                   ) : events.length === 0 ? (
-                    <div className="py-12 text-center text-gray-400 border border-dashed border-gray-200 rounded-xl bg-gray-50/20">
+                    <div className="py-12 text-center text-gray-500 border border-dashed border-gray-200 rounded-xl bg-gray-50/20">
                       <Calendar className="h-8 w-8 mx-auto text-gray-300 mb-3" />
-                      <p className="text-sm font-bold uppercase tracking-widest">{t('company.noEvents')}</p>
+                      <p className="text-sm font-bold tracking-widest">{t('company.noEvents')}</p>
                     </div>
                   ) : (
                     <div className="space-y-4">
@@ -665,15 +665,15 @@ const CompanyProfile = () => {
                           <div className="flex gap-3 items-start">
                             <div className="w-12 h-12 rounded-lg bg-secondary/10 text-secondary border border-secondary/20 flex flex-col items-center justify-center font-black flex-shrink-0">
                               <span className="text-base leading-none">{new Date(evt.date).getDate()}</span>
-                              <span className="text-[9px] uppercase leading-none tracking-wider mt-0.5">
+                              <span className="text-xs uppercase leading-none tracking-wider mt-0.5">
                                 {new Date(evt.date).toLocaleDateString(currentLocale(), { month: 'short' })}
                               </span>
                             </div>
                             <div className="space-y-0.5">
-                              <span className="inline-block bg-success/10 text-success text-[9px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wider">{evt.status}</span>
+                              <span className="inline-block bg-success/10 text-success text-xs font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wider">{evt.status}</span>
                               <h4 className="font-bold text-primary text-sm">{evt.title}</h4>
                               <p className="text-xs text-gray-500 font-medium leading-relaxed line-clamp-2">{evt.description}</p>
-                              <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-[10px] text-gray-400 font-bold mt-1.5">
+                              <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-gray-500 font-bold mt-1.5">
                                 <span className="flex items-center gap-0.5"><MapPin className="h-3 w-3" /> {evt.location}</span>
                               </div>
                             </div>
@@ -711,7 +711,7 @@ const CompanyProfile = () => {
                       />
                     ))}
                   </div>
-                  <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">{t('company.averageRating')}</p>
+                  <p className="text-xs font-bold text-gray-500 uppercase tracking-wider">{t('company.averageRating')}</p>
                 </div>
 
                 <div className="col-span-2 space-y-2 md:ps-4">
@@ -724,7 +724,7 @@ const CompanyProfile = () => {
                         <div className="flex-1 h-2.5 bg-gray-200 rounded-full overflow-hidden mx-3">
                           <div className="h-full bg-yellow-500 rounded-full" style={{ width: `${pct}%` }}></div>
                         </div>
-                        <span className="w-8 text-end font-bold text-gray-400">{count}</span>
+                        <span className="w-8 text-end font-bold text-gray-500">{count}</span>
                       </div>
                     );
                   })}
@@ -763,7 +763,7 @@ const CompanyProfile = () => {
                   <div className="bg-gray-50/30 p-6 md:p-8 rounded-xl border border-gray-100/80 relative animate-in fade-in slide-in-from-top-4 duration-300">
                     <button 
                       onClick={() => setShowReviewForm(false)}
-                      className="absolute top-4 end-4 text-gray-400 hover:text-gray-600 transition-colors"
+                      className="absolute top-4 end-4 text-gray-500 hover:text-gray-600 transition-colors"
                       title={t('company.close')}
                       aria-label={t('company.close')}
                     >
@@ -772,9 +772,9 @@ const CompanyProfile = () => {
                     
                     {user ? (
                       <form onSubmit={handleSubmitReview} className="space-y-4">
-                        <h4 className="font-bold text-primary text-sm uppercase tracking-wider mb-2">{t('company.leaveReview')}</h4>
+                        <h4 className="font-bold text-primary text-sm tracking-wider mb-2">{t('company.leaveReview')}</h4>
                         <div>
-                          <label className="block text-xs font-black uppercase tracking-wider text-gray-400 mb-2">{t('company.yourRating')}</label>
+                          <label className="block text-xs font-black uppercase tracking-wider text-gray-500 mb-2">{t('company.yourRating')}</label>
                           <div className="flex space-x-2">
                             {[1, 2, 3, 4, 5].map((star) => {
                               const active = hoveredRating !== null ? star <= hoveredRating : star <= newRating;
@@ -800,7 +800,7 @@ const CompanyProfile = () => {
                         </div>
 
                         <div>
-                          <label htmlFor="review-comment" className="block text-xs font-black uppercase tracking-wider text-gray-400 mb-2">{t('company.yourComment')}</label>
+                          <label htmlFor="review-comment" className="block text-xs font-black uppercase tracking-wider text-gray-500 mb-2">{t('company.yourComment')}</label>
                           <textarea
                             id="review-comment"
                             rows={4}
@@ -844,11 +844,11 @@ const CompanyProfile = () => {
 
                 {/* Liste des avis */}
                 {reviewsLoading ? (
-                  <div className="py-8 text-center text-gray-400 font-bold uppercase tracking-widest text-xs">{t('company.reviewsLoading')}</div>
+                  <div className="py-8 text-center text-gray-500 font-bold uppercase tracking-widest text-xs">{t('company.reviewsLoading')}</div>
                 ) : reviews.length === 0 ? (
-                  <div className="py-12 text-center text-gray-400 border border-dashed border-gray-200 rounded-xl bg-gray-50/20">
+                  <div className="py-12 text-center text-gray-500 border border-dashed border-gray-200 rounded-xl bg-gray-50/20">
                     <Star className="h-8 w-8 mx-auto text-gray-300 mb-3" />
-                    <p className="text-sm font-bold uppercase tracking-widest">{t('company.noReviews')}</p>
+                    <p className="text-sm font-bold tracking-widest">{t('company.noReviews')}</p>
                     <p className="text-xs text-gray-500 mt-1">{t('company.beFirst')}</p>
                   </div>
                 ) : (
@@ -856,15 +856,15 @@ const CompanyProfile = () => {
                     {reviews.map((review) => (
                       <div key={review.id} className="py-6 first:pt-0 last:pb-0 flex flex-col md:flex-row gap-4 items-start">
                         {/* Avatar */}
-                        <div className="w-12 h-12 rounded-xl bg-secondary/10 border border-secondary/20 text-secondary flex items-center justify-center font-black text-lg uppercase flex-shrink-0 shadow-sm">
+                        <div className="w-12 h-12 rounded-xl bg-secondary/10 border border-secondary/20 text-secondary flex items-center justify-center font-black text-lg flex-shrink-0 shadow-sm">
                           {review.user?.name ? review.user.name.charAt(0) : '?'}
                         </div>
                         {/* Content */}
                         <div className="flex-1 space-y-2">
                           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
                             <div>
-                              <h4 className="font-bold text-primary text-sm uppercase">{review.user?.name || t('company.anonymousUser')}</h4>
-                              <p className="text-[10px] font-bold text-gray-400 tracking-wider">
+                              <h4 className="font-bold text-primary text-sm">{review.user?.name || t('company.anonymousUser')}</h4>
+                              <p className="text-xs font-bold text-gray-500 tracking-wider">
                                 {new Date(review.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
                               </p>
                             </div>

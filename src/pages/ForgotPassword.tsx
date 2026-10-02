@@ -51,10 +51,10 @@ const ForgotPassword = () => {
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="max-w-md w-full bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden"
+        className="max-w-md w-full bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden"
       >
         <div className="p-8">
-          <Link to="/login" className="inline-flex items-center text-sm font-bold text-gray-400 hover:text-primary transition-colors mb-8">
+          <Link to="/login" className="inline-flex items-center text-sm font-bold text-gray-500 hover:text-primary transition-colors mb-8">
             <ArrowLeft className="h-4 w-4 me-2 rtl:rotate-180" />
             {t('auth.forgot.back')}
           </Link>
@@ -87,7 +87,7 @@ const ForgotPassword = () => {
               <div>
                 <label htmlFor="forgot-email" className="block text-sm font-semibold text-gray-700 mb-2">{t('auth.email')}</label>
                 <div className="relative">
-                  <Mail className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5" />
+                  <Mail className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-500 h-5 w-5" />
                   <input 
                     id="forgot-email"
                     type="email" 

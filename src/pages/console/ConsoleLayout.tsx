@@ -114,7 +114,7 @@ export default function ConsoleLayout({ state }: { state: any }) {
             <ShieldCheck className="h-5 w-5 text-secondary" />
           </div>
           <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">Console admin</p>
+            <p className="text-xs font-black uppercase tracking-wider text-white/40">Console admin</p>
             <p className="text-xs font-black uppercase text-white">Algeria Industry</p>
           </div>
         </div>
@@ -122,7 +122,7 @@ export default function ConsoleLayout({ state }: { state: any }) {
         <div className="space-y-8">
           {MENU.map((section) => (
             <div key={section.title}>
-              <p className="text-[9px] font-black text-white/30 uppercase tracking-[0.3em] px-4 mb-3">{section.title}</p>
+              <p className="text-xs font-black text-white/30 uppercase tracking-wider px-4 mb-3">{section.title}</p>
               <div className="space-y-1">
                 {section.items.map((item) => {
                   const count = item.pendingKey && pending ? Number(pending[item.pendingKey] || 0) : 0;
@@ -133,14 +133,14 @@ export default function ConsoleLayout({ state }: { state: any }) {
                       onClick={() => { setActiveTab(item.id); setMobileOpen(false); }}
                       aria-current={active ? 'page' : undefined}
                       className={cn(
-                        'w-full flex items-center gap-3 px-4 py-3 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all text-start',
+                        'w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-wider transition-all text-start',
                         active ? 'bg-secondary text-white shadow-lg' : 'text-white/50 hover:bg-white/[0.04] hover:text-white'
                       )}
                     >
                       <item.icon className={cn('h-4 w-4 shrink-0', active ? 'text-white' : 'text-white/30')} />
                       <span className="flex-1 truncate">{item.name}</span>
                       {count > 0 && (
-                        <span className={cn('min-w-[20px] h-5 px-1.5 rounded-full text-[10px] flex items-center justify-center', active ? 'bg-white text-secondary' : 'bg-secondary text-white')}>
+                        <span className={cn('min-w-[20px] h-5 px-1.5 rounded-full text-xs flex items-center justify-center', active ? 'bg-white text-secondary' : 'bg-secondary text-white')}>
                           {count}
                         </span>
                       )}
@@ -154,12 +154,12 @@ export default function ConsoleLayout({ state }: { state: any }) {
       </div>
 
       <div className="p-6 border-t border-white/5 space-y-3">
-        <Link to="/" className="w-full flex items-center justify-center gap-2 py-3 text-white/50 hover:text-white text-[10px] font-black uppercase tracking-widest rounded-xl border border-white/5">
+        <Link to="/" className="w-full flex items-center justify-center gap-2 py-3 text-white/50 hover:text-white text-xs font-black uppercase tracking-widest rounded-xl border border-white/5">
           <ExternalLink className="h-4 w-4" /> Voir le site
         </Link>
         <button
           onClick={handleLogout}
-          className="w-full flex items-center justify-center gap-2 py-3 text-white/50 hover:text-error text-[10px] font-black uppercase tracking-widest rounded-xl border border-white/5 hover:bg-error/10"
+          className="w-full flex items-center justify-center gap-2 py-3 text-white/50 hover:text-error text-xs font-black uppercase tracking-widest rounded-xl border border-white/5 hover:bg-error/10"
         >
           <LogOut className="h-4 w-4" /> Déconnexion
         </button>
@@ -190,22 +190,22 @@ export default function ConsoleLayout({ state }: { state: any }) {
                 <Menu className="h-5 w-5" />
               </button>
               <div className="min-w-0">
-                <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Console admin</p>
-                <h1 className="text-sm font-black uppercase text-primary truncate">{activeItem?.name || "Vue d'ensemble"}</h1>
+                <p className="text-xs font-black uppercase tracking-widest text-gray-500">Console admin</p>
+                <h1 className="text-sm font-black text-primary truncate">{activeItem?.name || "Vue d'ensemble"}</h1>
               </div>
             </div>
 
             <div className="flex items-center gap-3">
               {totalPending > 0 && (
-                <span className="hidden sm:inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-orange-50 text-orange-600 text-[10px] font-black uppercase tracking-widest">
+                <span className="hidden sm:inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-orange-50 text-orange-600 text-xs font-black uppercase tracking-widest">
                   {totalPending} tâche{totalPending > 1 ? 's' : ''} en attente
                 </span>
               )}
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-primary text-white flex items-center justify-center font-black text-sm">{initials}</div>
                 <div className="hidden sm:block leading-tight">
-                  <p className="text-[11px] font-black text-primary">{user?.name}</p>
-                  <p className="text-[10px] text-gray-500">{user?.email}</p>
+                  <p className="text-xs font-black text-primary">{user?.name}</p>
+                  <p className="text-xs text-gray-500">{user?.email}</p>
                 </div>
               </div>
             </div>

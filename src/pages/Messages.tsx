@@ -164,7 +164,7 @@ export default function Messages() {
         >
           <div className="flex items-center space-x-3">
             <File className="h-4 w-4" />
-            <span className="text-[10px] font-black uppercase truncate max-w-[150px]">{fileName}</span>
+            <span className="text-xs font-black uppercase truncate max-w-[150px]">{fileName}</span>
           </div>
           <ArrowUpRight className="h-3 w-3 opacity-50 group-hover:opacity-100 transition-all" />
         </a>
@@ -186,10 +186,10 @@ export default function Messages() {
       animate={{ opacity: 1 }}
       className="flex flex-col lg:flex-row gap-6 h-[700px]"
     >
-      <div className="w-full lg:w-96 bg-white border border-gray-100 rounded-[32px] overflow-hidden flex flex-col">
+      <div className="w-full lg:w-96 bg-white border border-gray-100 rounded-2xl overflow-hidden flex flex-col">
         <div className="p-6 border-b border-gray-50 bg-gray-50/50">
           <div className="relative">
-            <Search className="absolute start-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Search className="absolute start-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
             <input 
               type="search" 
               value={filter}
@@ -202,12 +202,12 @@ export default function Messages() {
         </div>
         
         <div className="flex-1 overflow-y-auto no-scrollbar">
-          {isLoading && <div className="p-8 text-center text-gray-400 text-sm">{t('messages.loading')}</div>}
+          {isLoading && <div className="p-8 text-center text-gray-500 text-sm">{t('messages.loading')}</div>}
           {conversations.length === 0 && !isLoading && (
-            <div className="p-8 text-center text-gray-400 text-sm">{t('messages.empty')}</div>
+            <div className="p-8 text-center text-gray-500 text-sm">{t('messages.empty')}</div>
           )}
           {conversations.length > 0 && visibleConversations.length === 0 && (
-            <div className="p-8 text-center text-gray-400 text-sm">{t('messages.noMatch')}</div>
+            <div className="p-8 text-center text-gray-500 text-sm">{t('messages.noMatch')}</div>
           )}
           {visibleConversations.map((c) => (
             <button 
@@ -228,11 +228,11 @@ export default function Messages() {
                   <p className={cn("text-xs font-black uppercase tracking-tight truncate", selectedContact === c.id ? "text-white" : "text-primary")}>
                     {c.name}
                   </p>
-                  <span className={cn("text-[9px] font-bold", selectedContact === c.id ? "text-white/60" : "text-gray-400")}>
+                  <span className={cn("text-xs font-bold", selectedContact === c.id ? "text-white/60" : "text-gray-500")}>
                     {c.lastMessage.time}
                   </span>
                 </div>
-                <p className={cn("text-[10px] font-medium truncate", selectedContact === c.id ? "text-white/80" : "text-gray-500")}>
+                <p className={cn("text-xs font-medium truncate", selectedContact === c.id ? "text-white/80" : "text-gray-500")}>
                   {c.lastMessage.text}
                 </p>
               </div>
@@ -241,7 +241,7 @@ export default function Messages() {
         </div>
       </div>
 
-      <div className="flex-1 bg-white border border-gray-100 rounded-[32px] overflow-hidden flex flex-col shadow-xl">
+      <div className="flex-1 bg-white border border-gray-100 rounded-2xl overflow-hidden flex flex-col shadow-xl">
         {selectedContact ? (
           <>
             <div className="p-6 border-b border-gray-50 flex items-center justify-between">
@@ -262,11 +262,11 @@ export default function Messages() {
                 <div key={m.id} className={cn("flex space-x-4 max-w-[80%]", m.sender === 'me' ? "flex-row-reverse space-x-reverse ms-auto" : "")}>
                   <div className={cn("w-8 h-8 rounded-lg shrink-0", m.sender === 'me' ? "bg-secondary" : "bg-gray-200")} />
                   <div className={cn(
-                    "p-4 rounded-2xl text-[11px] font-medium leading-relaxed shadow-sm min-w-[120px]",
+                    "p-4 rounded-2xl text-xs font-medium leading-relaxed shadow-sm min-w-[120px]",
                     m.sender === 'me' ? "bg-primary text-white rounded-tr-none" : "bg-white text-gray-600 rounded-tl-none border border-gray-100"
                   )}>
                     {renderMessageContent(m.text)}
-                    <p className={cn("text-[8px] font-bold mt-2 uppercase opacity-40", m.sender === 'me' ? "text-end" : "")}>{m.time}</p>
+                    <p className={cn("text-xs font-bold mt-2 uppercase opacity-40", m.sender === 'me' ? "text-end" : "")}>{m.time}</p>
                   </div>
                 </div>
               ))}
@@ -291,7 +291,7 @@ export default function Messages() {
                     title={t('messages.attach')}
                     className={cn("p-4 bg-gray-50 rounded-2xl cursor-pointer hover:bg-gray-100 transition-colors flex items-center justify-center", isUploading && "opacity-50 pointer-events-none")}
                   >
-                    {isUploading ? <Loader2 className="h-5 w-5 text-gray-400 animate-spin" /> : <Paperclip className="h-5 w-5 text-gray-400" />}
+                    {isUploading ? <Loader2 className="h-5 w-5 text-gray-500 animate-spin" /> : <Paperclip className="h-5 w-5 text-gray-500" />}
                   </label>
                 </div>
                 <input 
@@ -315,9 +315,9 @@ export default function Messages() {
             </div>
           </>
         ) : (
-          <div className="flex-1 flex items-center justify-center flex-col text-gray-400">
+          <div className="flex-1 flex items-center justify-center flex-col text-gray-500">
             <Search className="h-12 w-12 mb-4 opacity-20" />
-            <p className="text-sm font-bold uppercase tracking-widest">{t('messages.select')}</p>
+            <p className="text-sm font-bold tracking-widest">{t('messages.select')}</p>
           </div>
         )}
       </div>

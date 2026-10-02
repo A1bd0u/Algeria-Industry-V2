@@ -45,18 +45,18 @@ const AdSpace: React.FC<AdSpaceProps> = ({
         />
       ) : (
         <div className="w-full h-full bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col items-center justify-center p-6 text-center">
-          <div className="bg-white/80 backdrop-blur-sm px-3 py-1 rounded-full text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">
+          <div className="bg-white/80 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">
             Espace Publicitaire
           </div>
           {title && <h4 className="text-primary font-bold mb-1">{title}</h4>}
-          {description && <p className="text-xs text-gray-400 line-clamp-2">{description}</p>}
+          {description && <p className="text-xs text-gray-500 line-clamp-2">{description}</p>}
         </div>
       )}
       
       {/* Overlay info */}
       <div className="absolute top-2 end-2 flex space-x-1">
         {isSponsor && (
-          <span className="bg-black/20 backdrop-blur-md text-[8px] text-white px-2 py-0.5 rounded-full font-bold uppercase tracking-tighter">
+          <span className="bg-black/20 backdrop-blur-md text-xs text-white px-2 py-0.5 rounded-full font-bold uppercase tracking-tighter">
             Sponsorisé
           </span>
         )}
@@ -67,7 +67,7 @@ const AdSpace: React.FC<AdSpaceProps> = ({
       
       {/* Ad Label */}
       <div className="absolute bottom-2 start-2">
-        <div className="flex items-center space-x-1 text-[8px] text-white/40 bg-black/5 px-1.5 py-0.5 rounded">
+        <div className="flex items-center space-x-1 text-xs text-white/40 bg-black/5 px-1.5 py-0.5 rounded">
           <Info className="h-2 w-2" />
           <span>Annonce</span>
         </div>

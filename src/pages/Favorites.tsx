@@ -63,18 +63,18 @@ const Favorites = () => {
             className="flex items-center space-x-2 text-secondary mb-4"
           >
             <Heart className="h-4 w-4" />
-            <span className="text-[10px] font-black uppercase tracking-widest">{t('favorites.eyebrow')}</span>
+            <span className="text-xs font-black uppercase tracking-widest">{t('favorites.eyebrow')}</span>
           </motion.div>
-          <h1 className="text-4xl md:text-5xl font-black text-primary uppercase italic mb-6">{t('favorites.title')}</h1>
+          <h1 className="text-4xl md:text-5xl font-black text-primary mb-6">{t('favorites.title')}</h1>
           <p className="text-gray-500 font-medium max-w-2xl">
             {t('favorites.subtitle')}
           </p>
         </div>
 
         {favorites.length === 0 ? (
-          <div className="bg-white rounded-3xl p-16 text-center shadow-sm border border-gray-100 flex flex-col items-center">
+          <div className="bg-white rounded-2xl p-16 text-center shadow-sm border border-gray-100 flex flex-col items-center">
             <Heart className="h-16 w-16 text-gray-200 mb-6" />
-            <h2 className="text-xl font-black text-primary uppercase italic mb-2">{t('favorites.emptyTitle')}</h2>
+            <h2 className="text-xl font-black text-primary mb-2">{t('favorites.emptyTitle')}</h2>
             <p className="text-gray-500 mb-8 max-w-md mx-auto">
               {t('favorites.emptyText')}
             </p>
@@ -89,7 +89,7 @@ const Favorites = () => {
                 key={fav.id}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-white p-6 rounded-[32px] border border-gray-100 shadow-sm group hover:shadow-xl transition-all flex flex-col relative"
+                className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm group hover:shadow-xl transition-all flex flex-col relative"
               >
                 <div className="flex justify-between items-start mb-6">
                   <div className="flex items-center space-x-4">
@@ -103,9 +103,9 @@ const Favorites = () => {
                       </div>
                     )}
                     <div>
-                      <h4 className="text-lg font-black text-primary uppercase italic line-clamp-1">{fav.name || `Favori (${fav.reference_id || fav.item_id.substring(0,8)})`}</h4>
-                      <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">{fav.category || fav.item_type}</p>
-                      <p className="text-[10px] font-mono text-gray-400 uppercase mt-1 tracking-widest">
+                      <h4 className="text-lg font-black text-primary line-clamp-1">{fav.name || `Favori (${fav.reference_id || fav.item_id.substring(0,8)})`}</h4>
+                      <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">{fav.category || fav.item_type}</p>
+                      <p className="text-xs font-mono text-gray-500 uppercase mt-1 tracking-widest">
                          {fav.reference_id ? `REF: ${fav.reference_id}` : `ID: ${fav.item_id.substring(0,8)}`}
                       </p>
                     </div>
@@ -115,7 +115,7 @@ const Favorites = () => {
                 <div className="mt-auto pt-4 flex gap-3">
                   <Link 
                     to={fav.item_type === 'product' ? `/products/${fav.item_id}` : `/directory/${fav.item_id}`}
-                    className="flex-1 text-center bg-gray-50 text-primary py-3 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-gray-100 transition-colors"
+                    className="flex-1 text-center bg-gray-50 text-primary py-3 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-gray-100 transition-colors"
                   >
                     {t('favorites.details')}
                   </Link>

@@ -1,10 +1,11 @@
 import type React from 'react';
-import { Building2, ChevronRight, Mail, MapPin, Phone } from 'lucide-react';
+import { ChevronRight, Mail, MapPin, Phone } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { cn } from '../lib/utils';
 import { SUPPORT, telHref } from '../config/site';
 import { OPEN_COOKIE_SETTINGS_EVENT } from './CookieBanner';
+import Logo from './ui/Logo';
 
 const FooterLink = ({ to, children, accent = false }: { to: string; children: React.ReactNode; accent?: boolean }) => (
   <li>
@@ -18,7 +19,7 @@ const FooterLink = ({ to, children, accent = false }: { to: string; children: Re
 const FooterTitle = ({ children }: { children: React.ReactNode }) => (
   <div className="flex items-center gap-2 mb-8">
     <div className="w-4 h-[2px] bg-secondary" />
-    <h4 className="text-xs font-black uppercase tracking-[0.3em] text-white">{children}</h4>
+    <h4 className="text-xs font-black uppercase tracking-wider text-white">{children}</h4>
   </div>
 );
 
@@ -34,23 +35,15 @@ const Footer = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-12 md:gap-16 mb-20">
           <div>
-            <div className="flex items-center gap-3 mb-8">
-              <div className="bg-secondary p-1.5 rounded-sm">
-                <Building2 className="h-6 w-6 text-white" />
-              </div>
-              <div className="flex flex-col">
-                <span className="text-xl font-black tracking-tighter leading-none">ALGERIA</span>
-                <span className="text-xl font-black tracking-tighter leading-none text-secondary">INDUSTRY</span>
-              </div>
-            </div>
-            <p className="text-gray-400 text-sm leading-relaxed">
+            <Logo className="mb-8" />
+            <p className="text-gray-500 text-sm leading-relaxed">
               {t('footer.about_text')}
             </p>
           </div>
 
           <div>
             <FooterTitle>{t('footer.platform')}</FooterTitle>
-            <ul className="space-y-4 text-[11px] font-bold uppercase tracking-wider text-gray-400">
+            <ul className="space-y-4 text-xs font-bold uppercase tracking-wider text-gray-500">
               <FooterLink to="/directory">{t('nav.suppliers')}</FooterLink>
               <FooterLink to="/products">{t('nav.products')}</FooterLink>
               <FooterLink to="/catalogues">{t('nav.catalogues')}</FooterLink>
@@ -63,7 +56,7 @@ const Footer = () => {
 
           <div>
             <FooterTitle>{t('nav.resources')}</FooterTitle>
-            <ul className="space-y-4 text-[11px] font-bold uppercase tracking-wider text-gray-400">
+            <ul className="space-y-4 text-xs font-bold uppercase tracking-wider text-gray-500">
               <FooterLink to="/resources">{t('footer.resourceCenter')}</FooterLink>
               <FooterLink to="/blog">{t('nav.news')}</FooterLink>
               <FooterLink to="/events">{t('nav.events')}</FooterLink>
@@ -73,7 +66,7 @@ const Footer = () => {
 
           <div>
             <FooterTitle>{t('footer.contactTitle')}</FooterTitle>
-            <ul className="space-y-5 text-[11px] font-bold uppercase tracking-wider text-gray-400">
+            <ul className="space-y-5 text-xs font-bold uppercase tracking-wider text-gray-500">
               {SUPPORT.phone && (
                 <li className="flex items-center gap-4">
                   <Phone className="h-4 w-4 text-secondary shrink-0" />
@@ -94,7 +87,7 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="border-t border-white/5 pt-10 flex flex-col md:flex-row justify-between items-center gap-6 text-[10px] font-bold uppercase tracking-widest text-gray-500">
+        <div className="border-t border-white/5 pt-10 flex flex-col md:flex-row justify-between items-center gap-6 text-xs font-bold uppercase tracking-widest text-gray-500">
           <p>© {year} Algeria Industry</p>
           <div className="flex flex-wrap justify-center gap-x-8 gap-y-3">
             <Link to="/terms" className="hover:text-white transition-colors">{t('footer.legal')}</Link>

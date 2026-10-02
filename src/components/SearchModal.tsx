@@ -101,10 +101,10 @@ const SearchModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void
             role="dialog"
             aria-modal="true"
             aria-label={t('searchModal.dialog')}
-            className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden relative z-10"
+            className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden relative z-10"
           >
             <form onSubmit={handleSearchSubmit} className="p-6 border-b border-gray-100 flex items-center space-x-4">
-              <Search className="h-6 w-6 text-gray-400" />
+              <Search className="h-6 w-6 text-gray-500" />
               <input 
                 autoFocus
                 type="text" 
@@ -120,14 +120,14 @@ const SearchModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void
                 aria-label={t('searchModal.close')}
                 className="p-2 hover:bg-gray-100 rounded-full transition-colors"
               >
-                <X className="h-5 w-5 text-gray-400" />
+                <X className="h-5 w-5 text-gray-500" />
               </button>
             </form>
 
             <div className="p-4 max-h-[60vh] overflow-y-auto no-scrollbar">
               {query.length === 0 ? (
                 <div className="py-8 px-4">
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-6 px-2">{t('searchModal.suggestions')}</p>
+                  <p className="text-xs font-black uppercase tracking-wider text-gray-500 mb-6 px-2">{t('searchModal.suggestions')}</p>
                   <div className="grid grid-cols-2 gap-3">
                     {['Pompes', 'Solaire', 'Maintenance', 'Tuyauterie'].map((term) => (
                       <button 
@@ -143,7 +143,7 @@ const SearchModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void
                 </div>
               ) : results.length > 0 ? (
                 <div className="space-y-2">
-                   <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-4 px-4">{t('searchModal.results', { count: results.length })}</p>
+                   <p className="text-xs font-black uppercase tracking-wider text-gray-500 mb-4 px-4">{t('searchModal.results', { count: results.length })}</p>
                    {results.map((result) => {
                      const Icon = getIcon(result.type);
                      return (
@@ -158,9 +158,9 @@ const SearchModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void
                          </div>
                          <div className="flex-1">
                             <div className="flex items-center space-x-2">
-                               <span className="text-[8px] font-black uppercase tracking-widest text-secondary">{t(`searchModal.type.${result.type}`, { defaultValue: result.type })}</span>
-                               <span className="text-[8px] font-black uppercase tracking-widest text-gray-400">•</span>
-                               <span className="text-[8px] font-black uppercase tracking-widest text-gray-400">{result.category}</span>
+                               <span className="text-xs font-black uppercase tracking-widest text-secondary">{t(`searchModal.type.${result.type}`, { defaultValue: result.type })}</span>
+                               <span className="text-xs font-black uppercase tracking-widest text-gray-500">•</span>
+                               <span className="text-xs font-black uppercase tracking-widest text-gray-500">{result.category}</span>
                             </div>
                             <p className="text-sm font-bold text-primary group-hover:text-secondary transition-colors">{result.title}</p>
                             <p className="text-xs text-gray-500">{result.subtitle}</p>
@@ -175,7 +175,7 @@ const SearchModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void
                   <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Search className="h-8 w-8 text-gray-300" />
                   </div>
-                  <p className="text-sm font-bold text-gray-400 uppercase tracking-widest">{t('searchModal.noResults', { query })}</p>
+                  <p className="text-sm font-bold text-gray-500 tracking-widest">{t('searchModal.noResults', { query })}</p>
                 </div>
               )}
             </div>
@@ -183,15 +183,15 @@ const SearchModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void
             <div className="p-6 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 <div className="flex items-center space-x-1">
-                   <kbd className="bg-white border border-gray-200 rounded px-1.5 py-0.5 text-[10px] font-bold text-gray-400">ESC</kbd>
-                   <span className="text-[10px] text-gray-400 font-bold uppercase">{t('searchModal.quit')}</span>
+                   <kbd className="bg-white border border-gray-200 rounded px-1.5 py-0.5 text-xs font-bold text-gray-500">ESC</kbd>
+                   <span className="text-xs text-gray-500 font-bold uppercase">{t('searchModal.quit')}</span>
                 </div>
                 <div className="flex items-center space-x-1">
-                   <kbd className="bg-white border border-gray-200 rounded px-1.5 py-0.5 text-[10px] font-bold text-gray-400">↵</kbd>
-                   <span className="text-[10px] text-gray-400 font-bold uppercase">{t('searchModal.select')}</span>
+                   <kbd className="bg-white border border-gray-200 rounded px-1.5 py-0.5 text-xs font-bold text-gray-500">↵</kbd>
+                   <span className="text-xs text-gray-500 font-bold uppercase">{t('searchModal.select')}</span>
                 </div>
               </div>
-              <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Algeria Industry Search v2.0</p>
+              <p className="text-xs text-gray-500 font-bold uppercase tracking-widest">Algeria Industry Search v2.0</p>
             </div>
           </motion.div>
         </div>

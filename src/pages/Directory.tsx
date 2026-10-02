@@ -15,6 +15,7 @@ import { CompanySkeleton } from '../components/Skeleton';
 import SEO from '../components/SEO';
 import { absoluteUrl } from '../config/site';
 import { formatNumber } from '../lib/format';
+import { CompanyAvatar } from '../components/ui/ProductImage';
 
 const Directory = () => {
   const { t, i18n } = useTranslation();
@@ -101,7 +102,7 @@ const Directory = () => {
           sector: c.activity_sector || '',
           location: c.wilaya || '',
           description: c.description || '',
-          logo: c.logo_url || '/favicon.svg',
+          logo: c.logo_url || null,
           verified: c.status === 'approved',
           status: c.status
         }));
@@ -155,9 +156,9 @@ const Directory = () => {
               className="flex items-center space-x-2 text-secondary mb-4"
             >
               <Factory className="h-4 w-4" />
-              <span className="text-[10px] font-black uppercase tracking-[0.4em]">{t('exhibitor.list.label')}</span>
+              <span className="text-xs font-black uppercase tracking-wider">{t('exhibitor.list.label')}</span>
             </motion.div>
-            <h1 className="text-4xl md:text-5xl font-black text-primary uppercase tracking-tighter leading-none mb-6">
+            <h1 className="text-4xl md:text-5xl font-black text-primary tracking-tighter leading-none mb-6">
               {t('exhibitor.list.title')}
             </h1>
             <p className="text-gray-500 font-medium text-lg leading-relaxed">
@@ -168,12 +169,12 @@ const Directory = () => {
           {stats && (
             <div className="flex items-center gap-4 bg-white p-3 rounded-2xl border border-gray-100 shadow-sm">
               <div className="text-end">
-                <p className="text-[10px] font-black text-primary uppercase tracking-widest">{t('home.stats.verifiedCompanies')}</p>
+                <p className="text-xs font-black text-primary uppercase tracking-widest">{t('home.stats.verifiedCompanies')}</p>
                 <p className="text-2xl font-black text-secondary tracking-tighter">{formatNumber(stats.verifiedCompanies)}</p>
               </div>
               <div className="w-px h-8 bg-gray-100" />
               <div className="text-end">
-                <p className="text-[10px] font-black text-primary uppercase tracking-widest">{t('home.stats.publishedProducts')}</p>
+                <p className="text-xs font-black text-primary uppercase tracking-widest">{t('home.stats.publishedProducts')}</p>
                 <p className="text-2xl font-black text-secondary tracking-tighter">{formatNumber(stats.publishedProducts)}</p>
               </div>
             </div>
@@ -184,7 +185,7 @@ const Directory = () => {
         <div className="sticky top-[96px] z-30 bg-transparent py-4 -mt-4 mb-12">
           <div className="flex flex-col lg:flex-row gap-4">
             <div className="flex-1 flex items-center bg-white p-2 rounded-2xl border border-gray-100 shadow-sm focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary transition-all">
-              <Search className="h-5 w-5 text-gray-400 ms-3" />
+              <Search className="h-5 w-5 text-gray-500 ms-3" />
               <input 
                 type="text" 
                 placeholder={t('exhibitor.list.searchPlaceholder')}
@@ -202,16 +203,16 @@ const Directory = () => {
                   className="w-full sm:w-auto flex items-center justify-between bg-white px-5 py-3 rounded-xl border border-gray-100 shadow-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all cursor-pointer text-gray-800 hover:border-gray-300 min-w-[260px] text-start"
                 >
                   <div className="flex flex-col gap-0.5">
-                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{t('exhibitor.list.sector')}</span>
+                    <span className="text-xs text-gray-500 font-bold uppercase tracking-widest">{t('exhibitor.list.sector')}</span>
                     <span className="text-xs font-black uppercase tracking-widest truncate">{activeSector || t('exhibitor.list.allSectors')}</span>
                   </div>
-                  <ChevronDown className={cn("w-4 h-4 text-gray-400 transition-transform ms-4 shrink-0", isSectorOpen && "rotate-180")} />
+                  <ChevronDown className={cn("w-4 h-4 text-gray-500 transition-transform ms-4 shrink-0", isSectorOpen && "rotate-180")} />
                 </button>
                 
                 {isSectorOpen && (
                   <div className="absolute top-full start-0 z-50 w-full mt-2 bg-white rounded-xl shadow-xl border border-gray-100 py-2 overflow-hidden transform origin-top animate-in fade-in slide-in-from-top-2 duration-200">
                     <div className="px-4 py-2">
-                       <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{t('exhibitor.list.sectors')}</span>
+                       <span className="text-xs text-gray-500 font-black uppercase tracking-widest">{t('exhibitor.list.sectors')}</span>
                     </div>
                     {sectors.map(s => (
                       <button
@@ -239,16 +240,16 @@ const Directory = () => {
                   className="w-full sm:w-auto flex items-center justify-between bg-white px-5 py-3 rounded-xl border border-gray-100 shadow-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all cursor-pointer text-gray-800 hover:border-gray-300 min-w-[200px] text-start"
                 >
                   <div className="flex flex-col gap-0.5">
-                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{t('exhibitor.list.wilaya')}</span>
+                    <span className="text-xs text-gray-500 font-bold uppercase tracking-widest">{t('exhibitor.list.wilaya')}</span>
                     <span className="text-xs font-black uppercase tracking-widest truncate">{activeRegion || t('exhibitor.list.allWilayas')}</span>
                   </div>
-                  <ChevronDown className={cn("w-4 h-4 text-gray-400 transition-transform ms-4 shrink-0", isRegionOpen && "rotate-180")} />
+                  <ChevronDown className={cn("w-4 h-4 text-gray-500 transition-transform ms-4 shrink-0", isRegionOpen && "rotate-180")} />
                 </button>
                 
                 {isRegionOpen && (
                   <div className="absolute top-full start-0 z-50 w-full mt-2 bg-white rounded-xl shadow-xl border border-gray-100 py-2 overflow-hidden transform origin-top animate-in fade-in slide-in-from-top-2 duration-200">
                     <div className="px-4 py-2">
-                       <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{t('exhibitor.list.wilayas')}</span>
+                       <span className="text-xs text-gray-500 font-black uppercase tracking-widest">{t('exhibitor.list.wilayas')}</span>
                     </div>
                     {regions.map(r => (
                       <button
@@ -287,7 +288,7 @@ const Directory = () => {
             </div>
           ) : filteredExhibitors.length === 0 ? (
             <div className="col-span-full text-center py-12 bg-white rounded-2xl p-8 border border-gray-100">
-              <p className="text-gray-400 font-bold">{t('exhibitor.list.none')}</p>
+              <p className="text-gray-500 font-bold">{t('exhibitor.list.none')}</p>
             </div>
           ) : (
             paginatedExhibitors.map((exhibitor: any, idx) => (
@@ -300,11 +301,9 @@ const Directory = () => {
               >
                 <div>
                   <div className="flex items-start justify-between mb-5">
-                    <div className="w-16 h-16 rounded-xl bg-gray-50 border border-gray-100 p-2 overflow-hidden group-hover:scale-105 transition-transform">
-                      <img src={exhibitor.logo} alt={exhibitor.name} className="w-full h-full object-contain" />
-                    </div>
+                    <CompanyAvatar src={exhibitor.logo} name={exhibitor.name} className="w-16 h-16 rounded-xl text-lg border border-gray-100" />
                     {exhibitor.verified && (
-                      <span className="flex items-center gap-1 text-success text-[9px] font-black uppercase tracking-widest">
+                      <span className="flex items-center gap-1 text-success text-xs font-black uppercase tracking-widest">
                         <ShieldCheck className="h-4 w-4" />
                         {t('compare.verified')}
                       </span>
@@ -312,14 +311,14 @@ const Directory = () => {
                   </div>
 
                   <div className="mb-5">
-                    {exhibitor.sector && <p className="text-[10px] font-black text-secondary uppercase tracking-[0.2em] mb-1">{exhibitor.sector}</p>}
-                    <h3 className="text-lg font-black text-primary uppercase tracking-tight group-hover:text-secondary transition-colors mb-2 line-clamp-1">
+                    {exhibitor.sector && <p className="text-xs font-black text-secondary uppercase tracking-wider mb-1">{exhibitor.sector}</p>}
+                    <h3 className="text-lg font-black text-primary tracking-tight group-hover:text-secondary transition-colors mb-2 line-clamp-1">
                       {exhibitor.name}
                     </h3>
                     {exhibitor.location && (
-                      <div className="flex items-center text-gray-400 mb-1">
+                      <div className="flex items-center text-gray-500 mb-1">
                         <MapPin className="h-3.5 w-3.5 me-2 shrink-0 text-secondary" />
-                        <span className="text-[10px] font-bold uppercase tracking-widest truncate">{exhibitor.location}</span>
+                        <span className="text-xs font-bold uppercase tracking-widest truncate">{exhibitor.location}</span>
                       </div>
                     )}
                   </div>
@@ -331,11 +330,11 @@ const Directory = () => {
                   )}
 
                   <div className="flex gap-3">
-                    <Link to={`/directory/${generateSlugUrl(exhibitor.name, String(exhibitor.id))}`} className="flex-1 py-3 bg-primary text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-secondary transition-all flex items-center justify-center space-x-2 shadow-lg group">
+                    <Link to={`/directory/${generateSlugUrl(exhibitor.name, String(exhibitor.id))}`} className="flex-1 py-3 bg-primary text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-secondary transition-all flex items-center justify-center space-x-2 shadow-lg group">
                       <span>{t('exhibitor.list.visit')}</span>
                       <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform rtl:rotate-180" />
                     </Link>
-                    <Link to={`/directory/${generateSlugUrl(exhibitor.name, String(exhibitor.id))}`} aria-label={t('common.contact_supplier')} className="w-12 h-12 bg-gray-50 text-gray-400 rounded-xl flex items-center justify-center hover:text-secondary hover:bg-secondary/5 transition-all shrink-0">
+                    <Link to={`/directory/${generateSlugUrl(exhibitor.name, String(exhibitor.id))}`} aria-label={t('common.contact_supplier')} className="w-12 h-12 bg-gray-50 text-gray-500 rounded-xl flex items-center justify-center hover:text-secondary hover:bg-secondary/5 transition-all shrink-0">
                       <MessageSquare className="h-4 w-4" />
                     </Link>
                   </div>
@@ -382,7 +381,7 @@ const Directory = () => {
               return rangeWithDots.map((page, index) => {
                 if (page === '...') {
                   return (
-                    <span key={`dots-${index}`} className="px-3 py-2 text-gray-400 font-bold select-none">
+                    <span key={`dots-${index}`} className="px-3 py-2 text-gray-500 font-bold select-none">
                       .....
                     </span>
                   );
@@ -428,17 +427,17 @@ const Directory = () => {
                style={{ backgroundImage: 'radial-gradient(#fff 1.5px, transparent 1.5px)', backgroundSize: '32px 32px' }} />
           
           <div className="relative z-10 max-w-2xl mx-auto">
-            <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tighter mb-6">
+            <h2 className="text-3xl md:text-5xl font-black tracking-tighter mb-6">
               {t('exhibitor.list.ctaTitle')}
             </h2>
             <p className="text-white/60 font-medium mb-10 text-lg">
               {t('exhibitor.list.ctaText')}
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link to="/register?role=fournisseur" className="btn-secondary px-12 py-5 rounded-2xl text-sm font-black uppercase tracking-widest shadow-2xl">
+              <Link to="/register?role=fournisseur" className="btn-secondary px-12 py-5 rounded-2xl text-sm font-black tracking-widest shadow-2xl">
                 {t('exhibitor.list.ctaButton')}
               </Link>
-              <Link to="/tarifs" className="bg-white/10 border border-white/20 px-12 py-5 rounded-2xl text-sm font-black uppercase tracking-widest hover:bg-white/20 transition-all flex items-center justify-center">
+              <Link to="/tarifs" className="bg-white/10 border border-white/20 px-12 py-5 rounded-2xl text-sm font-black tracking-widest hover:bg-white/20 transition-all flex items-center justify-center">
                 {t('exhibitor.list.ctaPricing')}
               </Link>
             </div>

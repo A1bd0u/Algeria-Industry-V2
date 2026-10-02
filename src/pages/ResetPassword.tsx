@@ -83,7 +83,7 @@ const ResetPassword = () => {
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="max-w-md w-full bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden"
+        className="max-w-md w-full bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden"
       >
         <div className="p-8">
           <div className="text-center mb-10">
@@ -122,7 +122,7 @@ const ResetPassword = () => {
               <div>
                 <label htmlFor="new-password" className="block text-sm font-semibold text-gray-700 mb-2">{t('auth.reset.newPassword')}</label>
                 <div className="relative">
-                  <Lock className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5" />
+                  <Lock className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-500 h-5 w-5" />
                   <input 
                     id="new-password"
                     autoComplete="new-password"
@@ -137,7 +137,7 @@ const ResetPassword = () => {
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     aria-label={showPassword ? t('auth.hidePassword') : t('auth.showPassword')}
-                    className="absolute end-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary transition-colors"
+                    className="absolute end-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-primary transition-colors"
                   >
                     {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                   </button>
@@ -148,7 +148,7 @@ const ResetPassword = () => {
               <div>
                 <label htmlFor="confirm-password" className="block text-sm font-semibold text-gray-700 mb-2">{t('auth.reset.confirmPassword')}</label>
                 <div className="relative">
-                  <Lock className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5" />
+                  <Lock className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-500 h-5 w-5" />
                   <input 
                     id="confirm-password"
                     autoComplete="new-password"

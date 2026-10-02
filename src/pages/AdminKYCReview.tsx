@@ -135,8 +135,8 @@ export default function AdminKYCReview() {
             <ArrowLeft className="h-5 w-5 text-gray-500 rtl:rotate-180" />
           </button>
           <div>
-            <h1 className="text-xl font-black text-primary uppercase tracking-tight">{t('kyc.admin_title')} {kyc.name}</h1>
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">{kyc.company_details?.activity_sector || 'Secteur non spécifié'}</p>
+            <h1 className="text-xl font-black text-primary tracking-tight">{t('kyc.admin_title')} {kyc.name}</h1>
+            <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">{kyc.company_details?.activity_sector || 'Secteur non spécifié'}</p>
           </div>
         </div>
         <div className="flex space-x-3">
@@ -166,7 +166,7 @@ export default function AdminKYCReview() {
           <div className="max-w-2xl mx-auto space-y-10">
             {/* Company Info */}
             <section>
-              <h2 className="text-sm font-black text-gray-400 uppercase tracking-widest mb-6 flex items-center">
+              <h2 className="text-sm font-black text-gray-500 tracking-widest mb-6 flex items-center">
                 <Building2 className="h-4 w-4 me-2" />
                 Informations de l'entreprise
               </h2>
@@ -198,7 +198,7 @@ export default function AdminKYCReview() {
 
             {/* Submitter Info */}
             <section>
-              <h2 className="text-sm font-black text-gray-400 uppercase tracking-widest mb-6 flex items-center">
+              <h2 className="text-sm font-black text-gray-500 tracking-widest mb-6 flex items-center">
                 <User className="h-4 w-4 me-2" />
                 Soumis par
               </h2>
@@ -216,7 +216,7 @@ export default function AdminKYCReview() {
 
             {/* Documents List */}
             <section>
-              <h2 className="text-sm font-black text-gray-400 uppercase tracking-widest mb-6 flex items-center">
+              <h2 className="text-sm font-black text-gray-500 tracking-widest mb-6 flex items-center">
                 <FileText className="h-4 w-4 me-2" />
                 Documents fournis
               </h2>
@@ -241,7 +241,7 @@ export default function AdminKYCReview() {
                         target="_blank" 
                         rel="noopener noreferrer" 
                         onClick={(e) => e.stopPropagation()}
-                        className="p-2 hover:bg-gray-100 rounded-lg text-gray-400 hover:text-primary transition-colors"
+                        className="p-2 hover:bg-gray-100 rounded-lg text-gray-500 hover:text-primary transition-colors"
                       >
                         <Download className="h-4 w-4" />
                       </a>}
@@ -260,7 +260,7 @@ export default function AdminKYCReview() {
           {activeDoc && !activeDoc.file_url ? (
             <div className="flex flex-col items-center justify-center h-full text-gray-500">
               <FileText className="h-16 w-16 mb-4 opacity-20" />
-              <p className="text-sm font-bold uppercase tracking-widest">Document introuvable dans le stockage</p>
+              <p className="text-sm font-bold tracking-widest">Document introuvable dans le stockage</p>
             </div>
           ) : activeDoc ? (
             isPdfUrl(activeDoc.file_url) ? (
@@ -305,9 +305,9 @@ export default function AdminKYCReview() {
               </div>
             )
           ) : (
-            <div className="flex flex-col items-center justify-center h-full text-gray-400">
+            <div className="flex flex-col items-center justify-center h-full text-gray-500">
               <FileText className="h-16 w-16 mb-4 opacity-20" />
-              <p className="text-sm font-bold uppercase tracking-widest">{t('kyc.select_doc')}</p>
+              <p className="text-sm font-bold tracking-widest">{t('kyc.select_doc')}</p>
             </div>
           )}
         </div>
@@ -319,18 +319,18 @@ export default function AdminKYCReview() {
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl"
+            className="bg-white rounded-2xl max-w-md w-full p-8 shadow-2xl"
           >
             <div className="w-12 h-12 bg-red-100 rounded-2xl flex items-center justify-center mb-6">
               <AlertTriangle className="h-6 w-6 text-red-600" />
             </div>
-            <h3 className="text-xl font-black text-primary uppercase tracking-tighter mb-2">{t('kyc.reject')}</h3>
+            <h3 className="text-xl font-black text-primary tracking-tighter mb-2">{t('kyc.reject')}</h3>
             <p className="text-xs text-gray-500 mb-6 font-medium leading-relaxed">
               Veuillez indiquer le motif du refus pour <strong className="text-primary">{kyc.name}</strong>. Ce motif lui sera communiqué par email.
             </p>
             
             <div className="mb-8">
-              <label className="block text-[10px] font-black text-primary uppercase tracking-widest mb-2">{t('kyc.reject_reason')}</label>
+              <label className="block text-xs font-black text-primary uppercase tracking-widest mb-2">{t('kyc.reject_reason')}</label>
               <textarea 
                 value={rejectReason}
                 onChange={(e) => setRejectReason(e.target.value)}

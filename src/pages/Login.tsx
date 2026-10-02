@@ -91,7 +91,7 @@ const Login = () => {
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="max-w-md w-full bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden"
+        className="max-w-md w-full bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden"
       >
         <div className="p-8">
           <div className="text-center mb-10">
@@ -127,7 +127,7 @@ const Login = () => {
                   autoComplete="one-time-code"
                   autoFocus
                   maxLength={useRecovery ? 9 : 6}
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-center text-2xl font-mono tracking-[0.4em] focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-center text-2xl font-mono tracking-wider focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
                   placeholder={useRecovery ? 'xxxx-xxxx' : '000000'}
                 />
               </div>
@@ -158,7 +158,7 @@ const Login = () => {
             <div>
               <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">{t('auth.email')}</label>
               <div className="relative">
-                <Mail className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5" />
+                <Mail className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-500 h-5 w-5" />
                 <input 
                   id="email"
                   type="text"
@@ -178,7 +178,7 @@ const Login = () => {
                 </Link>
               </div>
               <div className="relative">
-                <Lock className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5" />
+                <Lock className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-500 h-5 w-5" />
                 <input 
                   id="password"
                   type={showPassword ? "text" : "password"}
@@ -190,7 +190,7 @@ const Login = () => {
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   aria-label={showPassword ? t('auth.hidePassword') : t('auth.showPassword')}
-                  className="absolute end-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary transition-colors"
+                  className="absolute end-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-primary transition-colors"
                 >
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
@@ -246,7 +246,7 @@ const Login = () => {
             </Link>
           </p>
           <div className="pt-4 border-t border-gray-200">
-             <Link to="/extranet" className="text-[10px] font-black text-gray-400 uppercase tracking-widest hover:text-primary transition-all">
+             <Link to="/extranet" className="text-xs font-black text-gray-500 uppercase tracking-widest hover:text-primary transition-all">
                 {t('auth.login.proConsole')}
              </Link>
           </div>
