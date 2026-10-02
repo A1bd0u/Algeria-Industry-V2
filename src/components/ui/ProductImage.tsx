@@ -6,7 +6,7 @@ import { cn } from '../../lib/utils';
 
 // Visuel d'un produit. Sans photo (ou si elle ne charge pas), on affiche
 // l'icône du groupe de la catégorie sur un fond doux plutôt qu'un logo géant.
-const GROUP_STYLE: Record<string, { icon: React.ElementType; tint: string }> = {
+export const GROUP_STYLE: Record<string, { icon: React.ElementType; tint: string }> = {
   A: { icon: Package, tint: 'bg-amber-50 text-amber-600' },
   B: { icon: Wrench, tint: 'bg-orange-50 text-secondary' },
   C: { icon: Cpu, tint: 'bg-sky-50 text-sky-600' },
