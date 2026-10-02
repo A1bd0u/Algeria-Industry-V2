@@ -1,7 +1,7 @@
 
 -- Initial Migration
 
-CREATE TABLE public.users (
+CREATE TABLE IF NOT EXISTS public.users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name TEXT,
     email TEXT UNIQUE NOT NULL,
@@ -14,7 +14,7 @@ CREATE TABLE public.users (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE TABLE public.companies (
+CREATE TABLE IF NOT EXISTS public.companies (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     reference_id TEXT,
     name TEXT NOT NULL,
@@ -28,7 +28,7 @@ CREATE TABLE public.companies (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE TABLE public.kyc_requests (
+CREATE TABLE IF NOT EXISTS public.kyc_requests (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     company_id UUID REFERENCES public.companies(id),
     user_id UUID REFERENCES public.users(id),
@@ -43,7 +43,7 @@ CREATE TABLE public.kyc_requests (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE TABLE public.kyc_documents (
+CREATE TABLE IF NOT EXISTS public.kyc_documents (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     company_id UUID REFERENCES public.companies(id),
     document_type TEXT,
@@ -54,7 +54,7 @@ CREATE TABLE public.kyc_documents (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE TABLE public.ads (
+CREATE TABLE IF NOT EXISTS public.ads (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     title TEXT,
     type TEXT,
@@ -64,7 +64,7 @@ CREATE TABLE public.ads (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE TABLE public.articles (
+CREATE TABLE IF NOT EXISTS public.articles (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     title TEXT,
     content TEXT,
@@ -74,7 +74,7 @@ CREATE TABLE public.articles (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE TABLE public.catalogues (
+CREATE TABLE IF NOT EXISTS public.catalogues (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     title TEXT,
     description TEXT,
@@ -83,7 +83,7 @@ CREATE TABLE public.catalogues (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE TABLE public.events (
+CREATE TABLE IF NOT EXISTS public.events (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     title TEXT,
     description TEXT,
@@ -94,7 +94,7 @@ CREATE TABLE public.events (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE TABLE public.products (
+CREATE TABLE IF NOT EXISTS public.products (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name TEXT,
     description TEXT,
@@ -105,14 +105,14 @@ CREATE TABLE public.products (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE TABLE public.favorites (
+CREATE TABLE IF NOT EXISTS public.favorites (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID REFERENCES public.users(id),
     product_id UUID REFERENCES public.products(id),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE TABLE public.messages (
+CREATE TABLE IF NOT EXISTS public.messages (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     sender_id UUID REFERENCES public.users(id),
     receiver_id UUID REFERENCES public.users(id),
@@ -121,7 +121,7 @@ CREATE TABLE public.messages (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE TABLE public.tenders (
+CREATE TABLE IF NOT EXISTS public.tenders (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     title TEXT,
     description TEXT,
@@ -132,7 +132,7 @@ CREATE TABLE public.tenders (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE TABLE public.rfqs (
+CREATE TABLE IF NOT EXISTS public.rfqs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     tender_id UUID REFERENCES public.tenders(id),
     user_id UUID REFERENCES public.users(id),

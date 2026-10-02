@@ -42,3 +42,33 @@ jobs:
 
     - name: Run E2E Tests
       run: npm run test:e2e
+
+  migrations:
+    # Les migrations doivent s'installer sur une base neuve ET se rejouer sans
+    # erreur sur une base existante : c'est ce que fait l'intégration Supabase
+    # quand l'historique de la production est vide ou incomplet.
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Replay migrations twice
+      env:
+        PGHOST: localhost
+        PGPORT: 5432
+        PGUSER: postgres
+        PGPASSWORD: postgres
+      run: ./scripts/replay-migrations.sh

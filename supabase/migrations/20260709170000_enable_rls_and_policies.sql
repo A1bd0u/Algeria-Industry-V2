@@ -240,6 +240,7 @@ DROP POLICY IF EXISTS "Allow creator and admin to write rfqs" ON public.rfqs;
 
 CREATE POLICY "Allow creator, receiver and admin to read rfqs" ON public.rfqs 
   FOR SELECT USING (user_id = public.get_current_user_id() OR tender_id IN (SELECT id FROM public.tenders WHERE company_id IN (SELECT id FROM public.companies WHERE owner_id = public.get_current_user_id())) OR public.get_current_user_role() = 'admin');
+DROP POLICY IF EXISTS "Allow creator and admin to write rfqs" ON public.rfqs;
 
 CREATE POLICY "Allow creator and admin to write rfqs" ON public.rfqs 
   FOR ALL USING (user_id = public.get_current_user_id() OR public.get_current_user_role() = 'admin');

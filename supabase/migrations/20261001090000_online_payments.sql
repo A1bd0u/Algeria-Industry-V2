@@ -14,12 +14,22 @@ ALTER TABLE public.subscriptions ADD COLUMN IF NOT EXISTS checkout_created_at TI
 ALTER TABLE public.subscriptions ADD COLUMN IF NOT EXISTS source TEXT NOT NULL DEFAULT 'admin';
 
 ALTER TABLE public.subscriptions DROP CONSTRAINT IF EXISTS subscriptions_source_check;
-ALTER TABLE public.subscriptions ADD CONSTRAINT subscriptions_source_check
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'subscriptions_source_check') THEN
+    ALTER TABLE public.subscriptions ADD CONSTRAINT subscriptions_source_check
   CHECK (source IN ('admin', 'self_service'));
+  END IF;
+END $$;
 
 ALTER TABLE public.subscriptions DROP CONSTRAINT IF EXISTS subscriptions_payment_method_check;
-ALTER TABLE public.subscriptions ADD CONSTRAINT subscriptions_payment_method_check
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'subscriptions_payment_method_check') THEN
+    ALTER TABLE public.subscriptions ADD CONSTRAINT subscriptions_payment_method_check
   CHECK (payment_method IN ('virement', 'cheque', 'gratuit', 'cib_edahabia'));
+  END IF;
+END $$;
 
 CREATE UNIQUE INDEX IF NOT EXISTS idx_subscriptions_checkout_id ON public.subscriptions(checkout_id) WHERE checkout_id IS NOT NULL;
 
