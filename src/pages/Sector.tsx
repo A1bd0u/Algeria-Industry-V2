@@ -7,6 +7,7 @@ import { Skeleton } from '../components/Skeleton';
 import ProductCard, { companyNameOf } from '../components/ui/ProductCard';
 import { absoluteUrl } from '../config/site';
 import { useAdCategories } from '../context/AdTargetingContext';
+import { SectorIcon } from '../components/ui/IndustryIcons';
 import { productCategories, sectorBySlug, sectorPath } from '../data/productCategories';
 import { cn, generateSlugUrl } from '../lib/utils';
 
@@ -65,6 +66,7 @@ const Sector = () => {
               <ChevronRight className="h-3.5 w-3.5 rtl:rotate-180" aria-hidden="true" />
               <span className="text-primary font-medium">{name}</span>
             </nav>
+            <div className="flex items-start justify-between gap-10">
             <div className="max-w-2xl">
               <p className="flex items-center gap-3 text-xs font-bold uppercase tracking-[0.18em] text-gray-500 mb-4">
                 <span className="text-secondary">{t('sector.code', { code: group.id })}</span>
@@ -82,6 +84,10 @@ const Sector = () => {
                   {t('sector.listCompany')}
                 </Link>
               </div>
+            </div>
+            <div className="hidden md:flex h-44 w-44 shrink-0 items-center justify-center rounded-2xl border border-border-tech bg-neutral-bg">
+              <SectorIcon id={group.id} className="h-24 w-24 text-primary" />
+            </div>
             </div>
           </div>
         </section>
@@ -164,8 +170,8 @@ const Sector = () => {
               {productCategories.filter((g) => g.id !== group.id).map((g) => {
                 return (
                   <Link key={g.id} to={sectorPath(g.id)}
-                    className="flex items-baseline gap-3 rounded-lg bg-white border border-border-tech p-3 hover:border-secondary transition-colors">
-                    <span className="text-xs font-bold text-gray-400 tabular-nums">{g.id}</span>
+                    className="flex items-center gap-3 rounded-lg bg-white border border-border-tech p-3 hover:border-secondary transition-colors">
+                    <SectorIcon id={g.id} className="h-7 w-7 shrink-0 text-primary" />
                     <span className="text-sm font-bold text-primary leading-snug">{t(`productCategories.${g.id}`)}</span>
                   </Link>
                 );
