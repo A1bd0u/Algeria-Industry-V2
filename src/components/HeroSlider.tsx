@@ -12,13 +12,16 @@ import { cn } from '../lib/utils';
 // Bandeau publicitaire : annonces publiées depuis la console admin et ciblant
 // la page (groupe de pages et catégories produit). Sans annonce, il présente la
 // plateforme (inscription, offre fondateur, emplacement publicitaire). Grand
-// format sur l'accueil, compact ailleurs.
+// format sur l'accueil, compact ailleurs. Une annonce est soit un modèle
+// (textes posés sur un visuel), soit une bannière image affichée telle quelle.
 
 interface Ad {
   id: string;
   title: string;
   subtitle?: string | null;
   image_url?: string | null;
+  mobile_image_url?: string | null;
+  display_mode?: 'template' | 'banner' | null;
   logo_url?: string | null;
   brand_name?: string | null;
   cta_label?: string | null;
@@ -31,6 +34,8 @@ interface SlideView {
   title: string;
   subtitle?: string;
   image?: string;
+  mobileImage?: string;
+  banner?: boolean;
   logo?: string;
   brand?: string;
   cta: string;
@@ -51,6 +56,40 @@ const trackClick = (adId: string) => {
     // sendBeacon indisponible : repli sur fetch.
   }
   fetch(url, { method: 'POST', keepalive: true }).catch(() => {});
+};
+
+// Bannière image : visuel complet (textes inclus), version mobile facultative,
+// toute la surface est cliquable. Le texte alternatif est le titre de l'annonce.
+const BannerImage: React.FC<{ slide: SlideView; eager: boolean; sponsored: string; onClick: () => void }> = ({
+  slide, eager, sponsored, onClick,
+}) => {
+  const picture = (
+    <picture>
+      {slide.mobileImage && <source media="(max-width: 767px)" srcSet={slide.mobileImage} />}
+      <img
+        src={slide.image}
+        alt={slide.title}
+        className="absolute inset-0 h-full w-full object-cover"
+        loading={eager ? 'eager' : 'lazy'}
+        decoding="async"
+      />
+    </picture>
+  );
+  const badge = (
+    <span className="absolute top-2 start-2 z-10 rounded bg-black/55 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
+      {sponsored}
+    </span>
+  );
+  if (!slide.href) return <>{picture}{badge}</>;
+  return isExternal(slide.href) ? (
+    <a href={slide.href} target="_blank" rel="noopener noreferrer sponsored" onClick={onClick} className="absolute inset-0 block">
+      {picture}{badge}
+    </a>
+  ) : (
+    <Link to={slide.href} onClick={onClick} className="absolute inset-0 block">
+      {picture}{badge}
+    </Link>
+  );
 };
 
 const prefersReducedMotion = () =>
@@ -86,6 +125,8 @@ const HeroSlider: React.FC<{ placement: AdPlacement }> = ({ placement }) => {
         title: ad.title,
         subtitle: ad.subtitle || undefined,
         image: ad.image_url || undefined,
+        mobileImage: ad.mobile_image_url || undefined,
+        banner: ad.display_mode === 'banner' && Boolean(ad.image_url),
         logo: ad.logo_url || undefined,
         brand: ad.brand_name || undefined,
         cta: ad.cta_label || t('slides.learnMore'),
@@ -141,7 +182,14 @@ const HeroSlider: React.FC<{ placement: AdPlacement }> = ({ placement }) => {
     <section
       aria-roledescription="carousel"
       aria-label={t('slides.label')}
-      className={cn('relative w-full overflow-hidden bg-primary', compact ? 'h-[128px] md:h-[112px]' : 'h-[230px] md:h-[240px]')}
+      // Proportions des bannières image : accueil 4:1 (3:2 sur mobile), autres
+      // pages 8:1 (3:1 sur mobile). Voir BANNER_FORMATS.
+      className={cn(
+        'relative w-full overflow-hidden bg-primary',
+        compact
+          ? 'aspect-[3/1] md:aspect-[8/1] md:min-h-[112px] max-h-[260px]'
+          : 'aspect-[3/2] md:aspect-[4/1] md:min-h-[230px] max-h-[520px]',
+      )}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onFocusCapture={() => setHovered(true)}
@@ -161,6 +209,9 @@ const HeroSlider: React.FC<{ placement: AdPlacement }> = ({ placement }) => {
           aria-roledescription="slide"
           aria-label={`${index + 1} / ${count}`}
         >
+          {slide.banner ? (
+            <BannerImage slide={slide} eager={index === 0} sponsored={t('slides.sponsored')} onClick={onCta} />
+          ) : (<>
           {slide.image && (
             <>
               <img
@@ -234,6 +285,7 @@ const HeroSlider: React.FC<{ placement: AdPlacement }> = ({ placement }) => {
               </div>
             )}
           </div>
+          </>)}
         </motion.div>
       </AnimatePresence>
 

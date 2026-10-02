@@ -16,7 +16,7 @@ const PUBLISHED_STATUSES = ['published', 'Actif', 'approuvée', 'Approuvé'];
 // Colonnes publiques : ni user_id ni coordonnées du demandeur.
 const PUBLIC_AD_COLUMNS = 'id, title, type, url, status, created_at';
 // Contenu affiché dans le bandeau de l'accueil.
-const SLIDE_COLUMNS = 'id, title, subtitle, image_url, logo_url, brand_name, cta_label, url, starts_at, ends_at, placements, categories';
+const SLIDE_COLUMNS = 'id, title, subtitle, image_url, mobile_image_url, display_mode, logo_url, brand_name, cta_label, url, starts_at, ends_at, placements, categories';
 const MAX_SLIDES = 8;
 
 const isLive = (ad: { starts_at?: string | null; ends_at?: string | null }, now: number) =>

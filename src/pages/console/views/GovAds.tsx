@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'motion/react';
 import { CheckCircle, ImagePlus, Loader2, Mail, MousePointerClick, Pencil, Phone, Plus, StopCircle, X, XCircle, Zap } from 'lucide-react';
 import { adminFetch, formatDate } from '../adminApi';
-import { AD_PLACEMENTS } from '../../../data/adPlacements';
+import { AD_PLACEMENTS, BANNER_FORMATS } from '../../../data/adPlacements';
 import { productCategories } from '../../../data/productCategories';
 
 const PUBLISHED = ['published', 'Actif', 'approuvée', 'Approuvé'];
@@ -26,7 +26,8 @@ const targetingLabel = (ad: any) => {
 
 const EMPTY_FORM = {
   title: '', subtitle: '', brand_name: '', cta_label: '', url: '',
-  image_url: '', logo_url: '', starts_at: '', ends_at: '', sort_order: 0, company: '',
+  image_url: '', mobile_image_url: '', logo_url: '', starts_at: '', ends_at: '', sort_order: 0, company: '',
+  display_mode: 'banner' as 'template' | 'banner',
   placements: [...AD_PLACEMENTS] as string[], categories: [] as string[],
 };
 type AdForm = typeof EMPTY_FORM;
@@ -43,7 +44,9 @@ const formFromAd = (ad: any): AdForm => ({
   cta_label: ad.cta_label || '',
   url: ad.url || '',
   image_url: ad.image_url || '',
+  mobile_image_url: ad.mobile_image_url || '',
   logo_url: ad.logo_url || '',
+  display_mode: ad.display_mode === 'banner' ? 'banner' : 'template',
   starts_at: toDateInput(ad.starts_at),
   ends_at: toDateInput(ad.ends_at),
   sort_order: ad.sort_order ?? 0,
@@ -67,10 +70,28 @@ async function uploadImage(file: File): Promise<string> {
   return data.url;
 }
 
-function ImageField({ label, hint, value, onChange, onError }: {
+// Dimensions réelles d'une image, pour comparer au format conseillé.
+const readSize = (url: string) => new Promise<[number, number] | null>((resolve) => {
+  const img = new Image();
+  img.onload = () => resolve([img.naturalWidth, img.naturalHeight]);
+  img.onerror = () => resolve(null);
+  img.src = url;
+});
+
+function ImageField({ label, hint, value, onChange, onError, expected }: {
   label: string; hint: string; value: string; onChange: (url: string) => void; onError: (msg: string) => void;
+  expected?: readonly [number, number];
 }) {
   const [busy, setBusy] = useState(false);
+  const [size, setSize] = useState<[number, number] | null>(null);
+  React.useEffect(() => {
+    let alive = true;
+    if (value) readSize(value).then((s) => alive && setSize(s)); else setSize(null);
+    return () => { alive = false; };
+  }, [value]);
+  // Écart de proportions au-delà de 8 % : le visuel sera rogné à l'affichage.
+  const ratioOff = Boolean(size && expected && Math.abs(size[0] / size[1] - expected[0] / expected[1]) / (expected[0] / expected[1]) > 0.08);
+  const tooSmall = Boolean(size && expected && size[0] < expected[0] * 0.6);
   return (
     <div>
       <p className="text-xs font-bold text-gray-600 mb-1">{label}</p>
@@ -94,6 +115,12 @@ function ImageField({ label, hint, value, onChange, onError }: {
         </label>
         <div className="text-xs text-gray-500 space-y-1">
           <p>{hint}</p>
+          {size && (
+            <p className={ratioOff || tooSmall ? 'font-bold text-amber-600' : 'text-emerald-600'}>
+              {size[0]} × {size[1]} px
+              {ratioOff ? ' : proportions différentes, le visuel sera rogné' : tooSmall ? ' : image trop petite, risque de flou' : ' ✓'}
+            </p>
+          )}
           {value && <button type="button" onClick={() => onChange('')} className="text-red-500 font-bold">Retirer</button>}
         </div>
       </div>
@@ -113,6 +140,12 @@ function AdEditor({ ad, onClose, onSaved, showNotify }: {
       [key]: f[key].includes(value) ? f[key].filter((v) => v !== value) : [...f[key], value],
     }));
   const allPages = form.placements.length === AD_PLACEMENTS.length;
+  const banner = form.display_mode === 'banner';
+  // Format de bannière : grand pour l'accueil, compact pour les autres pages.
+  const onHome = form.placements.includes('home');
+  const onInner = form.placements.some((p) => p !== 'home');
+  const format = onHome ? BANNER_FORMATS.home : BANNER_FORMATS.compact;
+  const sizeLabel = (wh: readonly [number, number]) => `${wh[0]} × ${wh[1]} px`;
 
   const save = useMutation({
     mutationFn: () => {
@@ -144,8 +177,48 @@ function AdEditor({ ad, onClose, onSaved, showNotify }: {
           <button type="button" onClick={onClose} aria-label="Fermer" className="p-1 text-gray-500 hover:text-primary"><X className="h-5 w-5" /></button>
         </div>
 
-        {/* Aperçu fidèle au bandeau de l'accueil */}
-        <div className="relative mx-6 mt-6 h-40 overflow-hidden rounded-xl bg-gradient-to-r from-primary to-accent text-white">
+        <div className="mx-6 mt-6 grid grid-cols-2 gap-2 rounded-xl bg-gray-100 p-1 text-sm font-bold" role="radiogroup" aria-label="Type d'annonce">
+          {([
+            ['banner', 'Bannière image', 'Votre visuel PNG/JPG complet, affiché tel quel'],
+            ['template', 'Modèle avec textes', 'Titre, bouton et logo posés sur une photo'],
+          ] as const).map(([mode, label, hint]) => (
+            <button
+              key={mode}
+              type="button"
+              role="radio"
+              aria-checked={form.display_mode === mode}
+              onClick={() => setForm((f) => ({ ...f, display_mode: mode }))}
+              className={`rounded-lg px-3 py-2 text-start transition-colors ${form.display_mode === mode ? 'bg-white text-primary shadow-sm' : 'text-gray-500 hover:text-primary'}`}
+            >
+              {label}
+              <span className="block text-xs font-normal text-gray-500">{hint}</span>
+            </button>
+          ))}
+        </div>
+
+        {banner ? (
+          /* Aperçu de la bannière, aux proportions du site */
+          <div className="mx-6 mt-4 grid grid-cols-1 gap-3 sm:grid-cols-[1fr_auto] items-end">
+            <div>
+              <p className="mb-1 text-xs font-bold text-gray-500">Ordinateur · {sizeLabel(format.desktop)}</p>
+              <div className="relative overflow-hidden rounded-lg bg-gray-100 border border-gray-200" style={{ aspectRatio: `${format.desktop[0]} / ${format.desktop[1]}` }}>
+                {form.image_url
+                  ? <img src={form.image_url} alt="" className="absolute inset-0 h-full w-full object-cover" />
+                  : <span className="absolute inset-0 flex items-center justify-center text-xs text-gray-500">Visuel ordinateur</span>}
+              </div>
+            </div>
+            <div className="w-32">
+              <p className="mb-1 text-xs font-bold text-gray-500">Mobile · {sizeLabel(format.mobile)}</p>
+              <div className="relative overflow-hidden rounded-lg bg-gray-100 border border-gray-200" style={{ aspectRatio: `${format.mobile[0]} / ${format.mobile[1]}` }}>
+                {(form.mobile_image_url || form.image_url)
+                  ? <img src={form.mobile_image_url || form.image_url} alt="" className="absolute inset-0 h-full w-full object-cover" />
+                  : <span className="absolute inset-0 flex items-center justify-center text-xs text-gray-500">Mobile</span>}
+              </div>
+            </div>
+          </div>
+        ) : (
+        /* Aperçu fidèle au bandeau de l'accueil */
+        <div className="relative mx-6 mt-4 h-40 overflow-hidden rounded-xl bg-gradient-to-r from-primary to-accent text-white">
           {form.image_url && (
             <>
               <img src={form.image_url} alt="" className="absolute inset-0 h-full w-full object-cover" />
@@ -166,14 +239,43 @@ function AdEditor({ ad, onClose, onSaved, showNotify }: {
             )}
           </div>
         </div>
+        )}
+
+        {banner && onHome && onInner && (
+          <p className="mx-6 mt-3 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-700">
+            Cette bannière vise l'accueil et d'autres pages : le format de l'accueil sera rogné sur le bandeau compact
+            ({sizeLabel(BANNER_FORMATS.compact.desktop)}). Pour un rendu parfait, créez une annonce par format.
+          </p>
+        )}
 
         <form
           className="grid grid-cols-1 gap-4 p-6 md:grid-cols-2"
           onSubmit={(e) => { e.preventDefault(); save.mutate(); }}
         >
-          <label className="md:col-span-2 text-xs font-bold text-gray-600">Titre *
-            <input required minLength={2} maxLength={120} value={form.title} onChange={set('title')} className={`${field} mt-1`} />
+          <label className="md:col-span-2 text-xs font-bold text-gray-600">{banner ? 'Titre interne et texte alternatif *' : 'Titre *'}
+            <input required minLength={2} maxLength={120} value={form.title} onChange={set('title')} className={`${field} mt-1`}
+              placeholder={banner ? 'Ex. : Compresseurs Atlas -15 % jusqu\'au 30 novembre' : ''} />
+            {banner && <span className="mt-1 block font-normal text-gray-500">Lu par les lecteurs d'écran et affiché si l'image ne charge pas : reprenez le message de la bannière.</span>}
           </label>
+          {banner ? (
+            <>
+              <ImageField label="Bannière ordinateur *" expected={format.desktop}
+                hint={`${sizeLabel(format.desktop)} conseillé. PNG ou JPG, 10 Mo max. Gardez textes et logo au centre.`}
+                value={form.image_url}
+                onChange={(url) => setForm((f) => ({ ...f, image_url: url }))} onError={(m) => showNotify(m, 'error')} />
+              <ImageField label="Bannière mobile (facultatif)" expected={format.mobile}
+                hint={`${sizeLabel(format.mobile)} conseillé. Sans elle, la version ordinateur est recadrée.`}
+                value={form.mobile_image_url}
+                onChange={(url) => setForm((f) => ({ ...f, mobile_image_url: url }))} onError={(m) => showNotify(m, 'error')} />
+              <label className="md:col-span-2 text-xs font-bold text-gray-600">Lien au clic sur la bannière
+                <input maxLength={1000} placeholder="https://… ou /directory/…" value={form.url} onChange={set('url')} className={`${field} mt-1`} />
+              </label>
+              <label className="text-xs font-bold text-gray-600">Annonceur (pour vos statistiques)
+                <input maxLength={80} value={form.brand_name} onChange={set('brand_name')} className={`${field} mt-1`} />
+              </label>
+            </>
+          ) : (
+            <>
           <label className="md:col-span-2 text-xs font-bold text-gray-600">Sous-titre
             <input maxLength={200} value={form.subtitle} onChange={set('subtitle')} className={`${field} mt-1`} />
           </label>
@@ -186,10 +288,12 @@ function AdEditor({ ad, onClose, onSaved, showNotify }: {
           <label className="md:col-span-2 text-xs font-bold text-gray-600">Lien du bouton
             <input maxLength={1000} placeholder="https://… ou /directory/…" value={form.url} onChange={set('url')} className={`${field} mt-1`} />
           </label>
-          <ImageField label="Visuel de fond" hint="Paysage, 1920 × 460 px conseillé (JPG, PNG, WEBP)." value={form.image_url}
+          <ImageField label="Visuel de fond" hint={`Photo paysage, ${sizeLabel(format.desktop)} conseillé (JPG, PNG, WEBP).`} value={form.image_url}
             onChange={(url) => setForm((f) => ({ ...f, image_url: url }))} onError={(m) => showNotify(m, 'error')} />
           <ImageField label="Logo" hint="Fond transparent ou blanc." value={form.logo_url}
             onChange={(url) => setForm((f) => ({ ...f, logo_url: url }))} onError={(m) => showNotify(m, 'error')} />
+            </>
+          )}
           <label className="text-xs font-bold text-gray-600">Début de diffusion
             <input type="date" value={form.starts_at} onChange={set('starts_at')} className={`${field} mt-1`} />
           </label>
@@ -236,7 +340,8 @@ function AdEditor({ ad, onClose, onSaved, showNotify }: {
           <div className="md:col-span-2 flex justify-end gap-3 border-t border-gray-100 pt-4">
             <button type="button" onClick={onClose} className="btn-ghost">Annuler</button>
             {form.placements.length === 0 && <p className="me-auto self-center text-xs font-bold text-red-500">Choisissez au moins une page.</p>}
-            <button type="submit" disabled={save.isPending || form.placements.length === 0} className="btn-primary">
+            {banner && !form.image_url && <p className="me-auto self-center text-xs font-bold text-red-500">Ajoutez la bannière ordinateur.</p>}
+            <button type="submit" disabled={save.isPending || form.placements.length === 0 || (banner && !form.image_url)} className="btn-primary">
               {save.isPending && <Loader2 className="h-4 w-4 animate-spin" />} Enregistrer
             </button>
           </div>
@@ -378,13 +483,15 @@ export default function GovAds({ state }: { state: any }) {
               ) : (
                 <ul className="space-y-3">
                   {active.map((ad: any) => (
-                    <li key={ad.id} className="p-4 border border-gray-100 rounded-2xl flex items-center justify-between gap-3">
+                    <li key={ad.id} className="p-4 border border-gray-100 rounded-2xl flex flex-wrap items-center justify-between gap-3">
+                      {ad.image_url && <img src={ad.image_url} alt="" className="w-full h-14 rounded-md object-cover border border-gray-100" />}
                       <div className="min-w-0">
                         <p className="font-bold text-sm text-gray-900 line-clamp-2">{ad.title}</p>
                         <p className="text-xs text-gray-500">{ad.brand_name || ad.company || ad.user?.name}</p>
                         <p className="text-xs text-gray-500 mt-1 flex flex-wrap gap-x-3">
                           <span>{periodLabel(ad)}</span>
                           <span>{targetingLabel(ad)}</span>
+                          <span>{ad.display_mode === 'banner' ? 'Bannière image' : 'Modèle avec textes'}</span>
                           <span className="inline-flex items-center gap-1"><MousePointerClick className="h-3 w-3" /> {ad.clicks || 0} clic{(ad.clicks || 0) > 1 ? 's' : ''}</span>
                         </p>
                       </div>
