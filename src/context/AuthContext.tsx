@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { ApiError } from '../lib/apiError';
+import { goal } from '../lib/analytics';
 
 export interface User {
   id: string;
@@ -129,6 +130,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const errorData = await res.json().catch(() => ({}));
         throw new ApiError(errorData);
       }
+      goal('Inscription', { role: String(userData.role || 'acheteur') });
       // Pas de session à ce stade : elle s'ouvre après vérification du code e-mail.
     } catch (err: any) {
       setLoading(false);

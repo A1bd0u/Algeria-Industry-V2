@@ -371,7 +371,8 @@
     "contactTitle": "Contact",
     "legal": "Mentions légales",
     "privacy": "Confidentialité",
-    "cookies": "Cookies"
+    "cookies": "Cookies",
+    "cgv": "CGV"
   },
   "common": {
     "compare": "Comparer",
@@ -671,7 +672,9 @@
     "COMPANY_IMAGE_INVALID": "Image invalide : déposez-la depuis votre tableau de bord.",
     "PRODUCT_IMAGE_INVALID": "Image invalide : déposez-la depuis votre tableau de bord.",
     "PLAN_IMAGE_LIMIT": "Nombre de photos limité par votre offre. Passez à une offre supérieure.",
-    "WEBSITE_INVALID": "Adresse de site web invalide."
+    "WEBSITE_INVALID": "Adresse de site web invalide.",
+    "CATALOGUE_LIMIT_REACHED": "Nombre de catalogues PDF limité par votre offre. Passez à une offre supérieure.",
+    "CATALOGUE_FILE_INVALID": "Fichier invalide : déposez un PDF depuis votre tableau de bord."
   },
   "mfa": {
     "title": "Double authentification",
@@ -731,8 +734,8 @@
     "unlimited": "illimité",
     "perYearVat": "TTC / an",
     "features": {
-      "basic": "15 produits, 5 images par produit, statistiques de base, support sous 48 h.",
-      "pro": "Produits illimités, 10 images par produit, 3 mises en avant, statistiques avancées, support sous 24 h."
+      "basic": "15 produits, 5 images par produit, 5 catalogues PDF, statistiques de vues, support sous 48 h.",
+      "pro": "Produits et catalogues PDF illimités, 10 images par produit, statistiques avancées (vues, clics WhatsApp, contacts), support sous 24 h."
     },
     "choose": "Choisir {{plan}}",
     "ownerRequired": "Pour souscrire, vous devez être titulaire d'une fiche entreprise.",
@@ -764,7 +767,10 @@
       "amount": "Montant",
       "period": "Période",
       "status": "Statut"
-    }
+    },
+    "acceptTermsBefore": "J'ai lu et j'accepte les",
+    "acceptTermsLink": "conditions générales de vente",
+    "acceptTermsAfter": "."
   },
   "productCategories": {
     "A": "Matières Premières & Semi-produits",
@@ -914,10 +920,6 @@
       "why1": "Touchez des acheteurs industriels ciblés",
       "why3": "Bannière affichée sur la page d'accueil"
     },
-    "statsSoon": {
-      "title": "Statistiques bientôt disponibles",
-      "text": "La mesure des visites et des clics sur vos fiches est en cours de mise en place. En attendant, la vue d'ensemble affiche vos produits et vos messages réels."
-    },
     "products": {
       "title": "Mes produits",
       "add": "Ajouter",
@@ -956,7 +958,8 @@
       "ads": "Publicité",
       "subscription": "Abonnement",
       "stats": "Statistiques",
-      "admin": "Console Pro"
+      "admin": "Console Pro",
+      "catalogues": "Mes catalogues PDF"
     },
     "logout": "Déconnexion",
     "title": "Tableau de bord",
@@ -1419,7 +1422,9 @@
       "statsAdvanced": "Statistiques avancées",
       "support48": "Support sous 48 h",
       "support24": "Support sous 24 h",
-      "featured": "3 mises en avant"
+      "featured": "3 mises en avant",
+      "catalogues": "{{count}} catalogue(s) PDF",
+      "unlimitedCatalogues": "Catalogues PDF illimités"
     },
     "popular": "Populaire",
     "recommended": "Recommandé",
@@ -1435,8 +1440,6 @@
       "price": "Prix annuel TTC",
       "products": "Produits",
       "images": "Images par produit",
-      "featured": "Mise en avant",
-      "featuredPro": "3 produits (page d'accueil)",
       "stats": "Statistiques",
       "statsBasic": "Basiques (vues)",
       "statsAdvanced": "Avancées (vues, clics, contacts)",
@@ -1446,6 +1449,8 @@
       "support24": "24 h, prioritaire",
       "messaging": "Messagerie",
       "catalogues": "Catalogues PDF",
+      "featured": "Mise en avant",
+      "featuredPro": "3 produits (page d'accueil)",
       "visibility": "Visibilité",
       "sectorHighlight": "Mise en avant dans le secteur"
     },
@@ -1561,5 +1566,62 @@
   "emptyStates": {
     "directoryText": "Essayez une autre wilaya ou un autre secteur, ou référencez votre entreprise.",
     "messagesText": "Contactez un fournisseur depuis une fiche produit ou entreprise : la conversation apparaîtra ici."
+  },
+  "cgv": {
+    "kicker": "Abonnements fournisseurs",
+    "sellerTitle": "Vendeur",
+    "pricingLink": "Voir les tarifs",
+    "termsLink": "Conditions générales d'utilisation",
+    "privacyLink": "Politique de confidentialité"
+  },
+  "supplierStats": {
+    "title": "Statistiques de votre fiche",
+    "subtitle": "Visiteurs uniques par jour, hors robots et hors vos propres visites.",
+    "period": "Période",
+    "days": "{{count}} jours",
+    "companyViews": "Vues de la fiche",
+    "productViews": "Vues des produits",
+    "whatsappClicks": "Clics WhatsApp",
+    "catalogueDownloads": "Catalogues ouverts",
+    "contacts": "Contacts",
+    "contactsHint": "acheteurs qui vous ont écrit",
+    "chartTitle": "Vues par jour",
+    "noViews": "Pas encore de visite sur cette période. Complétez votre fiche et publiez des produits pour gagner en visibilité.",
+    "topProducts": "Produits les plus vus",
+    "noTopProducts": "Aucune vue de produit sur cette période.",
+    "views": "{{count}} vues",
+    "advancedHint": "Avec l'offre Pro : clics WhatsApp, catalogues ouverts, contacts reçus et produits les plus vus.",
+    "upgradePro": "Passer en Pro",
+    "lockedTitle": "Statistiques disponibles en Basic et Pro",
+    "lockedText": "Sachez combien d'acheteurs consultent votre fiche et vos produits chaque jour.",
+    "upgrade": "Voir les offres",
+    "companyRequired": "Créez d'abord votre fiche entreprise pour suivre ses statistiques.",
+    "completeCompany": "Compléter ma fiche",
+    "loadError": "Impossible de charger les statistiques.",
+    "privacy": "Mesure anonyme, sans cookie : aucune donnée personnelle des visiteurs n'est conservée."
+  },
+  "cataloguesPanel": {
+    "title": "Catalogues PDF",
+    "subtitle": "Publiés sur votre fiche et dans la page Catalogues. PDF, 10 Mo maximum.",
+    "usage": "{{used}} / {{limit}} catalogue(s)",
+    "usageUnlimited": "{{count}} catalogue(s), illimité",
+    "limitReached": "Vous avez atteint le nombre de catalogues de votre offre. Retirez-en un ou passez à une offre supérieure.",
+    "upgrade": "Voir les offres",
+    "choose": "Choisir un fichier PDF",
+    "fileHint": "Catalogue produits, fiche technique, brochure… 10 Mo maximum",
+    "titleLabel": "Titre",
+    "descriptionLabel": "Description (facultatif)",
+    "publish": "Publier le catalogue",
+    "published": "Catalogue publié.",
+    "deleted": "Catalogue retiré.",
+    "deleteConfirm": "Retirer ce catalogue ?",
+    "delete": "Retirer",
+    "open": "Ouvrir le PDF",
+    "empty": "Aucun catalogue publié pour le moment.",
+    "invalidFile": "Choisissez un fichier PDF de 10 Mo maximum.",
+    "fileRequired": "Choisissez un fichier PDF.",
+    "uploadFailed": "L'envoi du fichier a échoué.",
+    "saveFailed": "Impossible de publier le catalogue.",
+    "deleteFailed": "Impossible de retirer le catalogue."
   }
 }

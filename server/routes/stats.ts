@@ -1,8 +1,13 @@
 import { logger } from '../utils/logger';
 import express from 'express';
 import { getSupabase } from '../db/supabaseClient';
-import { requireAuth, verifyRole } from '../middlewares/authMiddleware';
+import { z } from 'zod';
+import { getOptionalUser, requireAuth, verifyRole } from '../middlewares/authMiddleware';
 import { isUuid } from '../middlewares/validateParams';
+import { validate } from '../middlewares/validateMiddleware';
+import { trackLimiter } from '../middlewares/rateLimiter';
+import { PLAN_LIMITS, getCompanyPlan } from '../services/billingService';
+import { AUDIENCE_TYPES, AudienceType, isBot, recordAudience, resolveTarget, visitorHash } from '../services/audienceService';
 
 const router = express.Router();
 
@@ -139,6 +144,121 @@ router.get('/dashboard', requireAuth, async (req, res) => {
   } catch (err: any) {
     logger.error("Stats Error:", err);
     return res.status(500).json({ error: "Erreur lors du calcul des statistiques" });
+  }
+});
+
+// POST /api/stats/track - Vue d'une fiche entreprise ou produit, clic
+// WhatsApp, téléchargement de catalogue. Réponse 204 dans tous les cas utiles :
+// la mesure ne doit jamais gêner la navigation.
+const trackSchema = z.object({
+  type: z.enum(AUDIENCE_TYPES),
+  id: z.string().refine(isUuid, 'Identifiant invalide'),
+});
+
+router.post('/track', trackLimiter, validate(trackSchema), async (req, res) => {
+  const { type, id } = req.body as { type: AudienceType; id: string };
+  if (isBot(req)) return res.status(204).end();
+  try {
+    const target = await resolveTarget(type, id);
+    if (!target) return res.status(204).end();
+    // Le fournisseur qui consulte sa propre fiche n'est pas compté.
+    const viewer = await getOptionalUser(req);
+    if (viewer?.company_id && viewer.company_id === target.companyId) return res.status(204).end();
+    await recordAudience(type, target, visitorHash(req));
+    return res.status(204).end();
+  } catch (err) {
+    logger.error('Track error', err);
+    return res.status(204).end();
+  }
+});
+
+const dayKey = (d: Date) => d.toISOString().slice(0, 10);
+
+// GET /api/stats/supplier?days=30 - Statistiques de la fiche du fournisseur,
+// selon son offre : aucune en gratuit, vues en Basic, détail complet en Pro.
+router.get('/supplier', requireAuth, async (req, res) => {
+  const user = (req as any).user;
+  const days = req.query.days === '90' ? 90 : req.query.days === '7' ? 7 : 30;
+  if (!user.company_id || !isUuid(user.company_id)) {
+    return res.status(404).json({ error: 'Aucune fiche entreprise.', code: 'COMPANY_REQUIRED' });
+  }
+  try {
+    const supabase = getSupabase();
+    const plan = await getCompanyPlan(user.company_id);
+    const level = user.role === 'admin' ? 'advanced' : PLAN_LIMITS[plan].stats;
+    if (level === 'none') return res.json({ plan, level, days });
+
+    const since = new Date();
+    since.setUTCDate(since.getUTCDate() - (days - 1));
+    const sinceDay = dayKey(since);
+
+    const { data: events, error } = await supabase
+      .from('audience_events')
+      .select('type, product_id, day')
+      .eq('company_id', user.company_id)
+      .gte('day', sinceDay)
+      .limit(100000);
+    if (error) throw error;
+
+    // Série quotidienne complète (jours sans visite à 0).
+    const series = new Map<string, { day: string; companyViews: number; productViews: number; whatsappClicks: number }>();
+    for (let i = 0; i < days; i++) {
+      const d = new Date(since);
+      d.setUTCDate(since.getUTCDate() + i);
+      const key = dayKey(d);
+      series.set(key, { day: key, companyViews: 0, productViews: 0, whatsappClicks: 0 });
+    }
+    const totals = { companyViews: 0, productViews: 0, whatsappClicks: 0, catalogueDownloads: 0 };
+    const perProduct = new Map<string, number>();
+    for (const e of events || []) {
+      const point = series.get(String(e.day).slice(0, 10));
+      if (e.type === 'company_view') { totals.companyViews++; if (point) point.companyViews++; }
+      else if (e.type === 'product_view') {
+        totals.productViews++;
+        if (point) point.productViews++;
+        if (e.product_id) perProduct.set(e.product_id, (perProduct.get(e.product_id) || 0) + 1);
+      } else if (e.type === 'whatsapp_click') { totals.whatsappClicks++; if (point) point.whatsappClicks++; }
+      else if (e.type === 'catalogue_download') totals.catalogueDownloads++;
+    }
+
+    if (level === 'basic') {
+      return res.json({
+        plan, level, days,
+        totals: { companyViews: totals.companyViews, productViews: totals.productViews },
+        daily: [...series.values()].map(({ day, companyViews, productViews }) => ({ day, companyViews, productViews })),
+      });
+    }
+
+    // Contacts : acheteurs distincts qui ont écrit au fournisseur sur la période.
+    const { data: company } = await supabase.from('companies').select('owner_id').eq('id', user.company_id).maybeSingle();
+    let contacts = 0;
+    if (company?.owner_id) {
+      const { data: messages } = await supabase
+        .from('messages')
+        .select('sender_id')
+        .eq('receiver_id', company.owner_id)
+        .gte('created_at', since.toISOString())
+        .limit(20000);
+      contacts = new Set((messages || []).map((m: any) => m.sender_id).filter(Boolean)).size;
+    }
+
+    const topIds = [...perProduct.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5);
+    let topProducts: { id: string; name: string; views: number }[] = [];
+    if (topIds.length > 0) {
+      const { data: products } = await supabase.from('products').select('id, name').in('id', topIds.map(([id]) => id));
+      const names = new Map((products || []).map((p: any) => [p.id, p.name]));
+      topProducts = topIds.map(([id, views]) => ({ id, name: names.get(id) || '', views })).filter((p) => p.name);
+    }
+
+    return res.json({
+      plan, level, days,
+      totals: { ...totals, contacts },
+      daily: [...series.values()],
+      topProducts,
+    });
+  } catch (err) {
+    logger.error('Supplier stats error', err);
+    return res.status(500).json({ error: 'Erreur lors du calcul des statistiques' });
   }
 });
 

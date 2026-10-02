@@ -60,6 +60,7 @@ export function createSupabaseMock(handlers: Record<string, Handler> = {}) {
 
   const storageBucket = {
     upload: vi.fn().mockResolvedValue({ data: { path: 'x' }, error: null }),
+    remove: vi.fn().mockResolvedValue({ data: [], error: null }),
     getPublicUrl: vi.fn((path: string) => ({ data: { publicUrl: `https://cdn.test/${path}` } })),
     createSignedUrl: vi.fn((path: string, ttl: number) =>
       Promise.resolve({ data: { signedUrl: `https://signed.test/${path}?ttl=${ttl}` }, error: null })

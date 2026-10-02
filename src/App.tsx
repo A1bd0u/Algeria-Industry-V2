@@ -43,6 +43,7 @@ const Resources = lazy(() => import('./pages/Resources'));
 const SearchResults = lazy(() => import('./pages/SearchResults'));
 const Tarifs = lazy(() => import('./pages/Tarifs'));
 const Terms = lazy(() => import('./pages/Terms'));
+const Cgv = lazy(() => import('./pages/Cgv'));
 const Catalogues = lazy(() => import('./pages/Catalogues'));
 const Sector = lazy(() => import('./pages/Sector'));
 
@@ -168,6 +169,7 @@ export default function App() {
                       <Route path="/ads-request" element={<PageTransition><AdsRequest /></PageTransition>} />
                       <Route path="/resources" element={<PageTransition><Resources /></PageTransition>} />
                       <Route path="/terms" element={<PageTransition><Terms /></PageTransition>} />
+                      <Route path="/cgv" element={<PageTransition><Cgv /></PageTransition>} />
                       <Route path="/privacy" element={<PageTransition><Privacy /></PageTransition>} />
                       <Route path="/compare" element={<PageTransition><Compare /></PageTransition>} />
                       <Route path="/catalogues" element={<PageTransition><Catalogues /></PageTransition>} />

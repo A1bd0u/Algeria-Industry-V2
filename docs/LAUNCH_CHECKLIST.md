@@ -106,6 +106,15 @@ Balises `title`, description, Open Graph, `canonical` et JSON-LD (`Organization`
 - **Bannières image** (migration `20261008090000_ad_banner_mode.sql`) : une annonce peut être un visuel PNG/JPG complet (textes et logo inclus), affiché tel quel et cliquable, avec une version mobile facultative. Formats conseillés : accueil 1920 × 384 px (mobile 1200 × 675), autres pages 1920 × 240 px (mobile 1200 × 400). La console vérifie les dimensions et prévient si le visuel sera rogné. Le mode « Modèle avec textes » reste disponible.
 - **Ciblage** (migration `20261007090000_ad_targeting.sql`) : chaque annonce choisit ses pages — accueil (grand bandeau), catalogue (produits, fiche produit, recherche, comparateur), fournisseurs (annuaire, fiche entreprise), contenus (actualités, événements, catalogues PDF, ressources) — et, en option, des catégories produit (groupes A à E). Une annonce ciblée par catégorie n'apparaît que sur les pages qui affichent cette catégorie. Hors accueil, le bandeau est compact ; sans annonce, il présente la plateforme. Jamais de bandeau sur les formulaires, l'espace client, la console, les pages juridiques, Tarifs, FAQ ni Contact. Les annonces existantes restent sur l'accueil.
 
+## Statistiques, catalogues et CGV (mise à jour du 2 octobre)
+
+- **Statistiques fournisseur** (onglet « Statistiques ») : vues de la fiche et des produits en Basic ; en Pro, en plus, clics WhatsApp, catalogues ouverts, acheteurs qui ont écrit et produits les plus vus, sur 7, 30 ou 90 jours. Mesure anonyme (empreinte quotidienne hachée, sans IP ni cookie), un visiteur compté une fois par jour et par élément, robots et visites du fournisseur exclus.
+- **Catalogues PDF** (onglet « Mes catalogues PDF ») : dépôt (10 Mo max) réservé aux entreprises vérifiées, 1 en gratuit, 5 en Basic, illimité en Pro ; affichés sur la fiche entreprise et la page Catalogues ; retrait par l'entreprise ou un admin.
+- **CGV** : page `/cgv` (fr/en/ar), lien en pied de page et sur Tarifs ; case obligatoire avant toute souscription, date et version (`2026-10`) enregistrées sur la facture. 🧾 Faire relire les CGV par un juriste avant le lancement.
+- **Tarifs** : la mise en avant de produits est retirée de la page et du comparatif ; les catalogues PDF y figurent.
+- **Objectifs Plausible** : voir `docs/DEPLOYMENT.md` § 7.
+- Migration `20261011090000_supplier_stats_catalogues_terms.sql`.
+
 ## Reste à faire (code, non bloquant pour le lancement)
 
 1. **Préfixes de langue** `/fr`, `/ar`, `/en` avec `hreflang` : l'interface est traduite côté client, mais les contenus (fiches, produits, articles) n'existent qu'en français. À envisager quand des contenus traduits existeront ; les URL lisibles `{slug}-{id}` sont déjà en place.

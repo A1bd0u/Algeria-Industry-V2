@@ -17,8 +17,12 @@ import { alertAdminsTransferProof, notifyInvoiceIssued } from '../services/notif
 const router = express.Router();
 router.use(requireAuth);
 
+// Version des conditions générales de vente acceptées (page /cgv).
+export const TERMS_VERSION = '2026-10';
+
 const subscribeSchema = z.object({
   plan: z.enum(['basic', 'pro']),
+  acceptTerms: z.literal(true, { message: 'Vous devez accepter les conditions générales de vente.' }),
 });
 
 const proofSchema = z.object({
@@ -120,6 +124,8 @@ router.post('/', requireEmailVerified, validate(subscribeSchema), async (req, re
         amount_dzd: PLANS[plan].amount,
         status: 'pending',
         source: 'self_service',
+        terms_accepted_at: new Date().toISOString(),
+        terms_version: TERMS_VERSION,
       }])
       .select(CLIENT_COLUMNS)
       .single();

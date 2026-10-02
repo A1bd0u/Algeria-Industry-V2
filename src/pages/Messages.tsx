@@ -6,6 +6,7 @@ import { useSearchParams } from 'react-router-dom';
 import { cn } from '../lib/utils';
 import { useTranslation } from 'react-i18next';
 import EmptyState from '../components/ui/EmptyState';
+import { goal } from '../lib/analytics';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -83,6 +84,8 @@ export default function Messages() {
       return res.json();
     },
     onSuccess: () => {
+      // Premier message d'une conversation : contact établi avec le fournisseur.
+      if (!activeMessages || activeMessages.length === 0) goal('Contact fournisseur');
       queryClient.invalidateQueries({ queryKey: ['messages', selectedContact] });
       queryClient.invalidateQueries({ queryKey: ['conversations'] });
       setInputText('');
