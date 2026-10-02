@@ -8,7 +8,7 @@ import { validate } from '../middlewares/validateMiddleware';
 import { generateReferenceId } from '../utils/reference';
 import { requireAuth, requireEmailVerified, getOptionalUser } from '../middlewares/authMiddleware';
 import { requireUuidParams } from '../middlewares/validateParams';
-import { PRODUCT_BUCKET } from './upload';
+import { isAllowedImageUrl } from '../utils/storageUrl';
 
 const router = express.Router();
 
@@ -28,14 +28,6 @@ const companySchema = z.object({
 
 // Une image d'entreprise doit venir du stockage public de la plateforme,
 // dans le dossier de l'utilisateur qui l'a déposée (un admin : tout le bucket).
-const isAllowedImageUrl = (url: string, user: { id: string; role: string }) => {
-  const base = (process.env.SUPABASE_URL || '').replace(/\/+$/, '');
-  if (!base) return false;
-  const prefix = `${base}/storage/v1/object/public/${PRODUCT_BUCKET}/`;
-  if (!url.startsWith(prefix) || url.includes('..')) return false;
-  return user.role === 'admin' || url.slice(prefix.length).startsWith(`${user.id}/`);
-};
-
 const reviewSchema = z.object({
   rating: z.coerce.number().int().min(1, 'La note doit être comprise entre 1 et 5.').max(5, 'La note doit être comprise entre 1 et 5.'),
   comment: z.string().trim().max(2000).optional()

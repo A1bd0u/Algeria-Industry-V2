@@ -252,6 +252,42 @@ describe('Régressions de sécurité P0', () => {
     expect(filterValue(select!, 'in', 'status')).toBeDefined();
   });
 
+  it('le bandeau ne montre que les annonces en cours de diffusion, sans coordonnées', async () => {
+    const day = 86_400_000;
+    const iso = (offset: number) => new Date(Date.now() + offset).toISOString();
+    const mock = createSupabaseMock({
+      ads: () => ({
+        data: [
+          { id: 'a', title: 'En cours', starts_at: iso(-day), ends_at: iso(day) },
+          { id: 'b', title: 'Sans dates', starts_at: null, ends_at: null },
+          { id: 'c', title: 'Future', starts_at: iso(day), ends_at: null },
+          { id: 'd', title: 'Terminée', starts_at: null, ends_at: iso(-day) },
+        ],
+      }),
+    });
+    vi.mocked(getSupabase).mockReturnValue(mock.client as any);
+
+    const res = await request(app).get('/api/campaigns');
+    expect(res.body.map((ad: any) => ad.id)).toEqual(['a', 'b']);
+    const select = mock.queries.find((q) => q.table === 'ads');
+    expect(select?.columns).not.toMatch(/contact_|message|clicks/);
+  });
+
+  it('compte un clic seulement sur une annonce publiée', async () => {
+    const AD = '77777777-7777-4777-8777-777777777777';
+    const mock = createSupabaseMock({
+      ads: (q) => (q.op === 'select' ? { data: { id: AD, clicks: 4 } } : undefined),
+    });
+    vi.mocked(getSupabase).mockReturnValue(mock.client as any);
+
+    const res = await request(app).post(`/api/campaigns/${AD}/click`);
+    expect(res.status).toBe(204);
+    const select = mock.queries.find((q) => q.table === 'ads' && q.op === 'select');
+    expect(filterValue(select!, 'in', 'status')).toBeDefined();
+    const update = mock.queries.find((q) => q.table === 'ads' && q.op === 'update');
+    expect(update?.payload).toEqual({ clicks: 5 });
+  });
+
   it('les anciennes API d\'appels d\'offres et de RFQ n\'existent plus', async () => {
     for (const path of ['/api/rfqs', '/api/tenders']) {
       const res = await request(app).get(path);

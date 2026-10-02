@@ -26,7 +26,7 @@ Suivi de la roadmap de lancement du 24 septembre 2026 : beta privée le **25 oct
 | Balises SEO injectées côté serveur, sitemap dynamique soumis, domaine définitif actif | ✅ Injection et sitemap ; 🧾 domaine et Search Console |
 | LCP mobile sous 2,5 s (accueil, fiche entreprise) | ✅ Carrousel limité à l'accueil, polices auto-hébergées ; 🧾 à mesurer avec Lighthouse |
 | CGV publiées, facturation prête | 🧾 |
-| Au moins 30 fournisseurs vérifiés actifs et 10 appels d'offres réels | 🧾 |
+| Au moins 30 fournisseurs vérifiés actifs | 🧾 |
 
 ## Ce qui a changé dans le code
 
@@ -95,6 +95,14 @@ Balises `title`, description, Open Graph, `canonical` et JSON-LD (`Organization`
 - **Déploiement** : variables `VITE_*` passées au build Docker ; guide `docs/DEPLOYMENT.md`.
 - Migration `20261003090000_search_and_whatsapp.sql`.
 - **Événements** : création, modification et suppression depuis la console admin (journalisées).
+
+## Bandeau publicitaire de l'accueil (octobre)
+
+- **Annonces en carrousel** en haut de l'accueil : visuel de fond, logo, annonceur, titre, sous-titre et bouton vers un lien interne ou externe (`rel="sponsored"`). Défilement automatique avec pause, flèches, points, glissement sur mobile, RTL.
+- **Console > Publicités** : préparation du visuel d'une demande reçue, création directe d'une annonce, aperçu en direct, période de diffusion (début/fin), ordre d'affichage, nombre de clics par campagne.
+- Seules les annonces publiées **et** dans leur période sont servies (8 au plus). Sans annonce en ligne, le bandeau présente la plateforme : inscription gratuite, offre fondateur et « Votre annonce ici » vers la page Publicité.
+- Liens limités à http(s) ou aux chemins internes, images limitées au stockage de la plateforme.
+- Migration `20261006090000_ad_creatives.sql`.
 
 ## Reste à faire (code, non bloquant pour le lancement)
 

@@ -27,8 +27,8 @@
     "suppliers": "Fournisseurs",
     "adminConsole": "Console d'administration",
     "mobileTabs": "Navigation principale",
-    "console_pro": "Espace administrateur",
-    "language": "Langue : {{name}}"
+    "language": "Langue : {{name}}",
+    "console_pro": "Espace administrateur"
   },
   "hero": {
     "title": "Connectez-vous à l'industrie",
@@ -1312,17 +1312,27 @@
   },
   "slides": {
     "sponsored": "Annonce",
-    "suppliers": {
-      "title": "Fournisseurs industriels vérifiés",
-      "subtitle": "Trouvez le bon partenaire",
-      "description": "Contactez-les directement et demandez un devis",
-      "tagline": "La place de marché B2B algérienne"
+    "label": "Annonces",
+    "prev": "Annonce précédente",
+    "next": "Annonce suivante",
+    "goTo": "Aller à l'annonce {{n}}",
+    "pause": "Mettre en pause",
+    "play": "Reprendre le défilement",
+    "learnMore": "En savoir plus",
+    "advertise": {
+      "title": "Votre annonce ici",
+      "subtitle": "Présentez votre marque aux acheteurs industriels algériens.",
+      "cta": "Réserver cet espace"
+    },
+    "listing": {
+      "title": "Référencez votre entreprise gratuitement",
+      "subtitle": "Fiche vérifiée, catalogue produits et demandes de devis des acheteurs.",
+      "cta": "Créer ma fiche"
     },
     "founder": {
-      "title": "Membre fondateur",
-      "subtitle": "Premium offert 12 mois",
-      "description": "Pour les 100 premiers fournisseurs vérifiés",
-      "tagline": "Offre de lancement"
+      "title": "Premium offert 12 mois",
+      "subtitle": "Pour les 100 premiers fournisseurs vérifiés.",
+      "cta": "Voir l'offre"
     }
   }
 }

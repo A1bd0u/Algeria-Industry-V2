@@ -28,6 +28,8 @@ const ACTION_LABELS: Record<string, string> = {
   subscription_activate: 'Abonnement activé',
   subscription_cancel: 'Abonnement annulé',
   ad_status_change: 'Publicité mise à jour',
+  ad_create: 'Annonce créée',
+  ad_update: 'Annonce modifiée',
   content_approve: 'Signalement classé',
   content_reject: 'Contenu dépublié',
   product_delete: 'Produit supprimé',

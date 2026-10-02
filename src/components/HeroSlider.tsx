@@ -1,211 +1,260 @@
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { ArrowRight, Building2, ChevronLeft, ChevronRight, Megaphone, Pause, Play, Sparkles } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
-import React, { useEffect, useState } from 'react';
+import type React from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Slide } from '../constants/slides';
+import { Link } from 'react-router-dom';
 import { cn } from '../lib/utils';
 
-interface HeroSliderProps {
-  slides: Slide[];
+// Bandeau de l'accueil : annonces publiées depuis la console admin
+// (/api/campaigns), sinon les messages de la plateforme, dont l'emplacement
+// publicitaire lui-même.
+
+interface Ad {
+  id: string;
+  title: string;
+  subtitle?: string | null;
+  image_url?: string | null;
+  logo_url?: string | null;
+  brand_name?: string | null;
+  cta_label?: string | null;
+  url?: string | null;
 }
 
-const HeroSlider: React.FC<HeroSliderProps> = ({ slides }) => {
-  const { t, i18n } = useTranslation();
+interface SlideView {
+  key: string;
+  adId?: string;
+  title: string;
+  subtitle?: string;
+  image?: string;
+  logo?: string;
+  brand?: string;
+  cta: string;
+  href?: string;
+  icon?: React.ElementType;
+  tint: string;
+}
+
+const AUTOPLAY_MS = 7000;
+
+const isExternal = (href: string) => /^https?:\/\//.test(href);
+
+const trackClick = (adId: string) => {
+  const url = `/api/campaigns/${adId}/click`;
+  try {
+    if (navigator.sendBeacon?.(url)) return;
+  } catch {
+    // sendBeacon indisponible : repli sur fetch.
+  }
+  fetch(url, { method: 'POST', keepalive: true }).catch(() => {});
+};
+
+const prefersReducedMotion = () =>
+  typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+
+const HeroSlider: React.FC = () => {
+  const { t } = useTranslation();
   const [current, setCurrent] = useState(0);
-  const [dynamicSlides, setDynamicSlides] = useState<Slide[]>([]);
+  const [paused, setPaused] = useState(prefersReducedMotion);
+  const [hovered, setHovered] = useState(false);
+  const touchStart = useRef<number | null>(null);
+
+  const { data: ads = [] } = useQuery<Ad[]>({
+    queryKey: ['home-ads'],
+    queryFn: async () => {
+      const res = await fetch('/api/campaigns');
+      if (!res.ok) return [];
+      return res.json();
+    },
+    staleTime: 60_000,
+  });
+
+  const slides: SlideView[] = ads.length > 0
+    ? ads.map((ad) => ({
+        key: ad.id,
+        adId: ad.id,
+        title: ad.title,
+        subtitle: ad.subtitle || undefined,
+        image: ad.image_url || undefined,
+        logo: ad.logo_url || undefined,
+        brand: ad.brand_name || undefined,
+        cta: ad.cta_label || t('slides.learnMore'),
+        href: ad.url || undefined,
+        tint: 'from-primary to-accent',
+      }))
+    : [
+        { key: 'listing', title: t('slides.listing.title'), subtitle: t('slides.listing.subtitle'), cta: t('slides.listing.cta'), href: '/register', icon: Building2, tint: 'from-primary to-accent' },
+        { key: 'founder', title: t('slides.founder.title'), subtitle: t('slides.founder.subtitle'), cta: t('slides.founder.cta'), href: '/tarifs', icon: Sparkles, tint: 'from-primary to-[#3a1d00]' },
+        { key: 'advertise', title: t('slides.advertise.title'), subtitle: t('slides.advertise.subtitle'), cta: t('slides.advertise.cta'), href: '/ads-request', icon: Megaphone, tint: 'from-accent to-primary' },
+      ];
+
+  const count = slides.length;
+  const index = count ? current % count : 0;
+  const slide = slides[index];
+  const isAd = Boolean(slide?.adId);
+
+  const go = useCallback((delta: number) => setCurrent((c) => (c + delta + count) % count), [count]);
 
   useEffect(() => {
-    const fetchAds = async () => {
-      try {
-        const res = await fetch('/api/campaigns');
-        if (res.ok) {
-          const data = await res.json();
-          // Filter ads that are validated
-          const activeAds = data.filter((ad: any) => 
-            ['Actif', 'published', 'approuvée', 'Approuvé'].includes(ad.status)
-          );
-          
-          const formattedSlides: Slide[] = activeAds.map((ad: any) => ({
-            id: ad.id,
-            bgGradient: ad.bg_gradient || 'from-primary to-primary/90',
-            productImg: ad.image_url || '/placeholder.svg',
-            title: ad.title,
-            subtitle: ad.subtitle || '',
-            description: ad.description || ad.objective || '',
-            brandLogo: ad.brand_logo || '/favicon.svg',
-            brandName: ad.brand_name || '',
-            brandTagline: ad.brand_tagline || t('slides.sponsored')
-          }));
-          setDynamicSlides(formattedSlides);
-        }
-      } catch (err) {
-        console.warn("Failed to fetch ads gracefully:", err);
-      }
-    };
-    fetchAds();
-  }, []);
+    if (paused || hovered || count < 2) return;
+    const timer = window.setInterval(() => setCurrent((c) => (c + 1) % count), AUTOPLAY_MS);
+    return () => window.clearInterval(timer);
+  }, [paused, hovered, count]);
 
-  const displaySlides = dynamicSlides.length > 0 ? [...dynamicSlides, ...slides] : slides;
+  if (!slide) return null;
 
-  useEffect(() => {
-    setCurrent(0); // Reset current slide when slides change
-    if (!displaySlides || displaySlides.length === 0) return;
-    const timer = setInterval(() => {
-      setCurrent((prev) => (prev + 1) % displaySlides.length);
-    }, 6000);
-    return () => clearInterval(timer);
-  }, [displaySlides.length]);
+  const onTouchEnd = (e: React.TouchEvent) => {
+    if (touchStart.current === null) return;
+    const dx = e.changedTouches[0].clientX - touchStart.current;
+    touchStart.current = null;
+    if (Math.abs(dx) < 40) return;
+    // En RTL, glisser vers la gauche ramène à l'annonce précédente.
+    const rtl = document.documentElement.dir === 'rtl';
+    go((dx < 0) !== rtl ? 1 : -1);
+  };
 
-  const next = () => setCurrent((prev) => (prev + 1) % displaySlides.length);
-  const prev = () => setCurrent((prev) => (prev - 1 + displaySlides.length) % displaySlides.length);
+  const ctaClass = 'inline-flex items-center gap-2 bg-secondary text-white px-4 py-2 md:px-5 md:py-2.5 rounded-lg text-sm font-bold hover:bg-white hover:text-primary transition-colors';
+  const ctaContent = (
+    <>
+      {slide.cta}
+      <ArrowRight className="h-4 w-4 rtl:rotate-180" aria-hidden="true" />
+    </>
+  );
+  const onCta = () => { if (slide.adId) trackClick(slide.adId); };
 
-  if (!displaySlides || displaySlides.length === 0) return null;
-
-  // Safely get the current slide to avoid "undefined" errors during transitions
-  const activeSlide = displaySlides[current] || displaySlides[0];
+  const Icon = slide.icon;
 
   return (
-    <div className={cn("relative h-[150px] md:h-[180px] w-full overflow-hidden bg-primary border-b border-border-tech", i18n.language?.startsWith('ar') && "font-arabic")}>
-      {/* Technical Grid Background Overlay */}
-      <div className="absolute inset-0 opacity-[0.03] pointer-events-none z-10" 
-           style={{ backgroundImage: 'radial-gradient(#fff 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
-      
-      <AnimatePresence mode="wait">
+    <section
+      aria-roledescription="carousel"
+      aria-label={t('slides.label')}
+      className="relative w-full h-[230px] md:h-[240px] overflow-hidden bg-primary"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      onFocusCapture={() => setHovered(true)}
+      onBlurCapture={() => setHovered(false)}
+      onTouchStart={(e) => { touchStart.current = e.touches[0].clientX; }}
+      onTouchEnd={onTouchEnd}
+    >
+      <AnimatePresence initial={false} mode="popLayout">
         <motion.div
-          key={`${activeSlide.id}-${current}`}
+          key={slide.key}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.8 }}
-          className={cn(
-            "absolute inset-0 bg-gradient-to-r flex items-center",
-            activeSlide.bgGradient
-          )}
+          transition={{ duration: 0.6 }}
+          className={cn('absolute inset-0 bg-gradient-to-r', slide.tint)}
+          role="group"
+          aria-roledescription="slide"
+          aria-label={`${index + 1} / ${count}`}
         >
-          <div className={cn(
-            "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full grid grid-cols-1 lg:grid-cols-2 gap-8 items-center relative z-20"
-          )}>
-            
-            {/* Left Content: Product */}
-            <div className={cn("flex items-center space-x-12")}>
-              {activeSlide.productImg !== '/placeholder.svg' && <motion.div
-                initial={{ x: i18n.language?.startsWith('ar') ? 50 : -50, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ delay: 0.2, duration: 0.6 }}
-                className="hidden md:block w-24 h-32 lg:w-32 lg:h-40 flex-shrink-0 bg-white/5 backdrop-blur-sm p-3 border border-white/10"
-              >
-                <img 
-                  src={activeSlide.productImg} 
-                  alt={activeSlide.title} 
-                  className="w-full h-full object-contain drop-shadow-2xl"
-                  referrerPolicy="no-referrer"
-                />
-              </motion.div>}
-              <div className="text-white">
-                <motion.div
-                  initial={{ opacity: 0, x: i18n.language?.startsWith('ar') ? -20 : 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.2 }}
-                  className={cn("flex items-center space-x-2 mb-2")}
-                >
-                  <span className="text-xs font-black uppercase tracking-wider text-secondary">
+          {slide.image && (
+            <>
+              <img
+                src={slide.image}
+                alt=""
+                className="absolute inset-0 w-full h-full object-cover"
+                loading={index === 0 ? 'eager' : 'lazy'}
+                decoding="async"
+              />
+              {/* Voile pour garder le texte lisible sur n'importe quel visuel. */}
+              <div className="absolute inset-0 bg-black/65 md:bg-transparent md:bg-gradient-to-r md:rtl:bg-gradient-to-l from-black/80 via-black/50 to-black/10" />
+            </>
+          )}
+          {!slide.image && (
+            <div
+              className="absolute inset-0 opacity-[0.07] pointer-events-none"
+              style={{ backgroundImage: 'radial-gradient(#fff 1px, transparent 1px)', backgroundSize: '24px 24px' }}
+            />
+          )}
+
+          <div className="relative h-full max-w-7xl mx-auto px-4 sm:px-6 md:px-16 pb-7 md:pb-4 flex items-center gap-8">
+            <div className="flex-1 min-w-0 text-white">
+              <div className="flex items-center gap-2 mb-2">
+                {isAd ? (
+                  <span className="text-xs font-bold uppercase tracking-wider bg-white/15 backdrop-blur px-2 py-0.5 rounded">
                     {t('slides.sponsored')}
                   </span>
-                  <div className="h-[1px] w-8 bg-secondary" />
-                </motion.div>
-                <motion.h2 
-                  initial={{ y: 10, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.3 }}
-                  className="text-xl md:text-2xl lg:text-3xl font-black tracking-tighter mb-1"
-                >
-                  {activeSlide.title}
-                </motion.h2>
-                <motion.h3 
-                  initial={{ y: 10, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.4 }}
-                  className="text-md md:text-lg font-bold text-white/90 mb-2 font-mono tracking-tighter line-clamp-1"
-                >
-                  {activeSlide.subtitle}
-                </motion.h3>
-                <motion.p 
-                  initial={{ y: 10, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.5 }}
-                  className="text-xs font-medium text-white/60 tracking-widest max-w-sm leading-relaxed hidden lg:block"
-                >
-                  {activeSlide.description}
-                </motion.p>
+                ) : Icon && (
+                  <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-secondary/90">
+                    <Icon className="h-4 w-4" aria-hidden="true" />
+                  </span>
+                )}
+                {slide.brand && <span className="text-sm font-bold text-white/90 truncate">{slide.brand}</span>}
               </div>
+              <h2 className="text-xl md:text-3xl font-black tracking-tight leading-tight line-clamp-2">{slide.title}</h2>
+              {slide.subtitle && (
+                <p className="mt-1.5 text-sm md:text-base text-white/80 max-w-xl line-clamp-2">{slide.subtitle}</p>
+              )}
+              {slide.href && (
+                <div className="mt-3 md:mt-4">
+                  {isExternal(slide.href) ? (
+                    <a href={slide.href} target="_blank" rel="noopener noreferrer sponsored" onClick={onCta} className={ctaClass}>
+                      {ctaContent}
+                    </a>
+                  ) : (
+                    <Link to={slide.href} onClick={onCta} className={ctaClass}>
+                      {ctaContent}
+                    </Link>
+                  )}
+                </div>
+              )}
             </div>
 
-            {/* Right Content: Brand */}
-            <motion.div 
-              initial={{ x: i18n.language?.startsWith('ar') ? -50 : 50, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ delay: 0.4, duration: 0.6 }}
-              className={cn(
-                "hidden lg:flex flex-col items-center text-white border-white/10",
-                "lg:items-end border-s ps-12"
-              )}
-            >
-              <div className="bg-white/10 backdrop-blur-sm p-4 border border-white/10 mb-4">
-                <img 
-                  src={activeSlide.brandLogo} 
-                  alt={activeSlide.brandName} 
-                  className="h-8 w-auto brightness-0 invert opacity-80"
-                  referrerPolicy="no-referrer"
-                />
+            {slide.logo && (
+              <div className="hidden md:flex shrink-0 h-24 w-40 lg:h-28 lg:w-48 items-center justify-center rounded-2xl bg-white p-4 shadow-xl">
+                <img src={slide.logo} alt={slide.brand || ''} className="max-h-full max-w-full object-contain" loading="lazy" />
               </div>
-              <h4 className="text-2xl font-black tracking-tighter mb-1">{activeSlide.brandName}</h4>
-              <p className="text-xs font-black text-secondary uppercase tracking-wider">{activeSlide.brandTagline}</p>
-            </motion.div>
+            )}
           </div>
         </motion.div>
       </AnimatePresence>
 
-      {/* Slide Counter (Technical Style) */}
-      <div className={cn("absolute bottom-6 z-30 flex items-baseline space-x-2 text-white/40 font-mono", "end-10")}>
-        <span className="text-xl font-black text-white">{(current + 1).toString().padStart(2, '0')}</span>
-        <span className="text-xs">/</span>
-        <span className="text-xs">{displaySlides.length.toString().padStart(2, '0')}</span>
-      </div>
-
-      {/* Navigation Dots */}
-      {displaySlides.length > 1 && (
-        <div className={cn("absolute bottom-6 flex space-x-2 z-30", "start-10")}>
-          {displaySlides.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setCurrent(i)}
-              className={cn(
-                "h-1 transition-all duration-500",
-                current === i ? "bg-secondary w-8" : "bg-white/20 w-4 hover:bg-white/40"
-              )}
-            />
-          ))}
-        </div>
-      )}
-
-      {/* Arrows */}
-      {displaySlides.length > 1 && (
+      {count > 1 && (
         <>
-          <button 
-            onClick={prev}
-            className={cn("absolute top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/10 text-white hover:bg-black/30 transition-all z-20", "start-4")}
+          <button
+            type="button"
+            onClick={() => go(-1)}
+            aria-label={t('slides.prev')}
+            className="hidden md:flex absolute top-1/2 -translate-y-1/2 start-3 h-9 w-9 items-center justify-center rounded-full bg-black/25 text-white hover:bg-black/50 transition-colors z-10"
           >
-            {i18n.language?.startsWith('ar') ? <ChevronRight className="h-6 w-6 rtl:rotate-180" /> : <ChevronLeft className="h-6 w-6 rtl:rotate-180" />}
+            <ChevronLeft className="h-5 w-5 rtl:rotate-180" />
           </button>
-          <button 
-            onClick={next}
-            className={cn("absolute top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/10 text-white hover:bg-black/30 transition-all z-20", "end-4")}
+          <button
+            type="button"
+            onClick={() => go(1)}
+            aria-label={t('slides.next')}
+            className="hidden md:flex absolute top-1/2 -translate-y-1/2 end-3 h-9 w-9 items-center justify-center rounded-full bg-black/25 text-white hover:bg-black/50 transition-colors z-10"
           >
-            {i18n.language?.startsWith('ar') ? <ChevronLeft className="h-6 w-6 rtl:rotate-180" /> : <ChevronRight className="h-6 w-6 rtl:rotate-180" />}
+            <ChevronRight className="h-5 w-5 rtl:rotate-180" />
           </button>
+
+          <div className="absolute bottom-3 inset-x-0 z-10 flex items-center justify-center gap-2">
+            {slides.map((s, i) => (
+              <button
+                key={s.key}
+                type="button"
+                onClick={() => setCurrent(i)}
+                aria-label={t('slides.goTo', { n: i + 1 })}
+                aria-current={i === index}
+                className="p-1.5"
+              >
+                <span className={cn('block h-1.5 rounded-full transition-all', i === index ? 'w-6 bg-secondary' : 'w-1.5 bg-white/50 hover:bg-white/80')} />
+              </button>
+            ))}
+            <button
+              type="button"
+              onClick={() => setPaused((p) => !p)}
+              aria-label={paused ? t('slides.play') : t('slides.pause')}
+              className="ms-1 p-1 text-white/70 hover:text-white"
+            >
+              {paused ? <Play className="h-3.5 w-3.5" /> : <Pause className="h-3.5 w-3.5" />}
+            </button>
+          </div>
         </>
       )}
-    </div>
+    </section>
   );
 };
 
