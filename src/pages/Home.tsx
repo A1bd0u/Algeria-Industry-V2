@@ -1,4 +1,4 @@
-import { ArrowRight, BadgeCheck, Package, Search, Star } from 'lucide-react';
+import { ArrowRight, Package, Search, Star } from 'lucide-react';
 import { motion } from 'motion/react';
 import type React from 'react';
 import { useEffect, useState } from 'react';
@@ -309,9 +309,6 @@ const Home = () => {
                   <div className="min-w-0">
                     <p className="font-bold text-primary truncate group-hover:text-secondary transition-colors">{c.name}</p>
                     <p className="text-xs text-gray-500 truncate">{[c.activity_sector && categoryLabel(t, c.activity_sector), c.wilaya].filter(Boolean).join(' · ')}</p>
-                    <p className="mt-1 inline-flex items-center gap-1 text-xs font-bold text-success">
-                      <BadgeCheck className="h-3.5 w-3.5" aria-hidden="true" /> {t('home.suppliers.verified')}
-                    </p>
                   </div>
                 </Link>
               ))}

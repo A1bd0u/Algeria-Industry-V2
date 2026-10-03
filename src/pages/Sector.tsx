@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { ArrowRight, BadgeCheck, ChevronRight, Package } from 'lucide-react';
+import { ArrowRight, ChevronRight, Package } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, Navigate, useParams } from 'react-router-dom';
 import SEO from '../components/SEO';
@@ -155,7 +155,6 @@ const Sector = () => {
                     to={`/directory/${generateSlugUrl(c.name, c.id)}`}
                     className="inline-flex items-center gap-2 rounded-full bg-white border border-border-tech px-4 py-2 text-sm font-bold text-primary hover:border-secondary hover:text-secondary transition-colors"
                   >
-                    {c.verified && <BadgeCheck className="h-4 w-4 text-success" aria-label={t('products.badges.verified')} />}
                     {c.name}
                   </Link>
                 ))}
