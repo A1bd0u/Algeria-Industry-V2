@@ -150,7 +150,7 @@ export async function createApp() {
       if (error) throw error;
       res.json({ status: 'ready', database: 'connected' });
     } catch (err: any) {
-      logger.error('Readiness check failed:', err.message);
+      logger.error(`Readiness check failed: ${err?.message || err}`);
       res.status(503).json({ status: 'not ready', error: 'Database unavailable' });
     }
   });
