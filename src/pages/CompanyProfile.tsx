@@ -575,7 +575,7 @@ const CompanyProfile = () => {
                         {company.activity_sector && (
                           <tr className="border-b border-gray-50">
                             <td className="px-6 py-4 font-bold text-gray-500">{t('company.sector')}</td>
-                            <td className="px-6 py-4 text-gray-700 font-medium">{company.activity_sector}</td>
+                            <td className="px-6 py-4 text-gray-700 font-medium">{categoryLabel(t, company.activity_sector)}</td>
                           </tr>
                         )}
                       </tbody>

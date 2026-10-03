@@ -1,5 +1,5 @@
 import type React from 'react';
-import { Cpu, HardHat, ImageOff, Package, Truck, Wrench } from 'lucide-react';
+import { Cpu, Factory, FlaskConical, ImageOff, Laptop, Package, Truck, Wheat, Wrench, Zap } from 'lucide-react';
 import { useState } from 'react';
 import { productCategories } from '../../data/productCategories';
 import { cn } from '../../lib/utils';
@@ -7,11 +7,14 @@ import { cn } from '../../lib/utils';
 // Visuel d'un produit. Sans photo (ou si elle ne charge pas), on affiche
 // l'icône du groupe de la catégorie sur un fond doux plutôt qu'un logo géant.
 export const GROUP_STYLE: Record<string, { icon: React.ElementType; tint: string }> = {
-  A: { icon: Package, tint: 'bg-amber-50 text-amber-600' },
-  B: { icon: Wrench, tint: 'bg-orange-50 text-secondary' },
-  C: { icon: Cpu, tint: 'bg-sky-50 text-sky-600' },
-  D: { icon: Truck, tint: 'bg-emerald-50 text-emerald-600' },
-  E: { icon: HardHat, tint: 'bg-violet-50 text-violet-600' },
+  A: { icon: Wheat, tint: 'bg-amber-50 text-amber-600' },
+  B: { icon: Factory, tint: 'bg-stone-100 text-stone-600' },
+  C: { icon: Zap, tint: 'bg-yellow-50 text-yellow-700' },
+  D: { icon: Wrench, tint: 'bg-orange-50 text-secondary' },
+  E: { icon: FlaskConical, tint: 'bg-violet-50 text-violet-600' },
+  F: { icon: Cpu, tint: 'bg-sky-50 text-sky-600' },
+  G: { icon: Laptop, tint: 'bg-indigo-50 text-indigo-600' },
+  H: { icon: Truck, tint: 'bg-emerald-50 text-emerald-600' },
 };
 
 const groupOf = (category?: string | null) =>

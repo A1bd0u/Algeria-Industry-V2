@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react';
 
 // Pictogrammes dessinés pour la plateforme : trait fin, aplat orange léger,
-// vocabulaire industriel (lingots, engrenage, écrou, casque, carton, carte de
-// l'Algérie). Le trait suit `currentColor`, l'aplat la couleur d'accent.
+// vocabulaire industriel (épi, grue, derrick, engrenage, fiole, puce, écran,
+// camion, carte de l'Algérie). Le trait suit `currentColor`, l'aplat la couleur d'accent.
 
 type IconProps = { className?: string; title?: string };
 
@@ -38,17 +38,37 @@ const GEAR_PATH = (() => {
   return `M${pts.join('L')}Z`;
 })();
 
-/** A — Matières premières : lingots empilés. */
-export const RawMaterialsIcon = (p: IconProps) => (
+/** A — Agroalimentaire et agriculture : épi de blé. */
+export const AgriFoodIcon = (p: IconProps) => (
   <Svg {...p}>
-    <path d="M7.2 13 8.7 7.5h6.6l1.5 5.5Z" className={ACCENT} />
-    <path d="M2.5 18.5 4 13h7l1.5 5.5Z" />
-    <path d="M11.5 18.5 13 13h7l1.5 5.5Z" />
-    <path d="M7.2 13 8.7 7.5h6.6l1.5 5.5M2 21h20" />
+    <path d="M12 21V8" />
+    <path d="M12 8c-2.4-.6-3.6-2.4-3.6-4.8 2.4.6 3.6 2.4 3.6 4.8ZM12 8c2.4-.6 3.6-2.4 3.6-4.8-2.4.6-3.6 2.4-3.6 4.8Z" className={ACCENT} />
+    <path d="M12 13c-2.4-.6-3.6-2.4-3.6-4.8 2.4.6 3.6 2.4 3.6 4.8ZM12 13c2.4-.6 3.6-2.4 3.6-4.8-2.4.6-3.6 2.4-3.6 4.8Z" />
+    <path d="M12 18c-2.4-.6-3.6-2.4-3.6-4.8 2.4.6 3.6 2.4 3.6 4.8ZM12 18c2.4-.6 3.6-2.4 3.6-4.8-2.4.6-3.6 2.4-3.6 4.8Z" />
   </Svg>
 );
 
-/** B — Équipements et machines : engrenage. */
+/** B — BTP et matériaux : mur de briques et grue. */
+export const ConstructionIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M3 15h9v6H3Z" className={ACCENT} />
+    <path d="M3 15h9v6H3ZM3 18h9M7.5 15v3M5 18v3M10 18v3" />
+    <path d="M16 21V4h-1.5M16 4h5.5M16 4l-3 3.5h8.5M19 7.5v3" />
+    <path d="M18 10.5h2v1.8h-2Z" />
+  </Svg>
+);
+
+/** C — Énergie, mines et hydrocarbures : derrick et éclair. */
+export const EnergyIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="m8.5 3-4 18M8.5 3l4 18M6.6 11h3.8M5.5 16h6" />
+    <path d="M3 21h11" />
+    <path d="m17.5 6-2.5 5h3.5L16 17" className={ACCENT} />
+    <path d="m17.5 6-2.5 5h3.5L16 17" />
+  </Svg>
+);
+
+/** D — Mécanique, métallurgie et machines : engrenage. */
 export const MachineryIcon = (p: IconProps) => (
   <Svg {...p}>
     <path d={GEAR_PATH} className={ACCENT} />
@@ -57,33 +77,40 @@ export const MachineryIcon = (p: IconProps) => (
   </Svg>
 );
 
-/** C — Composants et pièces : écrou hexagonal. */
-export const ComponentsIcon = (p: IconProps) => (
+/** E — Chimie, plasturgie et pharmacie : fiole. */
+export const ChemistryIcon = (p: IconProps) => (
   <Svg {...p}>
-    <path
-      d="M12 3.5 19.4 7.75v8.5L12 20.5l-7.4-4.25v-8.5ZM8.4 12a3.6 3.6 0 1 0 7.2 0 3.6 3.6 0 1 0-7.2 0Z"
-      fillRule="evenodd"
-      className={ACCENT}
-    />
-    <circle cx="12" cy="12" r="3.6" />
+    <path d="M6.2 15.5h11.6l1.6 3a1.6 1.6 0 0 1-1.4 2.5H6a1.6 1.6 0 0 1-1.4-2.5Z" className={ACCENT} />
+    <path d="M9.5 3h5M10.5 3v6.2L4.6 18.5A1.6 1.6 0 0 0 6 21h12a1.6 1.6 0 0 0 1.4-2.5L13.5 9.2V3" />
+    <path d="M10 18h.01M14 17.5h.01" />
   </Svg>
 );
 
-/** D — Services aux entreprises : casque de chantier. */
-export const ServicesIcon = (p: IconProps) => (
+/** F — Électrique, électronique et automatisme : puce. */
+export const ElectronicsIcon = (p: IconProps) => (
   <Svg {...p}>
-    <path d="M4.5 15.5V14a7.5 7.5 0 0 1 15 0v1.5Z" className={ACCENT} />
-    <path d="M10 6.8V5.5h4v1.3M10 6.8V12M14 6.8V12" />
-    <path d="M2.5 15.5h19v1.2a1.8 1.8 0 0 1-1.8 1.8H4.3a1.8 1.8 0 0 1-1.8-1.8Z" />
+    <path d="M9 9h6v6H9Z" className={ACCENT} />
+    <path d="M6 6h12v12H6ZM9 9h6v6H9Z" />
+    <path d="M9 3v3M12 3v3M15 3v3M9 18v3M12 18v3M15 18v3M3 9h3M3 12h3M3 15h3M18 9h3M18 12h3M18 15h3" />
   </Svg>
 );
 
-/** E — Consommables et fournitures : carton scellé. */
-export const SuppliesIcon = (p: IconProps) => (
+/** G — Numérique et technologies : écran et balises de code. */
+export const DigitalIcon = (p: IconProps) => (
   <Svg {...p}>
-    <path d="M12 3 20 7.5 12 12 4 7.5Z" className={ACCENT} />
-    <path d="M4 7.5v9L12 21l8-4.5v-9M12 12v9" />
-    <path d="m8 5.25 8 4.5v3.4" />
+    <path d="M3 4.5h18v11.5H3Z" className={ACCENT} />
+    <path d="M3 4.5h18v11.5H3ZM9 20h6M12 16v4" />
+    <path d="m9.5 8-2.5 2.2 2.5 2.3M14.5 8l2.5 2.2-2.5 2.3" />
+  </Svg>
+);
+
+/** H — Services, logistique et emballage : camion. */
+export const LogisticsIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M2.5 6h11v10h-11Z" className={ACCENT} />
+    <path d="M2.5 6h11v10h-11ZM13.5 9.5h4l3 3.5v3h-7" />
+    <circle cx="6.5" cy="17.5" r="1.8" className="fill-white" />
+    <circle cx="17" cy="17.5" r="1.8" className="fill-white" />
   </Svg>
 );
 
@@ -130,15 +157,18 @@ export const LanguagesIcon = (p: IconProps) => (
 );
 
 const SECTOR_ICONS: Record<string, (p: IconProps) => ReturnType<typeof Svg>> = {
-  A: RawMaterialsIcon,
-  B: MachineryIcon,
-  C: ComponentsIcon,
-  D: ServicesIcon,
-  E: SuppliesIcon,
+  A: AgriFoodIcon,
+  B: ConstructionIcon,
+  C: EnergyIcon,
+  D: MachineryIcon,
+  E: ChemistryIcon,
+  F: ElectronicsIcon,
+  G: DigitalIcon,
+  H: LogisticsIcon,
 };
 
-/** Pictogramme d'un grand secteur (A à E). */
+/** Pictogramme d'un grand secteur (A à H). */
 export const SectorIcon = ({ id, ...p }: IconProps & { id: string }) => {
-  const Icon = SECTOR_ICONS[id] || SuppliesIcon;
+  const Icon = SECTOR_ICONS[id] || LogisticsIcon;
   return <Icon {...p} />;
 };

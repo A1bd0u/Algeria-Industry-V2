@@ -111,10 +111,10 @@ describe('Catalogue public : filtres et tri côté serveur', () => {
   };
 
   it('développe un groupe de catégories en ses sous-catégories', async () => {
-    const { res, q } = await listWith(`category=${encodeURIComponent('Composants & Pièces Détachées')}`);
+    const { res, q } = await listWith(`category=${encodeURIComponent('Mécanique, Métallurgie & Machines')}`);
     expect(res.status).toBe(200);
     const inFilter = q.filters.find((f) => f.method === 'in' && f.args[0] === 'category');
-    expect(inFilter?.args[1]).toContain('Pièces mécaniques : Engrenages, roulements, joints.');
+    expect(inFilter?.args[1]).toContain('Pièces mécaniques, roulements & transmission');
   });
 
   it('trie par prix et filtre par wilaya et par entreprise', async () => {

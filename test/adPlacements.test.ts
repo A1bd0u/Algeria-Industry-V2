@@ -19,8 +19,8 @@ describe('Emplacements du bandeau publicitaire', () => {
   });
 
   it('retrouve le groupe d\'une catégorie produit', () => {
-    expect(categoryGroupId('Machines-outils : Tours, fraiseuses, presses.')).toBe('B');
-    expect(categoryGroupId('Consommables & Fournitures')).toBe('E');
+    expect(categoryGroupId('Machines-outils & usinage')).toBe('D');
+    expect(categoryGroupId('Numérique & Technologies')).toBe('G');
     expect(categoryGroupId('C')).toBe('C');
     expect(categoryGroupId('Inconnue')).toBeNull();
     expect(categoryGroupId(null)).toBeNull();

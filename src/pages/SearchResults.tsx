@@ -18,6 +18,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { cn, generateSlugUrl } from '../lib/utils';
 import ProductImage from '../components/ui/ProductImage';
 import EmptyState from '../components/ui/EmptyState';
+import { categoryLabel } from '../data/productCategories';
 
 const SearchResults = () => {
   const [searchParams] = useSearchParams();
@@ -201,7 +202,7 @@ const SearchResults = () => {
                                   </div>
                                   <div className="flex items-center space-x-4 text-xs font-black text-gray-500 uppercase tracking-widest">
                                     <span className="flex items-center"><Globe className="h-3 w-3 me-1" /> {company.wilaya || company.address || t('search.algeria')}</span>
-                                    <span className="flex items-center"><Package className="h-3 w-3 me-1" /> {company.activity_sector || t('search.general')}</span>
+                                    <span className="flex items-center"><Package className="h-3 w-3 me-1" /> {company.activity_sector ? categoryLabel(t, company.activity_sector) : t('search.general')}</span>
                                   </div>
                                 </div>
                               </div>

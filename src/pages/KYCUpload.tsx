@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { ArrowLeft, ArrowRight, Building2, CheckCircle2, FileText, Loader2, Upload, AlertTriangle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { productCategories } from '../data/productCategories';
 
 const KYCUpload = () => {
   const { t } = useTranslation();
@@ -136,14 +137,18 @@ const KYCUpload = () => {
                   <div className="space-y-8">
                      <div>
                         <label className="block text-sm font-black text-gray-700 tracking-widest mb-3">{t('kyc.sector')}</label>
-                        <input 
-                          type="text" 
+                        {/* Secteur choisi dans la nomenclature : l'annuaire filtre sur cette valeur (libellé français). */}
+                        <select
                           required
                           value={activity}
                           onChange={(e) => setActivity(e.target.value)}
-                          placeholder="Ex: Construction, Énergie, Informatique..."
                           className="w-full px-5 py-4 bg-gray-50 border border-gray-200 rounded-2xl focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-medium outline-none"
-                        />
+                        >
+                          <option value="">{t('kyc.sectorPlaceholder')}</option>
+                          {productCategories.map((group) => (
+                            <option key={group.id} value={group.name}>{t(`productCategories.${group.id}`)}</option>
+                          ))}
+                        </select>
                      </div>
 
                      <div className="pt-6 border-t border-gray-100">

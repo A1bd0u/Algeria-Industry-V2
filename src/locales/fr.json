@@ -28,7 +28,7 @@
     "adminConsole": "Console d'administration",
     "mobileTabs": "Navigation principale",
     "language": "Langue : {{name}}",
-    "megaHint": "Cinq secteurs, de la matière première aux services industriels.",
+    "megaHint": "Huit secteurs, de l'agroalimentaire au numérique.",
     "console_pro": "Espace administrateur"
   },
   "hero": {
@@ -171,7 +171,7 @@
     "categories": {
       "label": "Secteurs",
       "title": "Explorer par secteur",
-      "subtitle": "Cinq grands univers industriels, de la matière première aux services.",
+      "subtitle": "Huit secteurs pensés pour l'industrie algérienne, de l'agroalimentaire au numérique.",
       "count": "{{count}} sous-catégories",
       "all": "Tout le catalogue"
     },
@@ -473,7 +473,8 @@
     "email": "Email",
     "no_docs": "Aucun document attaché.",
     "select_doc": "Sélectionnez un document",
-    "reject_reason": "Motif du rejet *"
+    "reject_reason": "Motif du rejet *",
+    "sectorPlaceholder": "Choisissez votre secteur"
   },
   "ads": {
     "title": "Espace Publicitaire",
@@ -774,37 +775,55 @@
     "acceptTermsAfter": "."
   },
   "productCategories": {
-    "A": "Matières Premières & Semi-produits",
-    "A1": "Métaux (acier, aluminium, cuivre, etc.)",
-    "A2": "Chimie de base (acides, solvants, polymères)",
-    "A3": "Matériaux de construction (ciment, briques, verre)",
-    "A4": "Textiles bruts & cuirs",
-    "A5": "Produits agricoles bruts",
-    "B": "Équipements & Machines Industrielles",
-    "B1": "Machines-outils : Tours, fraiseuses, presses.",
-    "B2": "Équipements de production : Lignes de montage, robots industriels.",
-    "B3": "Engins de chantier & BTP : Pelles, bulldozers, grues.",
-    "B4": "Équipements agricoles : Tracteurs, moissonneuses.",
-    "B5": "Matériel de manutention : Chariots élévateurs, convoyeurs.",
-    "C": "Composants & Pièces Détachées",
-    "C1": "Composants électroniques : Capteurs, microcontrôleurs, cartes.",
-    "C2": "Pièces mécaniques : Engrenages, roulements, joints.",
-    "C3": "Pièces automobiles : Moteurs, freins, systèmes électriques.",
-    "C4": "Équipements hydrauliques & pneumatiques.",
-    "D": "Services aux Entreprises",
-    "D1": "Maintenance industrielle : Réparation, entretien préventif.",
-    "D2": "Ingénierie & Bureau d'études : Conception, prototypage.",
-    "D3": "Logistique & Transport : Stockage, distribution, fret.",
-    "D4": "Conseil & Formation : Management, certifications, sécurité.",
-    "D5": "Sous-traitance industrielle : Traitement de surface, usinage, etc.",
-    "D6": "Informatique industrielle : Logiciels, automatisation, IA.",
-    "E": "Consommables & Fournitures",
-    "E1": "Outillage : Outils à main, outillage électroportatif.",
-    "E2": "Produits d'entretien & hygiène : Nettoyants, lubrifiants.",
-    "E3": "Équipements de protection (EPI) : Casques, gants, chaussures de sécurité.",
-    "E4": "Emballages : Cartons, films, palettes.",
-    "E5": "Fournitures de bureau.",
-    "uncategorized": "Non catégorisé"
+    "A": "Agroalimentaire & Agriculture",
+    "A1": "Ingrédients & matières premières agricoles",
+    "A2": "Machines agroalimentaires & lignes de conditionnement",
+    "A3": "Matériel agricole, irrigation & serres",
+    "A4": "Froid industriel & stockage",
+    "A5": "Boissons, laiterie & minoterie",
+    "B": "BTP & Matériaux de construction",
+    "B1": "Ciment, granulats & béton",
+    "B2": "Acier de construction, rond à béton & profilés",
+    "B3": "Engins de chantier & levage",
+    "B4": "Second œuvre : menuiserie, carrelage, isolation",
+    "B5": "Plomberie, sanitaire & robinetterie",
+    "C": "Énergie, Mines & Hydrocarbures",
+    "C1": "Équipements pétroliers & gaziers",
+    "C2": "Énergies renouvelables : solaire, éolien, stockage",
+    "C3": "Production & distribution électrique",
+    "C4": "Mines, carrières & forage",
+    "D": "Mécanique, Métallurgie & Machines",
+    "D1": "Machines-outils & usinage",
+    "D2": "Pièces mécaniques, roulements & transmission",
+    "D3": "Hydraulique & pneumatique",
+    "D4": "Manutention, levage & stockage",
+    "D5": "Pièces automobiles & poids lourds",
+    "D6": "Fonderie, chaudronnerie & métaux",
+    "E": "Chimie, Plasturgie & Pharmacie",
+    "E1": "Chimie de base & produits industriels",
+    "E2": "Plastiques, caoutchouc & polymères",
+    "E3": "Industrie pharmaceutique & dispositifs médicaux",
+    "E4": "Peintures, détergents & cosmétiques",
+    "uncategorized": "Non catégorisé",
+    "F": "Électrique, Électronique & Automatisme",
+    "F1": "Composants électroniques & capteurs",
+    "F2": "Automates, robotique & IoT industriel",
+    "F3": "Matériel électrique, câbles & éclairage",
+    "F4": "Électroménager, climatisation & froid",
+    "G": "Numérique & Technologies",
+    "G1": "Logiciels de gestion : ERP, CRM, paie",
+    "G2": "Cloud, hébergement & centres de données",
+    "G3": "Cybersécurité",
+    "G4": "Intelligence artificielle & données",
+    "G5": "Télécoms & réseaux",
+    "G6": "Matériel informatique & bureautique",
+    "H": "Services, Logistique & Emballage",
+    "H1": "Transport, logistique & transit",
+    "H2": "Emballage & conditionnement",
+    "H3": "Maintenance industrielle",
+    "H4": "Ingénierie, conseil & certification (ISO, HSE)",
+    "H5": "EPI, hygiène & sécurité",
+    "H6": "Textile, cuir & vêtements professionnels"
   },
   "addProduct": {
     "titleNew": "Nouveau produit",
@@ -1549,22 +1568,31 @@
     "suppliers": "Fournisseurs actifs dans ce secteur",
     "others": "Autres secteurs",
     "A": {
-      "intro": "Métaux, chimie de base, matériaux de construction, textiles et produits agricoles bruts : trouvez vos fournisseurs de matières premières en Algérie."
+      "intro": "Ingrédients, machines de transformation, matériel agricole, irrigation et froid : les fournisseurs de la première industrie du pays, de la ferme à l'usine."
     },
     "B": {
-      "intro": "Machines-outils, lignes de production, engins de chantier, matériel agricole et de manutention, auprès de fournisseurs vérifiés."
+      "intro": "Ciment, acier, engins de chantier, second œuvre et sanitaire : tout ce qu'il faut pour bâtir, du gros œuvre à la livraison."
     },
     "C": {
-      "intro": "Composants électroniques, pièces mécaniques et automobiles, hydraulique et pneumatique : les pièces dont votre production a besoin."
+      "intro": "Équipements pétroliers et gaziers, solaire, réseaux électriques, mines et forage : les fournisseurs de l'énergie algérienne, fossile et renouvelable."
     },
     "D": {
-      "intro": "Maintenance, ingénierie, logistique, conseil, sous-traitance et informatique industrielle : des prestataires pour vos projets."
+      "intro": "Machines-outils, pièces mécaniques, hydraulique, manutention, pièces automobiles et chaudronnerie : la mécanique qui fait tourner les usines."
     },
     "E": {
-      "intro": "Outillage, produits d'entretien, équipements de protection, emballages et fournitures : les consommables de votre activité."
+      "intro": "Chimie de base, plastiques, médicaments, dispositifs médicaux, peintures et détergents : des fournisseurs aux normes de l'industrie de transformation."
     },
     "code": "Secteur {{code}}",
-    "label": "Nomenclature Industigo"
+    "label": "Nomenclature Industigo",
+    "F": {
+      "intro": "Composants, capteurs, automates, robotique, matériel électrique et électroménager : l'électricité et l'électronique au service de la production."
+    },
+    "G": {
+      "intro": "Logiciels de gestion, cloud, cybersécurité, intelligence artificielle, télécoms et matériel informatique : les solutions numériques des entreprises algériennes."
+    },
+    "H": {
+      "intro": "Transport et transit, emballage, maintenance, ingénierie, certification, équipements de protection et textile professionnel : les services qui font tourner la chaîne."
+    }
   },
   "emptyStates": {
     "directoryText": "Essayez une autre wilaya ou un autre secteur, ou référencez votre entreprise.",

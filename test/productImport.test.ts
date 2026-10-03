@@ -33,9 +33,9 @@ describe('Lecture des fichiers d\'import', () => {
   });
 
   it('résout la catégorie par code ou par libellé', () => {
-    expect(resolveCategory('b1')).toBe('Machines-outils : Tours, fraiseuses, presses.');
-    expect(resolveCategory('Machines-outils')).toBe('Machines-outils : Tours, fraiseuses, presses.');
-    expect(resolveCategory('metaux')).toBe('Métaux (acier, aluminium, cuivre, etc.)');
+    expect(resolveCategory('d1')).toBe('Machines-outils & usinage');
+    expect(resolveCategory('Logiciels de gestion')).toBe('Logiciels de gestion : ERP, CRM, paie');
+    expect(resolveCategory('cybersecurite')).toBe('Cybersécurité');
     expect(resolveCategory('Fusées')).toBeNull();
   });
 
@@ -91,7 +91,7 @@ describe('POST /api/products/import', () => {
   it('crée les produits en brouillon', async () => {
     const mock = setup('pro', 0);
     const res = await request(app).post('/api/products/import').set('Cookie', ['token=t']).send({ rows: [
-      { line: 2, name: 'Pompe centrifuge', category: 'B2', price: '185 000', description: 'Inox' },
+      { line: 2, name: 'Pompe centrifuge', category: 'D3', price: '185 000', description: 'Inox' },
       { line: 3, name: 'Gants nitrile', category: '', price: '' },
     ] });
     expect(res.status).toBe(201);
@@ -99,7 +99,7 @@ describe('POST /api/products/import', () => {
     const insert = mock.queries.find((q) => q.table === 'products' && q.op === 'insert');
     expect(insert?.payload[0]).toMatchObject({ name: 'Pompe centrifuge', price: 185000, status: 'Brouillon', owner_id: '11111111-1111-4111-8111-111111111111' });
     expect(insert?.payload[1]).toMatchObject({ category: 'Non catégorisé', price: null });
-    expect(insert?.payload[0].category).toContain('Équipements de production');
+    expect(insert?.payload[0].category).toBe('Hydraulique & pneumatique');
   });
 
   it('ne crée rien si une ligne est invalide', async () => {
