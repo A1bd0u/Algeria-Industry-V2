@@ -138,7 +138,7 @@ const Navbar = () => {
                       className="fixed left-1/2 top-[76px] pt-4 w-[min(1040px,calc(100vw-4rem))] z-50"
                     >
                       <div className="bg-[#222] text-white shadow-2xl border border-white/10 overflow-hidden rounded-2xl">
-                      <div className="grid grid-cols-5 gap-1 p-3">
+                      <div className="grid grid-cols-4 gap-1 p-3">
                         {productCategories.map((group) => {
                           return (
                             <div key={group.id} className="rounded-xl p-3 hover:bg-white/[0.03] transition-colors">

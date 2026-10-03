@@ -17,6 +17,7 @@ import { absoluteUrl } from '../config/site';
 import { formatNumber } from '../lib/format';
 import { CompanyAvatar } from '../components/ui/ProductImage';
 import EmptyState from '../components/ui/EmptyState';
+import { categoryLabel } from '../data/productCategories';
 
 const Directory = () => {
   const { t, i18n } = useTranslation();
@@ -227,7 +228,7 @@ const Directory = () => {
                           setIsSectorOpen(false);
                         }}
                       >
-                        <span className={cn(activeSector === s ? "" : "group-hover:translate-x-1 transition-transform")}>{s || t('exhibitor.list.allSectors')}</span>
+                        <span className={cn(activeSector === s ? "" : "group-hover:translate-x-1 transition-transform")}>{s ? categoryLabel(t, s) : t('exhibitor.list.allSectors')}</span>
                         {activeSector === s && <Check className="w-4 h-4 text-primary" />}
                       </button>
                     ))}
@@ -312,7 +313,7 @@ const Directory = () => {
                   </div>
 
                   <div className="mb-5">
-                    {exhibitor.sector && <p className="text-xs font-black text-secondary uppercase tracking-wider mb-1">{exhibitor.sector}</p>}
+                    {exhibitor.sector && <p className="text-xs font-black text-secondary uppercase tracking-wider mb-1">{categoryLabel(t, exhibitor.sector)}</p>}
                     <h3 className="text-lg font-black text-primary tracking-tight group-hover:text-secondary transition-colors mb-2 line-clamp-1">
                       {exhibitor.name}
                     </h3>

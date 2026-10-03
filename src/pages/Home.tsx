@@ -11,7 +11,7 @@ import SEO from '../components/SEO';
 import { SITE_NAME, absoluteUrl } from '../config/site';
 import { CompanyAvatar } from '../components/ui/ProductImage';
 import { AlgeriaMapIcon, LanguagesIcon, SectorIcon, StorefrontIcon, VerifiedRegistryIcon } from '../components/ui/IndustryIcons';
-import { productCategories, sectorPath } from '../data/productCategories';
+import { productCategories, sectorPath, categoryLabel } from '../data/productCategories';
 import ProductCard from '../components/ui/ProductCard';
 
 interface PublicStats {
@@ -224,12 +224,12 @@ const Home = () => {
             }
           />
           {/* Index des secteurs, à la manière d'un catalogue industriel */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 border-t-2 border-primary">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 border-t-2 border-primary">
             {productCategories.map((group) => (
               <Link
                 key={group.id}
                 to={sectorPath(group.id)}
-                className="group flex flex-col border-b border-border-tech sm:border-e lg:last:border-e-0 px-0 sm:px-5 py-6 lg:first:ps-0 hover:bg-neutral-bg transition-colors"
+                className="group flex flex-col border-b border-border-tech sm:border-e sm:[&:nth-child(2n)]:border-e-0 lg:[&:nth-child(2n)]:border-e lg:[&:nth-child(4n)]:border-e-0 px-0 sm:px-5 py-6 lg:[&:nth-child(4n+1)]:ps-0 hover:bg-neutral-bg transition-colors"
               >
                 <div className="flex items-start justify-between gap-3 mb-4">
                   <SectorIcon id={group.id} className="h-11 w-11 text-primary transition-transform duration-300 group-hover:-translate-y-0.5" />
@@ -308,7 +308,7 @@ const Home = () => {
                   <CompanyAvatar src={c.logo_url} name={c.name} className="h-14 w-14 shrink-0 rounded-xl border border-border-tech" />
                   <div className="min-w-0">
                     <p className="font-bold text-primary truncate group-hover:text-secondary transition-colors">{c.name}</p>
-                    <p className="text-xs text-gray-500 truncate">{[c.activity_sector, c.wilaya].filter(Boolean).join(' · ')}</p>
+                    <p className="text-xs text-gray-500 truncate">{[c.activity_sector && categoryLabel(t, c.activity_sector), c.wilaya].filter(Boolean).join(' · ')}</p>
                     <p className="mt-1 inline-flex items-center gap-1 text-xs font-bold text-success">
                       <BadgeCheck className="h-3.5 w-3.5" aria-hidden="true" /> {t('home.suppliers.verified')}
                     </p>

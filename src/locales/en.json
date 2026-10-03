@@ -28,7 +28,7 @@
     "adminConsole": "Admin console",
     "mobileTabs": "Main navigation",
     "language": "Language: {{name}}",
-    "megaHint": "Five sectors, from raw materials to industrial services.",
+    "megaHint": "Eight sectors, from agri-food to digital.",
     "console_pro": "Admin area"
   },
   "hero": {
@@ -171,7 +171,7 @@
     "categories": {
       "label": "Sectors",
       "title": "Browse by sector",
-      "subtitle": "Five industrial families, from raw materials to services.",
+      "subtitle": "Eight sectors built around Algerian industry, from agri-food to digital.",
       "count": "{{count}} subcategories",
       "all": "Full catalogue"
     },
@@ -473,7 +473,8 @@
     "email": "Email",
     "no_docs": "No documents attached.",
     "select_doc": "Select a document",
-    "reject_reason": "Reason for rejection *"
+    "reject_reason": "Reason for rejection *",
+    "sectorPlaceholder": "Choose your sector"
   },
   "ads": {
     "title": "Advertising Space",
@@ -774,37 +775,55 @@
     "acceptTermsAfter": "."
   },
   "productCategories": {
-    "A": "Raw materials & semi-finished products",
-    "A1": "Metals (steel, aluminium, copper, etc.)",
-    "A2": "Basic chemicals (acids, solvents, polymers)",
-    "A3": "Construction materials (cement, bricks, glass)",
-    "A4": "Raw textiles & leather",
-    "A5": "Raw agricultural products",
-    "B": "Industrial equipment & machinery",
-    "B1": "Machine tools: lathes, milling machines, presses.",
-    "B2": "Production equipment: assembly lines, industrial robots.",
-    "B3": "Construction machinery: excavators, bulldozers, cranes.",
-    "B4": "Agricultural equipment: tractors, harvesters.",
-    "B5": "Handling equipment: forklifts, conveyors.",
-    "C": "Components & spare parts",
-    "C1": "Electronic components: sensors, microcontrollers, boards.",
-    "C2": "Mechanical parts: gears, bearings, seals.",
-    "C3": "Automotive parts: engines, brakes, electrical systems.",
-    "C4": "Hydraulic & pneumatic equipment.",
-    "D": "Business services",
-    "D1": "Industrial maintenance: repair, preventive maintenance.",
-    "D2": "Engineering & design office: design, prototyping.",
-    "D3": "Logistics & transport: storage, distribution, freight.",
-    "D4": "Consulting & training: management, certifications, safety.",
-    "D5": "Industrial subcontracting: surface treatment, machining, etc.",
-    "D6": "Industrial IT: software, automation, AI.",
-    "E": "Consumables & supplies",
-    "E1": "Tools: hand tools, power tools.",
-    "E2": "Cleaning & hygiene products: cleaners, lubricants.",
-    "E3": "Personal protective equipment (PPE): helmets, gloves, safety shoes.",
-    "E4": "Packaging: cartons, films, pallets.",
-    "E5": "Office supplies.",
-    "uncategorized": "Uncategorized"
+    "A": "Agri-food & Agriculture",
+    "A1": "Ingredients & agricultural raw materials",
+    "A2": "Food processing machines & packaging lines",
+    "A3": "Farm equipment, irrigation & greenhouses",
+    "A4": "Industrial refrigeration & storage",
+    "A5": "Beverages, dairy & flour milling",
+    "B": "Construction & Building materials",
+    "B1": "Cement, aggregates & concrete",
+    "B2": "Structural steel, rebar & sections",
+    "B3": "Construction machinery & lifting",
+    "B4": "Finishing works: joinery, tiling, insulation",
+    "B5": "Plumbing, sanitary ware & taps",
+    "C": "Energy, Mining & Oil and gas",
+    "C1": "Oil and gas equipment",
+    "C2": "Renewable energy: solar, wind, storage",
+    "C3": "Power generation & distribution",
+    "C4": "Mining, quarrying & drilling",
+    "D": "Mechanics, Metalworking & Machinery",
+    "D1": "Machine tools & machining",
+    "D2": "Mechanical parts, bearings & power transmission",
+    "D3": "Hydraulics & pneumatics",
+    "D4": "Material handling, lifting & storage",
+    "D5": "Automotive & truck parts",
+    "D6": "Foundry, boilermaking & metals",
+    "E": "Chemicals, Plastics & Pharmaceuticals",
+    "E1": "Basic chemicals & industrial products",
+    "E2": "Plastics, rubber & polymers",
+    "E3": "Pharmaceuticals & medical devices",
+    "E4": "Paints, detergents & cosmetics",
+    "uncategorized": "Uncategorized",
+    "F": "Electrical, Electronics & Automation",
+    "F1": "Electronic components & sensors",
+    "F2": "PLCs, robotics & industrial IoT",
+    "F3": "Electrical equipment, cables & lighting",
+    "F4": "Home appliances, air conditioning & cooling",
+    "G": "Digital & Technology",
+    "G1": "Business software: ERP, CRM, payroll",
+    "G2": "Cloud, hosting & data centres",
+    "G3": "Cybersecurity",
+    "G4": "Artificial intelligence & data",
+    "G5": "Telecoms & networks",
+    "G6": "IT hardware & office equipment",
+    "H": "Services, Logistics & Packaging",
+    "H1": "Transport, logistics & freight forwarding",
+    "H2": "Packaging",
+    "H3": "Industrial maintenance",
+    "H4": "Engineering, consulting & certification (ISO, HSE)",
+    "H5": "PPE, hygiene & safety",
+    "H6": "Textiles, leather & workwear"
   },
   "addProduct": {
     "titleNew": "New product",
@@ -1549,22 +1568,31 @@
     "suppliers": "Active suppliers in this sector",
     "others": "Other sectors",
     "A": {
-      "intro": "Metals, basic chemicals, building materials, textiles and raw agricultural products: find raw-material suppliers in Algeria."
+      "intro": "Ingredients, processing machines, farm equipment, irrigation and refrigeration: suppliers to the country's leading industry, from farm to factory."
     },
     "B": {
-      "intro": "Machine tools, production lines, construction and agricultural machinery, handling equipment, from verified suppliers."
+      "intro": "Cement, steel, construction machinery, finishing works and sanitary ware: everything needed to build, from structural work to handover."
     },
     "C": {
-      "intro": "Electronic components, mechanical and automotive parts, hydraulics and pneumatics: the parts your production needs."
+      "intro": "Oil and gas equipment, solar, power grids, mining and drilling: suppliers to Algeria's energy sector, fossil and renewable."
     },
     "D": {
-      "intro": "Maintenance, engineering, logistics, consulting, subcontracting and industrial IT: service providers for your projects."
+      "intro": "Machine tools, mechanical parts, hydraulics, handling, automotive parts and boilermaking: the mechanics that keep factories running."
     },
     "E": {
-      "intro": "Tools, cleaning products, protective equipment, packaging and supplies: the consumables of your business."
+      "intro": "Basic chemicals, plastics, medicines, medical devices, paints and detergents: suppliers meeting process-industry standards."
     },
     "code": "Sector {{code}}",
-    "label": "Industigo classification"
+    "label": "Industigo classification",
+    "F": {
+      "intro": "Components, sensors, PLCs, robotics, electrical equipment and appliances: electrical and electronic engineering serving production."
+    },
+    "G": {
+      "intro": "Business software, cloud, cybersecurity, artificial intelligence, telecoms and IT hardware: digital solutions for Algerian businesses."
+    },
+    "H": {
+      "intro": "Transport and forwarding, packaging, maintenance, engineering, certification, protective equipment and workwear: the services that keep the chain moving."
+    }
   },
   "emptyStates": {
     "directoryText": "Try another province or sector, or list your company.",
