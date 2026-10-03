@@ -207,7 +207,7 @@ export const renderInvoiceHtml = (sub: any) => {
 <html lang="fr"><head><meta charset="utf-8"><title>Facture ${escapeHtml(sub.invoice_number)}</title>
 <style>
 body{font-family:Arial,sans-serif;color:#1a1a1a;max-width:800px;margin:40px auto;padding:0 24px;font-size:14px}
-header{display:flex;justify-content:space-between;border-bottom:4px solid #4338ca;padding-bottom:16px;margin-bottom:24px}
+header{display:flex;justify-content:space-between;border-bottom:4px solid #ff6b00;padding-bottom:16px;margin-bottom:24px}
 h1{font-size:22px;margin:0} .muted{color:#6b7280} table{width:100%;border-collapse:collapse;margin:24px 0}
 th,td{border-bottom:1px solid #e5e7eb;padding:10px;text-align:left} th{background:#f8f9fa}
 .right{text-align:right} .total td{font-weight:bold;font-size:16px} .status{display:inline-block;padding:4px 10px;border-radius:6px;background:#f3f4f6;font-weight:bold}
@@ -216,7 +216,7 @@ th,td{border-bottom:1px solid #e5e7eb;padding:10px;text-align:left} th{backgroun
 <div class="no-print"><button id="print">Imprimer / enregistrer en PDF</button></div>
 <script>document.getElementById('print').addEventListener('click', function () { window.print(); });</script>
 <header>
-  <div><h1>industi<span style="color:#4338ca">go</span></h1>
+  <div><h1><span style="color:#c44700">industigo</span></h1>
     <div class="muted">${pending(legalSetting('COMPANY_NAME'))}<br>${pending(legalSetting('ADDRESS'))}<br>
     RC : ${pending(legalSetting('RC'))} — NIF : ${pending(legalSetting('NIF'))}</div></div>
   <div class="right"><h1>Facture</h1><div>${escapeHtml(sub.invoice_number)}</div>
