@@ -674,7 +674,8 @@
     "PLAN_IMAGE_LIMIT": "Nombre de photos limité par votre offre. Passez à une offre supérieure.",
     "WEBSITE_INVALID": "Adresse de site web invalide.",
     "CATALOGUE_LIMIT_REACHED": "Nombre de catalogues PDF limité par votre offre. Passez à une offre supérieure.",
-    "CATALOGUE_FILE_INVALID": "Fichier invalide : déposez un PDF depuis votre tableau de bord."
+    "CATALOGUE_FILE_INVALID": "Fichier invalide : déposez un PDF depuis votre tableau de bord.",
+    "IMPORT_INVALID_ROWS": "Certaines lignes sont invalides : corrigez-les puis réessayez."
   },
   "mfa": {
     "title": "Double authentification",
@@ -928,10 +929,12 @@
       "deleteConfirm": "Supprimer ce produit ?",
       "status": {
         "Actif": "Actif",
-        "Inactif": "Inactif"
+        "Inactif": "Inactif",
+        "Brouillon": "Brouillon"
       },
       "emptyTitle": "Aucun produit",
-      "emptyText": "Vous n'avez pas encore ajouté de produits à votre catalogue."
+      "emptyText": "Vous n'avez pas encore ajouté de produits à votre catalogue.",
+      "draftHint": "Ajoutez une photo pour publier ce produit."
     },
     "company": {
       "name": "Nom de l'entreprise",
@@ -1624,5 +1627,50 @@
     "saveFailed": "Impossible de publier le catalogue.",
     "deleteFailed": "Impossible de retirer le catalogue.",
     "removed": "Retiré par la modération"
+  },
+  "productImport": {
+    "open": "Importer",
+    "title": "Importer des produits",
+    "subtitle": "Depuis un fichier Excel (.xlsx) ou CSV, jusqu'à {{max}} produits à la fois.",
+    "close": "Fermer",
+    "step1": "Téléchargez le modèle",
+    "template": "Modèle CSV",
+    "step2": "Remplissez-le",
+    "step2Text": "Une ligne par produit : nom (obligatoire), catégorie (code ou libellé), prix en DA (vide = sur devis), description.",
+    "step3": "Importez et vérifiez",
+    "step3Text": "Les erreurs sont signalées ligne par ligne avant toute création.",
+    "codes": "Codes des catégories",
+    "choose": "Choisir un fichier",
+    "formats": "Excel (.xlsx) ou CSV, 5 Mo maximum",
+    "summary": "{{valid}} ligne(s) prête(s), {{invalid}} à corriger",
+    "colLine": "Ligne",
+    "colName": "Nom",
+    "colCategory": "Catégorie",
+    "colPrice": "Prix",
+    "colStatus": "Contrôle",
+    "ok": "Prête",
+    "onRequest": "Sur devis",
+    "skipInvalid": "Les lignes à corriger seront ignorées : corrigez-les dans votre fichier et importez-les ensuite.",
+    "draftNote": "Les produits sont créés en brouillon : ajoutez une photo à chacun pour le publier.",
+    "cancel": "Annuler",
+    "submit": "Importer {{count}} produit(s)",
+    "success": "{{count}} produit(s) importé(s) en brouillon. Ajoutez une photo à chacun pour le publier.",
+    "planLimit": "Votre offre permet {{limit}} produits : il vous reste {{remaining}} place(s). Retirez des lignes ou passez à une offre supérieure.",
+    "failed": "L'import a échoué.",
+    "errors": {
+      "TOO_LARGE": "Fichier trop volumineux (5 Mo maximum).",
+      "FORMAT": "Format non pris en charge : utilisez un fichier .xlsx ou .csv.",
+      "READ": "Impossible de lire ce fichier.",
+      "EMPTY_FILE": "Le fichier est vide.",
+      "NAME_COLUMN_MISSING": "Colonne « nom » introuvable sur la première ligne : partez du modèle.",
+      "TOO_MANY_ROWS": "{{max}} produits au maximum par import : divisez votre fichier."
+    },
+    "issues": {
+      "NAME_REQUIRED": "nom manquant",
+      "NAME_TOO_LONG": "nom trop long",
+      "CATEGORY_UNKNOWN": "catégorie inconnue",
+      "PRICE_INVALID": "prix invalide",
+      "DESCRIPTION_TOO_LONG": "description trop longue"
+    }
   }
 }

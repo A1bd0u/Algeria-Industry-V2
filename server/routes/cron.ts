@@ -3,6 +3,7 @@ import express from 'express';
 import { logger } from '../utils/logger';
 import { expireSubscriptions } from '../services/billingService';
 import { notifyExpired, sendExpiryReminders } from '../services/notificationService';
+import { sendOnboardingReminders } from '../services/onboardingReminders';
 
 const router = express.Router();
 
@@ -17,7 +18,9 @@ const isAuthorized = (header: string | undefined, secret: string) => {
 // l'en-tête « Authorization: Bearer <CRON_SECRET> » :
 //   1. passe en « expiré » les abonnements échus (retour à l'offre gratuite) ;
 //   2. prévient les titulaires des abonnements qui viennent d'expirer ;
-//   3. envoie les rappels J-30 et J-7.
+//   3. envoie les rappels J-30 et J-7 ;
+//   4. envoie les relances d'accompagnement des fournisseurs (KYC, premier
+//      produit, fiche incomplète).
 // Chaque étape est idempotente : relancer la tâche ne renvoie aucun e-mail.
 router.post('/daily', async (req, res) => {
   const secret = process.env.CRON_SECRET;
@@ -32,7 +35,14 @@ router.post('/daily', async (req, res) => {
     const expired = await expireSubscriptions();
     const expiredNotices = await notifyExpired();
     const reminders = await sendExpiryReminders();
-    const result = { expired, expiredNotices, ...reminders };
+    // Une relance en échec ne doit pas faire échouer la facturation.
+    let onboarding: Record<string, number> | { error: true } = { error: true };
+    try {
+      onboarding = await sendOnboardingReminders();
+    } catch (err) {
+      logger.error('[Cron] Relances d\'accompagnement en échec :', err);
+    }
+    const result = { expired, expiredNotices, ...reminders, onboarding };
     logger.info('[Cron] Tâche quotidienne terminée', result);
     return res.json(result);
   } catch (err) {

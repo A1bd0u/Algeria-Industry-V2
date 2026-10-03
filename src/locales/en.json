@@ -674,7 +674,8 @@
     "PLAN_IMAGE_LIMIT": "Number of photos limited by your plan. Upgrade your plan.",
     "WEBSITE_INVALID": "Invalid website address.",
     "CATALOGUE_LIMIT_REACHED": "Your plan limits the number of PDF catalogues. Upgrade to a higher plan.",
-    "CATALOGUE_FILE_INVALID": "Invalid file: upload a PDF from your dashboard."
+    "CATALOGUE_FILE_INVALID": "Invalid file: upload a PDF from your dashboard.",
+    "IMPORT_INVALID_ROWS": "Some rows are invalid: fix them and try again."
   },
   "mfa": {
     "title": "Two-factor authentication",
@@ -928,10 +929,12 @@
       "deleteConfirm": "Delete this product?",
       "status": {
         "Actif": "Active",
-        "Inactif": "Inactive"
+        "Inactif": "Inactive",
+        "Brouillon": "Draft"
       },
       "emptyTitle": "No products",
-      "emptyText": "You have not added any products to your catalogue yet."
+      "emptyText": "You have not added any products to your catalogue yet.",
+      "draftHint": "Add a photo to publish this product."
     },
     "company": {
       "name": "Company name",
@@ -1624,5 +1627,50 @@
     "saveFailed": "Unable to publish the catalogue.",
     "deleteFailed": "Unable to remove the catalogue.",
     "removed": "Removed by moderation"
+  },
+  "productImport": {
+    "open": "Import",
+    "title": "Import products",
+    "subtitle": "From an Excel (.xlsx) or CSV file, up to {{max}} products at a time.",
+    "close": "Close",
+    "step1": "Download the template",
+    "template": "CSV template",
+    "step2": "Fill it in",
+    "step2Text": "One row per product: name (required), category (code or label), price in DZD (empty = on request), description.",
+    "step3": "Import and check",
+    "step3Text": "Errors are shown row by row before anything is created.",
+    "codes": "Category codes",
+    "choose": "Choose a file",
+    "formats": "Excel (.xlsx) or CSV, 5 MB max",
+    "summary": "{{valid}} row(s) ready, {{invalid}} to fix",
+    "colLine": "Row",
+    "colName": "Name",
+    "colCategory": "Category",
+    "colPrice": "Price",
+    "colStatus": "Check",
+    "ok": "Ready",
+    "onRequest": "On request",
+    "skipInvalid": "Rows with errors will be skipped: fix them in your file and import them afterwards.",
+    "draftNote": "Products are created as drafts: add a photo to each one to publish it.",
+    "cancel": "Cancel",
+    "submit": "Import {{count}} product(s)",
+    "success": "{{count}} product(s) imported as drafts. Add a photo to each one to publish it.",
+    "planLimit": "Your plan allows {{limit}} products: {{remaining}} slot(s) left. Remove rows or upgrade.",
+    "failed": "Import failed.",
+    "errors": {
+      "TOO_LARGE": "File too large (5 MB max).",
+      "FORMAT": "Unsupported format: use a .xlsx or .csv file.",
+      "READ": "Unable to read this file.",
+      "EMPTY_FILE": "The file is empty.",
+      "NAME_COLUMN_MISSING": "No “name” column on the first row: start from the template.",
+      "TOO_MANY_ROWS": "{{max}} products max per import: split your file."
+    },
+    "issues": {
+      "NAME_REQUIRED": "name missing",
+      "NAME_TOO_LONG": "name too long",
+      "CATEGORY_UNKNOWN": "unknown category",
+      "PRICE_INVALID": "invalid price",
+      "DESCRIPTION_TOO_LONG": "description too long"
+    }
   }
 }

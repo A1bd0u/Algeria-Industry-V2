@@ -10,7 +10,9 @@
   
   /* Algeria Industry Technical Palette */
   --color-primary: #1a1a1a;
-  --color-secondary: #ff6b00;
+  /* Orange de la marque, assombri pour un contraste AA (4,5:1) avec un texte
+     blanc et sur fond clair. Sur fond sombre, il est éclairci plus bas. */
+  --color-secondary: #c44700;
   --color-neutral-bg: #f8f9fa;
   --color-accent: #004a99;
   --color-error: #e11d48;
@@ -25,6 +27,16 @@
 }
 
 @layer base {
+  /* Sur fond sombre (en-tête, pied de page, blocs noirs), l'orange redevient
+     vif pour rester lisible ; un aplat orange garde la teinte foncée afin que
+     son texte blanc reste lisible. */
+  .bg-primary, .bg-black, .bg-neutral-950, .bg-\[\#1a1a1a\], .bg-\[\#1A1A1A\], .bg-\[\#222\] {
+    --color-secondary: #ff7a1a;
+  }
+  .bg-secondary, .hover\:bg-secondary:hover, .group:hover .group-hover\:bg-secondary {
+    --color-secondary: #c44700;
+  }
+
   body {
     @apply bg-neutral-bg text-gray-900 font-sans antialiased;
   }
