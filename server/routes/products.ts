@@ -10,6 +10,7 @@ import { isAllowedImageUrl } from '../utils/storageUrl';
 import { generateReferenceId } from '../utils/reference';
 import { z } from 'zod';
 import { validate } from '../middlewares/validateMiddleware';
+import { MAX_IMPORT_ROWS, validateRow } from '../../src/lib/productImport';
 
 
 const router = express.Router();
@@ -240,6 +241,72 @@ router.get('/:id', requireUuidParams('id'), async (req, res, next) => {
     return res.json({ product: formattedProduct, similar: formattedSimilar });
   } catch (err: any) {
     logger.error("Supabase Error GET /products/:id:", err);
+    next(err);
+  }
+});
+
+// POST /api/products/import - Import en masse (fichier CSV ou Excel lu par le
+// navigateur). Toutes les lignes sont recontrôlées ici ; au moindre défaut,
+// rien n'est créé. Les produits arrivent en brouillon : le fournisseur ajoute
+// ensuite une photo à chacun avant de le publier.
+const importSchema = z.object({
+  rows: z.array(z.object({
+    line: z.number().int().positive().optional(),
+    name: z.unknown(),
+    category: z.unknown().optional(),
+    price: z.unknown().optional(),
+    description: z.unknown().optional(),
+  })).min(1, 'Aucune ligne à importer.').max(MAX_IMPORT_ROWS, `${MAX_IMPORT_ROWS} lignes au maximum par import.`),
+});
+
+router.post('/import', verifyRole(['fournisseur', 'exposant', 'admin']), requireKyc, validate(importSchema), async (req, res, next) => {
+  const user = (req as any).user;
+  const rows = (req.body.rows as any[]).map((raw, index) => validateRow(raw, raw.line || index + 2));
+  const issues = rows.flatMap((r) => r.issues);
+  if (issues.length > 0) {
+    return res.status(400).json({ error: 'Certaines lignes sont invalides : corrigez-les puis réessayez.', code: 'IMPORT_INVALID_ROWS', issues });
+  }
+
+  try {
+    const supabase = getSupabase();
+    if (user.role !== 'admin') {
+      const plan = await getCompanyPlan(user.company_id);
+      const limit = PLAN_LIMITS[plan].products;
+      if (limit !== null) {
+        const { count } = await supabase
+          .from('products')
+          .select('*', { count: 'exact', head: true })
+          .eq('owner_id', user.id);
+        const remaining = Math.max(0, limit - (count || 0));
+        if (rows.length > remaining) {
+          return res.status(403).json({
+            error: `Votre offre permet ${limit} produits : il vous reste ${remaining} place(s).`,
+            code: 'IMPORT_PLAN_LIMIT',
+            plan,
+            limit,
+            remaining,
+          });
+        }
+      }
+    }
+
+    const { data, error } = await supabase
+      .from('products')
+      .insert(rows.map(({ row }) => ({
+        reference_id: generateReferenceId('PRD'),
+        name: row.name,
+        category: row.category || 'Non catégorisé',
+        description: row.description,
+        price: row.price,
+        status: 'Brouillon',
+        owner_id: user.id,
+        company_id: user.company_id || null,
+      })))
+      .select('id');
+    if (error) throw error;
+    return res.status(201).json({ created: (data || []).length });
+  } catch (err: any) {
+    logger.error('Supabase Error POST /products/import:', err);
     next(err);
   }
 });

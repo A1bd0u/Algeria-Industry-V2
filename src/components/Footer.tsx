@@ -19,7 +19,7 @@ const FooterLink = ({ to, children, accent = false }: { to: string; children: Re
 const FooterTitle = ({ children }: { children: React.ReactNode }) => (
   <div className="flex items-center gap-2 mb-8">
     <div className="w-4 h-[2px] bg-secondary" />
-    <h4 className="text-xs font-black uppercase tracking-wider text-white">{children}</h4>
+    <h2 className="text-xs font-black uppercase tracking-wider text-white">{children}</h2>
   </div>
 );
 

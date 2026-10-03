@@ -117,6 +117,14 @@ Balises `title`, description, Open Graph, `canonical` et JSON-LD (`Organization`
 - **Modération des catalogues PDF** (console > Plateforme > Catalogues PDF) : ouverture du fichier, retrait motivé (motifs proposés ou texte libre), e-mail au fournisseur qui voit aussi le motif dans son tableau de bord, remise en ligne, suppression définitive avec le fichier ; actions journalisées. Migration `20261012090000_catalogue_moderation.sql`.
 - `SECURITY_AUDIT.md` mis à jour (2FA admin, Redis partagé, nouvelles surfaces d'octobre).
 
+## Accompagnement, import et qualité (mise à jour du 3 octobre)
+
+- **Relances automatiques** (tâche quotidienne) : dossier KYC non déposé 2 jours après l'inscription ; entreprise vérifiée sans produit après 3 jours ; fiche incomplète (logo, présentation, WhatsApp, wilaya, photos) après 5 jours. Chaque relance part une seule fois (table `onboarding_reminders`), et seulement dans une fenêtre de 30 à 45 jours pour ne pas relancer d'anciens comptes. Migration `20261013090000_onboarding_reminders.sql`.
+- **Import de produits** (onglet « Mes produits » > « Importer ») : fichier Excel (.xlsx) ou CSV, 200 lignes max, modèle téléchargeable, colonnes reconnues en français, anglais et arabe, catégorie par code (B1) ou libellé, aperçu avec les erreurs ligne par ligne. Les produits arrivent en brouillon et sont publiés dès qu'une photo est ajoutée. Limite de l'offre respectée.
+- **Application mobile** : manifest, icônes 192/512, icône « maskable » et icône Apple : le site peut être ajouté à l'écran d'accueil.
+- **Lighthouse (mobile)** : accessibilité 88-95 → 100 sur l'accueil, le catalogue et les tarifs ; SEO 100 ; décalage de mise en page (CLS) de 0,38 à 0,02 sur Tarifs. Orange de la marque assombri (#c44700) sur fond clair pour un contraste AA, conservé vif (#ff7a1a) sur fond sombre.
+- **Tests de bout en bout** : dépôt KYC, souscription avec CGV, messagerie, catalogue PDF et import, en plus de l'inscription et de la création de produit.
+
 ## Reste à faire (code, non bloquant pour le lancement)
 
 1. **Préfixes de langue** `/fr`, `/ar`, `/en` avec `hreflang` : l'interface est traduite côté client, mais les contenus (fiches, produits, articles) n'existent qu'en français. À envisager quand des contenus traduits existeront ; les URL lisibles `{slug}-{id}` sont déjà en place.

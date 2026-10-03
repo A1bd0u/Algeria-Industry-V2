@@ -122,8 +122,10 @@ gcloud run deploy algeria-industry \
 - [ ] Tâche quotidienne : créer un job Cloud Scheduler qui appelle
       `POST https://<domaine>/api/cron/daily` chaque jour (ex. 6 h, fuseau
       Africa/Algiers) avec l'en-tête `Authorization: Bearer <CRON_SECRET>`.
-      Elle expire les abonnements échus et envoie les rappels J-30, J-7 et
-      l'avis d'expiration ; relancée, elle ne renvoie aucun e-mail.
+      Elle expire les abonnements échus, envoie les rappels J-30, J-7 et
+      l'avis d'expiration, puis les relances d'accompagnement des fournisseurs
+      (KYC non déposé, aucun produit, fiche incomplète) ; relancée, elle ne
+      renvoie aucun e-mail.
       ```bash
       gcloud scheduler jobs create http algeria-industry-daily \
         --location $REGION --schedule "0 6 * * *" --time-zone "Africa/Algiers" \

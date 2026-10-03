@@ -112,7 +112,7 @@ export default function App() {
               <div className={cn("flex flex-col min-h-screen", !isExtranet && "pb-16 lg:pb-0")}>
               {!isExtranet && <Navbar />}
               {adPlacement && <HeroSlider placement={adPlacement} />}
-              <main className="flex-grow">
+              <main className="flex-grow min-h-screen">
                 <Suspense fallback={<div className="flex items-center justify-center min-h-[50vh]"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
                   <AnimatePresence mode="wait">
                     {/* @ts-ignore - framer-motion requires key on Routes */}

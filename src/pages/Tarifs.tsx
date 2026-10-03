@@ -25,7 +25,7 @@ const Tarifs = () => {
         { text: t('pricing.features.supportStandard') }
       ],
       badge: null,
-      bgClass: 'bg-[#F8F9FA] text-primary border-[#E0E0E0]',
+      bgClass: 'bg-neutral-bg text-primary border-[#E0E0E0]',
       buttonText: t('pricing.start'),
       buttonAction: '/register',
       buttonClass: 'bg-neutral-200 text-neutral-800 border-transparent hover:bg-neutral-300'
@@ -44,10 +44,10 @@ const Tarifs = () => {
         { text: t('pricing.features.support48') }
       ],
       badge: t('pricing.popular'),
-      bgClass: 'bg-[#F8F9FA] text-primary border-[#E86A17] shadow-lg',
+      bgClass: 'bg-neutral-bg text-primary border-secondary shadow-lg',
       buttonText: t('subscription.choose', { plan: 'Basic' }),
       buttonAction: subscribeLink,
-      buttonClass: 'bg-[#E86A17] text-white border-transparent hover:bg-[#c8530b]'
+      buttonClass: 'bg-secondary text-white border-transparent hover:brightness-110'
     },
     {
       id: 'pro',
@@ -63,10 +63,10 @@ const Tarifs = () => {
         { text: t('pricing.features.messaging') }
       ],
       badge: t('pricing.recommended'),
-      bgClass: 'bg-[#1A1A1A] text-white border-[#E86A17] shadow-xl',
+      bgClass: 'bg-primary text-white border-secondary shadow-xl',
       buttonText: t('subscription.choose', { plan: 'Pro' }),
       buttonAction: subscribeLink,
-      buttonClass: 'bg-[#E86A17] text-white border-transparent hover:bg-[#c8530b]'
+      buttonClass: 'bg-secondary text-white border-transparent hover:brightness-110'
     }
   ];
 
@@ -84,7 +84,7 @@ const Tarifs = () => {
   ];
   const cellClass = [
     'bg-gray-100/30 text-gray-800',
-    'bg-[#E86A17]/15 text-neutral-900',
+    'bg-secondary/15 text-neutral-900',
     'bg-neutral-950/10 text-neutral-950',
   ];
 
@@ -131,22 +131,22 @@ const Tarifs = () => {
                 className={cn(
                   "relative p-6 md:p-8 rounded-2xl flex flex-col items-stretch justify-between transition-all duration-300 hover:-translate-y-2 border",
                   plan.bgClass,
-                  plan.id === 'basic' && "hover:shadow-2xl hover:shadow-[#E86A17]/10",
-                  plan.id === 'pro' && "hover:shadow-2xl hover:shadow-[#E86A17]/20"
+                  plan.id === 'basic' && "hover:shadow-2xl hover:shadow-secondary/10",
+                  plan.id === 'pro' && "hover:shadow-2xl hover:shadow-secondary/20"
                 )}
               >
                 {plan.badge && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#E86A17] text-white px-5 py-1.5 rounded-full text-xs font-black uppercase tracking-widest shadow-lg z-20">
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-secondary text-white px-5 py-1.5 rounded-full text-xs font-black uppercase tracking-widest shadow-lg z-20">
                     <span>{plan.badge}</span>
                   </div>
                 )}
                 
                 <div className="w-full">
                   <div className="text-center mb-6">
-                    <h4 className={cn(
+                    <h3 className={cn(
                       "text-2xl font-black tracking-tighter mb-2",
                       plan.id === 'pro' ? "text-white" : "text-neutral-900"
-                    )}>{plan.name}</h4>
+                    )}>{plan.name}</h3>
                     
                     <p className={cn(
                       "text-xs font-medium mb-4",
@@ -177,11 +177,11 @@ const Tarifs = () => {
                   <ul className="space-y-3 mb-8 border-t border-current/10 pt-6">
                     {plan.features.map((feature, idx) => (
                       <li key={idx} className="flex items-center gap-3 text-xs font-semibold">
-                        <Check className="h-4 w-4 shrink-0 text-[#E86A17]" />
+                        <Check className="h-4 w-4 shrink-0 text-secondary" />
                         <span className={cn(
                           "leading-tight",
                           plan.id === 'pro' ? "text-neutral-200" : "text-neutral-700",
-                          feature.isBold && "font-black text-[#E86A17]"
+                          feature.isBold && "font-black text-secondary"
                         )}>
                           {feature.text}
                         </span>
@@ -217,7 +217,7 @@ const Tarifs = () => {
                   <tr className="bg-gray-50/50">
                     <th className="px-6 py-4 text-start text-sm font-black text-gray-700 tracking-widest">{t('pricing.table.feature')}</th>
                     <th className="px-6 py-4 text-center text-sm font-black text-primary tracking-widest bg-gray-100/30">Free</th>
-                    <th className="px-6 py-4 text-center text-sm font-black text-white tracking-widest bg-[#E86A17]">Basic</th>
+                    <th className="px-6 py-4 text-center text-sm font-black text-white tracking-widest bg-secondary">Basic</th>
                     <th className="px-6 py-4 text-center text-sm font-black text-white tracking-widest bg-neutral-950">Pro</th>
                   </tr>
                 </thead>

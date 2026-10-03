@@ -72,7 +72,7 @@ describe('Tâche quotidienne', () => {
 
     const res = await request(app).post('/api/cron/daily').set('Authorization', `Bearer ${SECRET}`);
     expect(res.status).toBe(200);
-    expect(res.body).toEqual({ expired: 0, expiredNotices: 0, reminder7: 1, reminder30: 0 });
+    expect(res.body).toMatchObject({ expired: 0, expiredNotices: 0, reminder7: 1, reminder30: 0 });
 
     const claim = mock.queries.find((q) => q.table === 'subscriptions' && q.op === 'update' && q.payload?.reminder_7_sent_at);
     expect(claim?.payload).toHaveProperty('reminder_30_sent_at');

@@ -195,17 +195,17 @@ const Home = () => {
 
         {/* Bande de confiance : chiffres réels si disponibles, sinon engagements */}
         <div className="relative border-t border-border-tech bg-white">
-          <dl className="max-w-7xl mx-auto grid grid-cols-2 lg:grid-cols-4 gap-px bg-border-tech">
+          <ul className="max-w-7xl mx-auto grid grid-cols-2 lg:grid-cols-4 gap-px bg-border-tech">
             {trust.map((item, i) => (
-              <div key={i} className="flex items-center gap-4 bg-white py-6 px-4 md:px-8">
+              <li key={i} className="flex items-center gap-4 bg-white py-6 px-4 md:px-8">
                 <item.icon className="h-9 w-9 md:h-11 md:w-11 shrink-0 text-primary" />
-                <div className="flex min-w-0 flex-col-reverse">
-                  <dt className="text-sm text-gray-600 leading-snug mt-1">{item.label}</dt>
-                  <dd className="text-2xl md:text-3xl font-black text-primary tracking-tight tabular-nums">{item.value}</dd>
-                </div>
-              </div>
+                <p className="min-w-0">
+                  <strong className="block text-2xl md:text-3xl font-black text-primary tracking-tight tabular-nums">{item.value}</strong>
+                  <span className="block text-sm text-gray-600 leading-snug mt-1">{item.label}</span>
+                </p>
+              </li>
             ))}
-          </dl>
+          </ul>
         </div>
       </section>
 

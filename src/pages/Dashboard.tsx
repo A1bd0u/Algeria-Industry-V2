@@ -8,6 +8,7 @@ import {
   ChevronRight,
   CreditCard,
   Edit2,
+  FileSpreadsheet,
   FileText,
   Heart,
   Info,
@@ -34,6 +35,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import Messages from './Messages';
 import SupplierStats from '../components/SupplierStats';
 import CataloguesPanel from '../components/CataloguesPanel';
+import ProductImport from '../components/ProductImport';
 import AddProduct from './AddProduct';
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
@@ -89,6 +91,11 @@ const Dashboard = () => {
   const [favorites, setFavorites] = useState<any[]>([]);
   const [showAddProduct, setShowAddProduct] = useState(false);
   const [editProduct, setEditProduct] = useState<any>(null);
+  const [showImport, setShowImport] = useState(false);
+  const reloadProducts = async () => {
+    const res = await fetch('/api/products/my');
+    if (res.ok) setProducts(await res.json());
+  };
   
   useEffect(() => {
      const fetchData = async () => {
@@ -756,8 +763,17 @@ const Dashboard = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
           >
-            <div className="flex justify-between items-center mb-8">
+            <div className="flex flex-wrap justify-between items-center gap-4 mb-8">
                <h3 className="text-2xl font-black text-primary">{t('dashboard.products.title')}</h3>
+               <div className="flex flex-wrap gap-3">
+               <button
+                 type="button"
+                 onClick={() => setShowImport(true)}
+                 className="bg-white border border-gray-200 text-primary px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-widest flex items-center space-x-2 hover:border-secondary hover:text-secondary transition-all"
+               >
+                 <FileSpreadsheet className="h-4 w-4" />
+                 <span>{t('productImport.open')}</span>
+               </button>
                <button 
                  onClick={() => setShowAddProduct(true)}
                  className="bg-primary text-white px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-widest flex items-center space-x-2 hover:bg-secondary transition-all"
@@ -765,7 +781,9 @@ const Dashboard = () => {
                  <Package className="h-4 w-4" />
                  <span>{t('dashboard.products.add')}</span>
                </button>
+               </div>
             </div>
+            {showImport && <ProductImport onClose={() => setShowImport(false)} onImported={reloadProducts} notify={showNotify} />}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                {filteredProducts.map(p => (
                  <div key={p.id} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm relative group hover:shadow-md transition-all flex flex-col">
@@ -778,6 +796,9 @@ const Dashboard = () => {
                    )}
                    <h4 className="font-bold text-primary mb-1">{p.name}</h4>
                    <p className="text-xs text-gray-500 mb-2">{categoryLabel(t, p.category)}</p>
+                   {p.status === 'Brouillon' && (
+                     <p className="text-xs font-bold text-orange-600 mb-2">{t('dashboard.products.draftHint')}</p>
+                   )}
                    <div className="mt-auto pt-4 border-t border-gray-50 flex justify-between items-center">
                      <span className={cn("text-xs font-black uppercase tracking-widest", p.status === 'Actif' ? 'text-success' : 'text-orange-500')}>{t(`dashboard.products.status.${p.status}`, { defaultValue: p.status })}</span>
                      <div className="flex gap-2">
