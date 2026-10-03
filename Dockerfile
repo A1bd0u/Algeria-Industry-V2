@@ -1,5 +1,5 @@
 # Étape 1 : Build
-FROM node:20-slim AS builder
+FROM node:22-slim AS builder
 
 WORKDIR /app
 
@@ -55,7 +55,7 @@ ENV VITE_APP_URL=$VITE_APP_URL \
 RUN npm run build
 
 # Étape 2 : Image de production finale
-FROM node:20-slim
+FROM node:22-slim
 
 WORKDIR /app
 
