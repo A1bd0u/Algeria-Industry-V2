@@ -147,7 +147,7 @@ const Dashboard = () => {
 
   const [companyInfo, setCompanyInfo] = useState({
     name: '', bio: '', wilaya: '', whatsapp: '', logo_url: '', banner_url: '',
-    founded_year: '', employees: '', website: '', certifications: '', gallery: [] as string[],
+    founded_year: '', employees: '', website: '', contact_email: '', contact_phone: '', certifications: '', gallery: [] as string[],
   });
   const [uploadingGallery, setUploadingGallery] = useState(false);
   const GALLERY_MAX = 8;
@@ -202,7 +202,7 @@ const Dashboard = () => {
           setCompanyInfo({
             name: c.name || '', bio: c.description || '', wilaya: c.wilaya || '', whatsapp: c.whatsapp ? `+${c.whatsapp}` : '',
             logo_url: c.logo_url || '', banner_url: c.banner_url || '',
-            founded_year: c.founded_year ? String(c.founded_year) : '', employees: c.employees || '', website: c.website || '',
+            founded_year: c.founded_year ? String(c.founded_year) : '', employees: c.employees || '', website: c.website || '', contact_email: c.contact_email || '', contact_phone: c.contact_phone || '',
             certifications: (c.certifications || []).join(', '), gallery: c.gallery || [],
           });
         }
@@ -227,7 +227,7 @@ const Dashboard = () => {
         body: JSON.stringify({
           name: companyInfo.name, description: companyInfo.bio, wilaya: companyInfo.wilaya || undefined,
           whatsapp: companyInfo.whatsapp.trim(), logo_url: companyInfo.logo_url, banner_url: companyInfo.banner_url,
-          founded_year: companyInfo.founded_year.trim(), employees: companyInfo.employees, website: companyInfo.website.trim(),
+          founded_year: companyInfo.founded_year.trim(), employees: companyInfo.employees, website: companyInfo.website.trim(), contact_email: companyInfo.contact_email.trim(), contact_phone: companyInfo.contact_phone.trim(),
           certifications: companyInfo.certifications.split(',').map((c) => c.trim()).filter((c) => c.length >= 2).slice(0, 10),
           gallery: companyInfo.gallery,
         })
@@ -981,6 +981,18 @@ const Dashboard = () => {
                         <label htmlFor="company_website" className="text-xs font-bold text-gray-600">{t('company.website')}</label>
                         <input id="company_website" type="text" dir="ltr" placeholder="www.exemple.dz" value={companyInfo.website}
                           onChange={(e) => setCompanyInfo({ ...companyInfo, website: e.target.value })}
+                          className="w-full bg-gray-50 border-none px-5 py-3 rounded-xl text-sm font-bold outline-none" />
+                     </div>
+                     <div className="space-y-2">
+                        <label htmlFor="company_contact_phone" className="text-xs font-bold text-gray-600">{t('company.phone')}</label>
+                        <input id="company_contact_phone" type="tel" dir="ltr" placeholder="+213 23 00 00 00" value={companyInfo.contact_phone}
+                          onChange={(e) => setCompanyInfo({ ...companyInfo, contact_phone: e.target.value })}
+                          className="w-full bg-gray-50 border-none px-5 py-3 rounded-xl text-sm font-bold outline-none" />
+                     </div>
+                     <div className="space-y-2 md:col-span-2">
+                        <label htmlFor="company_contact_email" className="text-xs font-bold text-gray-600">{t('company.email')}</label>
+                        <input id="company_contact_email" type="email" dir="ltr" placeholder="contact@entreprise.dz" value={companyInfo.contact_email}
+                          onChange={(e) => setCompanyInfo({ ...companyInfo, contact_email: e.target.value })}
                           className="w-full bg-gray-50 border-none px-5 py-3 rounded-xl text-sm font-bold outline-none" />
                      </div>
                      <div className="space-y-2 md:col-span-3">

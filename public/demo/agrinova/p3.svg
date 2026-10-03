@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="38%" r="75%">
+      <stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#e6f2e3"/>
+    </radialGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg)"/>
+  <ellipse cx="400" cy="500" rx="220" ry="26" fill="#1f4d1c" fill-opacity=".12"/>
+  <g transform="translate(220 110) scale(3.6)" fill="none" stroke="#3f8f3a" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" color="#3f8f3a">
+    <style>.f{fill:#ffffff} .t{font:800 10px Inter,Arial,sans-serif;fill:#3f8f3a;stroke:none}</style>
+    <path d="M12 70h76" /><path d="M20 70V56M40 70V56M60 70V56M80 70V56"/><path d="M50 18c-10 14-16 22-16 30a16 16 0 0 0 32 0c0-8-6-16-16-30z" class="f"/>
+  </g>
+  <text x="40" y="560" font-family="Inter, Arial, sans-serif" font-size="22" font-weight="900" letter-spacing="2" fill="#3f8f3a">AGRINOVA</text>
+</svg>

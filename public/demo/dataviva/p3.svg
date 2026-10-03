@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="38%" r="75%">
+      <stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#e7eafa"/>
+    </radialGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg)"/>
+  <ellipse cx="400" cy="500" rx="220" ry="26" fill="#18225e" fill-opacity=".12"/>
+  <g transform="translate(220 110) scale(3.6)" fill="none" stroke="#3346c4" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" color="#3346c4">
+    <style>.f{fill:#ffffff} .t{font:800 10px Inter,Arial,sans-serif;fill:#3346c4;stroke:none}</style>
+    <path d="M50 14l30 10v22c0 20-14 32-30 40-16-8-30-20-30-40V24z" class="f"/><path d="M38 50l8 8 16-18"/>
+  </g>
+  <text x="40" y="560" font-family="Inter, Arial, sans-serif" font-size="22" font-weight="900" letter-spacing="2" fill="#3346c4">DATAVIVA</text>
+</svg>
