@@ -14,7 +14,8 @@ test('Dépôt du dossier KYC : quatre documents puis envoi', async ({ page }) =>
   });
 
   await page.goto('/kyc-upload');
-  await page.locator('input[type="text"]').first().fill('Fabrication de pompes industrielles');
+  // Le secteur se choisit dans la nomenclature (libellé français stocké).
+  await page.locator('select').first().selectOption('Mécanique, Métallurgie & Machines');
 
   const pdf = { name: 'document.pdf', mimeType: 'application/pdf', buffer: Buffer.from('%PDF-1.4\n%%EOF\n') };
   const inputs = page.locator('input[type="file"]');
@@ -28,7 +29,7 @@ test('Dépôt du dossier KYC : quatre documents puis envoi', async ({ page }) =>
   await expect(page.getByText('Demande Envoyée')).toBeVisible();
 
   const submit = api.find('POST', '/api/kyc/submit');
-  expect(submit?.body.activity).toBe('Fabrication de pompes industrielles');
+  expect(submit?.body.activity).toBe('Mécanique, Métallurgie & Machines');
   expect(submit?.body.files.map((f: any) => f.type)).toEqual(['RC', 'NIF', 'NIS', 'RIB']);
   expect(submit?.body.files.every((f: any) => f.url.startsWith(`${SUPPLIER.id}/`))).toBe(true);
 });
