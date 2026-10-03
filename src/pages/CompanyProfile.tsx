@@ -481,6 +481,28 @@ const CompanyProfile = () => {
                           </div>
                         </div>
                       )}
+                      {company.contact_phone && (
+                        <div className="flex items-start gap-3">
+                          <Phone className="h-5 w-5 text-secondary mt-0.5 flex-shrink-0" />
+                          <div className="min-w-0">
+                            <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">{t('company.phone')}</p>
+                            <a href={`tel:${company.contact_phone.replace(/[^+0-9]/g, '')}`} dir="ltr" className="text-sm font-bold text-secondary hover:underline">
+                              {company.contact_phone}
+                            </a>
+                          </div>
+                        </div>
+                      )}
+                      {company.contact_email && (
+                        <div className="flex items-start gap-3">
+                          <Mail className="h-5 w-5 text-secondary mt-0.5 flex-shrink-0" />
+                          <div className="min-w-0">
+                            <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">{t('company.email')}</p>
+                            <a href={`mailto:${company.contact_email}`} dir="ltr" className="text-sm font-bold text-secondary hover:underline break-all">
+                              {company.contact_email}
+                            </a>
+                          </div>
+                        </div>
+                      )}
                       {company.website && (
                         <div className="flex items-start gap-3">
                           <Globe className="h-5 w-5 text-secondary mt-0.5 flex-shrink-0" />

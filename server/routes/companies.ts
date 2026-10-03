@@ -30,6 +30,9 @@ const companySchema = z.object({
   certifications: z.array(z.string().trim().min(2).max(60)).max(10).optional(),
   gallery: z.array(z.string().trim().max(500)).max(8).optional(),
   website: z.string().trim().max(300).optional(),
+  // Coordonnées publiques ; chaîne vide : efface la valeur.
+  contact_email: z.union([z.literal(''), z.string().trim().toLowerCase().email('Adresse e-mail invalide').max(200)]).optional(),
+  contact_phone: z.union([z.literal(''), z.string().trim().regex(/^\+?[0-9 ().-]{8,25}$/, 'Numéro de téléphone invalide')]).optional(),
 });
 
 // Une image d'entreprise doit venir du stockage public de la plateforme,
@@ -42,7 +45,7 @@ const reviewSchema = z.object({
 // Colonnes publiques d'une entreprise : ni NIF/RC bruts ni motifs KYC.
 const PUBLISHED_PRODUCT_STATUSES = ['Actif', 'active'];
 
-const PUBLIC_COMPANY_COLUMNS = 'id, reference_id, name, description, activity_sector, wilaya, status, certified, logo_url, banner_url, verified_at, founded_year, employees, certifications, gallery, website, created_at';
+const PUBLIC_COMPANY_COLUMNS = 'id, reference_id, name, description, activity_sector, wilaya, status, certified, logo_url, banner_url, verified_at, founded_year, employees, certifications, gallery, website, contact_email, contact_phone, created_at';
 
 
 // GET /api/companies - Liste toutes les entreprises (pour l'annuaire)
@@ -241,7 +244,7 @@ router.post('/', requireAuth, validate(companySchema), async (req, res) => {
 
 // PUT /api/companies/:id - Mettre à jour une entreprise spécifique
 router.put('/:id', requireAuth, requireUuidParams('id'), validate(companySchema), async (req, res) => {
-  const { name, nif, rc, description, activity_sector, wilaya, whatsapp, logo_url, banner_url, founded_year, employees, certifications, gallery, website } = req.body;
+  const { name, nif, rc, description, activity_sector, wilaya, whatsapp, logo_url, banner_url, founded_year, employees, certifications, gallery, website, contact_email, contact_phone } = req.body;
   const user = (req as any).user;
 
   if (gallery && gallery.some((url: string) => !isAllowedImageUrl(url, user))) {
@@ -261,6 +264,8 @@ router.put('/:id', requireAuth, requireUuidParams('id'), validate(companySchema)
     ...(certifications !== undefined && { certifications: [...new Set(certifications as string[])] }),
     ...(gallery !== undefined && { gallery }),
     ...(websiteValue !== undefined && { website: websiteValue }),
+    ...(contact_email !== undefined && { contact_email: contact_email || null }),
+    ...(contact_phone !== undefined && { contact_phone: contact_phone || null }),
   };
 
   const images: Record<string, string | null> = {};

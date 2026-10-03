@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="38%" r="75%">
+      <stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#fbf2dc"/>
+    </radialGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg)"/>
+  <ellipse cx="400" cy="500" rx="220" ry="26" fill="#6b4700" fill-opacity=".12"/>
+  <g transform="translate(220 110) scale(3.6)" fill="none" stroke="#c98a00" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" color="#c98a00">
+    <style>.f{fill:#ffffff} .t{font:800 10px Inter,Arial,sans-serif;fill:#c98a00;stroke:none}</style>
+    <rect x="24" y="36" width="52" height="46" rx="4" class="f"/><path d="M34 36V22M50 36V18M66 36V22M24 50h52M24 64h52"/><circle cx="34" cy="20" r="3" class="f"/><circle cx="50" cy="16" r="3" class="f"/><circle cx="66" cy="20" r="3" class="f"/>
+  </g>
+  <text x="40" y="560" font-family="Inter, Arial, sans-serif" font-size="22" font-weight="900" letter-spacing="2" fill="#c98a00">SAHARIS</text>
+</svg>

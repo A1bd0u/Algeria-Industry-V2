@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="38%" r="75%">
+      <stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#e3f0fa"/>
+    </radialGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg)"/>
+  <ellipse cx="400" cy="500" rx="220" ry="26" fill="#0d3f63" fill-opacity=".12"/>
+  <g transform="translate(220 110) scale(3.6)" fill="none" stroke="#1d7fc4" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" color="#1d7fc4">
+    <style>.f{fill:#ffffff} .t{font:800 10px Inter,Arial,sans-serif;fill:#1d7fc4;stroke:none}</style>
+    <rect x="14" y="22" width="72" height="56" rx="4" class="f"/><path d="M22 32h8M34 32h8M46 32h8M58 32h8M70 32h8M22 68h8M34 68h8M46 68h8M58 68h8M70 68h8"/><rect x="26" y="42" width="48" height="16" rx="2"/>
+  </g>
+  <text x="40" y="560" font-family="Inter, Arial, sans-serif" font-size="22" font-weight="900" letter-spacing="2" fill="#1d7fc4">VOLTAÏS</text>
+</svg>

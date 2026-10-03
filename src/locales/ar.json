@@ -1414,7 +1414,9 @@
     "employeesValue": "{{value}} موظف",
     "website": "الموقع الإلكتروني",
     "certifications": "الشهادات",
-    "gallery": "معرض الصور"
+    "gallery": "معرض الصور",
+    "phone": "الهاتف",
+    "email": "البريد الإلكتروني للتواصل"
   },
   "pricing": {
     "eyebrow": "أسعار واضحة",

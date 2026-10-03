@@ -124,6 +124,28 @@ describe('Companies Ownership', () => {
     expect(badGallery.body.code).toBe('COMPANY_IMAGE_INVALID');
   });
 
+  it('enregistre les coordonnées publiques : e-mail et téléphone de contact', async () => {
+    const mock = mockWith(sessionRow({ id: OWNER_ID, role: 'fournisseur' }));
+    const ok = await request(app).put(`/api/companies/${COMPANY_ID}`).set('Cookie', ['token=t'])
+      .send({ name: 'Acme', contact_email: ' Ventes@Acme.DZ ', contact_phone: '+213 23 45 67 89' });
+    expect(ok.status).toBe(200);
+    const update = mock.queries.find((q) => q.table === 'companies' && q.op === 'update');
+    expect(update?.payload).toMatchObject({ contact_email: 'ventes@acme.dz', contact_phone: '+213 23 45 67 89' });
+
+    const cleared = await request(app).put(`/api/companies/${COMPANY_ID}`).set('Cookie', ['token=t'])
+      .send({ name: 'Acme', contact_email: '', contact_phone: '' });
+    expect(cleared.status).toBe(200);
+    const last = mock.queries.filter((q) => q.table === 'companies' && q.op === 'update').at(-1);
+    expect(last?.payload).toMatchObject({ contact_email: null, contact_phone: null });
+
+    const badEmail = await request(app).put(`/api/companies/${COMPANY_ID}`).set('Cookie', ['token=t'])
+      .send({ name: 'Acme', contact_email: 'pas-un-email' });
+    expect(badEmail.status).toBe(400);
+    const badPhone = await request(app).put(`/api/companies/${COMPANY_ID}`).set('Cookie', ['token=t'])
+      .send({ name: 'Acme', contact_phone: '<script>' });
+    expect(badPhone.status).toBe(400);
+  });
+
   it('met en avant des avis réels : 4 ou 5 étoiles, entreprise vérifiée, auteur abrégé', async () => {
     const long = 'Livraison rapide et matériel conforme, je recommande ce fournisseur.';
     const mock = createSupabaseMock({

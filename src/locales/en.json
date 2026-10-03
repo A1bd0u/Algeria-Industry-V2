@@ -1414,7 +1414,9 @@
     "employeesValue": "{{value}} employees",
     "website": "Website",
     "certifications": "Certifications",
-    "gallery": "Gallery"
+    "gallery": "Gallery",
+    "phone": "Phone",
+    "email": "Contact e-mail"
   },
   "pricing": {
     "eyebrow": "Transparent pricing",
