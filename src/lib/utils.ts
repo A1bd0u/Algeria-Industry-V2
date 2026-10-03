@@ -38,3 +38,10 @@ export function extractIdFromSlug(slugUrl: string | undefined) {
      return slugUrl; // old format fallback
   }
 }
+
+// Photo principale d'un produit : première image de la galerie, sinon les anciens champs.
+export function productCover(p: { images?: unknown; image?: string | null; file_url?: string | null } | null | undefined): string | null {
+  if (!p) return null;
+  const first = Array.isArray(p.images) ? p.images.find((u) => typeof u === 'string' && u) : null;
+  return (first as string | undefined) || p.image || p.file_url || null;
+}

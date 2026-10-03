@@ -1,6 +1,4 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240">
-  <rect width="240" height="240" rx="48" fill="#8a5a34"/>
-  <rect x="18" y="18" width="204" height="204" rx="36" fill="none" stroke="#ffffff" stroke-opacity=".25" stroke-width="4"/>
-  <text x="120" y="142" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="92" font-weight="900" letter-spacing="-4" fill="#ffffff">BX</text>
-  <text x="120" y="190" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="800" letter-spacing="3" fill="#ffffff" fill-opacity=".85">BÂTIREX</text>
+  <rect width="240" height="240" fill="#ffffff"/>
+  <g transform="translate(120 120) scale(1.35) translate(-120 -104)"><path d="M66 60h108M84 60v90M84 60l-18 22" stroke="#8a5a34" stroke-width="7" stroke-linecap="round" fill="none"/><path d="M150 60v26" stroke="#8a5a34" stroke-width="4"/><rect x="104" y="104" width="34" height="46" rx="3" fill="#8a5a34"/><rect x="142" y="86" width="36" height="64" rx="3" fill="#8a5a34" fill-opacity=".7"/><path d="M58 150h128" stroke="#8a5a34" stroke-width="7" stroke-linecap="round"/></g>
 </svg>

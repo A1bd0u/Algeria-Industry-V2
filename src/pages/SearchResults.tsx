@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from 'react-router-dom';
-import { cn, generateSlugUrl } from '../lib/utils';
+import { cn, generateSlugUrl, productCover } from '../lib/utils';
 import ProductImage from '../components/ui/ProductImage';
 import EmptyState from '../components/ui/EmptyState';
 import { categoryLabel } from '../data/productCategories';
@@ -159,7 +159,7 @@ const SearchResults = () => {
                               className="bg-white group border border-gray-100 hover:border-secondary transition-all flex flex-col sm:flex-row"
                             >
                               <div className="w-full sm:w-48 aspect-[4/3] sm:aspect-square overflow-hidden bg-gray-50 shrink-0">
-                                <ProductImage src={product.file_url} alt={product.name} category={product.category} imgClassName="group-hover:scale-105 transition-transform duration-700" />
+                                <ProductImage src={productCover(product)} alt={product.name} category={product.category} imgClassName="group-hover:scale-105 transition-transform duration-700" />
                               </div>
                               <div className="p-6 flex flex-col justify-between flex-1">
                                 <div>

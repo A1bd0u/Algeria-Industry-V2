@@ -1,6 +1,4 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240">
-  <rect width="240" height="240" rx="48" fill="#c98a00"/>
-  <rect x="18" y="18" width="204" height="204" rx="36" fill="none" stroke="#ffffff" stroke-opacity=".25" stroke-width="4"/>
-  <text x="120" y="142" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="92" font-weight="900" letter-spacing="-4" fill="#ffffff">SÉ</text>
-  <text x="120" y="190" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="800" letter-spacing="3" fill="#ffffff" fill-opacity=".85">SAHARIS</text>
+  <rect width="240" height="240" fill="#ffffff"/>
+  <g transform="translate(120 120) scale(1.35) translate(-120 -104)"><circle cx="120" cy="88" r="30" fill="#c98a00"/><path d="M78.0 88.0L64.0 88.0" stroke="#c98a00" stroke-width="7" stroke-linecap="round"/><path d="M90.3 58.3L80.4 48.4" stroke="#c98a00" stroke-width="7" stroke-linecap="round"/><path d="M120.0 46.0L120.0 32.0" stroke="#c98a00" stroke-width="7" stroke-linecap="round"/><path d="M149.7 58.3L159.6 48.4" stroke="#c98a00" stroke-width="7" stroke-linecap="round"/><path d="M162.0 88.0L176.0 88.0" stroke="#c98a00" stroke-width="7" stroke-linecap="round"/><path d="M56 140q32-26 64 0t64 0" stroke="#c98a00" stroke-width="8" fill="none" stroke-linecap="round"/><path d="M72 158q24-16 48 0t48 0" stroke="#c98a00" stroke-opacity=".6" stroke-width="6" fill="none" stroke-linecap="round"/></g>
 </svg>

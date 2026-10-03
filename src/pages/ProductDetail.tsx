@@ -24,7 +24,7 @@ import { ProductDetailSkeleton } from '../components/Skeleton';
 import { Product as IProduct, useComparison } from '../context/ComparisonContext';
 import { useCurrency } from '../context/CurrencyContext';
 import { useAuth } from '../context/AuthContext';
-import { cn, extractIdFromSlug, generateSlugUrl } from '../lib/utils';
+import { cn, extractIdFromSlug, generateSlugUrl, productCover } from '../lib/utils';
 import axios from 'axios';
 import { categoryGroupId, categoryLabel } from '../data/productCategories';
 import { useToast } from '../context/ToastContext';
@@ -461,7 +461,7 @@ const ProductDetail = () => {
                   window.scrollTo(0, 0);
                 }}>
                   <div className="aspect-square bg-gray-50 rounded-2xl mb-4 overflow-hidden relative">
-                    <ProductImage src={p.file_url} alt={p.name} category={p.category} imgClassName="transition-transform group-hover:scale-105" />
+                    <ProductImage src={productCover(p)} alt={p.name} category={p.category} imgClassName="transition-transform group-hover:scale-105" />
                   </div>
                   {p.companyName && <p className="text-xs font-black text-gray-500 uppercase tracking-widest mb-1">{p.companyName}</p>}
                   <h3 className="text-lg font-bold text-primary leading-tight mb-2 flex-1">{p.name}</h3>

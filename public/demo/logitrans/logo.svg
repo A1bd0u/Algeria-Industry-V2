@@ -1,6 +1,4 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240">
-  <rect width="240" height="240" rx="48" fill="#138a6b"/>
-  <rect x="18" y="18" width="204" height="204" rx="36" fill="none" stroke="#ffffff" stroke-opacity=".25" stroke-width="4"/>
-  <text x="120" y="142" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="92" font-weight="900" letter-spacing="-4" fill="#ffffff">LT</text>
-  <text x="120" y="190" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="800" letter-spacing="3" fill="#ffffff" fill-opacity=".85">LOGITRANS</text>
+  <rect width="240" height="240" fill="#ffffff"/>
+  <g transform="translate(120 120) scale(1.35) translate(-120 -104)"><path d="M62 68h44l34 34-34 34H62l34-34z" fill="#138a6b"/><path d="M118 68h30l34 34-34 34h-30l34-34z" fill="#138a6b" fill-opacity=".55"/></g>
 </svg>
