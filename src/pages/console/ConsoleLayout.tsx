@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import {
-  AlertTriangle, BarChart3, Building2, Calendar, CheckCircle, CreditCard, ExternalLink,
+  AlertTriangle, BarChart3, Building2, Calendar, CheckCircle, CreditCard, ExternalLink, FileText,
   LayoutDashboard, Lock, LogOut, Menu, MessageSquare, Newspaper, PackagePlus,
   ShieldCheck, Users, X, Zap
 } from 'lucide-react';
@@ -21,6 +21,7 @@ import GovModeration from './views/GovModeration';
 import GovSupport from './views/GovSupport';
 import GovUsers from './views/GovUsers';
 import GovProducts from './views/GovProducts';
+import GovCatalogues from './views/GovCatalogues';
 import SiteCms from './views/SiteCms';
 import GovEvents from './views/GovEvents';
 
@@ -56,6 +57,7 @@ const MENU: { title: string; items: MenuItem[] }[] = [
     items: [
       { id: 'gov-users', name: 'Comptes & accès', icon: Users },
       { id: 'gov-products', name: 'Catalogue produits', icon: PackagePlus },
+      { id: 'gov-catalogues', name: 'Catalogues PDF', icon: FileText },
       { id: 'site-cms', name: 'Blog', icon: Newspaper },
       { id: 'gov-events', name: 'Événements', icon: Calendar },
       { id: 'gov-security', name: "Journal d'audit", icon: Lock },
@@ -88,6 +90,7 @@ export default function ConsoleLayout({ state }: { state: any }) {
       case 'gov-support': return <GovSupport state={state} />;
       case 'gov-users': return <GovUsers state={state} />;
       case 'gov-products': return <GovProducts state={state} />;
+      case 'gov-catalogues': return <GovCatalogues state={state} />;
       case 'site-cms': return <SiteCms state={state} />;
       case 'gov-events': return <GovEvents state={state} />;
       case 'gov-security': return <GovSecurity state={state} />;

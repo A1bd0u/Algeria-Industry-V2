@@ -199,3 +199,17 @@ export const alertAdminsSupportRequest = (name: string, email: string, subject: 
     ctaLabel: 'Ouvrir la console',
     ctaPath: '/extranet',
   }));
+
+// --- Modération ----------------------------------------------------------------
+
+export const notifyCatalogueRemoved = (to: { email?: string | null; name?: string | null } | null, title: string, reason: string) =>
+  safely('Catalogue retiré', () =>
+    sendNotificationEmail(to?.email, {
+      subject: 'Catalogue PDF retiré',
+      heading: 'Votre catalogue a été retiré',
+      name: to?.name || '',
+      intro: `Votre catalogue « ${title} » a été retiré de la plateforme par l'équipe de modération.`,
+      details: `Motif : ${reason}. Vous pouvez déposer une version corrigée depuis votre tableau de bord ; elle sera publiée immédiatement.`,
+      ctaLabel: 'Mes catalogues PDF',
+      ctaPath: '/dashboard?tab=catalogues',
+    }));

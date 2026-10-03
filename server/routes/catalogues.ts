@@ -7,6 +7,7 @@ import { requireUuidParams } from '../middlewares/validateParams';
 import { validate } from '../middlewares/validateMiddleware';
 import { PLAN_LIMITS, getCompanyPlan } from '../services/billingService';
 import { PRODUCT_BUCKET, isAllowedImageUrl } from '../utils/storageUrl';
+import { logAdminAction } from '../utils/auditLogger';
 
 // Catalogues PDF des fournisseurs : déposés depuis le tableau de bord (fichier
 // envoyé d'abord via /api/upload), dans la limite de l'offre (1 en gratuit,
@@ -14,7 +15,7 @@ import { PRODUCT_BUCKET, isAllowedImageUrl } from '../utils/storageUrl';
 const router = express.Router();
 
 const PUBLIC_COLUMNS = 'id, title, description, pdf_url, file_size, company_id, created_at, companies(id, name, status)';
-const OWNER_COLUMNS = 'id, title, description, pdf_url, file_size, company_id, status, created_at';
+const OWNER_COLUMNS = 'id, title, description, pdf_url, file_size, company_id, status, removal_reason, removed_at, created_at';
 
 const catalogueSchema = z.object({
   title: z.string().trim().min(3, 'Titre trop court').max(150),
@@ -56,10 +57,12 @@ router.get('/mine', requireAuth, async (req, res) => {
       .from('catalogues')
       .select(OWNER_COLUMNS)
       .eq('company_id', user.company_id)
-      .eq('status', 'published')
       .order('created_at', { ascending: false });
     if (error) throw error;
-    return res.json({ data: data || [], limit: PLAN_LIMITS[plan].catalogues, used: (data || []).length, plan });
+    // Les catalogues retirés par la modération restent visibles (avec le motif)
+    // mais ne comptent pas dans la limite de l'offre.
+    const used = (data || []).filter((c: any) => c.status === 'published').length;
+    return res.json({ data: data || [], limit: PLAN_LIMITS[plan].catalogues, used, plan });
   } catch (err) {
     logger.error('Catalogues mine error', err);
     return res.status(500).json({ error: 'Une erreur interne est survenue.' });
@@ -132,6 +135,9 @@ router.delete('/:id', requireAuth, requireUuidParams('id'), async (req, res) => 
     }
     const { error } = await supabase.from('catalogues').delete().eq('id', catalogue.id);
     if (error) throw error;
+    if (user.role === 'admin' && catalogue.company_id !== user.company_id) {
+      await logAdminAction(req, 'catalogue_delete', { catalogueId: catalogue.id, targetCompanyId: catalogue.company_id });
+    }
     // Fichier supprimé du stockage (sans bloquer si c'est impossible).
     const marker = `/object/public/${PRODUCT_BUCKET}/`;
     const at = typeof catalogue.pdf_url === 'string' ? catalogue.pdf_url.indexOf(marker) : -1;

@@ -114,6 +114,8 @@ Balises `title`, description, Open Graph, `canonical` et JSON-LD (`Organization`
 - **Tarifs** : la mise en avant de produits est retirée de la page et du comparatif ; les catalogues PDF y figurent.
 - **Objectifs Plausible** : voir `docs/DEPLOYMENT.md` § 7.
 - Migration `20261011090000_supplier_stats_catalogues_terms.sql`.
+- **Modération des catalogues PDF** (console > Plateforme > Catalogues PDF) : ouverture du fichier, retrait motivé (motifs proposés ou texte libre), e-mail au fournisseur qui voit aussi le motif dans son tableau de bord, remise en ligne, suppression définitive avec le fichier ; actions journalisées. Migration `20261012090000_catalogue_moderation.sql`.
+- `SECURITY_AUDIT.md` mis à jour (2FA admin, Redis partagé, nouvelles surfaces d'octobre).
 
 ## Reste à faire (code, non bloquant pour le lancement)
 

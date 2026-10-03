@@ -11,6 +11,7 @@ import { z } from 'zod';
 import { validate } from '../middlewares/validateMiddleware';
 import { isAllowedImageUrl, isSafeLinkUrl } from '../utils/storageUrl';
 import { AD_CATEGORY_GROUPS, AD_PLACEMENTS } from '../../src/data/adPlacements';
+import { notifyCatalogueRemoved } from '../services/notificationService';
 
 const router = express.Router();
 
@@ -617,6 +618,81 @@ router.post('/moderation/:id/reject', verifyRole(['admin']), requireUuidParams('
     res.json({ success: true });
   } catch (err: any) {
     logger.error('Error reject moderation', err);
+    res.status(500).json({ error: 'Une erreur interne est survenue.' });
+  }
+});
+
+// --- Catalogues PDF ---------------------------------------------------------------
+
+const ADMIN_CATALOGUE_COLUMNS =
+  'id, title, description, pdf_url, file_size, status, removal_reason, removed_at, created_at, company:companies(id, name, wilaya), owner:users(name, email)';
+
+// GET /api/admin/catalogues?status=published|removed - Catalogues déposés par les fournisseurs
+router.get('/catalogues', verifyRole(['admin']), async (req, res) => {
+  try {
+    const supabase = getSupabase();
+    let query = supabase
+      .from('catalogues')
+      .select(ADMIN_CATALOGUE_COLUMNS)
+      .order('created_at', { ascending: false })
+      .limit(500);
+    if (req.query.status === 'published' || req.query.status === 'removed') {
+      query = query.eq('status', req.query.status);
+    }
+    const { data, error } = await query;
+    if (error) throw error;
+    res.json({ success: true, data: data || [] });
+  } catch (error: any) {
+    logger.error('Error GET /api/admin/catalogues', error);
+    res.status(500).json({ error: 'Une erreur interne est survenue.' });
+  }
+});
+
+const catalogueStatusSchema = z.discriminatedUnion('status', [
+  z.object({ status: z.literal('published') }),
+  z.object({ status: z.literal('removed'), reason: z.string().trim().min(3, 'Indiquez le motif du retrait.').max(500) }),
+]);
+
+// PATCH /api/admin/catalogues/:id - Retirer (avec motif, le fournisseur est prévenu) ou remettre en ligne
+router.patch('/catalogues/:id', verifyRole(['admin']), requireUuidParams('id'), validate(catalogueStatusSchema), async (req, res) => {
+  try {
+    const { id } = req.params;
+    const body = req.body as { status: 'published' } | { status: 'removed'; reason: string };
+    const supabase = getSupabase();
+    const { data: current } = await supabase
+      .from('catalogues')
+      .select('id, title, status, company_id, owner:users(name, email)')
+      .eq('id', id)
+      .maybeSingle();
+    if (!current) {
+      return res.status(404).json({ error: 'Catalogue introuvable.' });
+    }
+
+    const update = body.status === 'removed'
+      ? { status: 'removed', removal_reason: body.reason, removed_at: new Date().toISOString() }
+      : { status: 'published', removal_reason: null, removed_at: null };
+    const { data, error } = await supabase
+      .from('catalogues')
+      .update(update)
+      .eq('id', id)
+      .select(ADMIN_CATALOGUE_COLUMNS)
+      .single();
+    if (error) throw error;
+
+    await logAdminAction(req, 'catalogue_status_change', {
+      catalogueId: id,
+      targetCompanyId: current.company_id,
+      from: current.status,
+      to: body.status,
+      ...(body.status === 'removed' ? { reason: body.reason } : {}),
+    });
+    if (body.status === 'removed' && current.status !== 'removed') {
+      const owner = Array.isArray(current.owner) ? current.owner[0] : current.owner;
+      await notifyCatalogueRemoved(owner || null, current.title || 'Catalogue', body.reason);
+    }
+    res.json({ success: true, data });
+  } catch (error: any) {
+    logger.error('Error PATCH /api/admin/catalogues/:id', error);
     res.status(500).json({ error: 'Une erreur interne est survenue.' });
   }
 });

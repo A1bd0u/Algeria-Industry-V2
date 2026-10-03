@@ -1422,9 +1422,9 @@
       "statsAdvanced": "إحصائيات متقدمة",
       "support48": "دعم خلال 48 ساعة",
       "support24": "دعم خلال 24 ساعة",
-      "featured": "3 منتجات مميزة",
       "catalogues": "{{count}} كتالوج PDF",
-      "unlimitedCatalogues": "كتالوجات PDF غير محدودة"
+      "unlimitedCatalogues": "كتالوجات PDF غير محدودة",
+      "featured": "3 منتجات مميزة"
     },
     "popular": "الأكثر طلبًا",
     "recommended": "موصى به",
@@ -1622,6 +1622,7 @@
     "fileRequired": "اختر ملف PDF.",
     "uploadFailed": "فشل رفع الملف.",
     "saveFailed": "تعذّر نشر الكتالوج.",
-    "deleteFailed": "تعذّر حذف الكتالوج."
+    "deleteFailed": "تعذّر حذف الكتالوج.",
+    "removed": "حُذف من طرف الإشراف"
   }
 }
