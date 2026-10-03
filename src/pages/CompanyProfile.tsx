@@ -25,7 +25,7 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { ProfileSkeleton } from '../components/Skeleton';
-import { cn, generateSlugUrl, extractIdFromSlug } from '../lib/utils';
+import { cn, generateSlugUrl, extractIdFromSlug, productCover } from '../lib/utils';
 import SEO from '../components/SEO';
 import { absoluteUrl } from '../config/site';
 import { categoryGroupId, categoryLabel } from '../data/productCategories';
@@ -631,8 +631,8 @@ const CompanyProfile = () => {
                     company.products.map((product: any) => (
                       <Link to={`/products/${generateSlugUrl(product.name, product.id)}`} key={product.id} className="flex items-center p-5 rounded-xl border border-gray-100 hover:border-secondary/20 hover:shadow-md transition-all group bg-white relative">
                         <div className="w-20 h-20 bg-gray-50 rounded-lg flex-shrink-0 flex items-center justify-center text-gray-500 border border-gray-100 group-hover:scale-105 transition-transform overflow-hidden">
-                          {product.file_url ? (
-                            <img src={product.file_url} alt={product.name} className="w-full h-full object-cover" />
+                          {productCover(product) ? (
+                            <img src={productCover(product) as string} alt={product.name} className="w-full h-full object-cover" />
                           ) : (
                             <Package className="h-10 w-10" />
                           )}

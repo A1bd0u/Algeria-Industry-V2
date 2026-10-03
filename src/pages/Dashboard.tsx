@@ -54,7 +54,7 @@ import { ApiError } from '../lib/apiError';
 import { categoryLabel } from '../data/productCategories';
 import SubscriptionPanel from '../components/SubscriptionPanel';
 import TwoFactorSettings from '../components/TwoFactorSettings';
-import { cn, generateSlugUrl } from '../lib/utils';
+import { cn, generateSlugUrl, productCover } from '../lib/utils';
 
 
 
@@ -787,8 +787,8 @@ const Dashboard = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                {filteredProducts.map(p => (
                  <div key={p.id} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm relative group hover:shadow-md transition-all flex flex-col">
-                   {p.file_url ? (
-                     <img src={p.file_url} className="w-full h-40 object-cover rounded-2xl mb-4" alt={p.name} />
+                   {productCover(p) ? (
+                     <img src={productCover(p) as string} className="w-full h-40 object-cover rounded-2xl mb-4" alt={p.name} />
                    ) : (
                      <div className="w-full h-40 bg-gray-50 rounded-2xl mb-4 flex items-center justify-center">
                        <Package className="h-10 w-10 text-gray-300" />

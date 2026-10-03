@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { useCurrency } from '../../context/CurrencyContext';
 import { categoryLabel } from '../../data/productCategories';
-import { cn, generateSlugUrl } from '../../lib/utils';
+import { cn, generateSlugUrl, productCover } from '../../lib/utils';
 import ProductImage from './ProductImage';
 
 // Carte produit commune (accueil, secteurs, catalogue) : photo, badges
@@ -45,7 +45,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, layout = 'grid', onQ
     )}>
       <div className={cn('relative shrink-0', list ? 'w-28 sm:w-44' : 'mb-4')}>
         <Link to={href} className="block aspect-square overflow-hidden rounded-xl" tabIndex={-1} aria-hidden="true">
-          <ProductImage src={product.file_url || product.image} alt="" category={product.category}
+          <ProductImage src={productCover(product)} alt="" category={product.category}
             imgClassName="group-hover:scale-105 transition-transform duration-500" />
         </Link>
         {isNew && (
