@@ -23,7 +23,7 @@ const Cover = ({ post, className }: { post: any; className?: string }) =>
       className={cn('h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]', className)} />
   ) : (
     <div className={cn('flex h-full w-full items-end bg-[#ececea] p-5', className)}>
-      <span className="text-xs font-bold uppercase tracking-[0.18em] text-gray-500">{post.category || 'Algeria Industry'}</span>
+      <span className="text-xs font-bold uppercase tracking-[0.18em] text-gray-500">{post.category || 'Industigo'}</span>
     </div>
   );
 

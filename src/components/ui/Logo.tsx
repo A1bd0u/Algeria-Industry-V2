@@ -1,12 +1,15 @@
 import { cn } from '../../lib/utils';
 
-// Logo de la marque : même dessin que l'icône d'onglet (public/favicon.svg),
-// repris dans la navigation, le pied de page et les e-mails.
+// Logo Industigo : un « i » dont le point est une flèche qui avance (« go »),
+// sur un carré orange, la couleur de la marque. Même dessin que l'icône d'onglet (public/favicon.svg)
+// et les icônes d'application (public/icon-*.png).
+export const BRAND_ORANGE = '#ff6b00';
+
 export const LogoMark = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 64 64" className={cn('shrink-0', className)} aria-hidden="true" focusable="false">
-    <rect width="64" height="64" rx="12" fill="#1a1a1a" />
-    <path d="M14 50 L28 14 H36 L50 50 H41 L38 41 H26 L23 50 Z M29 33 H35 L32 24 Z" fill="#ffffff" />
-    <rect x="14" y="54" width="36" height="4" fill="#ff6b00" />
+    <rect width="64" height="64" rx="14" fill={BRAND_ORANGE} />
+    <rect x="22" y="31" width="11" height="22" rx="2.5" fill="#ffffff" />
+    <path d="M22 11h11l10 8.5L33 28H22l7.5-8.5z" fill="#ffffff" />
   </svg>
 );
 
@@ -18,12 +21,15 @@ interface LogoProps {
 }
 
 const Logo = ({ className, tone = 'dark', compact = false }: LogoProps) => (
-  <span className={cn('inline-flex items-center gap-3', className)}>
-    <LogoMark className={cn('h-10 w-10', tone === 'dark' && 'ring-1 ring-white/15 rounded-xl')} />
+  <span className={cn('inline-flex items-center gap-2.5', className)}>
+    <LogoMark className={cn('h-10 w-10', tone === 'dark' && 'ring-1 ring-white/15 rounded-[10px]')} />
     {!compact && (
-      <span className="flex flex-col leading-none" dir="ltr">
-        <span className={cn('text-[15px] font-black tracking-tight', tone === 'dark' ? 'text-white' : 'text-primary')}>Algeria</span>
-        <span className="text-[15px] font-black tracking-tight text-secondary">Industry</span>
+      <span
+        dir="ltr"
+        // Orange plus clair sur fond sombre, plus foncé sur fond clair (contraste AA).
+        className={cn('text-[22px] font-black tracking-[-0.03em] leading-none', tone === 'dark' ? 'text-[#ff7a1a]' : 'text-[#c44700]')}
+      >
+        industigo
       </span>
     )}
   </span>

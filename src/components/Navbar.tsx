@@ -84,16 +84,16 @@ const Navbar = () => {
         <div className={cn("flex justify-between h-24 items-center gap-4 lg:gap-6")}>
           <div className={cn("flex items-center space-x-4 lg:space-x-6")}>
             {/* Logo */}
-            <Link to="/" onClick={handleLogoClick} className="min-w-max" aria-label="Algeria Industry">
-              <Logo className="lg:hidden" compact />
-              <Logo className="hidden lg:inline-flex" />
+            <Link to="/" onClick={handleLogoClick} className="min-w-max" aria-label="Industigo">
+              <Logo className="xl:hidden" compact />
+              <Logo className="hidden xl:inline-flex" />
             </Link>
 
             {/* Search Bar - Re-added and polished */}
             <div 
               onClick={() => setIsSearchOpen(true)}
               className={cn(
-                "hidden xl:flex items-center space-x-3 px-4 py-2.5 bg-white/[0.03] border border-white/5 rounded-2xl cursor-pointer hover:bg-white/[0.08] hover:border-white/20 transition-all w-48 2xl:w-[280px] group/search shrink-0"
+                "hidden xl:flex items-center space-x-3 px-4 py-2.5 bg-white/[0.03] border border-white/5 rounded-2xl cursor-pointer hover:bg-white/[0.08] hover:border-white/20 transition-all w-40 2xl:w-[280px] group/search shrink-0"
               )}
             >
               <Search className="h-3.5 w-3.5 text-white/20 group-hover/search:text-secondary transition-colors" />

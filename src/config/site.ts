@@ -6,7 +6,7 @@ const env = import.meta.env;
 
 const clean = (value: unknown) => (typeof value === 'string' ? value.trim() : '');
 
-export const SITE_NAME = 'Algeria Industry';
+export const SITE_NAME = 'Industigo';
 
 export const SITE_URL = (clean(env.VITE_APP_URL) || (typeof window !== 'undefined' ? window.location.origin : '')).replace(/\/+$/, '');
 

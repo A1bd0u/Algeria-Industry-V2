@@ -1,9 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400">
   <rect width="600" height="400" fill="#f3f4f6"/>
-  <g transform="translate(260 150)" opacity="0.35">
-    <rect width="80" height="80" fill="#1a1a1a"/>
-    <path d="M17 62 L35 18 H45 L63 62 H52 L48 51 H32 L28 62 Z M36 41 H44 L40 30 Z" fill="#ffffff"/>
-    <rect x="17" y="68" width="46" height="5" fill="#ff6b00"/>
+  <g transform="translate(260 150) scale(1.25)" opacity="0.35">
+    <rect width="64" height="64" rx="14" fill="#ff6b00"/>
+    <rect x="22" y="31" width="11" height="22" rx="2.5" fill="#ffffff"/>
+    <path d="M22 11h11l10 8.5L33 28H22l7.5-8.5z" fill="#ffffff"/>
   </g>
-  <text x="300" y="275" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="700" fill="#9ca3af" letter-spacing="3">ALGERIA INDUSTRY</text>
+  <text x="300" y="275" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="700" fill="#9ca3af" letter-spacing="3">INDUSTIGO</text>
 </svg>

@@ -191,7 +191,7 @@ const SearchModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void
                    <span className="text-xs text-gray-500 font-bold uppercase">{t('searchModal.select')}</span>
                 </div>
               </div>
-              <p className="text-xs text-gray-500 font-bold uppercase tracking-widest">Algeria Industry Search v2.0</p>
+              <p className="text-xs text-gray-500 font-bold uppercase tracking-widest">Industigo</p>
             </div>
           </motion.div>
         </div>

@@ -203,7 +203,7 @@ router.post('/:id/checkout', requireUuidParams('id'), async (req, res, next) => 
     const appUrl = getAppUrl().replace(/\/+$/, '');
     const checkout = await createCheckout({
       amount: Number(sub.amount_dzd),
-      description: `Algeria Industry — abonnement ${PLANS[sub.plan as 'basic' | 'pro'].label} 12 mois (${sub.invoice_number})`,
+      description: `Industigo — abonnement ${PLANS[sub.plan as 'basic' | 'pro'].label} 12 mois (${sub.invoice_number})`,
       successUrl: `${appUrl}/dashboard?tab=subscription&payment=success`,
       failureUrl: `${appUrl}/dashboard?tab=subscription&payment=failed`,
       webhookUrl: `${appUrl}/api/payments/chargily/webhook`,

@@ -33,14 +33,14 @@ export type TemplateType =
   | 'notification';
 
 const SUBJECTS: Record<TemplateType, string> = {
-  verificationCode: 'Votre code de vérification - Algeria Industry',
-  resetPassword: 'Réinitialisation de votre mot de passe - Algeria Industry',
-  kycApproved: 'Votre dossier KYC a été approuvé - Algeria Industry',
-  kycRejected: 'Mise à jour concernant votre dossier KYC - Algeria Industry',
-  securityAlert: 'Alerte de sécurité - Algeria Industry',
-  accountExists: 'Tentative d\'inscription avec votre adresse - Algeria Industry',
-  contactMessage: 'Nouveau message de contact - Algeria Industry',
-  notification: 'Algeria Industry',
+  verificationCode: 'Votre code de vérification - Industigo',
+  resetPassword: 'Réinitialisation de votre mot de passe - Industigo',
+  kycApproved: 'Votre dossier KYC a été approuvé - Industigo',
+  kycRejected: 'Mise à jour concernant votre dossier KYC - Industigo',
+  securityAlert: 'Alerte de sécurité - Industigo',
+  accountExists: 'Tentative d\'inscription avec votre adresse - Industigo',
+  contactMessage: 'Nouveau message de contact - Industigo',
+  notification: 'Industigo',
 };
 
 // Les templates sont copiés dans l'image Docker (voir Dockerfile) :
@@ -145,7 +145,7 @@ export async function sendNotificationEmail(to: string | null | undefined, mail:
       ctaLabel: mail.ctaLabel,
       ctaUrl: `${getAppUrl()}${mail.ctaPath}`,
     },
-    `${mail.subject} - Algeria Industry`,
+    `${mail.subject} - Industigo`,
   );
 }
 

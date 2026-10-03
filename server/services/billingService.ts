@@ -216,7 +216,7 @@ th,td{border-bottom:1px solid #e5e7eb;padding:10px;text-align:left} th{backgroun
 <div class="no-print"><button id="print">Imprimer / enregistrer en PDF</button></div>
 <script>document.getElementById('print').addEventListener('click', function () { window.print(); });</script>
 <header>
-  <div><h1>Algeria Industry</h1>
+  <div><h1><span style="color:#c44700">industigo</span></h1>
     <div class="muted">${pending(legalSetting('COMPANY_NAME'))}<br>${pending(legalSetting('ADDRESS'))}<br>
     RC : ${pending(legalSetting('RC'))} — NIF : ${pending(legalSetting('NIF'))}</div></div>
   <div class="right"><h1>Facture</h1><div>${escapeHtml(sub.invoice_number)}</div>

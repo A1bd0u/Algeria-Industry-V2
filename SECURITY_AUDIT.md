@@ -1,4 +1,4 @@
-# Audit de sécurité — Algeria Industry V2
+# Audit de sécurité — Industigo V2
 
 Dernière révision : 3 octobre 2026, base `8b52575` (première version : 29 septembre 2026, base `49baa10`).
 
