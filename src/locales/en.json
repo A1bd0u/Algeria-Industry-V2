@@ -1422,9 +1422,9 @@
       "statsAdvanced": "Advanced statistics",
       "support48": "Support within 48 h",
       "support24": "Support within 24 h",
-      "featured": "3 featured listings",
       "catalogues": "{{count}} PDF catalogue(s)",
-      "unlimitedCatalogues": "Unlimited PDF catalogues"
+      "unlimitedCatalogues": "Unlimited PDF catalogues",
+      "featured": "3 featured listings"
     },
     "popular": "Popular",
     "recommended": "Recommended",
@@ -1622,6 +1622,7 @@
     "fileRequired": "Choose a PDF file.",
     "uploadFailed": "File upload failed.",
     "saveFailed": "Unable to publish the catalogue.",
-    "deleteFailed": "Unable to remove the catalogue."
+    "deleteFailed": "Unable to remove the catalogue.",
+    "removed": "Removed by moderation"
   }
 }

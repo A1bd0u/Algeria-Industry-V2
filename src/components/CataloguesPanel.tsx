@@ -87,7 +87,8 @@ export default function CataloguesPanel({ notify }: { notify: (message: string, 
 
   const list = data?.data || [];
   const limit = data?.limit ?? null;
-  const full = limit !== null && list.length >= limit;
+  const used = list.filter((c: any) => c.status !== 'removed').length;
+  const full = limit !== null && used >= limit;
 
   return (
     <div className="space-y-8">
@@ -97,7 +98,7 @@ export default function CataloguesPanel({ notify }: { notify: (message: string, 
           <p className="text-sm text-gray-500 mt-1">{t('cataloguesPanel.subtitle')}</p>
         </div>
         <p className="text-sm font-bold text-gray-600">
-          {limit === null ? t('cataloguesPanel.usageUnlimited', { count: list.length }) : t('cataloguesPanel.usage', { used: list.length, limit })}
+          {limit === null ? t('cataloguesPanel.usageUnlimited', { count: used }) : t('cataloguesPanel.usage', { used, limit })}
         </p>
       </div>
 
@@ -154,6 +155,11 @@ export default function CataloguesPanel({ notify }: { notify: (message: string, 
               <div className="flex-1 min-w-0">
                 <p className="font-bold text-primary truncate">{c.title}</p>
                 <p className="text-xs text-gray-500">{[formatDate(c.created_at), fileSize(c.file_size)].filter(Boolean).join(' · ')}</p>
+                {c.status === 'removed' && (
+                  <p className="mt-1 text-xs font-bold text-red-600">
+                    {t('cataloguesPanel.removed')}{c.removal_reason ? ` : ${c.removal_reason}` : ''}
+                  </p>
+                )}
               </div>
               <a href={c.pdf_url} target="_blank" rel="noopener noreferrer" aria-label={t('cataloguesPanel.open')} className="p-2 text-primary hover:bg-gray-50 rounded-lg">
                 <Download className="h-4 w-4" />

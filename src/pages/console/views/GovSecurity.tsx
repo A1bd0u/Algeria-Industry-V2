@@ -150,6 +150,10 @@ export default function GovSecurity({ state }: { state: any }) {
         return { label: 'Événement Modifié', color: 'text-gray-600 bg-gray-50 border-gray-100', icon: CheckCircle };
       case 'mfa_reset':
         return { label: '2FA Réinitialisée', color: 'text-amber-700 bg-amber-50 border-amber-100', icon: AlertTriangle };
+      case 'catalogue_status_change':
+        return { label: 'Catalogue PDF Modéré', color: 'text-amber-700 bg-amber-50 border-amber-100', icon: FileText };
+      case 'catalogue_delete':
+        return { label: 'Catalogue PDF Supprimé', color: 'text-rose-600 bg-rose-50 border-rose-100', icon: Trash2 };
       case 'kyc_document_view':
         return { label: 'Document KYC Consulté', color: 'text-gray-600 bg-gray-50 border-gray-100', icon: FileText };
       default:

@@ -1422,9 +1422,9 @@
       "statsAdvanced": "Statistiques avancées",
       "support48": "Support sous 48 h",
       "support24": "Support sous 24 h",
-      "featured": "3 mises en avant",
       "catalogues": "{{count}} catalogue(s) PDF",
-      "unlimitedCatalogues": "Catalogues PDF illimités"
+      "unlimitedCatalogues": "Catalogues PDF illimités",
+      "featured": "3 mises en avant"
     },
     "popular": "Populaire",
     "recommended": "Recommandé",
@@ -1622,6 +1622,7 @@
     "fileRequired": "Choisissez un fichier PDF.",
     "uploadFailed": "L'envoi du fichier a échoué.",
     "saveFailed": "Impossible de publier le catalogue.",
-    "deleteFailed": "Impossible de retirer le catalogue."
+    "deleteFailed": "Impossible de retirer le catalogue.",
+    "removed": "Retiré par la modération"
   }
 }
