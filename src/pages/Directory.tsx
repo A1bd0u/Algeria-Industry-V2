@@ -3,7 +3,7 @@ import {
   Layout,
   MapPin,
   MessageSquare,
-  Search, ShieldCheck, Star, ChevronDown, Check, ArrowRight,
+  Search, Star, ChevronDown, Check, ArrowRight,
   ChevronLeft, ChevronRight
 } from 'lucide-react';
 import { motion } from 'motion/react';
@@ -302,14 +302,8 @@ const Directory = () => {
                 className="bg-white rounded-2xl p-6 border border-gray-100 hover:shadow-2xl hover:border-secondary/20 transition-all group flex flex-col justify-between"
               >
                 <div>
-                  <div className="flex items-start justify-between mb-5">
+                  <div className="mb-5">
                     <CompanyAvatar src={exhibitor.logo} name={exhibitor.name} className="w-16 h-16 rounded-xl text-lg border border-gray-100" />
-                    {exhibitor.verified && (
-                      <span className="flex items-center gap-1 text-success text-xs font-black uppercase tracking-widest">
-                        <ShieldCheck className="h-4 w-4" />
-                        {t('compare.verified')}
-                      </span>
-                    )}
                   </div>
 
                   <div className="mb-5">
