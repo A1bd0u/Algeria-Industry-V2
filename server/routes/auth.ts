@@ -244,7 +244,8 @@ router.post('/register', authIpLimiter, authLimiter, validate(registerSchema), a
         email,
         company: cCompany,
         role: cRole,
-        passwordHash: hashedPassword,
+        // Colonne créée sans guillemets : Postgres l'a mise en minuscules.
+        passwordhash: hashedPassword,
         email_verified: false,
         kyc_status: 'none'
       }])
@@ -375,7 +376,7 @@ router.post('/reset-password', authIpLimiter, validate(resetPasswordSchema), asy
     // Nouveau token_version : toutes les sessions ouvertes sont invalidées.
     const { error: updateError } = await supabase
       .from('users')
-      .update({ passwordHash, token_version: nextVersion })
+      .update({ passwordhash: passwordHash, token_version: nextVersion })
       .eq('id', resetRecord.user_id);
 
     if (updateError) {

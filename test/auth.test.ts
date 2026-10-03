@@ -80,7 +80,7 @@ describe('Auth Routes Integration', () => {
       // Nouveau compte : e-mail non vérifié, KYC à zéro, bcrypt coût 12.
       const insert = fresh.queries.find((q) => q.table === 'users' && q.op === 'insert');
       expect(insert?.payload[0]).toMatchObject({ email_verified: false, kyc_status: 'none', email: 'nouveau@example.com' });
-      expect(insert?.payload[0].passwordHash).toMatch(/^\$2[aby]\$12\$/);
+      expect(insert?.payload[0].passwordhash).toMatch(/^\$2[aby]\$12\$/);
     });
   });
 
