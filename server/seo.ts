@@ -9,9 +9,9 @@ import { logger } from './utils/logger';
 // article et appel d'offres, Express lit la fiche en base et injecte titre,
 // description, Open Graph, canonical et JSON-LD dans index.html avant l'envoi.
 
-export const SITE_NAME = 'Algeria Industry';
+export const SITE_NAME = 'Industigo';
 const DEFAULT_DESCRIPTION =
-  "Algeria Industry : la marketplace B2B des fournisseurs industriels algériens vérifiés. Trouvez un fournisseur, comparez les produits et obtenez un devis.";
+  "Industigo : la marketplace B2B des fournisseurs industriels algériens vérifiés. Trouvez un fournisseur, comparez les produits et obtenez un devis.";
 
 export const getSiteUrl = () => (process.env.APP_URL || 'http://localhost:3000').replace(/\/+$/, '');
 

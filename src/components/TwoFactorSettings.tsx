@@ -31,7 +31,7 @@ function RecoveryCodes({ codes, onDone }: { codes: string[]; onDone: () => void 
     const url = URL.createObjectURL(new Blob([`${t('mfa.recoveryFileTitle')}\n\n${text}\n`], { type: 'text/plain' }));
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'algeria-industry-codes-de-secours.txt';
+    a.download = 'industigo-codes-de-secours.txt';
     a.click();
     URL.revokeObjectURL(url);
   };

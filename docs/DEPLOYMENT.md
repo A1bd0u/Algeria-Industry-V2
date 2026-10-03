@@ -52,7 +52,7 @@ passées en `--build-arg` à Docker. Voir la liste des `ARG` du `Dockerfile` :
 | `MFA_ENCRYPTION_KEY` | oui | `openssl rand -hex 32` — ne jamais la changer après la 1re activation 2FA |
 | `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` | oui | clé service_role : serveur uniquement |
 | `TURNSTILE_SECRET_KEY` | oui | sans elle, connexion et inscription sont refusées en production |
-| `APP_URL` | oui | URL publique, ex. `https://algeria-industry.dz` |
+| `APP_URL` | oui | URL publique, ex. `https://industigo.dz` |
 | `RESEND_API_KEY`, `SENDER_EMAIL` | oui | codes de vérification, réinitialisation (domaine d'envoi vérifié chez Resend) |
 | `BEHIND_CLOUDFLARE` | oui derrière Cloudflare | `true` : l'IP réelle est lue dans `CF-Connecting-IP` (rate limiting par visiteur) |
 | `LEGAL_RIB`, `LEGAL_*` | oui | factures |
@@ -70,25 +70,25 @@ La liste complète et commentée est dans `.env.example`.
 ```bash
 PROJECT=<projet-gcp>
 REGION=europe-west1
-IMAGE=$REGION-docker.pkg.dev/$PROJECT/algeria-industry/app:$(git rev-parse --short HEAD)
+IMAGE=$REGION-docker.pkg.dev/$PROJECT/industigo/app:$(git rev-parse --short HEAD)
 
 # Construire l'image avec les variables publiques du front
 docker build \
-  --build-arg VITE_APP_URL=https://algeria-industry.dz \
+  --build-arg VITE_APP_URL=https://industigo.dz \
   --build-arg VITE_TURNSTILE_SITE_KEY=<site-key> \
   --build-arg VITE_SENTRY_DSN=<dsn-front> \
-  --build-arg VITE_SUPPORT_EMAIL=support@algeria-industry.dz \
+  --build-arg VITE_SUPPORT_EMAIL=support@industigo.dz \
   --build-arg VITE_LEGAL_COMPANY_NAME="<raison sociale>" \
   -t $IMAGE .
 docker push $IMAGE
 
 # Déployer (secrets depuis Secret Manager)
-gcloud run deploy algeria-industry \
+gcloud run deploy industigo \
   --image $IMAGE --region $REGION --platform managed \
   --allow-unauthenticated --port 3000 \
   --min-instances 1 --max-instances 1 \
   --memory 1Gi --cpu 1 \
-  --set-env-vars NODE_ENV=production,APP_URL=https://algeria-industry.dz,BEHIND_CLOUDFLARE=true,SENDER_EMAIL=noreply@algeria-industry.dz \
+  --set-env-vars NODE_ENV=production,APP_URL=https://industigo.dz,BEHIND_CLOUDFLARE=true,SENDER_EMAIL=noreply@industigo.dz \
   --set-secrets JWT_SECRET=jwt-secret:latest,MFA_ENCRYPTION_KEY=mfa-key:latest,SUPABASE_SERVICE_ROLE_KEY=supabase-service-role:latest,TURNSTILE_SECRET_KEY=turnstile-secret:latest,RESEND_API_KEY=resend-key:latest,CRON_SECRET=cron-secret:latest \
   --set-env-vars SUPABASE_URL=https://<ref>.supabase.co
 ```
@@ -100,7 +100,7 @@ gcloud run deploy algeria-industry \
 
 ## 5. Domaine et Cloudflare
 
-1. Cloud Run → **Manage custom domains** → ajouter `algeria-industry.dz` et
+1. Cloud Run → **Manage custom domains** → ajouter `industigo.dz` et
    `www.` ; créer chez Cloudflare les enregistrements indiqués.
 2. Cloudflare : proxy activé (nuage orange), SSL **Full (strict)**,
    « Always Use HTTPS », HSTS.
@@ -127,9 +127,9 @@ gcloud run deploy algeria-industry \
       (KYC non déposé, aucun produit, fiche incomplète) ; relancée, elle ne
       renvoie aucun e-mail.
       ```bash
-      gcloud scheduler jobs create http algeria-industry-daily \
+      gcloud scheduler jobs create http industigo-daily \
         --location $REGION --schedule "0 6 * * *" --time-zone "Africa/Algiers" \
-        --uri https://algeria-industry.dz/api/cron/daily --http-method POST \
+        --uri https://industigo.dz/api/cron/daily --http-method POST \
         --headers "Authorization=Bearer <CRON_SECRET>"
       ```
 

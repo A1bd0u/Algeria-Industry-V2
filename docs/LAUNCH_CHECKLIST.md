@@ -50,7 +50,7 @@ Images picsum, prix par défaut de 850 000 DA, caractéristiques et spécificati
 - En production, l'expéditeur `onboarding@resend.dev` est refusé ; `SENDER_EMAIL` est obligatoire.
 - Un seul schéma de référence : `supabase/migrations/`. `database_setup_full.sql` et `server/db/schema.sql` sont supprimés.
 - Incohérence `owner_id` / `company_id` sur `products` corrigée : les deux champs sont renseignés à la création, et la migration complète l'existant.
-- Fichiers résiduels supprimés (`fix_legal.js`, `app/applet/`, `metadata.json`, mentions AI Studio) ; le paquet s'appelle `algeria-industry`.
+- Fichiers résiduels supprimés (`fix_legal.js`, `app/applet/`, `metadata.json`, mentions AI Studio) ; le paquet s'appelle `industigo`.
 
 ### SEO
 Balises `title`, description, Open Graph, `canonical` et JSON-LD (`Organization`, `LocalBusiness`, `Product`, `BreadcrumbList`) injectées côté serveur pour `/directory/:id`, `/products/:id` et `/blog/:id` ; `robots.txt` et sitemaps générés depuis la base (entreprises vérifiées, produits actifs, articles) ; `noindex` sur les pages privées et les fiches non revendiquées sans description ; image OG et favicon de la marque.

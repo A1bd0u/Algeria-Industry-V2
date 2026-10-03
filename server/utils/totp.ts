@@ -80,7 +80,7 @@ export const verifyTotp = (
   return null;
 };
 
-export const otpauthUri = (secret: string, account: string, issuer = 'Algeria Industry') =>
+export const otpauthUri = (secret: string, account: string, issuer = 'Industigo') =>
   `otpauth://totp/${encodeURIComponent(`${issuer}:${account}`)}?secret=${secret}&issuer=${encodeURIComponent(issuer)}&algorithm=SHA1&digits=${TOTP_DIGITS}&period=${TOTP_PERIOD_SECONDS}`;
 
 // --- Chiffrement du secret au repos (AES-256-GCM) ---------------------------
@@ -96,6 +96,8 @@ const encryptionKey = (): Buffer => {
   }
   const base = process.env.JWT_SECRET;
   if (!base) throw new Error('JWT_SECRET manquant');
+  // Sel historique (ancien nom de la plateforme) : ne jamais le modifier, sinon
+  // les secrets 2FA déjà chiffrés deviennent illisibles.
   return Buffer.from(crypto.hkdfSync('sha256', base, 'algeria-industry', 'mfa-secret-encryption', 32));
 };
 

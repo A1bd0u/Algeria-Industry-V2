@@ -118,7 +118,7 @@ export default function ConsoleLayout({ state }: { state: any }) {
           </div>
           <div>
             <p className="text-xs font-black uppercase tracking-wider text-white/40">Console admin</p>
-            <p className="text-xs font-black uppercase text-white">Algeria Industry</p>
+            <p className="text-xs font-black uppercase text-white">Industigo</p>
           </div>
         </div>
 

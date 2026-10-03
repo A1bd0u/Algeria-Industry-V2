@@ -132,7 +132,7 @@ export default function GovSupport({ state }: { state: any }) {
 
               <div className="flex flex-wrap gap-3">
                 <a
-                  href={`mailto:${selected.email}?subject=${encodeURIComponent('Re : votre message à Algeria Industry')}`}
+                  href={`mailto:${selected.email}?subject=${encodeURIComponent('Re : votre message à Industigo')}`}
                   onClick={() => selected.status === 'new' && update({ status: 'in_progress' })}
                   className="px-5 py-3 rounded-xl bg-primary text-white text-xs font-black uppercase tracking-widest flex items-center gap-2"
                 >

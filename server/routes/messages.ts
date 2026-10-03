@@ -52,7 +52,7 @@ export async function notifyNewMessage(supabase: any, message: { id: string; sen
       subject: 'Nouveau message',
       heading: 'Vous avez reçu un nouveau message',
       name: receiver.name,
-      intro: `${senderName} vous a écrit sur Algeria Industry. Pour votre sécurité, le contenu du message n'est lisible que sur la plateforme.`,
+      intro: `${senderName} vous a écrit sur Industigo. Pour votre sécurité, le contenu du message n'est lisible que sur la plateforme.`,
       ctaLabel: 'Lire le message',
       ctaPath: `/dashboard?tab=messages&to=${message.sender_id}`,
     });

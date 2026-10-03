@@ -79,7 +79,7 @@
     "noProducts": "No products published yet.",
     "beFirst": "Be the first supplier to publish your catalogue",
     "price": "Price",
-    "whyTitle": "Why choose Algeria Industry?",
+    "whyTitle": "Why choose Industigo?",
     "why": {
       "visibility": "More visibility for suppliers",
       "sourcing": "Simpler sourcing for buyers",
@@ -240,10 +240,10 @@
   "products": {
     "similar": "Similar Products",
     "report": "Report inappropriate content",
-    "report_desc": "Help us keep Algeria Industry safe. Why are you reporting this product?",
+    "report_desc": "Help us keep Industigo safe. Why are you reporting this product?",
     "cancel": "Cancel",
     "send_report": "Send Report",
-    "join_suppliers": "Join Algeria Industry's verified suppliers",
+    "join_suppliers": "Join Industigo's verified suppliers",
     "prev": "Previous",
     "next": "Next",
     "sourcing": "Industrial Sourcing",
@@ -285,7 +285,7 @@
       "reportError": "The report could not be sent.",
       "favoriteError": "Unable to update your favourites.",
       "quoteMessage": "Hello, I would like a quote for “{{name}}” (ref. {{ref}}). Quantity: … Delivery place: … Desired lead time: …",
-      "whatsappMessage": "Hello, I am contacting you via Algeria Industry about “{{name}}”.",
+      "whatsappMessage": "Hello, I am contacting you via Industigo about “{{name}}”.",
       "requestQuoteShort": "Request a quote",
       "zoom": "Enlarge image"
     },
@@ -432,7 +432,7 @@
     "call_expert": "Call support",
     "send_ticket": "Write to us",
     "search_placeholder": "Search for a question...",
-    "q1": "What is Algeria Industry?",
+    "q1": "What is Industigo?",
     "a1": "An online directory and catalogue of Algerian industrial suppliers. Buyers find verified companies and their products there and contact them directly.",
     "q2": "Is the site free for buyers?",
     "a2": "Yes. Browsing the catalogue, comparing products and contacting a supplier is free. An account is required for messaging and favourites.",
@@ -489,18 +489,18 @@
     "formats": "Accepted formats: JPG, PNG, WEBP (Max 5MB)",
     "error_send": "An error occurred while sending. Please try again later.",
     "send_request": "Send Request",
-    "why_advertise": "Why advertise on Algeria Industry?",
+    "why_advertise": "Why advertise on Industigo?",
     "captchaRequired": "Please complete the captcha.",
     "placementHome": "Home page banner",
     "heroTitle": "Promote your company",
-    "heroText": "Present your offer to the industry professionals who visit Algeria Industry. Fill in the form and our team will get back to you with a proposal.",
+    "heroText": "Present your offer to the industry professionals who visit Industigo. Fill in the form and our team will get back to you with a proposal.",
     "successText": "Our team has received your advertising request. We will reply by email within 2 business days.",
     "newRequest": "New request",
     "companyPlaceholder": "Your company",
     "contactPlaceholder": "Full name",
     "messagePlaceholder": "Describe your goals, the desired duration…",
     "visualsNote": "Our team will ask for your visuals once the request is approved.",
-    "whyText": "Algeria Industry is aimed at Algerian industrial buyers and suppliers. Your banners are seen by professionals actively looking for products and partners."
+    "whyText": "Industigo is aimed at Algerian industrial buyers and suppliers. Your banners are seen by professionals actively looking for products and partners."
   },
   "auth": {
     "captchaRequired": "Please complete the captcha to continue.",
@@ -531,7 +531,7 @@
     },
     "login": {
       "title": "Welcome back!",
-      "subtitle": "Sign in to your Algeria Industry account",
+      "subtitle": "Sign in to your Industigo account",
       "forgot": "Forgot?",
       "remember": "Remember me",
       "submit": "Sign in",
@@ -697,7 +697,7 @@
     "copy": "Copy",
     "download": "Download",
     "savedCodes": "I have saved my codes",
-    "recoveryFileTitle": "Algeria Industry recovery codes",
+    "recoveryFileTitle": "Industigo recovery codes",
     "newRecoveryCodes": "New recovery codes",
     "disable": "Disable",
     "disableAdminWarning": "Without two-factor authentication, access to the admin console will be blocked.",
@@ -857,7 +857,7 @@
     "favoriteRemoved": "Favourite removed.",
     "profileUpdated": "Profile updated successfully.",
     "exportFailed": "Export failed. Please try again.",
-    "exportFileName": "my-algeria-industry-data.json",
+    "exportFileName": "my-industigo-data.json",
     "deleteAccountConfirm": "Permanently delete your account and all your data? This cannot be undone.",
     "deleteFailed": "Deletion failed. Please contact support.",
     "kyc": {
@@ -1010,7 +1010,7 @@
       "gallery": "At least 3 photos in the gallery"
     },
     "onboarding": {
-      "title": "Getting started on Algeria Industry",
+      "title": "Getting started on Industigo",
       "subtitle": "Four steps to be visible and receive quote requests.",
       "progress": "{{done}} / {{total}} steps",
       "account": {
@@ -1067,7 +1067,7 @@
     "verified": "Verified company",
     "notVerified": "Not verified",
     "quoteTitle": "Request a quote",
-    "quoteText": "Each supplier receives a message in their Algeria Industry inbox listing their products. Replies arrive in your dashboard.",
+    "quoteText": "Each supplier receives a message in their Industigo inbox listing their products. Replies arrive in your dashboard.",
     "notePlaceholder": "Details for suppliers (quantities, lead time, delivery place…) — optional",
     "sendQuote": "Send the request",
     "sending": "Sending…",
@@ -1115,7 +1115,7 @@
       "q3": "How do I contact a supplier?",
       "a3": "Use the contact button on a company or product page. Your conversations are then grouped in the messages section of your dashboard.",
       "q4": "Is the platform available outside Algeria?",
-      "a4": "Yes, Algeria Industry aims to connect Algerian industry with the whole world. The platform is available in French, Arabic and English."
+      "a4": "Yes, Industigo aims to connect Algerian industry with the whole world. The platform is available in French, Arabic and English."
     }
   },
   "favorites": {
@@ -1153,7 +1153,7 @@
     "noPast": "No past events.",
     "organizer": "Organised by {{name}}",
     "submitTitle": "Organising an industrial event?",
-    "submitText": "Promote your trade fair, conference or webinar to the whole Algeria Industry community.",
+    "submitText": "Promote your trade fair, conference or webinar to the whole Industigo community.",
     "submitButton": "Suggest an event"
   },
   "resources": {
@@ -1291,7 +1291,7 @@
     "list": {
       "label": "Registered companies",
       "title": "Supplier directory",
-      "subtitle": "Discover the industrial companies registered on Algeria Industry and contact them directly.",
+      "subtitle": "Discover the industrial companies registered on Industigo and contact them directly.",
       "loadError": "Unable to load companies.",
       "searchPlaceholder": "Search a company by name or activity…",
       "sector": "Business sector",
@@ -1348,7 +1348,7 @@
     "legalTitle": "Legal information",
     "legalName": "Company name",
     "legalDocs": "Trade register and tax ID",
-    "legalChecked": "Checked by Algeria Industry (KYC)",
+    "legalChecked": "Checked by Industigo (KYC)",
     "legalUnchecked": "Not verified",
     "sector": "Business sector",
     "productsIntro": "Discover the product range offered by {{name}}.",
@@ -1388,7 +1388,7 @@
     "cataloguesCtaText": "View the catalogues published by {{name}}.",
     "cataloguesCtaButton": "View catalogues",
     "whatsapp": "WhatsApp",
-    "whatsappMessage": "Hello, I am contacting you via Algeria Industry about {{name}}.",
+    "whatsappMessage": "Hello, I am contacting you via Industigo about {{name}}.",
     "verifiedOn": "Trade register and tax ID checked on {{date}}",
     "foundedYear": "Founded",
     "employees": "Employees",
@@ -1497,7 +1497,7 @@
       "profileText": "Add your company information."
     },
     "createdTitle": "Account created successfully",
-    "welcome": "Welcome to Algeria Industry, the marketplace of verified Algerian industrial suppliers.",
+    "welcome": "Welcome to Industigo, the marketplace of verified Algerian industrial suppliers.",
     "nextSteps": "Next steps",
     "progressLabel": "Step {{done}} of {{total}}",
     "progress": "Progress",
@@ -1564,7 +1564,7 @@
       "intro": "Tools, cleaning products, protective equipment, packaging and supplies: the consumables of your business."
     },
     "code": "Sector {{code}}",
-    "label": "Algeria Industry classification"
+    "label": "Industigo classification"
   },
   "emptyStates": {
     "directoryText": "Try another province or sector, or list your company.",
