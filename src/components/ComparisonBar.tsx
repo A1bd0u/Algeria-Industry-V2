@@ -1,8 +1,8 @@
 import { ChevronDown, ChevronUp, Columns, GitCompare, Plus, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { moreToCompareHref, useComparison } from '../context/ComparisonContext';
+import { MAX_COMPARED, moreToCompareHref, useComparison } from '../context/ComparisonContext';
 import { useTranslation } from 'react-i18next';
 
 const ComparisonBar = () => {
@@ -14,6 +14,14 @@ const ComparisonBar = () => {
   const [closedFor, setClosedFor] = useState<string | null>(null);
   const { pathname } = useLocation();
   const selectionKey = comparedProducts.map((p) => p.id).join(',');
+
+  // Échap replie le panneau ouvert.
+  useEffect(() => {
+    if (!isExpanded) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setIsExpanded(false); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [isExpanded]);
 
   // Sur la page de comparaison, la barre ferait doublon et masquerait le tableau.
   if (comparedProducts.length === 0 || pathname === '/compare' || closedFor === selectionKey) return null;
@@ -33,12 +41,17 @@ const ComparisonBar = () => {
             initial={{ y: 100, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 100, opacity: 0 }}
-            className="bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden"
+            // Jamais plus haut que l'écran (sous le menu) : le contenu défile, l'en-tête
+            // et sa croix restent visibles.
+            className="bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden flex flex-col max-h-[calc(100dvh-11rem)] lg:max-h-[calc(100dvh-12rem)]"
+            role="dialog"
+            aria-label={t('compare.title')}
           >
-            <div className="p-8 border-b border-gray-100 flex items-center justify-between bg-primary text-white">
+            <div className="shrink-0 px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-100 flex items-center justify-between bg-primary text-white">
               <div className="flex items-center space-x-3">
                 <Columns className="h-6 w-6 text-secondary" />
                 <h3 className="font-black tracking-widest text-sm">{t('compare.title')}</h3>
+                <span className="text-xs font-bold text-white/60">{comparedProducts.length} / {MAX_COMPARED}</span>
               </div>
               <div className="flex items-center gap-1">
                 <button 
@@ -58,12 +71,12 @@ const ComparisonBar = () => {
               </div>
             </div>
             
-            <div className="p-8 overflow-x-auto no-scrollbar">
-              <div className="flex space-x-6 min-w-max">
+            <div className="flex-1 min-h-0 overflow-auto overscroll-contain p-4 sm:p-6">
+              <div className="flex gap-4 sm:gap-6 min-w-max">
                 {comparedProducts.map((product) => (
-                  <div key={product.id} className="w-64 flex flex-col">
-                    <div className="relative group mb-6">
-                      <div className="aspect-square bg-gray-50 rounded-2xl flex items-center justify-center p-4">
+                  <div key={product.id} className="w-48 sm:w-56 flex flex-col">
+                    <div className="relative group mb-4">
+                      <div className="aspect-[4/3] bg-gray-50 rounded-2xl flex items-center justify-center p-2 overflow-hidden">
                         <img src={product.image} alt={product.name} className="max-h-full object-contain" referrerPolicy="no-referrer" />
                       </div>
                       <button 
@@ -74,7 +87,7 @@ const ComparisonBar = () => {
                         <X className="h-4 w-4" />
                       </button>
                     </div>
-                    <div className="mb-6">
+                    <div className="mb-4">
                       <p className="text-xs font-black text-secondary uppercase tracking-widest mb-1">{product.brand}</p>
                       <h4 className="text-sm font-bold text-primary line-clamp-2 h-10 leading-tight">{product.name}</h4>
                     </div>
@@ -93,7 +106,7 @@ const ComparisonBar = () => {
                   <Link
                     to={moreHref}
                     onClick={() => setIsExpanded(false)}
-                    className="w-64 border-2 border-dashed border-gray-200 rounded-2xl flex flex-col items-center justify-center text-gray-400 p-8 hover:border-secondary hover:text-secondary transition-colors"
+                    className="w-48 sm:w-56 border-2 border-dashed border-gray-200 rounded-2xl flex flex-col items-center justify-center text-gray-400 p-6 hover:border-secondary hover:text-secondary transition-colors"
                   >
                     <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
                       <Plus className="h-8 w-8" />
@@ -104,14 +117,14 @@ const ComparisonBar = () => {
               </div>
             </div>
             
-            <div className="p-8 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
+            <div className="shrink-0 px-4 py-3 sm:px-6 sm:py-4 bg-gray-50 border-t border-gray-100 flex flex-wrap items-center justify-between gap-3">
               <button 
                 onClick={clearCompare}
                 className="text-xs font-black text-gray-500 hover:text-error uppercase tracking-wider transition-colors"
               >
                 {t('compare.clear')}
               </button>
-              <Link to="/compare" className="btn-primary px-8 py-3 rounded-2xl flex items-center space-x-3 group">
+              <Link to="/compare" className="btn-primary px-5 sm:px-8 py-3 rounded-2xl flex items-center space-x-3 group">
                 <span className="text-xs font-black uppercase tracking-widest">{t('compare.requestQuote')}</span>
                 <ChevronUp className="h-4 w-4 group-hover:-translate-y-1 transition-transform" />
               </Link>

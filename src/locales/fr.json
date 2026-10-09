@@ -1086,7 +1086,8 @@
     "features": "Points clés",
     "swipeHint": "{{count}} produits : faites glisser le tableau pour tous les voir →",
     "closeBar": "Fermer le comparateur",
-    "addProduct": "Ajouter un produit"
+    "addProduct": "Ajouter un produit",
+    "closePage": "Fermer la comparaison"
   },
   "contact": {
     "titleStart": "Contactez",

@@ -1086,7 +1086,8 @@
     "features": "Key features",
     "swipeHint": "{{count}} products: swipe the table to see them all →",
     "closeBar": "Close the comparison bar",
-    "addProduct": "Add a product"
+    "addProduct": "Add a product",
+    "closePage": "Close the comparison"
   },
   "contact": {
     "titleStart": "Contact",
