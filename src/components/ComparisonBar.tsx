@@ -1,18 +1,29 @@
-import { ChevronDown, ChevronUp, Columns, GitCompare, X, Zap } from 'lucide-react';
+import { ChevronDown, ChevronUp, Columns, GitCompare, Plus, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { useComparison } from '../context/ComparisonContext';
+import { moreToCompareHref, useComparison } from '../context/ComparisonContext';
 import { useTranslation } from 'react-i18next';
 
 const ComparisonBar = () => {
   const { comparedProducts, removeFromCompare, clearCompare } = useComparison();
   const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
+  // Barre fermée pour la sélection en cours : elle revient dès que la sélection
+  // change (produit ajouté ou retiré). La sélection, elle, est conservée.
+  const [closedFor, setClosedFor] = useState<string | null>(null);
   const { pathname } = useLocation();
+  const selectionKey = comparedProducts.map((p) => p.id).join(',');
 
   // Sur la page de comparaison, la barre ferait doublon et masquerait le tableau.
-  if (comparedProducts.length === 0 || pathname === '/compare') return null;
+  if (comparedProducts.length === 0 || pathname === '/compare' || closedFor === selectionKey) return null;
+
+  const close = () => {
+    setIsExpanded(false);
+    setClosedFor(selectionKey);
+  };
+  // Choisir d'autres produits : catalogue du secteur du premier produit comparé.
+  const moreHref = moreToCompareHref(comparedProducts[0]?.category);
 
   return (
     <div className="fixed bottom-20 lg:bottom-24 start-1/2 -translate-x-1/2 z-[9999] w-full max-w-4xl px-4">
@@ -29,13 +40,22 @@ const ComparisonBar = () => {
                 <Columns className="h-6 w-6 text-secondary" />
                 <h3 className="font-black tracking-widest text-sm">{t('compare.title')}</h3>
               </div>
-              <button 
-                onClick={() => setIsExpanded(false)}
-                aria-label={t('compare.collapse')}
-                className="p-2 hover:bg-white/10 rounded-full transition-colors"
-              >
-                <ChevronDown className="h-6 w-6" />
-              </button>
+              <div className="flex items-center gap-1">
+                <button 
+                  onClick={() => setIsExpanded(false)}
+                  aria-label={t('compare.collapse')}
+                  className="p-2 hover:bg-white/10 rounded-full transition-colors"
+                >
+                  <ChevronDown className="h-6 w-6" />
+                </button>
+                <button
+                  onClick={close}
+                  aria-label={t('compare.closeBar')}
+                  className="p-2 hover:bg-white/10 rounded-full transition-colors"
+                >
+                  <X className="h-6 w-6" />
+                </button>
+              </div>
             </div>
             
             <div className="p-8 overflow-x-auto no-scrollbar">
@@ -70,12 +90,16 @@ const ComparisonBar = () => {
                 ))}
                 
                 {comparedProducts.length < 4 && (
-                  <div className="w-64 border-2 border-dashed border-gray-100 rounded-2xl flex flex-col items-center justify-center text-gray-300 p-8">
+                  <Link
+                    to={moreHref}
+                    onClick={() => setIsExpanded(false)}
+                    className="w-64 border-2 border-dashed border-gray-200 rounded-2xl flex flex-col items-center justify-center text-gray-400 p-8 hover:border-secondary hover:text-secondary transition-colors"
+                  >
                     <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
-                      <Zap className="h-8 w-8" />
+                      <Plus className="h-8 w-8" />
                     </div>
                     <p className="text-xs font-black uppercase tracking-widest text-center">{t('compare.addAnother')}</p>
-                  </div>
+                  </Link>
                 )}
               </div>
             </div>
@@ -94,6 +118,7 @@ const ComparisonBar = () => {
             </div>
           </motion.div>
         ) : (
+          <div className="flex items-center gap-2">
           <motion.button
             layoutId="compare-bar"
             onClick={() => setIsExpanded(true)}
@@ -119,6 +144,16 @@ const ComparisonBar = () => {
             
             <ChevronUp className="h-5 w-5 text-gray-500 animate-bounce" />
           </motion.button>
+          <button
+            type="button"
+            onClick={close}
+            aria-label={t('compare.closeBar')}
+            title={t('compare.closeBar')}
+            className="h-10 w-10 shrink-0 rounded-full bg-primary text-white shadow-2xl border border-white/10 flex items-center justify-center hover:bg-secondary transition-colors"
+          >
+            <X className="h-5 w-5" />
+          </button>
+          </div>
         )}
       </AnimatePresence>
     </div>

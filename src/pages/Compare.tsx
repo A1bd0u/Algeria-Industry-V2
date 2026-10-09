@@ -1,6 +1,7 @@
 import {
   ArrowLeft,
   MessageSquare,
+  Plus,
   Scale,
   ShieldCheck,
   Trash2,
@@ -11,7 +12,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { useComparison } from '../context/ComparisonContext';
+import { MAX_COMPARED, moreToCompareHref, useComparison } from '../context/ComparisonContext';
 import { useCurrency } from '../context/CurrencyContext';
 import { useToast } from '../context/ToastContext';
 import { apiErrorMessage } from '../lib/apiError';
@@ -73,6 +74,9 @@ const Compare = () => {
   const specKeys: string[] = Array.from(new Set(items.flatMap((p) => Object.keys(p.specs || {}))));
   const hasSeller = items.some((p) => p.sellerId);
   const hasFeatures = items.some((p) => p.features?.length);
+  // Moins de 4 produits : une colonne pour en ajouter, depuis le secteur du premier.
+  const canAdd = items.length < MAX_COMPARED;
+  const moreHref = moreToCompareHref(items[0]?.category);
 
   return (
     <div className={cn("min-h-screen bg-neutral-bg pt-32 pb-20", i18n.language?.startsWith('ar') && "font-arabic")}>
@@ -130,6 +134,17 @@ const Compare = () => {
                     </span>
                   </th>
                 ))}
+                {canAdd && (
+                  <th className="p-4 sm:p-8 align-top min-w-[150px] sm:min-w-[200px]">
+                    <Link
+                      to={moreHref}
+                      className="flex aspect-[4/3] flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-gray-200 text-gray-400 hover:border-secondary hover:text-secondary transition-colors"
+                    >
+                      <Plus className="h-7 w-7" aria-hidden="true" />
+                      <span className="text-xs font-black uppercase tracking-widest text-center px-2">{t('compare.addProduct')}</span>
+                    </Link>
+                  </th>
+                )}
               </tr>
             </thead>
             <tbody className="text-sm">
@@ -149,6 +164,7 @@ const Compare = () => {
                     )}
                   </td>
                 ))}
+                {canAdd && <td aria-hidden="true" />}
               </tr>
               {hasFeatures && (
                 <tr className="border-b border-gray-50">
@@ -166,6 +182,7 @@ const Compare = () => {
                       ) : '—'}
                     </td>
                   ))}
+                  {canAdd && <td aria-hidden="true" />}
                 </tr>
               )}
               {specKeys.map((key) => (
@@ -178,6 +195,7 @@ const Compare = () => {
                       {product.specs?.[key] || '—'}
                     </td>
                   ))}
+                  {canAdd && <td aria-hidden="true" />}
                 </tr>
               ))}
             </tbody>

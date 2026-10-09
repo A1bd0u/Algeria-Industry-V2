@@ -1,15 +1,17 @@
 import type React from 'react';
-import { Eye, Sparkles, Star } from 'lucide-react';
+import { Check, Eye, GitCompare, Sparkles, Star } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+import { toCompareItem, useComparison } from '../../context/ComparisonContext';
 import { useCurrency } from '../../context/CurrencyContext';
+import { useToast } from '../../context/ToastContext';
 import { categoryLabel } from '../../data/productCategories';
 import { cn, generateSlugUrl, productCover } from '../../lib/utils';
 import ProductImage from './ProductImage';
 
 // Carte produit commune (accueil, secteurs, catalogue) : photo, badge
-// « Nouveau », fournisseur, prix ou « Sur devis » ; en option, favori et
-// aperçu rapide. Pas de badge « Vérifié » : seules les entreprises vérifiées
+// « Nouveau », fournisseur, prix ou « Sur devis », bouton « Comparer » ; en
+// option, favori et aperçu rapide. Pas de badge « Vérifié » : seules les entreprises vérifiées
 // sont publiées.
 
 const NEW_DAYS = 7;
@@ -31,6 +33,12 @@ interface ProductCardProps {
 const ProductCard: React.FC<ProductCardProps> = ({ product, layout = 'grid', onQuickView, favorite, className }) => {
   const { t } = useTranslation();
   const { formatPrice } = useCurrency();
+  const { isCompared, toggleCompare } = useComparison();
+  const toast = useToast();
+  const compared = isCompared(String(product.id));
+  const onCompare = () => {
+    if (toggleCompare(toCompareItem(product)) === 'full') toast.info(t('products.detail.compareFull'));
+  };
   const href = `/products/${generateSlugUrl(product.name, product.id)}`;
   const company = companyNameOf(product);
   const isNew = isNewProduct(product.created_at);
@@ -96,6 +104,20 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, layout = 'grid', onQ
           <p className="text-sm font-black text-primary">
             {priced ? formatPrice(Number(product.price)) : <span className="text-secondary">{t('common.onQuote')}</span>}
           </p>
+          <button
+            type="button"
+            onClick={onCompare}
+            aria-pressed={compared}
+            title={compared ? t('products.detail.compared') : t('common.compare')}
+            className={cn(
+              'shrink-0 inline-flex items-center gap-1 rounded-lg border px-2 py-1 text-[11px] font-bold transition-colors',
+              compared ? 'border-secondary bg-secondary/10 text-secondary' : 'border-border-tech text-gray-500 hover:border-secondary hover:text-secondary',
+            )}
+          >
+            {compared ? <Check className="h-3.5 w-3.5" aria-hidden="true" /> : <GitCompare className="h-3.5 w-3.5" aria-hidden="true" />}
+            <span className="hidden sm:inline">{compared ? t('products.detail.compared') : t('common.compare')}</span>
+            <span className="sr-only sm:hidden">{compared ? t('products.detail.compared') : t('common.compare')}</span>
+          </button>
         </div>
       </div>
     </article>

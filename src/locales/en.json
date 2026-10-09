@@ -277,7 +277,8 @@
       "requestQuoteShort": "Request a quote",
       "zoom": "Enlarge image",
       "supplierTitle": "Supplier",
-      "seeSupplier": "View company profile"
+      "seeSupplier": "View company profile",
+      "compareWith": "Compare with another product"
     },
     "searchPlaceholder": "Search a machine, a brand…",
     "sort": {
@@ -1083,7 +1084,9 @@
     "quoteSent": "Request sent to {{count}} supplier(s). Follow the replies in your inbox.",
     "quoteError": "The request could not be sent.",
     "features": "Key features",
-    "swipeHint": "{{count}} products: swipe the table to see them all →"
+    "swipeHint": "{{count}} products: swipe the table to see them all →",
+    "closeBar": "Close the comparison bar",
+    "addProduct": "Add a product"
   },
   "contact": {
     "titleStart": "Contact",
