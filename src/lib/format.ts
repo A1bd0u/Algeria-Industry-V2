@@ -19,3 +19,6 @@ export const formatDate = (iso?: string | null) =>
   iso
     ? new Date(iso).toLocaleDateString(currentLocale(), { day: '2-digit', month: 'long', year: 'numeric', numberingSystem: 'latn' } as Intl.DateTimeFormatOptions)
     : '—';
+
+export const formatDateTime = (iso?: string | null) =>
+  iso ? new Date(iso).toLocaleString(currentLocale(), { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', numberingSystem: 'latn' } as Intl.DateTimeFormatOptions) : '';

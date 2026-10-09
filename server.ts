@@ -51,6 +51,8 @@ import userRoutes from './server/routes/users';
 import uploadRoutes from './server/routes/upload';
 import statsRoutes from './server/routes/stats';
 import cronRoutes from './server/routes/cron';
+import integrationRoutes from './server/routes/integrations';
+import apiV1Routes from './server/routes/apiV1';
 import aiRoutes from './server/routes/ai';
 import adminRoutes from './server/routes/admin';
 import mfaRoutes from './server/routes/mfa';
@@ -134,6 +136,8 @@ export async function createApp() {
   // donc montés avant le parseur JSON.
   app.use('/api/payments', paymentRoutes);
 
+  // API publique : lots de produits plus volumineux (5 000 produits au plus).
+  app.use('/api/v1', express.json({ limit: '10mb' }));
   app.use(express.json({ limit: '2mb' }));
   app.use(cookieParser());
 
@@ -177,6 +181,8 @@ export async function createApp() {
   app.use('/api/search', searchRoutes);
   app.use('/api/contact', contactRoutes);
   app.use('/api/cron', cronRoutes);
+  app.use('/api/integrations', integrationRoutes);
+  app.use('/api/v1', apiV1Routes);
 
   // Route API inconnue : 404 JSON plutôt que la page SPA.
   app.use('/api', (req, res) => {

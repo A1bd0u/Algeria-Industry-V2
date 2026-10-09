@@ -40,6 +40,7 @@ const Favorites = lazy(() => import('./pages/Favorites'));
 const Register = lazy(() => import('./pages/Register'));
 const RegisterSuccess = lazy(() => import('./pages/RegisterSuccess'));
 const Resources = lazy(() => import('./pages/Resources'));
+const Developers = lazy(() => import('./pages/Developers'));
 const SearchResults = lazy(() => import('./pages/SearchResults'));
 const Tarifs = lazy(() => import('./pages/Tarifs'));
 const Terms = lazy(() => import('./pages/Terms'));
@@ -168,6 +169,7 @@ export default function App() {
                       <Route path="/become-exhibitor" element={<PageTransition><BecomeExhibitor /></PageTransition>} />
                       <Route path="/ads-request" element={<PageTransition><AdsRequest /></PageTransition>} />
                       <Route path="/resources" element={<PageTransition><Resources /></PageTransition>} />
+                      <Route path="/developers" element={<PageTransition><Developers /></PageTransition>} />
                       <Route path="/terms" element={<PageTransition><Terms /></PageTransition>} />
                       <Route path="/cgv" element={<PageTransition><Cgv /></PageTransition>} />
                       <Route path="/privacy" element={<PageTransition><Privacy /></PageTransition>} />

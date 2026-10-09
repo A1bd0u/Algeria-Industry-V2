@@ -370,7 +370,8 @@
     "legal": "Legal notice",
     "privacy": "Privacy",
     "cookies": "Cookies",
-    "cgv": "Terms of sale"
+    "cgv": "Terms of sale",
+    "developers": "API and integrations"
   },
   "common": {
     "compare": "Compare",
@@ -674,7 +675,21 @@
     "WEBSITE_INVALID": "Invalid website address.",
     "CATALOGUE_LIMIT_REACHED": "Your plan limits the number of PDF catalogues. Upgrade to a higher plan.",
     "CATALOGUE_FILE_INVALID": "Invalid file: upload a PDF from your dashboard.",
-    "IMPORT_INVALID_ROWS": "Some rows are invalid: fix them and try again."
+    "IMPORT_INVALID_ROWS": "Some rows are invalid: fix them and try again.",
+    "FEED_NOT_ALLOWED": "Catalogue sync is included in the Basic and Pro plans, once your company is verified.",
+    "FEED_HOURLY_NOT_ALLOWED": "Hourly sync is reserved for the Pro plan.",
+    "FEED_COOLDOWN": "A sync just ran: try again in a few minutes.",
+    "FEED_NOT_FOUND": "No feed configured.",
+    "WEBHOOKS_NOT_ALLOWED": "Webhooks are included in the Pro plan.",
+    "WEBHOOK_LIMIT": "5 webhooks at most.",
+    "WEBHOOK_EVENT_NOT_ALLOWED": "Event not available for your account.",
+    "API_KEYS_NOT_ALLOWED": "The API is included in the Pro plan.",
+    "API_KEY_LIMIT": "5 active keys at most.",
+    "API_SCOPE_NOT_ALLOWED": "Permission not available for your account.",
+    "URL_INVALID": "Invalid address.",
+    "URL_NOT_HTTPS": "The address must start with https://.",
+    "URL_PRIVATE": "Local or private address refused.",
+    "URL_CREDENTIALS": "No credentials in the address: put a token in the path or query instead."
   },
   "mfa": {
     "title": "Two-factor authentication",
@@ -979,7 +994,8 @@
       "subscription": "Subscription",
       "stats": "Statistics",
       "admin": "Pro console",
-      "catalogues": "My PDF catalogues"
+      "catalogues": "My PDF catalogues",
+      "integrations": "ERP / CRM integrations"
     },
     "logout": "Sign out",
     "title": "Dashboard",
@@ -1094,7 +1110,8 @@
     "swipeHint": "{{count}} products: swipe the table to see them all →",
     "closeBar": "Close the comparison bar",
     "addProduct": "Add a product",
-    "closePage": "Close the comparison"
+    "closePage": "Close the comparison",
+    "shareContact": "Send my email address to the suppliers with this request (it may be stored in their customer management software)."
   },
   "contact": {
     "titleStart": "Contact",
@@ -1162,7 +1179,8 @@
     "select": "Select a conversation",
     "uploadError": "The file upload failed.",
     "sendError": "The message could not be sent. Please try again.",
-    "title": "Messages"
+    "title": "Messages",
+    "shareContact": "Send my email address to the supplier with this quote request (it may be stored in their customer management software)."
   },
   "events": {
     "titleStart": "Industry",
@@ -1705,7 +1723,171 @@
       "NAME_TOO_LONG": "name too long",
       "CATEGORY_UNKNOWN": "unknown category",
       "PRICE_INVALID": "invalid price",
-      "DESCRIPTION_TOO_LONG": "description too long"
+      "DESCRIPTION_TOO_LONG": "description too long",
+      "REFERENCE_INVALID": "Invalid reference (100 characters max)"
+    }
+  },
+  "integrations": {
+    "title": "ERP and CRM integrations",
+    "subtitleSupplier": "Connect your catalogue to your ERP and get quote requests straight into your CRM.",
+    "subtitleBuyer": "Get supplier replies in your own tools (CRM, team chat, spreadsheet) and read your messages through the API.",
+    "docs": "API documentation",
+    "seePlans": "See plans",
+    "proOnly": "Pro plan",
+    "save": "Save",
+    "copy": "Copy",
+    "secretSaved": "Got it, hide",
+    "failed": "Could not load integrations.",
+    "events": {
+      "message_received": "New message received",
+      "quote_request_received": "New quote request",
+      "catalog_sync_completed": "Catalogue sync finished"
+    },
+    "scopes": {
+      "products_read": "read your products",
+      "products_write": "create and update your products",
+      "messages_read": "read received messages"
+    },
+    "feed": {
+      "title": "Catalogue sync",
+      "text": "Give us the address of the file your ERP exports (Sage, WinDev software, Odoo…). We read it automatically and update your products by item reference.",
+      "locked": "Included in the Basic (daily) and Pro (hourly) plans, once your company is verified.",
+      "url": "File address",
+      "urlHint": "https link to a CSV, Excel (.xlsx) or JSON file, 5 MB max. The link may contain a secret token.",
+      "format": "Format",
+      "formats": {
+        "auto": "Detect automatically",
+        "csv": "CSV",
+        "xlsx": "Excel (.xlsx)",
+        "json": "JSON"
+      },
+      "frequency": "Frequency",
+      "daily": "Every day",
+      "hourly": "Every hour",
+      "deactivateMissing": "Take products missing from the file off sale (tick this if the file holds your whole catalogue).",
+      "columnsTitle": "Recognised columns",
+      "columns": "reference (required, your item code), name (required), category (code or label), price in DZD (empty = on request), description. New products arrive as drafts: add a photo to publish them.",
+      "saved": "Sync saved. It will run on the next pass.",
+      "removed": "Sync stopped. Your products stay online.",
+      "remove": "Stop",
+      "runNow": "Sync now",
+      "neverRun": "Not synced yet.",
+      "nextRun": "Next sync: {{date}}",
+      "report": "{{received}} row(s) read: {{created}} created, {{updated}} updated, {{unchanged}} unchanged, {{deactivated}} taken off sale.",
+      "issues": "{{count}} row(s) not applied",
+      "issueLine": "Row {{line}}",
+      "issueCodes": {
+        "REFERENCE_REQUIRED": "missing reference",
+        "PLAN_LIMIT": "plan product limit reached"
+      },
+      "status": {
+        "success": "Sync succeeded",
+        "partial": "Partial sync",
+        "failed": "Sync failed"
+      }
+    },
+    "webhooks": {
+      "title": "Webhooks to your CRM",
+      "text": "On each event we send its data to the address you choose: HubSpot, Zoho, Odoo, Make, n8n, Zapier or your own server.",
+      "locked": "Included in the Pro plan.",
+      "url": "Receiving address",
+      "urlHint": "https address. Every delivery is signed with a secret you should check on your side (see the documentation).",
+      "events": "Events",
+      "add": "Add webhook",
+      "secretOnce": "Signing secret: copy it now, it will not be shown again.",
+      "test": "Test",
+      "log": "Log",
+      "pause": "Pause",
+      "resume": "Resume",
+      "remove": "Delete webhook",
+      "removed": "Webhook deleted.",
+      "paused": "Paused",
+      "testOk": "Test delivery received by your server.",
+      "testFailed": "Test delivery failed. {{reason}}",
+      "noDeliveries": "No deliveries yet.",
+      "delivery": {
+        "success": "Received",
+        "pending": "Retry scheduled",
+        "failed": "Given up"
+      }
+    },
+    "apiKeys": {
+      "title": "API keys",
+      "text": "So your ERP or CRM can read and update your data on Industigo.",
+      "locked": "Included in the Pro plan.",
+      "name": "Key name",
+      "namePlaceholder": "Sage ERP, sales CRM…",
+      "scopes": "Permissions",
+      "create": "Create key",
+      "keyOnce": "Your API key: copy it now, it will not be shown again.",
+      "revoke": "Revoke",
+      "revoked": "Key revoked.",
+      "lastUsed": "used on {{date}}",
+      "neverUsed": "never used"
+    }
+  },
+  "developers": {
+    "seoTitle": "API and ERP / CRM integrations",
+    "seoDescription": "Sync your catalogue from your ERP and get Industigo quote requests in your CRM.",
+    "title": "API and integrations",
+    "intro": "Three ways to connect Industigo to your software: a file read automatically, webhooks to your CRM, and an API for everything else.",
+    "toc": "Contents",
+    "start": {
+      "title": "Getting started",
+      "step1": "Sign in and open the “ERP / CRM integrations” tab of your dashboard.",
+      "step2": "Suppliers: enter the address of the file exported by your ERP, or create an API key.",
+      "step3": "Add a webhook to receive quote requests in your CRM.",
+      "plans": "Daily sync on Basic; hourly sync, webhooks and API on Pro. Buyers get webhooks and read access to their messages for free.",
+      "seePlans": "See plans",
+      "cta": "Open my integrations"
+    },
+    "feed": {
+      "title": "Catalogue sync",
+      "text": "Your ERP already exports your items as CSV, Excel or JSON. Give us the file's address: we read it every day (Basic) or every hour (Pro).",
+      "columns": "Columns: reference (required), name (required), category (code or label from the classification), price in DZD (empty = on request), description. Headers accepted in French, English or Arabic.",
+      "matching": "The item reference ties each row to the same product from one sync to the next: name, price, category and description are updated.",
+      "newProducts": "New products arrive as drafts: add a photo from the dashboard to publish them.",
+      "missing": "Option: take products missing from the file off sale, if it holds your whole catalogue.",
+      "limits": "5 MB and 5,000 products per file at most; https links only. In JSON: an array of objects or { \"products\": [...] }."
+    },
+    "webhooks": {
+      "title": "Webhooks",
+      "text": "A webhook sends a JSON POST request to your address on each event:",
+      "payload": "Example delivery:",
+      "consent": "The buyer's email is only included if they agreed to share it when making the request (Algerian law 18-07 on personal data). Otherwise, reply through Industigo messaging (reply_url link).",
+      "verifyTitle": "Verify the signature",
+      "verifyText": "Each delivery is signed with the secret shown when the webhook was created. Recompute the HMAC-SHA256 of “t.body” and refuse deliveries older than 5 minutes.",
+      "retries": "Reply with a 2xx code within 10 seconds. Otherwise we retry after 1 min, 5 min, 30 min, 2 h, 6 h and 24 h; each webhook's log is visible in the dashboard. After 20 consecutive failures the webhook is paused."
+    },
+    "api": {
+      "title": "API v1",
+      "text": "HTTPS requests with the key created in your dashboard, in the Authorization header. JSON responses.",
+      "endpoint": "Request",
+      "scope": "Permission",
+      "description": "Purpose",
+      "endpoints": {
+        "me": "Account and key permissions",
+        "list": "Your products (page, limit ≤ 100, updated_since)",
+        "get": "One product, by your item reference",
+        "put": "Creates or updates a product",
+        "batch": "Syncs a batch of products (5,000 max)",
+        "delete": "Takes a product off sale",
+        "messages": "Messages and quote requests received (since, kind, limit)"
+      },
+      "upsertTitle": "Create or update a product",
+      "fields": "Fields: name (required), category (code “B2” or label), price (number, null = on request), description, status (Actif, Brouillon, Inactif).",
+      "photo": "A product without a photo cannot be set to “Actif”: add one from the dashboard.",
+      "batch": "Batch: { \"products\": [{ \"reference\": \"…\", \"name\": \"…\" }], \"deactivate_missing\": false }; the response gives the report (created, updated, rejected).",
+      "errors": "Errors: { \"error\": \"…\", \"code\": \"…\" } with 400 (data), 401 (key), 403 (permission or plan), 404, 409 (missing photo), 429 (too many requests).",
+      "limits": "100 requests per minute. Keys can be revoked at any time from the dashboard."
+    },
+    "tools": {
+      "title": "No-code options",
+      "nocode": "Make, n8n or Zapier: a “Webhook” module receives quote requests and sends them to HubSpot, Zoho CRM, Google Sheets or by email to your team.",
+      "odoo": "Odoo: export your items to CSV with a scheduled action, or call the API from a module.",
+      "sage": "Sage and WinDev software: use their scheduled export to a file published over https (web server, SharePoint, Google Drive direct link).",
+      "help": "Need help connecting your software?",
+      "contact": "Contact us"
     }
   }
 }

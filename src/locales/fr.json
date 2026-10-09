@@ -370,7 +370,8 @@
     "legal": "Mentions légales",
     "privacy": "Confidentialité",
     "cookies": "Cookies",
-    "cgv": "CGV"
+    "cgv": "CGV",
+    "developers": "API et intégrations"
   },
   "common": {
     "compare": "Comparer",
@@ -674,7 +675,21 @@
     "WEBSITE_INVALID": "Adresse de site web invalide.",
     "CATALOGUE_LIMIT_REACHED": "Nombre de catalogues PDF limité par votre offre. Passez à une offre supérieure.",
     "CATALOGUE_FILE_INVALID": "Fichier invalide : déposez un PDF depuis votre tableau de bord.",
-    "IMPORT_INVALID_ROWS": "Certaines lignes sont invalides : corrigez-les puis réessayez."
+    "IMPORT_INVALID_ROWS": "Certaines lignes sont invalides : corrigez-les puis réessayez.",
+    "FEED_NOT_ALLOWED": "La synchronisation du catalogue est incluse dans les offres Basic et Pro, après vérification de l'entreprise.",
+    "FEED_HOURLY_NOT_ALLOWED": "La synchronisation toutes les heures est réservée à l'offre Pro.",
+    "FEED_COOLDOWN": "Une synchronisation vient d'avoir lieu : réessayez dans quelques minutes.",
+    "FEED_NOT_FOUND": "Aucun flux configuré.",
+    "WEBHOOKS_NOT_ALLOWED": "Les webhooks sont inclus dans l'offre Pro.",
+    "WEBHOOK_LIMIT": "5 webhooks au maximum.",
+    "WEBHOOK_EVENT_NOT_ALLOWED": "Événement non disponible pour votre compte.",
+    "API_KEYS_NOT_ALLOWED": "L'API est incluse dans l'offre Pro.",
+    "API_KEY_LIMIT": "5 clés actives au maximum.",
+    "API_SCOPE_NOT_ALLOWED": "Permission non disponible pour votre compte.",
+    "URL_INVALID": "Adresse invalide.",
+    "URL_NOT_HTTPS": "L'adresse doit commencer par https://.",
+    "URL_PRIVATE": "Adresse locale ou privée refusée.",
+    "URL_CREDENTIALS": "Pas d'identifiants dans l'adresse : utilisez un jeton dans le chemin ou la requête."
   },
   "mfa": {
     "title": "Double authentification",
@@ -979,7 +994,8 @@
       "subscription": "Abonnement",
       "stats": "Statistiques",
       "admin": "Console Pro",
-      "catalogues": "Mes catalogues PDF"
+      "catalogues": "Mes catalogues PDF",
+      "integrations": "Intégrations ERP / CRM"
     },
     "logout": "Déconnexion",
     "title": "Tableau de bord",
@@ -1094,7 +1110,8 @@
     "swipeHint": "{{count}} produits : faites glisser le tableau pour tous les voir →",
     "closeBar": "Fermer le comparateur",
     "addProduct": "Ajouter un produit",
-    "closePage": "Fermer la comparaison"
+    "closePage": "Fermer la comparaison",
+    "shareContact": "Transmettre mon e-mail aux fournisseurs avec la demande (il pourra être enregistré dans leur logiciel de gestion clients)."
   },
   "contact": {
     "titleStart": "Contactez",
@@ -1162,7 +1179,8 @@
     "select": "Sélectionnez une conversation",
     "uploadError": "L'envoi du fichier a échoué.",
     "sendError": "Le message n'a pas pu être envoyé. Réessayez.",
-    "title": "Messages"
+    "title": "Messages",
+    "shareContact": "Transmettre mon e-mail au fournisseur avec cette demande de devis (il pourra être enregistré dans son logiciel de gestion clients)."
   },
   "events": {
     "titleStart": "Agenda des",
@@ -1705,7 +1723,171 @@
       "NAME_TOO_LONG": "nom trop long",
       "CATEGORY_UNKNOWN": "catégorie inconnue",
       "PRICE_INVALID": "prix invalide",
-      "DESCRIPTION_TOO_LONG": "description trop longue"
+      "DESCRIPTION_TOO_LONG": "description trop longue",
+      "REFERENCE_INVALID": "Référence invalide (100 caractères au plus)"
+    }
+  },
+  "integrations": {
+    "title": "Intégrations ERP et CRM",
+    "subtitleSupplier": "Reliez votre catalogue à votre ERP et recevez les demandes de devis directement dans votre CRM.",
+    "subtitleBuyer": "Recevez les réponses des fournisseurs dans vos outils (CRM, messagerie d'équipe, tableur) et lisez vos messages par l'API.",
+    "docs": "Documentation de l'API",
+    "seePlans": "Voir les offres",
+    "proOnly": "offre Pro",
+    "save": "Enregistrer",
+    "copy": "Copier",
+    "secretSaved": "C'est noté, masquer",
+    "failed": "Impossible de charger les intégrations.",
+    "events": {
+      "message_received": "Nouveau message reçu",
+      "quote_request_received": "Nouvelle demande de devis",
+      "catalog_sync_completed": "Synchronisation du catalogue terminée"
+    },
+    "scopes": {
+      "products_read": "lire vos produits",
+      "products_write": "créer et modifier vos produits",
+      "messages_read": "lire les messages reçus"
+    },
+    "feed": {
+      "title": "Synchronisation du catalogue",
+      "text": "Indiquez l'adresse du fichier que votre ERP exporte (Sage, logiciel WinDev, Odoo…). Nous le relisons automatiquement et mettons à jour vos produits par référence article.",
+      "locked": "Incluse dans les offres Basic (chaque jour) et Pro (chaque heure), une fois l'entreprise vérifiée.",
+      "url": "Adresse du fichier",
+      "urlHint": "Lien https vers un fichier CSV, Excel (.xlsx) ou JSON, 5 Mo au plus. Un jeton secret peut figurer dans le lien.",
+      "format": "Format",
+      "formats": {
+        "auto": "Détection automatique",
+        "csv": "CSV",
+        "xlsx": "Excel (.xlsx)",
+        "json": "JSON"
+      },
+      "frequency": "Fréquence",
+      "daily": "Chaque jour",
+      "hourly": "Chaque heure",
+      "deactivateMissing": "Retirer de la vente les produits absents du fichier (à cocher si le fichier contient tout votre catalogue).",
+      "columnsTitle": "Colonnes reconnues",
+      "columns": "reference (obligatoire, votre code article), nom (obligatoire), categorie (code ou libellé), prix en DA (vide = sur devis), description. Les nouveaux produits arrivent en brouillon : ajoutez une photo pour les publier.",
+      "saved": "Synchronisation enregistrée. Elle aura lieu au prochain passage.",
+      "removed": "Synchronisation arrêtée. Vos produits restent en ligne.",
+      "remove": "Arrêter",
+      "runNow": "Synchroniser maintenant",
+      "neverRun": "Pas encore synchronisé.",
+      "nextRun": "Prochaine synchronisation : {{date}}",
+      "report": "{{received}} ligne(s) lue(s) : {{created}} créé(s), {{updated}} mis à jour, {{unchanged}} inchangé(s), {{deactivated}} retiré(s) de la vente.",
+      "issues": "{{count}} ligne(s) non prise(s) en compte",
+      "issueLine": "Ligne {{line}}",
+      "issueCodes": {
+        "REFERENCE_REQUIRED": "référence manquante",
+        "PLAN_LIMIT": "limite de produits de l'offre atteinte"
+      },
+      "status": {
+        "success": "Synchronisation réussie",
+        "partial": "Synchronisation partielle",
+        "failed": "Synchronisation en échec"
+      }
+    },
+    "webhooks": {
+      "title": "Webhooks vers votre CRM",
+      "text": "À chaque événement, nous envoyons ses données à l'adresse de votre choix : HubSpot, Zoho, Odoo, Make, n8n, Zapier ou votre propre serveur.",
+      "locked": "Inclus dans l'offre Pro.",
+      "url": "Adresse de réception",
+      "urlHint": "Adresse https. Chaque envoi est signé avec un secret, à vérifier de votre côté (voir la documentation).",
+      "events": "Événements",
+      "add": "Ajouter le webhook",
+      "secretOnce": "Secret de signature : copiez-le maintenant, il ne sera plus affiché.",
+      "test": "Tester",
+      "log": "Journal",
+      "pause": "Suspendre",
+      "resume": "Réactiver",
+      "remove": "Supprimer le webhook",
+      "removed": "Webhook supprimé.",
+      "paused": "Suspendu",
+      "testOk": "Envoi de test reçu par votre serveur.",
+      "testFailed": "Envoi de test en échec. {{reason}}",
+      "noDeliveries": "Aucun envoi pour le moment.",
+      "delivery": {
+        "success": "Reçu",
+        "pending": "Nouvel essai prévu",
+        "failed": "Abandonné"
+      }
+    },
+    "apiKeys": {
+      "title": "Clés d'API",
+      "text": "Pour que votre ERP ou votre CRM lise et mette à jour vos données sur Industigo.",
+      "locked": "Incluses dans l'offre Pro.",
+      "name": "Nom de la clé",
+      "namePlaceholder": "ERP Sage, CRM commercial…",
+      "scopes": "Permissions",
+      "create": "Créer la clé",
+      "keyOnce": "Votre clé d'API : copiez-la maintenant, elle ne sera plus affichée.",
+      "revoke": "Révoquer",
+      "revoked": "Clé révoquée.",
+      "lastUsed": "utilisée le {{date}}",
+      "neverUsed": "jamais utilisée"
+    }
+  },
+  "developers": {
+    "seoTitle": "API et intégrations ERP / CRM",
+    "seoDescription": "Synchronisez votre catalogue depuis votre ERP et recevez les demandes de devis Industigo dans votre CRM.",
+    "title": "API et intégrations",
+    "intro": "Trois façons de relier Industigo à vos logiciels : un fichier relu automatiquement, des webhooks vers votre CRM et une API pour tout le reste.",
+    "toc": "Sommaire",
+    "start": {
+      "title": "Démarrer",
+      "step1": "Connectez-vous et ouvrez l'onglet « Intégrations ERP / CRM » du tableau de bord.",
+      "step2": "Fournisseur : indiquez l'adresse du fichier exporté par votre ERP, ou créez une clé d'API.",
+      "step3": "Ajoutez un webhook pour recevoir les demandes de devis dans votre CRM.",
+      "plans": "Synchronisation quotidienne en Basic ; synchronisation horaire, webhooks et API en Pro. Les acheteurs ont accès gratuitement aux webhooks et à la lecture de leurs messages.",
+      "seePlans": "Voir les offres",
+      "cta": "Ouvrir mes intégrations"
+    },
+    "feed": {
+      "title": "Synchronisation du catalogue",
+      "text": "Votre ERP exporte déjà vos articles en CSV, Excel ou JSON. Donnez-nous l'adresse de ce fichier : nous le relisons chaque jour (Basic) ou chaque heure (Pro).",
+      "columns": "Colonnes : reference (obligatoire), nom (obligatoire), categorie (code ou libellé de la nomenclature), prix en DA (vide = sur devis), description. En-têtes acceptés en français, anglais ou arabe.",
+      "matching": "La référence article relie chaque ligne au même produit d'une synchronisation à l'autre : nom, prix, catégorie et description sont mis à jour.",
+      "newProducts": "Les nouveaux produits arrivent en brouillon : ajoutez une photo depuis le tableau de bord pour les publier.",
+      "missing": "Option : retirer de la vente les produits absents du fichier, si celui-ci contient tout votre catalogue.",
+      "limits": "5 Mo et 5 000 produits au plus par fichier ; lien https uniquement. En JSON : un tableau d'objets ou { \"products\": [...] }."
+    },
+    "webhooks": {
+      "title": "Webhooks",
+      "text": "Un webhook envoie une requête POST en JSON à votre adresse à chaque événement :",
+      "payload": "Exemple d'envoi :",
+      "consent": "L'e-mail de l'acheteur n'est transmis que s'il a accepté de le partager au moment de sa demande (loi 18-07 sur la protection des données personnelles). Sinon, répondez-lui par la messagerie Industigo (lien reply_url).",
+      "verifyTitle": "Vérifier la signature",
+      "verifyText": "Chaque envoi est signé avec le secret affiché à la création du webhook. Recalculez l'empreinte HMAC-SHA256 de « t.corps » et refusez les envois de plus de 5 minutes.",
+      "retries": "Répondez par un code 2xx en moins de 10 secondes. Sinon, nous réessayons après 1 min, 5 min, 30 min, 2 h, 6 h et 24 h ; le journal de chaque webhook est visible dans le tableau de bord. Après 20 échecs consécutifs, le webhook est suspendu."
+    },
+    "api": {
+      "title": "API v1",
+      "text": "Requêtes HTTPS avec la clé créée dans le tableau de bord, dans l'en-tête Authorization. Réponses en JSON.",
+      "endpoint": "Requête",
+      "scope": "Permission",
+      "description": "Rôle",
+      "endpoints": {
+        "me": "Compte et permissions de la clé",
+        "list": "Vos produits (page, limit ≤ 100, updated_since)",
+        "get": "Un produit, par votre référence article",
+        "put": "Crée ou met à jour un produit",
+        "batch": "Synchronise un lot de produits (5 000 au plus)",
+        "delete": "Retire un produit de la vente",
+        "messages": "Messages et demandes de devis reçus (since, kind, limit)"
+      },
+      "upsertTitle": "Créer ou mettre à jour un produit",
+      "fields": "Champs : name (obligatoire), category (code « B2 » ou libellé), price (nombre, null = sur devis), description, status (Actif, Brouillon, Inactif).",
+      "photo": "Un produit sans photo ne peut pas passer en « Actif » : ajoutez-la depuis le tableau de bord.",
+      "batch": "Lot : { \"products\": [{ \"reference\": \"…\", \"name\": \"…\" }], \"deactivate_missing\": false } ; la réponse donne le compte rendu (créés, mis à jour, rejetés).",
+      "errors": "Erreurs : { \"error\": \"…\", \"code\": \"…\" } avec 400 (données), 401 (clé), 403 (permission ou offre), 404, 409 (photo manquante), 429 (trop de requêtes).",
+      "limits": "100 requêtes par minute. Les clés se révoquent à tout moment depuis le tableau de bord."
+    },
+    "tools": {
+      "title": "Sans développement",
+      "nocode": "Make, n8n ou Zapier : un module « Webhook » reçoit les demandes de devis et les envoie dans HubSpot, Zoho CRM, Google Sheets ou par e-mail à votre équipe.",
+      "odoo": "Odoo : exportez vos articles en CSV via une action planifiée, ou appelez l'API depuis un module.",
+      "sage": "Sage et logiciels WinDev : utilisez leur export planifié vers un fichier publié en https (serveur web, SharePoint, Google Drive en lien direct).",
+      "help": "Besoin d'aide pour brancher votre logiciel ?",
+      "contact": "Contactez-nous"
     }
   }
 }

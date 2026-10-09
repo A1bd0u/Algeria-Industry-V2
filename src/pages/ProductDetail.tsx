@@ -162,7 +162,7 @@ const ProductDetail = () => {
     if (!product) return;
     if (product.sellerId && product.sellerId !== user?.id) {
       const text = t('products.detail.quoteMessage', { name: product.name, ref: product.reference_id || '' });
-      const target = `/dashboard?tab=messages&to=${product.sellerId}&text=${encodeURIComponent(text)}`;
+      const target = `/dashboard?tab=messages&to=${product.sellerId}&quote=${product.id}&text=${encodeURIComponent(text)}`;
       navigate(isAuthenticated ? target : `/login?redirect=${encodeURIComponent(target)}`);
       return;
     }

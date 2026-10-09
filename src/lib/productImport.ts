@@ -7,13 +7,15 @@ import { productCategories } from '../data/productCategories';
 
 export const MAX_IMPORT_ROWS = 200;
 
-export type ImportField = 'name' | 'category' | 'price' | 'description';
+// « reference » : référence article de l'ERP, clé de la synchronisation
+// automatique (flux catalogue, API). Facultative pour l'import manuel.
+export type ImportField = 'name' | 'category' | 'price' | 'description' | 'reference';
 
-export type ImportRow = { name: string; category: string | null; price: number | null; description: string };
+export type ImportRow = { name: string; category: string | null; price: number | null; description: string; reference: string | null };
 
 export type RowIssue = { row: number; field: ImportField; code: ImportIssueCode };
 
-export type ImportIssueCode = 'NAME_REQUIRED' | 'NAME_TOO_LONG' | 'CATEGORY_UNKNOWN' | 'PRICE_INVALID' | 'DESCRIPTION_TOO_LONG';
+export type ImportIssueCode = 'NAME_REQUIRED' | 'NAME_TOO_LONG' | 'CATEGORY_UNKNOWN' | 'PRICE_INVALID' | 'DESCRIPTION_TOO_LONG' | 'REFERENCE_INVALID';
 
 const normalize = (value: string) =>
   value
@@ -30,6 +32,7 @@ const HEADER_ALIASES: Record<ImportField, string[]> = {
   category: ['categorie', 'sous categorie', 'code categorie', 'category', 'subcategory', 'الفئة', 'الصنف'],
   price: ['prix', 'prix da', 'prix dzd', 'prix ttc', 'price', 'price dzd', 'السعر'],
   description: ['description', 'descriptif', 'details', 'الوصف'],
+  reference: ['reference', 'ref', 'reference article', 'code article', 'article', 'sku', 'code produit', 'product code', 'item code', 'المرجع', 'رمز المنتج'],
 };
 
 export const mapHeaders = (headers: unknown[]): Partial<Record<ImportField, number>> => {
@@ -91,13 +94,17 @@ export const validateRow = (fields: Partial<Record<ImportField, unknown>>, rowNu
   const description = String(fields.description ?? '').trim();
   if (description.length > 10000) issues.push({ row: rowNumber, field: 'description', code: 'DESCRIPTION_TOO_LONG' });
 
-  const row: ImportRow = { name, category, price: price === 'invalid' ? null : price, description };
+  const referenceInput = String(fields.reference ?? '').trim();
+  const reference = referenceInput || null;
+  if (reference && (reference.length > 100 || /[\u0000-\u001f]/.test(reference))) issues.push({ row: rowNumber, field: 'reference', code: 'REFERENCE_INVALID' });
+
+  const row: ImportRow = { name, category, price: price === 'invalid' ? null : price, description, reference };
   return { row, issues };
 };
 
 // Tableau de lignes (CSV ou Excel) -> lignes contrôlées. La première ligne
 // non vide est l'en-tête ; les lignes entièrement vides sont ignorées.
-export const rowsFromTable = (table: unknown[][]) => {
+export const rowsFromTable = (table: unknown[][], maxRows = MAX_IMPORT_ROWS) => {
   const nonEmpty = table
     .map((cells, index) => ({ cells, line: index + 1 }))
     .filter(({ cells }) => cells.some((c) => String(c ?? '').trim() !== ''));
@@ -105,10 +112,10 @@ export const rowsFromTable = (table: unknown[][]) => {
   const [header, ...body] = nonEmpty;
   const mapping = mapHeaders(header.cells);
   if (mapping.name === undefined) return { error: 'NAME_COLUMN_MISSING' as const };
-  if (body.length > MAX_IMPORT_ROWS) return { error: 'TOO_MANY_ROWS' as const };
+  if (body.length > maxRows) return { error: 'TOO_MANY_ROWS' as const };
   const pick = (cells: unknown[], field: ImportField) => (mapping[field] === undefined ? undefined : cells[mapping[field]!]);
   const results = body.map(({ cells, line }) =>
-    ({ line, ...validateRow({ name: pick(cells, 'name'), category: pick(cells, 'category'), price: pick(cells, 'price'), description: pick(cells, 'description') }, line) }));
+    ({ line, ...validateRow({ name: pick(cells, 'name'), category: pick(cells, 'category'), price: pick(cells, 'price'), description: pick(cells, 'description'), reference: pick(cells, 'reference') }, line) }));
   return { results, mapping };
 };
 

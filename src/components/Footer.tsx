@@ -54,6 +54,7 @@ const Footer = () => {
               <FooterLink to="/blog">{t('nav.news')}</FooterLink>
               <FooterLink to="/events">{t('nav.events')}</FooterLink>
               <FooterLink to="/faq">{t('faq.title')}</FooterLink>
+              <FooterLink to="/developers">{t('footer.developers')}</FooterLink>
             </ul>
           </div>
 

@@ -7,18 +7,36 @@ import { requireUuidParams, isUuid } from '../middlewares/validateParams';
 import { validate } from '../middlewares/validateMiddleware';
 import { quoteRequestLimiter } from '../middlewares/rateLimiter';
 import { sendNotificationEmail } from '../services/emailService';
+import { emitEvent } from '../services/integrations/webhooks';
+import { getSiteUrl } from '../seo';
 
 const router = express.Router();
 
 const messageSchema = z.object({
   text: z.string().trim().min(1, 'Message vide').max(5000, 'Message trop long'),
   receiver_id: z.string().uuid('Destinataire invalide'),
+  // Demande de devis depuis une fiche produit : produit concerné et accord
+  // de l'acheteur pour transmettre ses coordonnées au fournisseur.
+  quote_product_id: z.string().uuid().optional(),
+  share_contact: z.boolean().optional(),
 });
 
 const quoteRequestSchema = z.object({
   product_ids: z.array(z.string().uuid('Produit invalide')).min(1, 'Aucun produit').max(4, 'Quatre produits au plus'),
   note: z.string().trim().max(2000, 'Message trop long').optional(),
+  share_contact: z.boolean().optional(),
 });
+
+// Contenu des événements envoyés aux intégrations (CRM) du destinataire.
+// E-mail de l'expéditeur seulement s'il a accepté de le partager (loi 18-07).
+const eventSender = (user: any, shareContact: boolean) => ({
+  id: user.id,
+  name: user.name || null,
+  company: user.company || null,
+  email: shareContact ? user.email || null : null,
+});
+
+const replyUrl = (senderId: string) => `${getSiteUrl()}/dashboard?tab=messages&to=${senderId}`;
 
 // Statuts des produits visibles publiquement (voir routes/products.ts).
 const PUBLISHED_STATUSES = ['Actif', 'active'];
@@ -143,7 +161,7 @@ router.get('/:conversationId', requireAuth, requireUuidParams('conversationId'),
 
 // POST /api/messages - Envoyer un message
 router.post('/', requireAuth, requireEmailVerified, validate(messageSchema), async (req, res, next) => {
-  const { text, receiver_id } = req.body;
+  const { text, receiver_id, quote_product_id, share_contact } = req.body;
   const user = (req as any).user;
 
   if (receiver_id === user.id) {
@@ -163,15 +181,41 @@ router.post('/', requireAuth, requireEmailVerified, validate(messageSchema), asy
       return res.status(404).json({ error: 'Destinataire introuvable', code: 'RECEIVER_NOT_FOUND' });
     }
 
+    // Demande de devis : le produit doit appartenir au destinataire.
+    let quoteProduct: any = null;
+    if (quote_product_id) {
+      const { data: product } = await supabase
+        .from('products')
+        .select('id, name, external_ref, reference_id, owner_id')
+        .eq('id', quote_product_id)
+        .maybeSingle();
+      if (product && product.owner_id === receiver_id) quoteProduct = product;
+    }
+    const kind = quoteProduct ? 'quote_request' : 'message';
+    const shareContact = Boolean(quoteProduct && share_contact);
+
     const { data, error } = await supabase
       .from('messages')
-      .insert([{ text, sender_id: user.id, receiver_id }])
+      .insert([{ text, sender_id: user.id, receiver_id, kind, share_contact: shareContact }])
       .select()
       .single();
 
     if (error) throw error;
 
     await notifyNewMessage(supabase, data, user.company || user.name || 'Un utilisateur');
+    const event = {
+      message_id: data.id,
+      text,
+      sent_at: data.created_at,
+      sender: eventSender(user, shareContact),
+      reply_url: replyUrl(user.id),
+    };
+    await (quoteProduct
+      ? emitEvent(receiver_id, 'quote_request.received', {
+        ...event,
+        products: [{ id: quoteProduct.id, name: quoteProduct.name, reference: quoteProduct.external_ref ?? null, platform_reference: quoteProduct.reference_id ?? null }],
+      })
+      : emitEvent(receiver_id, 'message.received', event));
 
     return res.status(201).json({
        ...data,
@@ -189,24 +233,24 @@ router.post('/', requireAuth, requireEmailVerified, validate(messageSchema), asy
 // Les destinataires sont déduits des produits côté serveur, jamais fournis
 // par le client.
 router.post('/quote-requests', requireAuth, quoteRequestLimiter, requireEmailVerified, validate(quoteRequestSchema), async (req, res, next) => {
-  const { product_ids, note } = req.body as { product_ids: string[]; note?: string };
+  const { product_ids, note, share_contact } = req.body as { product_ids: string[]; note?: string; share_contact?: boolean };
   const user = (req as any).user;
 
   try {
     const supabase = getSupabase();
     const { data: products, error } = await supabase
       .from('products')
-      .select('id, name, owner_id')
+      .select('id, name, owner_id, external_ref, reference_id')
       .in('id', Array.from(new Set(product_ids)))
       .in('status', PUBLISHED_STATUSES);
     if (error) throw error;
 
-    const bySeller = new Map<string, string[]>();
+    const bySeller = new Map<string, any[]>();
     for (const product of products || []) {
       if (!product.owner_id || product.owner_id === user.id) continue;
-      const names = bySeller.get(product.owner_id) || [];
-      names.push(product.name);
-      bySeller.set(product.owner_id, names);
+      const list = bySeller.get(product.owner_id) || [];
+      list.push(product);
+      bySeller.set(product.owner_id, list);
     }
 
     if (bySeller.size === 0) {
@@ -214,12 +258,15 @@ router.post('/quote-requests', requireAuth, quoteRequestLimiter, requireEmailVer
     }
 
     const buyer = user.company || user.name || 'Un acheteur';
-    const rows = Array.from(bySeller.entries()).map(([sellerId, names]) => ({
+    const shareContact = Boolean(share_contact);
+    const rows = Array.from(bySeller.entries()).map(([sellerId, list]) => ({
       sender_id: user.id,
       receiver_id: sellerId,
+      kind: 'quote_request',
+      share_contact: shareContact,
       text: [
         `Demande de devis de ${buyer} pour :`,
-        ...names.map((name) => `- ${name}`),
+        ...list.map((p) => `- ${p.name}`),
         note ? `\n${note}` : '',
         '\nMerci de préciser prix, délai de livraison et conditions de paiement.',
       ].filter(Boolean).join('\n'),
@@ -230,6 +277,15 @@ router.post('/quote-requests', requireAuth, quoteRequestLimiter, requireEmailVer
 
     for (const message of inserted || []) {
       await notifyNewMessage(supabase, message, buyer);
+      await emitEvent(message.receiver_id, 'quote_request.received', {
+        message_id: message.id,
+        text: message.text,
+        note: note || null,
+        sent_at: message.created_at,
+        sender: eventSender(user, shareContact),
+        products: (bySeller.get(message.receiver_id) || []).map((p) => ({ id: p.id, name: p.name, reference: p.external_ref ?? null, platform_reference: p.reference_id ?? null })),
+        reply_url: replyUrl(user.id),
+      });
     }
 
     return res.status(201).json({ sent: rows.length });

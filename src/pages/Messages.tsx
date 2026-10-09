@@ -31,6 +31,11 @@ export default function Messages() {
   );
   // ?text=… : message pré-rempli (demande de devis depuis une fiche produit).
   const [inputText, setInputText] = useState((searchParams.get('text') || '').slice(0, 1000));
+  // ?quote=<produit> : le premier message envoyé est une demande de devis ;
+  // l'acheteur choisit de transmettre ou non ses coordonnées au fournisseur.
+  const quoteParam = searchParams.get('quote');
+  const [quoteProductId, setQuoteProductId] = useState<string | null>(quoteParam && UUID_RE.test(quoteParam) ? quoteParam : null);
+  const [shareContact, setShareContact] = useState(false);
   const [filter, setFilter] = useState('');
   const [sendError, setSendError] = useState('');
   const [isUploading, setIsUploading] = useState(false);
@@ -75,10 +80,11 @@ export default function Messages() {
 
   const sendMessageMutation = useMutation({
     mutationFn: async ({ text, receiver_id }: { text: string, receiver_id: string | null }) => {
+      const quote = quoteProductId && receiver_id === initialContact ? { quote_product_id: quoteProductId, share_contact: shareContact } : {};
       const res = await fetch('/api/messages', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text, receiver_id })
+        body: JSON.stringify({ text, receiver_id, ...quote })
       });
       if (!res.ok) throw new Error('Failed to send message');
       return res.json();
@@ -90,6 +96,7 @@ export default function Messages() {
       queryClient.invalidateQueries({ queryKey: ['conversations'] });
       setInputText('');
       setSendError('');
+      setQuoteProductId(null);
     },
     onError: () => setSendError(t('messages.sendError')),
   });
@@ -280,6 +287,12 @@ export default function Messages() {
 
             <div className="p-6 bg-white border-t border-gray-50">
               {sendError && <p role="alert" className="mb-3 text-xs font-bold text-red-600">{sendError}</p>}
+              {quoteProductId && selectedContact === initialContact && (
+                <label className="mb-3 flex items-start gap-2 text-xs text-gray-600">
+                  <input type="checkbox" checked={shareContact} onChange={(e) => setShareContact(e.target.checked)} className="mt-0.5 h-4 w-4 accent-secondary" />
+                  <span>{t('messages.shareContact')}</span>
+                </label>
+              )}
               <form onSubmit={handleSend} className="flex items-center space-x-4">
                 <div className="relative">
                   <input 
