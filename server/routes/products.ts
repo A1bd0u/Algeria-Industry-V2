@@ -168,7 +168,7 @@ router.get('/:id', requireUuidParams('id'), async (req, res, next) => {
     if (product.company_id) {
       const { data } = await supabase
         .from('companies')
-        .select('id, name, status, wilaya, whatsapp')
+        .select('id, name, status, wilaya, whatsapp, logo_url')
         .eq('id', product.company_id)
         .maybeSingle();
       company = data;
@@ -184,7 +184,7 @@ router.get('/:id', requireUuidParams('id'), async (req, res, next) => {
       if (!company && owner?.company_id) {
         const { data: c } = await supabase
           .from('companies')
-          .select('id, name, status, wilaya, whatsapp')
+          .select('id, name, status, wilaya, whatsapp, logo_url')
           .eq('id', owner.company_id)
           .maybeSingle();
         company = c;
@@ -208,6 +208,8 @@ router.get('/:id', requireUuidParams('id'), async (req, res, next) => {
       companyName,
       companyId: company?.id || null,
       companyVerified: company?.status === 'approved',
+      companyLogo: company?.logo_url || null,
+      companyWilaya: company?.wilaya || null,
       // WhatsApp public seulement pour une entreprise vérifiée (comme sa fiche).
       companyWhatsapp: company?.status === 'approved' ? company?.whatsapp || null : null,
       sellerId: product.owner_id || null,

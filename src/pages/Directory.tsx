@@ -13,7 +13,7 @@ import { Link } from 'react-router-dom';
 import { cn, generateSlugUrl } from '../lib/utils';
 import { CompanySkeleton } from '../components/Skeleton';
 import SEO from '../components/SEO';
-import { absoluteUrl } from '../config/site';
+import { SHOW_COMPANIES_FROM, SHOW_PRODUCTS_FROM, absoluteUrl } from '../config/site';
 import { formatNumber } from '../lib/format';
 import { CompanyAvatar } from '../components/ui/ProductImage';
 import EmptyState from '../components/ui/EmptyState';
@@ -168,7 +168,7 @@ const Directory = () => {
             </p>
           </div>
           
-          {stats && (
+          {stats && stats.verifiedCompanies >= SHOW_COMPANIES_FROM && stats.publishedProducts >= SHOW_PRODUCTS_FROM && (
             <div className="flex items-center gap-4 bg-white p-3 rounded-2xl border border-gray-100 shadow-sm">
               <div className="text-end">
                 <p className="text-xs font-black text-primary uppercase tracking-widest">{t('home.stats.verifiedCompanies')}</p>

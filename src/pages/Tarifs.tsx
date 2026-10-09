@@ -43,8 +43,9 @@ const Tarifs = () => {
         { text: t('pricing.features.statsBasic') },
         { text: t('pricing.features.support48') }
       ],
-      badge: t('pricing.popular'),
-      bgClass: 'bg-neutral-bg text-primary border-secondary shadow-lg',
+      // Un seul badge (« Recommandé », sur Pro) : deux offres mises en avant s'annulent.
+      badge: null,
+      bgClass: 'bg-white text-primary border-gray-200 shadow-sm',
       buttonText: t('subscription.choose', { plan: 'Basic' }),
       buttonAction: subscribeLink,
       buttonClass: 'bg-secondary text-white border-transparent hover:brightness-110'

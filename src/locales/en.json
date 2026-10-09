@@ -166,7 +166,7 @@
       "freeText": "to sign up, as a buyer or supplier",
       "kycValue": "Register + tax ID",
       "kycText": "checked before the “verified” badge",
-      "freeValue": "DZD 0"
+      "freeValue": "0 DA"
     },
     "categories": {
       "label": "Sectors",
@@ -181,18 +181,6 @@
       "subtitle": "Trade register and tax ID checked by our team.",
       "cta": "See the directory",
       "verified": "Verified"
-    },
-    "supplierBand": {
-      "title": "Your catalogue in front of industrial buyers",
-      "text": "Create your profile in minutes, get your company verified and receive quote requests.",
-      "s1": "Free account",
-      "s1Text": "Company profile and 5 products at no cost.",
-      "s2": "Verified badge",
-      "s2Text": "After checking your trade register and tax ID: buyers' trust.",
-      "s3": "Direct contacts",
-      "s3Text": "Quote requests by messaging and WhatsApp.",
-      "cta": "Create my profile for free",
-      "pricing": "See the plans"
     },
     "advertise": {
       "label": "Advertising",
@@ -287,7 +275,9 @@
       "quoteMessage": "Hello, I would like a quote for “{{name}}” (ref. {{ref}}). Quantity: … Delivery place: … Desired lead time: …",
       "whatsappMessage": "Hello, I am contacting you via Industigo about “{{name}}”.",
       "requestQuoteShort": "Request a quote",
-      "zoom": "Enlarge image"
+      "zoom": "Enlarge image",
+      "supplierTitle": "Supplier",
+      "seeSupplier": "View company profile"
     },
     "searchPlaceholder": "Search a machine, a brand…",
     "sort": {
@@ -379,7 +369,7 @@
     "request_quote": "Request Quote",
     "contact_supplier": "Contact Supplier",
     "see_details": "See details",
-    "dzd": "DZD",
+    "dzd": "DA",
     "backToTop": "Back to top",
     "errorTitle": "Something went wrong",
     "errorText": "We could not load this section. Please try again.",
@@ -1416,7 +1406,9 @@
     "certifications": "Certifications",
     "gallery": "Gallery",
     "phone": "Phone",
-    "email": "Contact e-mail"
+    "email": "Contact e-mail",
+    "reviewsList": "User reviews ({{count}})",
+    "seeAllProducts": "See all {{count}} products"
   },
   "pricing": {
     "eyebrow": "Transparent pricing",

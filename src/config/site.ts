@@ -35,3 +35,8 @@ export const LEGAL = {
 };
 
 export const TURNSTILE_SITE_KEY = clean(env.VITE_TURNSTILE_SITE_KEY);
+
+// Compteurs publics (entreprises vérifiées, produits) : affichés seulement à
+// partir de ces seuils ; en dessous, un petit chiffre dessert la plateforme.
+export const SHOW_COMPANIES_FROM = 50;
+export const SHOW_PRODUCTS_FROM = 200;

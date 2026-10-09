@@ -11,9 +11,10 @@ import { cn } from '../lib/utils';
 
 // Bandeau publicitaire : annonces publiées depuis la console admin et ciblant
 // la page (groupe de pages et catégories produit). Sans annonce, il présente la
-// plateforme (inscription, offre fondateur, emplacement publicitaire). Grand
-// format sur l'accueil, compact ailleurs. Une annonce est soit un modèle
-// (textes posés sur un visuel), soit une bannière image affichée telle quelle.
+// plateforme (inscription, offre fondateur, emplacement publicitaire), sur
+// l'accueil seulement. Grand format sur l'accueil, compact ailleurs. Une
+// annonce est soit un modèle (textes posés sur un visuel), soit une bannière
+// image affichée telle quelle.
 
 interface Ad {
   id: string;
@@ -152,7 +153,9 @@ const HeroSlider: React.FC<{ placement: AdPlacement }> = ({ placement }) => {
     return () => window.clearInterval(timer);
   }, [paused, hovered, count]);
 
-  if (!slide) return null;
+  // Sans annonceur, l'auto-promotion d'Industigo n'occupe que l'accueil : sur
+  // les autres pages, le bandeau n'apparaît que pour une annonce payante.
+  if (!slide || (compact && ads.length === 0)) return null;
 
   const onTouchEnd = (e: React.TouchEvent) => {
     if (touchStart.current === null) return;

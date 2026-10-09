@@ -1,4 +1,4 @@
-import { Upload, XCircle, CheckCircle, Clock,
+import { ArrowRight, Upload, XCircle, CheckCircle, Clock,
   AlertCircle,
   Award,
   Building2,
@@ -35,6 +35,7 @@ import { whatsappHref } from '../config/site';
 import { goal, trackAudience } from '../lib/analytics';
 import { formatDate, currentLocale } from '../lib/format';
 import { CompanyAvatar } from '../components/ui/ProductImage';
+import ProductCard from '../components/ui/ProductCard';
 import { useToast } from '../context/ToastContext';
 import { useAdCategories } from '../context/AdTargetingContext';
 
@@ -389,14 +390,16 @@ const CompanyProfile = () => {
                         <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">{company.sector}</p>
                       </div>
 
-                      <div className="flex items-center space-x-4">
-                        <div className="flex items-center text-yellow-500">
-                          <Star className="h-4 w-4 fill-current" />
-                          <span className="text-sm font-bold ms-1 text-gray-700">{avgRating}</span>
+                      {totalReviews > 0 && (
+                        <div className="flex items-center space-x-4">
+                          <div className="flex items-center text-yellow-500">
+                            <Star className="h-4 w-4 fill-current" />
+                            <span className="text-sm font-bold ms-1 text-gray-700">{avgRating}</span>
+                          </div>
+                          <span className="text-gray-300">|</span>
+                          <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">{t('company.reviewsCount', { count: totalReviews })}</span>
                         </div>
-                        <span className="text-gray-300">|</span>
-                        <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">{t('company.reviewsCount', { count: totalReviews })}</span>
-                      </div>
+                      )}
                     </div>
 
                     <div className="grid grid-cols-2 gap-3 w-full mt-6">
@@ -561,6 +564,33 @@ const CompanyProfile = () => {
                     {company.description || t('company.noDescription')}
                   </p>
                 </section>
+
+                {/* Aperçu du catalogue : les acheteurs voient des produits sans changer d'onglet. */}
+                {company.products.length > 0 && (
+                  <section>
+                    <div className="flex flex-wrap items-end justify-between gap-3 mb-4">
+                      <h2 className="text-2xl font-bold text-primary flex items-center gap-2">
+                        <Package className="h-6 w-6 text-secondary" />
+                        {t('company.tabs.products')}
+                      </h2>
+                      {company.products.length > 4 && (
+                        <button
+                          type="button"
+                          onClick={() => setActiveTab('products')}
+                          className="inline-flex items-center gap-1.5 text-sm font-bold text-secondary hover:underline"
+                        >
+                          {t('company.seeAllProducts', { count: company.products.length })}
+                          <ArrowRight className="h-4 w-4 rtl:rotate-180" aria-hidden="true" />
+                        </button>
+                      )}
+                    </div>
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                      {company.products.slice(0, 4).map((product: any) => (
+                        <ProductCard key={product.id} product={{ ...product, company_name: company.name }} />
+                      ))}
+                    </div>
+                  </section>
+                )}
 
                 {/* Galerie : usine, ateliers, réalisations */}
                 {company.gallery.length > 0 && (
@@ -802,7 +832,7 @@ const CompanyProfile = () => {
             )}
 
             {/* Système d'avis / Commentaires et étoiles */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden p-8 md:p-12 space-y-8">
+            <div className={cn('bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden', totalReviews > 0 ? 'p-8 md:p-12 space-y-8' : 'p-6 md:p-8 space-y-4')}>
               <div className="border-b border-gray-100 pb-6">
                 <h2 className="text-2xl font-bold text-primary flex items-center gap-2">
                   <Star className="h-6 w-6 text-yellow-500 fill-current" />
@@ -811,7 +841,8 @@ const CompanyProfile = () => {
                 <p className="text-gray-500 text-sm mt-1">{t('company.reviewsIntro', { name: company.name })}</p>
               </div>
 
-              {/* Note globale et répartition */}
+              {/* Note globale et répartition, dès le premier avis */}
+              {totalReviews > 0 && (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center bg-gray-50/50 p-6 rounded-xl border border-gray-100">
                 <div className="text-center md:border-e border-gray-200/60 md:pe-8">
                   <p className="text-5xl font-black text-primary leading-none mb-2">{avgRating}</p>
@@ -846,12 +877,16 @@ const CompanyProfile = () => {
                 </div>
               </div>
 
+              )}
+
               {/* Liste des avis & Formulaire fusionnés */}
-              <div className="space-y-6 mt-8 border-t border-gray-100 pt-8">
+              <div className={cn('space-y-6', totalReviews > 0 && 'mt-8 border-t border-gray-100 pt-8')}>
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <h3 className="font-bold text-primary text-lg flex items-center gap-2">
-                    <span>Avis des utilisateurs ({totalReviews})</span>
-                  </h3>
+                  {totalReviews > 0 && (
+                    <h3 className="font-bold text-primary text-lg flex items-center gap-2">
+                      <span>{t('company.reviewsList', { count: totalReviews })}</span>
+                    </h3>
+                  )}
                   {!showReviewForm && (
                     user ? (
                       <button
@@ -859,7 +894,7 @@ const CompanyProfile = () => {
                         className="btn-secondary px-5 py-2.5 text-xs font-black uppercase tracking-widest rounded-xl shadow-sm hover:scale-105 transition-all text-white flex items-center gap-1.5 self-start sm:self-auto animate-in fade-in duration-200"
                       >
                         <Star className="h-3.5 w-3.5 fill-current" />
-                        Laisser mon avis
+                        {t('company.leaveReview')}
                       </button>
                     ) : (
                       <Link
@@ -867,7 +902,7 @@ const CompanyProfile = () => {
                         className="btn-secondary px-5 py-2.5 text-xs font-black uppercase tracking-widest rounded-xl shadow-sm hover:scale-105 transition-all text-white flex items-center gap-1.5 self-start sm:self-auto animate-in fade-in duration-200"
                       >
                         <Star className="h-3.5 w-3.5 fill-current" />
-                        Laisser mon avis
+                        {t('company.leaveReview')}
                       </Link>
                     )
                   )}
@@ -961,11 +996,9 @@ const CompanyProfile = () => {
                 {reviewsLoading ? (
                   <div className="py-8 text-center text-gray-500 font-bold uppercase tracking-widest text-xs">{t('company.reviewsLoading')}</div>
                 ) : reviews.length === 0 ? (
-                  <div className="py-12 text-center text-gray-500 border border-dashed border-gray-200 rounded-xl bg-gray-50/20">
-                    <Star className="h-8 w-8 mx-auto text-gray-300 mb-3" />
-                    <p className="text-sm font-bold tracking-widest">{t('company.noReviews')}</p>
-                    <p className="text-xs text-gray-500 mt-1">{t('company.beFirst')}</p>
-                  </div>
+                  <p className="text-sm text-gray-500">
+                    <span className="font-bold text-gray-600">{t('company.noReviews')}.</span> {t('company.beFirst')}
+                  </p>
                 ) : (
                   <div className="divide-y divide-gray-100">
                     {reviews.map((review) => (
