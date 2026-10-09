@@ -34,18 +34,15 @@ const BecomeExhibitor = () => {
       <section className="py-24 bg-primary text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <span className="inline-block px-4 py-1.5 bg-secondary text-white text-xs font-black uppercase tracking-wider rounded-full mb-8">
-              {t('exhibitor.eyebrow')}
-            </span>
-            <h1 className="text-4xl md:text-6xl font-black mb-8 leading-tight tracking-tight">
+            <h1 className="text-4xl md:text-6xl font-extrabold mb-8 leading-tight tracking-tight">
               {t('exhibitor.titleStart')} <span className="text-secondary">{t('exhibitor.titleHighlight')}</span>
             </h1>
             <p className="text-xl text-gray-300 mb-12 leading-relaxed">{t('exhibitor.subtitle')}</p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link to={registerLink} className="w-full sm:w-auto btn-secondary px-10 py-4 rounded-2xl font-black tracking-widest text-sm inline-flex items-center justify-center gap-2">
+              <Link to={registerLink} className="w-full sm:w-auto btn-secondary px-10 py-4 rounded-2xl font-bold tracking-widest text-sm inline-flex items-center justify-center gap-2">
                 {t('exhibitor.cta')} <ArrowRight className="h-4 w-4 rtl:rotate-180" />
               </Link>
-              <Link to="/tarifs" className="w-full sm:w-auto bg-white/10 hover:bg-white/20 border border-white/20 px-10 py-4 rounded-2xl font-black tracking-widest text-sm transition-all text-center">
+              <Link to="/tarifs" className="w-full sm:w-auto bg-white/10 hover:bg-white/20 border border-white/20 px-10 py-4 rounded-2xl font-bold tracking-widest text-sm transition-all text-center">
                 {t('exhibitor.seePricing')}
               </Link>
             </div>
@@ -54,7 +51,7 @@ const BecomeExhibitor = () => {
       </section>
 
       <section className="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-3xl font-black text-primary tracking-tight text-center mb-16">{t('exhibitor.benefitsTitle')}</h2>
+        <h2 className="text-3xl font-extrabold text-primary tracking-tight text-center mb-16">{t('exhibitor.benefitsTitle')}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {BENEFITS.map(({ key, icon: Icon }, i) => (
             <motion.div
@@ -68,7 +65,7 @@ const BecomeExhibitor = () => {
               <div className="w-14 h-14 bg-primary/5 rounded-2xl flex items-center justify-center text-primary mb-6">
                 <Icon className="h-7 w-7" />
               </div>
-              <h3 className="text-lg font-black text-primary mb-3">{t(`exhibitor.benefits.${key}.title`)}</h3>
+              <h3 className="text-lg font-bold text-primary mb-3">{t(`exhibitor.benefits.${key}.title`)}</h3>
               <p className="text-sm text-gray-500 leading-relaxed">{t(`exhibitor.benefits.${key}.text`)}</p>
             </motion.div>
           ))}
@@ -77,13 +74,13 @@ const BecomeExhibitor = () => {
 
       <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-black text-primary tracking-tight text-center mb-16">{t('exhibitor.stepsTitle')}</h2>
+          <h2 className="text-3xl font-extrabold text-primary tracking-tight text-center mb-16">{t('exhibitor.stepsTitle')}</h2>
           <ol className="grid grid-cols-1 md:grid-cols-3 gap-12">
             {STEPS.map(({ key, icon: Icon }, i) => (
               <li key={key} className="text-center md:text-start">
-                <span className="text-5xl font-black text-secondary/20">0{i + 1}</span>
+                <span className="text-5xl font-extrabold text-secondary/20">0{i + 1}</span>
                 <Icon className="h-8 w-8 text-secondary my-4 mx-auto md:mx-0" />
-                <h3 className="text-lg font-black text-primary mb-2">{t(`exhibitor.steps.${key}.title`)}</h3>
+                <h3 className="text-lg font-bold text-primary mb-2">{t(`exhibitor.steps.${key}.title`)}</h3>
                 <p className="text-sm text-gray-500 leading-relaxed">{t(`exhibitor.steps.${key}.text`)}</p>
               </li>
             ))}
@@ -92,7 +89,7 @@ const BecomeExhibitor = () => {
       </section>
 
       <section id="plans" className="py-24 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-3xl font-black text-primary tracking-tight text-center mb-16">{t('exhibitor.plansTitle')}</h2>
+        <h2 className="text-3xl font-extrabold text-primary tracking-tight text-center mb-16">{t('exhibitor.plansTitle')}</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {PLANS.map((plan) => (
             <div
@@ -102,8 +99,8 @@ const BecomeExhibitor = () => {
                 'popular' in plan && plan.popular ? 'bg-primary text-white border-transparent shadow-2xl' : 'bg-white text-primary border-gray-200'
               )}
             >
-              <h3 className="text-xl font-black tracking-widest mb-4">{t(`subscription.plans.${plan.id}`)}</h3>
-              <p className="text-4xl font-black mb-1">{formatDzd(plan.price)}</p>
+              <h3 className="text-xl font-bold tracking-widest mb-4">{t(`subscription.plans.${plan.id}`)}</h3>
+              <p className="text-4xl font-extrabold mb-1">{formatDzd(plan.price)}</p>
               <p className="text-xs opacity-70 mb-8">{t('subscription.perYearVat')}</p>
               <ul className="flex-1 space-y-3 mb-10 text-sm">
                 <li className="flex items-start gap-3">
@@ -115,7 +112,7 @@ const BecomeExhibitor = () => {
                   <span>{t(`exhibitor.planExtra.${plan.id}`)}</span>
                 </li>
               </ul>
-              <Link to={registerLink} className="w-full py-4 rounded-2xl font-black uppercase tracking-widest text-xs text-center bg-secondary text-white hover:opacity-90">
+              <Link to={registerLink} className="w-full py-4 rounded-2xl font-semibold text-sm text-center bg-secondary text-white hover:opacity-90">
                 {t('exhibitor.start')}
               </Link>
             </div>

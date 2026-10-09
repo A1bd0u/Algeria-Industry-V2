@@ -68,12 +68,12 @@ const Sector = () => {
             </nav>
             <div className="flex items-start justify-between gap-10">
             <div className="max-w-2xl">
-              <p className="flex items-center gap-3 text-xs font-bold uppercase tracking-[0.18em] text-gray-500 mb-4">
+              <p className="flex items-center gap-3 text-sm font-bold text-gray-500 mb-4">
                 <span className="text-secondary">{t('sector.code', { code: group.id })}</span>
                 <span className="h-px w-8 bg-gray-300" aria-hidden="true" />
                 {t('sector.label')}
               </p>
-              <h1 className="text-3xl md:text-5xl font-black text-primary tracking-tight leading-tight mb-4">{name}</h1>
+              <h1 className="text-3xl md:text-5xl font-extrabold text-primary tracking-tight leading-tight mb-4">{name}</h1>
               <p className="text-lg text-gray-600 mb-8">{t(`sector.${group.id}.intro`)}</p>
               <div className="flex flex-wrap gap-3">
                 <Link to={catalogUrl} className="btn-primary px-6 py-3 text-base">
@@ -95,7 +95,7 @@ const Sector = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-14">
           {/* Sous-catégories */}
           <section>
-            <h2 className="text-2xl font-black text-primary mb-5">{t('sector.subcategories')}</h2>
+            <h2 className="text-2xl font-extrabold text-primary mb-5">{t('sector.subcategories')}</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {group.subCategories.map((sub) => {
                 const [title, detail] = t(`productCategories.${sub.id}`).split(/\s*:\s*/);
@@ -120,7 +120,7 @@ const Sector = () => {
           {/* Derniers produits */}
           <section>
             <div className="flex items-end justify-between gap-4 mb-5">
-              <h2 className="text-2xl font-black text-primary">{t('sector.latest')}</h2>
+              <h2 className="text-2xl font-extrabold text-primary">{t('sector.latest')}</h2>
               {latest.length > 0 && (
                 <Link to={catalogUrl} className="text-sm font-bold text-secondary hover:underline inline-flex items-center gap-1">
                   {t('sector.seeAll')} <ArrowRight className="h-4 w-4 rtl:rotate-180" aria-hidden="true" />
@@ -147,7 +147,7 @@ const Sector = () => {
           {/* Fournisseurs du secteur */}
           {suppliers.length > 0 && (
             <section>
-              <h2 className="text-2xl font-black text-primary mb-5">{t('sector.suppliers')}</h2>
+              <h2 className="text-2xl font-extrabold text-primary mb-5">{t('sector.suppliers')}</h2>
               <div className="flex flex-wrap gap-3">
                 {suppliers.map((c) => (
                   <Link
@@ -164,7 +164,7 @@ const Sector = () => {
 
           {/* Autres secteurs */}
           <section>
-            <h2 className="text-lg font-black text-primary mb-4">{t('sector.others')}</h2>
+            <h2 className="text-lg font-bold text-primary mb-4">{t('sector.others')}</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {productCategories.filter((g) => g.id !== group.id).map((g) => {
                 return (

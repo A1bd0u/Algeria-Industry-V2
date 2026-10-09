@@ -50,7 +50,7 @@ const ComparisonBar = () => {
             <div className="shrink-0 px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-100 flex items-center justify-between bg-primary text-white">
               <div className="flex items-center space-x-3">
                 <Columns className="h-6 w-6 text-secondary" />
-                <h3 className="font-black tracking-widest text-sm">{t('compare.title')}</h3>
+                <h3 className="font-bold tracking-widest text-sm">{t('compare.title')}</h3>
                 <span className="text-xs font-bold text-white/60">{comparedProducts.length} / {MAX_COMPARED}</span>
               </div>
               <div className="flex items-center gap-1">
@@ -88,13 +88,13 @@ const ComparisonBar = () => {
                       </button>
                     </div>
                     <div className="mb-4">
-                      <p className="text-xs font-black text-secondary uppercase tracking-widest mb-1">{product.brand}</p>
+                      <p className="text-sm font-semibold text-secondary mb-1">{product.brand}</p>
                       <h4 className="text-sm font-bold text-primary line-clamp-2 h-10 leading-tight">{product.name}</h4>
                     </div>
                     <div className="space-y-3">
                       {Object.entries(product.specs).map(([key, val]) => (
                         <div key={key} className="border-b border-gray-50 pb-2">
-                          <p className="text-xs text-gray-500 font-bold uppercase tracking-tight mb-0.5">{key}</p>
+                          <p className="text-sm text-gray-500 font-bold tracking-tight mb-0.5">{key}</p>
                           <p className="text-xs text-primary font-bold">{val}</p>
                         </div>
                       ))}
@@ -111,7 +111,7 @@ const ComparisonBar = () => {
                     <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
                       <Plus className="h-8 w-8" />
                     </div>
-                    <p className="text-xs font-black uppercase tracking-widest text-center">{t('compare.addAnother')}</p>
+                    <p className="text-sm font-semibold text-center">{t('compare.addAnother')}</p>
                   </Link>
                 )}
               </div>
@@ -120,12 +120,12 @@ const ComparisonBar = () => {
             <div className="shrink-0 px-4 py-3 sm:px-6 sm:py-4 bg-gray-50 border-t border-gray-100 flex flex-wrap items-center justify-between gap-3">
               <button 
                 onClick={clearCompare}
-                className="text-xs font-black text-gray-500 hover:text-error uppercase tracking-wider transition-colors"
+                className="text-sm font-semibold text-gray-500 hover:text-error transition-colors"
               >
                 {t('compare.clear')}
               </button>
               <Link to="/compare" className="btn-primary px-5 sm:px-8 py-3 rounded-2xl flex items-center space-x-3 group">
-                <span className="text-xs font-black uppercase tracking-widest">{t('compare.requestQuote')}</span>
+                <span className="text-sm font-semibold">{t('compare.requestQuote')}</span>
                 <ChevronUp className="h-4 w-4 group-hover:-translate-y-1 transition-transform" />
               </Link>
             </div>
@@ -140,11 +140,11 @@ const ComparisonBar = () => {
             <div className="flex items-center space-x-3 pe-4 border-r border-white/10">
               <div className="relative">
                 <GitCompare className="h-6 w-6 text-secondary" />
-                <span className="absolute -top-2 -end-2 bg-secondary text-white text-xs font-black w-5 h-5 flex items-center justify-center rounded-full border-2 border-primary">
+                <span className="absolute -top-2 -end-2 bg-secondary text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-primary">
                   {comparedProducts.length}
                 </span>
               </div>
-              <span className="text-xs font-black uppercase tracking-wider">{t('compare.open')}</span>
+              <span className="text-sm font-semibold">{t('compare.open')}</span>
             </div>
             
             <div className="flex -space-x-3 overflow-hidden">
@@ -155,7 +155,7 @@ const ComparisonBar = () => {
               ))}
             </div>
             
-            <ChevronUp className="h-5 w-5 text-gray-500 animate-bounce" />
+            <ChevronUp className="h-5 w-5 text-gray-500" />
           </motion.button>
           <button
             type="button"

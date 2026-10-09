@@ -1,5 +1,5 @@
 import type React from 'react';
-import { ArrowRight, BadgeCheck, FileText, X } from 'lucide-react';
+import { ArrowRight, FileText, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
@@ -50,14 +50,13 @@ const QuickView: React.FC<{ product: any; onClose: () => void }> = ({ product, o
         </div>
         <div className="flex flex-col">
           <p className="text-xs text-gray-500 mb-1">{categoryLabel(t, product.category)}</p>
-          <h2 id="quick-view-title" className="text-xl font-black text-primary leading-tight mb-2">{product.name}</h2>
+          <h2 id="quick-view-title" className="text-xl font-bold text-primary leading-tight mb-2">{product.name}</h2>
           {company && (
             <p className="text-sm text-gray-600 flex items-center gap-1.5 mb-4">
-              {product.company_verified && <BadgeCheck className="h-4 w-4 text-success" aria-label={t('products.badges.verified')} />}
               {company}{product.region ? ` · ${product.region}` : ''}
             </p>
           )}
-          <p className="text-2xl font-black text-primary mb-4">
+          <p className="text-2xl font-extrabold text-primary mb-4">
             {Number(product.price) > 0 ? formatPrice(Number(product.price)) : <span className="text-secondary">{t('common.onQuote')}</span>}
           </p>
           {product.description && <p className="text-sm text-gray-600 line-clamp-6 mb-6 whitespace-pre-line">{product.description}</p>}

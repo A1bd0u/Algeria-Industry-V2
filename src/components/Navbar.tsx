@@ -97,7 +97,7 @@ const Navbar = () => {
               )}
             >
               <Search className="h-3.5 w-3.5 text-white/20 group-hover/search:text-secondary transition-colors" />
-              <span className="text-xs font-black text-white/30 uppercase tracking-wider">{t('nav.searchShort')}</span>
+              <span className="text-sm font-semibold text-white/30">{t('nav.searchShort')}</span>
             </div>
           </div>
 
@@ -113,7 +113,7 @@ const Navbar = () => {
                 <Link
                   to={item.path}
                   className={cn(
-                    "px-2.5 py-2 rounded-xl text-xs font-black tracking-wider transition-all duration-300 flex items-center space-x-2 uppercase group relative",
+                    "px-2.5 py-2 rounded-xl text-sm font-semibold transition-all duration-300 flex items-center space-x-2 group relative",
                     location.pathname === item.path 
                       ? "bg-white text-[#1a1a1a] shadow-lg" 
                       : "bg-white/[0.05] text-white/90 hover:bg-white/[0.1] hover:text-white border border-white/5",
@@ -121,7 +121,7 @@ const Navbar = () => {
                   )}
                 >
                   <item.icon className={cn("hidden 2xl:block h-4 w-4 transition-all duration-500 group-hover:scale-125", location.pathname === item.path ? "text-[#1a1a1a] scale-110" : "text-secondary/60 group-hover:text-secondary")} />
-                  <span className="relative z-10 uppercase">{item.name}</span>
+                  <span className="relative z-10">{item.name}</span>
                   {item.hasMega && <ChevronDown className={cn("h-3 w-3 transition-transform duration-300 ms-1", location.pathname === item.path ? "text-[#1a1a1a]" : "group-hover:text-secondary", showMegaMenu && "rotate-180")} />}
                 </Link>
 
@@ -188,7 +188,7 @@ const Navbar = () => {
             {/* Become Exhibitor Button */}
             <Link 
               to="/register?role=fournisseur" 
-              className="relative group px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-500 flex items-center space-x-2 bg-secondary text-white hover:bg-secondary/90 shadow-lg shrink-0"
+              className="relative group px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-500 flex items-center space-x-2 bg-secondary text-white hover:bg-secondary/90 shadow-lg shrink-0"
             >
               <Zap className="h-3.5 w-3.5" />
               <span className={cn(i18n.language?.startsWith('ar') && "text-xs font-bold")}>{t('nav.become_exposant')}</span>
@@ -206,9 +206,9 @@ const Navbar = () => {
                   aria-label={t('nav.language', { name: currentLang.name })}
                   aria-expanded={showLang}
                   aria-haspopup="menu"
-                  className="flex items-center space-x-2 transition-all text-xs font-black uppercase tracking-widest text-white/40 hover:text-white cursor-pointer"
+                  className="flex items-center space-x-2 transition-all text-sm font-semibold text-white/40 hover:text-white cursor-pointer"
                 >
-                  <span className="text-xs font-black text-white/70" aria-label={currentLang.name}>{currentLang.short}</span>
+                  <span className="text-xs font-bold text-white/70" aria-label={currentLang.name}>{currentLang.short}</span>
                   <ChevronDown className={cn("h-3 w-3 text-secondary/40 group-hover/lang:text-secondary transition-all", showLang && "rotate-180")} />
                 </button>
                 
@@ -228,11 +228,11 @@ const Navbar = () => {
                             setShowLang(false); 
                           }}
                           className={cn(
-                            "flex items-center space-x-3 w-full px-4 py-3 hover:bg-white/5 text-xs font-bold uppercase transition-colors",
+                            "flex items-center space-x-3 w-full px-4 py-3 hover:bg-white/5 text-sm font-bold transition-colors",
                             i18n.language?.startsWith(lang.code) ? "text-secondary bg-white/5" : "text-white/60"
                           )}
                         >
-                          <span className="w-5 text-center text-xs font-black">{lang.short}</span>
+                          <span className="w-5 text-center text-xs font-bold">{lang.short}</span>
                           <span>{lang.name}</span>
                         </button>
                       ))}
@@ -268,13 +268,13 @@ const Navbar = () => {
                       <div className="p-4 mb-2 bg-white/5 rounded-xl border border-white/5">
                         {isAuthenticated ? (
                           <>
-                            <p className="text-xs font-black text-secondary uppercase tracking-wider mb-1">{user?.name}</p>
-                            <p className="text-xs text-white/40 font-bold uppercase truncate">{user?.company}</p>
+                            <p className="text-sm font-semibold text-secondary mb-1">{user?.name}</p>
+                            <p className="text-sm text-white/40 font-bold truncate">{user?.company}</p>
                           </>
                         ) : (
                           <>
-                            <p className="text-xs font-black text-secondary uppercase tracking-wider mb-1">{t('nav.workspace')}</p>
-                            <p className="text-xs text-white/40 font-bold uppercase">{t('nav.workspaceText')}</p>
+                            <p className="text-sm font-semibold text-secondary mb-1">{t('nav.workspace')}</p>
+                            <p className="text-sm text-white/40 font-bold">{t('nav.workspaceText')}</p>
                           </>
                         )}
                       </div>
@@ -300,13 +300,13 @@ const Navbar = () => {
                           <div className="grid grid-cols-2 gap-2">
                             <Link
                               to="/login"
-                              className="flex items-center justify-center py-3 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-black text-secondary uppercase tracking-widest transition-all"
+                              className="flex items-center justify-center py-3 rounded-xl bg-white/5 hover:bg-white/10 text-sm font-semibold text-secondary transition-all"
                             >
                               {t('nav.login')}
                             </Link>
                             <Link
                               to="/register"
-                              className="flex items-center justify-center py-3 rounded-xl bg-secondary text-white hover:bg-secondary/90 text-xs font-black uppercase tracking-widest transition-all shadow-lg"
+                              className="flex items-center justify-center py-3 rounded-xl bg-secondary text-white hover:bg-secondary/90 text-sm font-semibold transition-all shadow-lg"
                             >
                               {t('nav.register')}
                             </Link>
@@ -314,7 +314,7 @@ const Navbar = () => {
                         ) : (
                           <button
                             onClick={handleLogout}
-                            className="w-full flex items-center justify-center space-x-3 py-3 rounded-xl bg-red-500/10 hover:bg-red-500 text-xs font-black text-red-500 hover:text-white uppercase tracking-widest transition-all group/logout"
+                            className="w-full flex items-center justify-center space-x-3 py-3 rounded-xl bg-red-500/10 hover:bg-red-500 text-sm font-semibold text-red-500 hover:text-white transition-all group/logout"
                           >
                             <LogOut className="h-4 w-4" />
                             <span>{t('nav.logout')}</span>
@@ -358,7 +358,7 @@ const Navbar = () => {
                   to={item.path}
                   onClick={() => setIsOpen(false)}
                   className={cn(
-                    "flex items-center space-x-4 px-4 py-4 rounded-xl text-xs font-black uppercase tracking-widest transition-all",
+                    "flex items-center space-x-4 px-4 py-4 rounded-xl text-sm font-semibold transition-all",
                     location.pathname === item.path ? "bg-white text-primary" : "text-white hover:bg-white/5"
                   )}
                 >
@@ -371,7 +371,7 @@ const Navbar = () => {
                 <Link
                   to="/register?role=fournisseur"
                   onClick={() => setIsOpen(false)}
-                  className="flex items-center space-x-4 px-4 py-4 rounded-xl text-xs font-black uppercase tracking-widest bg-secondary text-white shadow-xl"
+                  className="flex items-center space-x-4 px-4 py-4 rounded-xl text-sm font-semibold bg-secondary text-white shadow-xl"
                 >
                   <Zap className="h-4 w-4" />
                   <span>{t('nav.become_exposant')}</span>
@@ -379,7 +379,7 @@ const Navbar = () => {
 
                 <div className="bg-white/5 rounded-2xl p-3 border border-white/5 shadow-2xl">
                   <div className="p-3 mb-3 border-b border-white/5 flex items-center justify-between">
-                    <span className="text-xs font-black text-white/20 uppercase tracking-wider">{t('nav.memberSpace')}</span>
+                    <span className="text-sm font-semibold text-white/20">{t('nav.memberSpace')}</span>
                     <div className="w-2 h-2 rounded-full bg-secondary animate-pulse" />
                   </div>
                   <div className="grid grid-cols-2 gap-2 mb-4">
@@ -388,7 +388,7 @@ const Navbar = () => {
                         key={idx}
                         to={item.path}
                         onClick={() => setIsOpen(false)}
-                        className="flex flex-col items-center justify-center p-5 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] text-xs font-black uppercase tracking-wider text-white transition-all border border-white/5 active:scale-95"
+                        className="flex flex-col items-center justify-center p-5 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] text-sm font-semibold text-white transition-all border border-white/5 active:scale-95"
                       >
                         <item.icon className="h-6 w-6 text-secondary mb-3 opacity-80" />
                         <span className="text-center leading-tight opacity-60">{item.label}</span>
@@ -399,14 +399,14 @@ const Navbar = () => {
                     <Link
                       to="/login"
                       onClick={() => setIsOpen(false)}
-                      className="flex-1 py-4 bg-white/5 rounded-xl text-center text-xs font-black uppercase tracking-widest text-secondary border border-white/5"
+                      className="flex-1 py-4 bg-white/5 rounded-xl text-center text-sm font-semibold text-secondary border border-white/5"
                     >
                       {t('nav.login')}
                     </Link>
                     <Link
                       to="/register"
                       onClick={() => setIsOpen(false)}
-                      className="flex-1 py-4 bg-secondary rounded-xl text-center text-xs font-black uppercase tracking-widest text-white shadow-lg"
+                      className="flex-1 py-4 bg-secondary rounded-xl text-center text-sm font-semibold text-white shadow-lg"
                     >
                       {t('nav.register')}
                     </Link>
@@ -425,7 +425,7 @@ const Navbar = () => {
                           i18n.language?.startsWith(lang.code) ? "bg-secondary text-white" : "bg-white/5 text-white/40"
                         )}
                       >
-                        <span className="text-xs font-black">{lang.code.toUpperCase()}</span>
+                        <span className="text-xs font-bold">{lang.code.toUpperCase()}</span>
                       </button>
                     ))}
                  </div>

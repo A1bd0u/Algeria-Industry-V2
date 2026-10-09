@@ -127,7 +127,7 @@ const SearchModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void
             <div className="p-4 max-h-[60vh] overflow-y-auto no-scrollbar">
               {query.length === 0 ? (
                 <div className="py-8 px-4">
-                  <p className="text-xs font-black uppercase tracking-wider text-gray-500 mb-6 px-2">{t('searchModal.suggestions')}</p>
+                  <p className="text-sm font-semibold text-gray-500 mb-6 px-2">{t('searchModal.suggestions')}</p>
                   <div className="grid grid-cols-2 gap-3">
                     {['Pompes', 'Solaire', 'Maintenance', 'Tuyauterie'].map((term) => (
                       <button 
@@ -143,7 +143,7 @@ const SearchModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void
                 </div>
               ) : results.length > 0 ? (
                 <div className="space-y-2">
-                   <p className="text-xs font-black uppercase tracking-wider text-gray-500 mb-4 px-4">{t('searchModal.results', { count: results.length })}</p>
+                   <p className="text-sm font-semibold text-gray-500 mb-4 px-4">{t('searchModal.results', { count: results.length })}</p>
                    {results.map((result) => {
                      const Icon = getIcon(result.type);
                      return (
@@ -158,9 +158,9 @@ const SearchModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void
                          </div>
                          <div className="flex-1">
                             <div className="flex items-center space-x-2">
-                               <span className="text-xs font-black uppercase tracking-widest text-secondary">{t(`searchModal.type.${result.type}`, { defaultValue: result.type })}</span>
-                               <span className="text-xs font-black uppercase tracking-widest text-gray-500">•</span>
-                               <span className="text-xs font-black uppercase tracking-widest text-gray-500">{result.category}</span>
+                               <span className="text-sm font-semibold text-secondary">{t(`searchModal.type.${result.type}`, { defaultValue: result.type })}</span>
+                               <span className="text-sm font-semibold text-gray-500">•</span>
+                               <span className="text-sm font-semibold text-gray-500">{result.category}</span>
                             </div>
                             <p className="text-sm font-bold text-primary group-hover:text-secondary transition-colors">{result.title}</p>
                             <p className="text-xs text-gray-500">{result.subtitle}</p>
@@ -184,14 +184,14 @@ const SearchModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void
               <div className="flex items-center space-x-4">
                 <div className="flex items-center space-x-1">
                    <kbd className="bg-white border border-gray-200 rounded px-1.5 py-0.5 text-xs font-bold text-gray-500">ESC</kbd>
-                   <span className="text-xs text-gray-500 font-bold uppercase">{t('searchModal.quit')}</span>
+                   <span className="text-sm text-gray-500 font-bold">{t('searchModal.quit')}</span>
                 </div>
                 <div className="flex items-center space-x-1">
                    <kbd className="bg-white border border-gray-200 rounded px-1.5 py-0.5 text-xs font-bold text-gray-500">↵</kbd>
-                   <span className="text-xs text-gray-500 font-bold uppercase">{t('searchModal.select')}</span>
+                   <span className="text-sm text-gray-500 font-bold">{t('searchModal.select')}</span>
                 </div>
               </div>
-              <p className="text-xs text-gray-500 font-bold uppercase tracking-widest">Industigo</p>
+              <p className="text-sm text-gray-500 font-bold">Industigo</p>
             </div>
           </motion.div>
         </div>

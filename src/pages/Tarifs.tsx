@@ -92,20 +92,9 @@ const Tarifs = () => {
   return (
     <div className="pt-12 pb-20 bg-gray-50/50 min-h-screen relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 relative z-10">
-        <div className="text-center mb-6">
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex items-center justify-center gap-2 text-secondary"
-          >
-            <Award className="h-4 w-4" />
-            <span className="text-xs font-black uppercase tracking-wider">{t('pricing.eyebrow')}</span>
-          </motion.div>
-        </div>
-
         <div className="mb-10">
           <div className="text-center mb-10">
-            <h2 className="text-4xl md:text-6xl font-black text-primary tracking-tighter mb-4 flex items-center justify-center">
+            <h2 className="text-4xl md:text-6xl font-extrabold text-primary tracking-tight mb-4 flex items-center justify-center">
               <span>{t('pricing.title')}</span>
             </h2>
             <p className="text-gray-700 font-bold max-w-xl mx-auto text-base md:text-lg">{t('pricing.subtitle')}</p>
@@ -113,12 +102,12 @@ const Tarifs = () => {
           <div className="max-w-4xl mx-auto mb-12 bg-primary text-white rounded-2xl p-6 md:p-8 flex flex-col md:flex-row items-center gap-6">
             <ShieldCheck className="h-10 w-10 text-secondary shrink-0" />
             <div className="flex-1 text-center md:text-start">
-              <p className="text-xs font-black uppercase tracking-wider text-secondary mb-1">{t('pricing.founder.label')}</p>
+              <p className="text-sm font-semibold text-secondary mb-1">{t('pricing.founder.label')}</p>
               <p className="font-bold">
                 {t('pricing.founder.text')}
               </p>
             </div>
-            <Link to="/register?role=fournisseur" className="bg-secondary text-white px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest whitespace-nowrap">
+            <Link to="/register?role=fournisseur" className="bg-secondary text-white px-6 py-3 rounded-xl text-sm font-semibold whitespace-nowrap">
               {t('pricing.founder.button')}
             </Link>
           </div>
@@ -137,7 +126,7 @@ const Tarifs = () => {
                 )}
               >
                 {plan.badge && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-secondary text-white px-5 py-1.5 rounded-full text-xs font-black uppercase tracking-widest shadow-lg z-20">
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-secondary text-white px-5 py-1.5 rounded-full text-sm font-semibold shadow-lg z-20">
                     <span>{plan.badge}</span>
                   </div>
                 )}
@@ -145,7 +134,7 @@ const Tarifs = () => {
                 <div className="w-full">
                   <div className="text-center mb-6">
                     <h3 className={cn(
-                      "text-2xl font-black tracking-tighter mb-2",
+                      "text-2xl font-extrabold tracking-tight mb-2",
                       plan.id === 'pro' ? "text-white" : "text-neutral-900"
                     )}>{plan.name}</h3>
                     
@@ -159,17 +148,17 @@ const Tarifs = () => {
                     <div className="mb-4 flex flex-col items-center justify-center">
                       <div className="flex items-baseline justify-center whitespace-nowrap">
                         <span className={cn(
-                          "text-3xl sm:text-4xl xl:text-5xl font-black tracking-tighter leading-none",
+                          "text-3xl sm:text-4xl xl:text-5xl font-extrabold tracking-tight leading-none",
                           plan.id === 'pro' ? "text-white" : "text-neutral-900"
                         )}>{plan.price}</span>
                         <span className={cn(
-                          "text-base sm:text-lg font-black ms-1 tracking-tighter",
+                          "text-base sm:text-lg font-bold ms-1 tracking-tight",
                           plan.id === 'pro' ? "text-white" : "text-neutral-900"
                         )}>{t('pricing.perYear')}</span>
                       </div>
                       
                       <span className={cn(
-                        "text-xs font-bold mt-2 uppercase tracking-wider",
+                        "text-sm font-bold mt-2",
                         plan.id === 'pro' ? "text-neutral-400" : "text-neutral-500"
                       )}>{t('pricing.vatIncluded')}</span>
                     </div>
@@ -182,7 +171,7 @@ const Tarifs = () => {
                         <span className={cn(
                           "leading-tight",
                           plan.id === 'pro' ? "text-neutral-200" : "text-neutral-700",
-                          feature.isBold && "font-black text-secondary"
+                          feature.isBold && "font-bold text-secondary"
                         )}>
                           {feature.text}
                         </span>
@@ -194,7 +183,7 @@ const Tarifs = () => {
                 <Link 
                   to={plan.buttonAction} 
                   className={cn(
-                    "w-full py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all text-center border-2 block font-sans",
+                    "w-full py-3 rounded-xl text-sm font-semibold transition-all text-center border-2 block font-sans",
                     plan.buttonClass
                   )}
                 >
@@ -208,7 +197,7 @@ const Tarifs = () => {
         {/* Tableau Comparatif */}
         <div className="mb-8 mt-8">
           <div className="text-center mb-12">
-            <h3 className="text-3xl md:text-5xl font-black text-primary tracking-tighter mb-4">{t('pricing.table.title')}</h3>
+            <h3 className="text-3xl md:text-5xl font-extrabold text-primary tracking-tight mb-4">{t('pricing.table.title')}</h3>
             <p className="text-gray-700 font-bold max-w-xl mx-auto text-base">{t('pricing.table.subtitle')}</p>
           </div>
           <div className="bg-white rounded-2xl border border-gray-100 shadow-xl overflow-hidden max-w-5xl mx-auto">
@@ -216,10 +205,10 @@ const Tarifs = () => {
               <table className="w-full text-start border-collapse">
                 <thead>
                   <tr className="bg-gray-50/50">
-                    <th className="px-6 py-4 text-start text-sm font-black text-gray-700 tracking-widest">{t('pricing.table.feature')}</th>
-                    <th className="px-6 py-4 text-center text-sm font-black text-primary tracking-widest bg-gray-100/30">Free</th>
-                    <th className="px-6 py-4 text-center text-sm font-black text-white tracking-widest bg-secondary">Basic</th>
-                    <th className="px-6 py-4 text-center text-sm font-black text-white tracking-widest bg-neutral-950">Pro</th>
+                    <th className="px-6 py-4 text-start text-sm font-bold text-gray-700 tracking-widest">{t('pricing.table.feature')}</th>
+                    <th className="px-6 py-4 text-center text-sm font-bold text-primary tracking-widest bg-gray-100/30">Free</th>
+                    <th className="px-6 py-4 text-center text-sm font-bold text-white tracking-widest bg-secondary">Basic</th>
+                    <th className="px-6 py-4 text-center text-sm font-bold text-white tracking-widest bg-neutral-950">Pro</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
@@ -248,7 +237,7 @@ const Tarifs = () => {
         <div className="mt-6 max-w-4xl mx-auto bg-white rounded-2xl p-10 text-center shadow-lg shadow-gray-200/50 border border-gray-100 relative">
           <div>
             <ShieldCheck className="h-16 w-16 text-secondary mx-auto mb-6 drop-shadow-md" />
-            <h3 className="text-2xl font-black text-primary tracking-tighter mb-4">{t('pricing.payment.title')}</h3>
+            <h3 className="text-2xl font-extrabold text-primary tracking-tight mb-4">{t('pricing.payment.title')}</h3>
             <p className="text-sm text-gray-600 max-w-lg mx-auto leading-relaxed font-medium">
               {t('pricing.payment.text')}
             </p>

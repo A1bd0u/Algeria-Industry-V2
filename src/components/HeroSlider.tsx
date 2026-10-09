@@ -77,7 +77,7 @@ const BannerImage: React.FC<{ slide: SlideView; eager: boolean; sponsored: strin
     </picture>
   );
   const badge = (
-    <span className="absolute top-2 start-2 z-10 rounded bg-black/55 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
+    <span className="absolute top-2 start-2 z-10 rounded bg-black/55 px-1.5 py-0.5 text-xs font-bold text-white">
       {sponsored}
     </span>
   );
@@ -243,7 +243,7 @@ const HeroSlider: React.FC<{ placement: AdPlacement }> = ({ placement }) => {
               <div className={cn('min-w-0', compact && 'md:flex-1')}>
               <div className={cn('flex items-center gap-2', compact ? 'mb-1' : 'mb-2')}>
                 {isAd ? (
-                  <span className="text-xs font-bold uppercase tracking-wider bg-white/15 backdrop-blur px-2 py-0.5 rounded">
+                  <span className="text-sm font-bold bg-white/15 backdrop-blur px-2 py-0.5 rounded">
                     {t('slides.sponsored')}
                   </span>
                 ) : Icon && (
@@ -254,7 +254,7 @@ const HeroSlider: React.FC<{ placement: AdPlacement }> = ({ placement }) => {
                 {slide.brand && <span className="text-sm font-bold text-white/90 truncate">{slide.brand}</span>}
               </div>
               <h2 className={cn(
-                'font-black tracking-tight leading-tight',
+                'font-bold tracking-tight leading-tight',
                 compact ? 'text-base md:text-xl line-clamp-1' : 'text-xl md:text-3xl line-clamp-2',
               )}>{slide.title}</h2>
               {slide.subtitle && (

@@ -246,7 +246,7 @@ const Login = () => {
             </Link>
           </p>
           <div className="pt-4 border-t border-gray-200">
-             <Link to="/extranet" className="text-xs font-black text-gray-500 uppercase tracking-widest hover:text-primary transition-all">
+             <Link to="/extranet" className="text-sm font-semibold text-gray-500 hover:text-primary transition-all">
                 {t('auth.login.proConsole')}
              </Link>
           </div>

@@ -108,25 +108,25 @@ const BlogDetail = () => {
             >
               <div className="flex items-center space-x-3">
                 {post.category && (
-                  <span className="bg-secondary px-4 py-1 text-xs font-black text-white uppercase tracking-widest">
+                  <span className="bg-secondary px-4 py-1 text-sm font-semibold text-white">
                     {post.category}
                   </span>
                 )}
-                <div className="flex items-center space-x-2 text-white/60 text-xs font-bold uppercase tracking-widest">
+                <div className="flex items-center space-x-2 text-white/60 text-sm font-bold">
                   <Clock className="h-4 w-4" />
                   <span>{t('blog.readTime', { count: post.readTime })}</span>
                 </div>
               </div>
-              <h1 className="text-4xl md:text-6xl font-black text-white tracking-tighter leading-tight">
+              <h1 className="text-4xl md:text-6xl font-extrabold text-white tracking-tight leading-tight">
                 {post.title}
               </h1>
               <div className="flex items-center space-x-6 border-t border-white/10 pt-6">
                  {post.author && (
-                   <p className="text-xs font-black text-white uppercase">{post.author}</p>
+                   <p className="text-sm font-semibold text-white">{post.author}</p>
                  )}
                  <div className="flex items-center gap-2 text-white/60">
                     <Calendar className="h-4 w-4" />
-                    <span className="text-xs font-bold uppercase tracking-widest">{formatDate(post.created_at)}</span>
+                    <span className="text-sm font-bold">{formatDate(post.created_at)}</span>
                  </div>
               </div>
             </motion.div>
@@ -141,7 +141,7 @@ const BlogDetail = () => {
           <aside className="lg:col-span-1">
              <div className="sticky top-32 space-y-12">
                 <div>
-                   <h3 className="text-xs font-black text-primary uppercase tracking-wider mb-6 border-b border-gray-100 pb-4">{t('blog.share')}</h3>
+                   <h3 className="text-sm font-semibold text-primary mb-6 border-b border-gray-100 pb-4">{t('blog.share')}</h3>
                    <div className="flex flex-col space-y-4">
                       {[
                         { icon: Facebook, color: 'text-blue-600', label: 'Facebook', url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}` },
@@ -162,7 +162,7 @@ const BlogDetail = () => {
                            <div className={cn("w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center transition-all group-hover:scale-110", social.color.replace('text', 'bg').concat('/10'), social.color)}>
                               <social.icon className="h-4 w-4" />
                            </div>
-                           <span className="text-xs font-black uppercase tracking-widest">{social.label}</span>
+                           <span className="text-sm font-semibold">{social.label}</span>
                         </button>
                       ))}
                    </div>
@@ -181,7 +181,7 @@ const BlogDetail = () => {
               <div className="space-y-8 text-gray-700 leading-loose">
                 {post.content.split('\n').map((line, i) => {
                   if (line.startsWith('###')) {
-                    return <h3 key={i} className="text-2xl font-black text-primary tracking-tighter mt-12 mb-6">{line.replace('###', '')}</h3>;
+                    return <h3 key={i} className="text-2xl font-extrabold text-primary tracking-tight mt-12 mb-6">{line.replace('###', '')}</h3>;
                   }
                   return <p key={i} className="font-medium">{line}</p>;
                 })}
@@ -191,10 +191,10 @@ const BlogDetail = () => {
 
             <div className="mt-20 bg-primary p-10 text-white rounded-2xl flex flex-col md:flex-row items-center gap-8">
                <div className="flex-1">
-                  <h3 className="text-2xl font-black tracking-tighter mb-2">{t('blog.ctaTitle')}</h3>
+                  <h3 className="text-2xl font-extrabold tracking-tight mb-2">{t('blog.ctaTitle')}</h3>
                   <p className="text-white/60 text-sm">{t('blog.ctaText')}</p>
                </div>
-               <Link to="/directory" className="bg-secondary px-8 py-4 rounded-xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-all">
+               <Link to="/directory" className="bg-secondary px-8 py-4 rounded-xl text-sm font-semibold hover:scale-105 transition-all">
                   {t('blog.ctaButton')}
                </Link>
             </div>
@@ -202,7 +202,7 @@ const BlogDetail = () => {
 
           {/* Right: Related Posts */}
           <aside className="lg:col-span-1">
-             <h3 className="text-xs font-black text-primary uppercase tracking-wider mb-8 flex items-center">
+             <h3 className="text-sm font-semibold text-primary mb-8 flex items-center">
                 <Newspaper className="h-4 w-4 me-2 text-secondary" />
                 {t('blog.latest')}
              </h3>
@@ -214,11 +214,11 @@ const BlogDetail = () => {
                          ? <img src={p.image_url} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt="" loading="lazy" />
                          : <div className="w-full h-full flex items-center justify-center"><img src="/favicon.svg" alt="" className="h-10 w-10 opacity-20" /></div>}
                     </div>
-                    {p.category && <span className="text-xs font-black text-secondary tracking-widest uppercase mb-2 block">{p.category}</span>}
-                    <h4 className="text-xs font-black text-primary uppercase tracking-tight group-hover:text-secondary transition-colors mb-2 line-clamp-2 italic leading-tight">
+                    {p.category && <span className="text-sm font-semibold text-secondary mb-2 block">{p.category}</span>}
+                    <h4 className="text-sm font-semibold text-primary tracking-tight group-hover:text-secondary transition-colors mb-2 line-clamp-2 italic leading-tight">
                       {p.title}
                     </h4>
-                    <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">{formatDate(p.created_at)} • {t('blog.readTime', { count: readingMinutes(p.content) })}</p>
+                    <p className="text-sm font-bold text-gray-500">{formatDate(p.created_at)} • {t('blog.readTime', { count: readingMinutes(p.content) })}</p>
                   </Link>
                 ))}
              </div>

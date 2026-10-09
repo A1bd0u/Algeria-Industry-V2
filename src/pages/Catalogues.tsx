@@ -41,9 +41,9 @@ const Catalogues = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-2 text-secondary mb-4">
             <div className="w-8 h-[2px] bg-secondary" />
-            <span className="text-xs font-black uppercase tracking-wider">{t('catalogues.tech_doc')}</span>
+            <span className="text-sm font-semibold">{t('catalogues.tech_doc')}</span>
           </div>
-          <h1 className="text-4xl font-black text-primary tracking-tighter leading-none">{t('catalogues.title')}</h1>
+          <h1 className="text-4xl font-extrabold text-primary tracking-tight leading-none">{t('catalogues.title')}</h1>
           <p className="text-gray-500 mt-4 max-w-2xl font-medium text-xs tracking-wider">
             {t('catalogues.subtitle')}
           </p>
@@ -58,7 +58,7 @@ const Catalogues = () => {
         ) : error ? (
           <div className="py-20 flex flex-col items-center justify-center">
              <AlertCircle className="h-10 w-10 text-red-500 mb-4" />
-             <p className="text-xs font-black uppercase text-red-500 tracking-widest">{t('catalogues.loadError')}</p>
+             <p className="text-sm font-semibold text-red-500">{t('catalogues.loadError')}</p>
           </div>
         ) : catalogues.length === 0 ? (
           <EmptyState illustration="document" title={t('catalogues.none_found')} text={t('catalogues.none_found_text')}>
@@ -80,32 +80,32 @@ const Catalogues = () => {
                     <FileText className="h-12 w-12 text-gray-300" />
                   </div>
                   {cat.companies?.name && (
-                    <div className="flex items-center gap-2 text-xs font-mono text-secondary mb-2 font-bold uppercase">
+                    <div className="flex items-center gap-2 text-sm font-mono text-secondary mb-2 font-bold">
                       <Building2 className="h-3 w-3" />
                       <span>{cat.companies.name}</span>
                     </div>
                   )}
-                  <h3 className="text-lg font-black text-primary tracking-tighter leading-tight mb-2">
+                  <h3 className="text-lg font-bold text-primary tracking-tight leading-tight mb-2">
                     {cat.title}
                   </h3>
                   {cat.description && <p className="text-sm text-gray-500 mb-4 line-clamp-3">{cat.description}</p>}
-                  <p className="mt-auto pt-4 border-t border-gray-100 text-xs font-bold text-gray-500 uppercase tracking-widest">
+                  <p className="mt-auto pt-4 border-t border-gray-100 text-sm font-bold text-gray-500">
                     {t('catalogues.date')} : {formatDate(cat.created_at)}
                   </p>
 
                   {pdfUrl ? (
                     <div className="mt-6 flex items-center justify-between">
-                      <a href={pdfUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-xs font-black text-primary uppercase tracking-widest hover:text-secondary transition-colors">
+                      <a href={pdfUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm font-semibold text-primary hover:text-secondary transition-colors">
                         <ExternalLink className="h-4 w-4" />
                         <span>{t('catalogues.view')}</span>
                       </a>
-                      <a href={pdfUrl} download target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-xs font-black text-secondary uppercase tracking-widest hover:underline">
+                      <a href={pdfUrl} download target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm font-semibold text-secondary hover:underline">
                         <Download className="h-4 w-4" />
                         <span>{t('catalogues.download')}</span>
                       </a>
                     </div>
                   ) : (
-                    <p className="mt-6 text-xs font-bold text-gray-500 uppercase tracking-widest">{t('catalogues.noFile')}</p>
+                    <p className="mt-6 text-sm font-bold text-gray-500">{t('catalogues.noFile')}</p>
                   )}
                 </motion.div>
               );

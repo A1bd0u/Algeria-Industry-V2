@@ -64,7 +64,7 @@ export const CompanyAvatar = ({ src, name, className }: { src?: string | null; n
   }
   const initials = name.split(/\s+/).filter((w) => !/^(sarl|eurl|spa|snc|sa|ets|ste)$/i.test(w)).slice(0, 2).map((w) => w[0]).join('').toUpperCase() || '?';
   return (
-    <div className={cn('flex items-center justify-center bg-primary text-white font-black', className)} aria-hidden="true">
+    <div className={cn('flex items-center justify-center bg-primary text-white font-bold', className)} aria-hidden="true">
       {initials}
     </div>
   );

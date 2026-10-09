@@ -54,7 +54,7 @@
   },
   "home": {
     "trends": "Derniers produits publiés",
-    "trends_subtitle": "Par les fournisseurs inscrits sur la plateforme",
+    "trends_subtitle": "Les dernières références ajoutées par les fournisseurs.",
     "featured_products": "Produits à la Une",
     "featured_subtitle": "Une sélection des meilleurs équipements disponibles actuellement.",
     "sectors": "Secteurs d'activité",
@@ -81,8 +81,8 @@
     "price": "Prix",
     "whyTitle": "Pourquoi choisir Industigo ?",
     "why": {
-      "visibility": "Visibilité accrue pour les fournisseurs",
-      "sourcing": "Sourcing simplifié pour les acheteurs",
+      "visibility": "Plus de visibilité pour les fournisseurs",
+      "sourcing": "Des fournisseurs plus faciles à trouver pour les acheteurs",
       "kyc": "Entreprises vérifiées (KYC)",
       "local": "Équipe support en Algérie"
     },
@@ -110,7 +110,7 @@
     "hero": {
       "eyebrow": "Fournisseurs industriels vérifiés",
       "title": "Trouvez le bon fournisseur industriel en Algérie",
-      "subtitle": "Des entreprises vérifiées (registre du commerce et NIF contrôlés), leurs catalogues et un contact direct pour demander un devis.",
+      "subtitle": "Chaque entreprise inscrite a fait contrôler son registre du commerce et son NIF par notre équipe. Consultez leurs catalogues et demandez un devis directement au fournisseur.",
       "searchLabel": "Rechercher un produit ou une entreprise",
       "searchPlaceholder": "Produit, machine, entreprise…",
       "browseSuppliers": "Parcourir les fournisseurs",
@@ -133,7 +133,7 @@
         "step1": "Recherchez",
         "step1Text": "Par produit, catégorie ou wilaya, en français ou en arabe.",
         "step2": "Comparez",
-        "step2Text": "Jusqu'à 4 produits côte à côte, avec le statut de vérification des fournisseurs.",
+        "step2Text": "Mettez jusqu'à 4 produits côte à côte : prix, caractéristiques, fournisseur.",
         "step3": "Contactez",
         "step3Text": "Demandez un devis par la messagerie ou par WhatsApp.",
         "cta": "Explorer le catalogue"
@@ -143,7 +143,7 @@
         "step1": "Créez votre compte",
         "step1Text": "Gratuit, en deux minutes.",
         "step2": "Faites vérifier l'entreprise",
-        "step2Text": "Déposez RC et NIF pour obtenir le badge « vérifiée ».",
+        "step2Text": "Envoyez le RC et le NIF, notre équipe les contrôle sous 48 h.",
         "step3": "Publiez vos produits",
         "step3Text": "Recevez les demandes des acheteurs dans votre messagerie.",
         "cta": "Référencer mon entreprise"
@@ -152,7 +152,7 @@
     "supplierCard": {
       "label": "Vous êtes fournisseur ?",
       "title": "Vendez aux acheteurs industriels de toute l'Algérie",
-      "p1": "Fiche entreprise vérifiée et catalogue produits",
+      "p1": "Une fiche entreprise et un catalogue produits",
       "p2": "Demandes de devis par messagerie et WhatsApp",
       "p3": "Inscription gratuite, sans engagement",
       "cta": "Référencer mon entreprise"
@@ -171,14 +171,14 @@
     "categories": {
       "label": "Secteurs",
       "title": "Explorer par secteur",
-      "subtitle": "Huit secteurs pensés pour l'industrie algérienne, de l'agroalimentaire au numérique.",
+      "subtitle": "Huit secteurs, de l'agroalimentaire au numérique.",
       "count": "{{count}} sous-catégories",
       "all": "Tout le catalogue"
     },
     "suppliers": {
       "label": "Annuaire",
       "title": "Fournisseurs vérifiés",
-      "subtitle": "Registre du commerce et NIF contrôlés par notre équipe.",
+      "subtitle": "Registre du commerce et NIF contrôlés pour chacune.",
       "cta": "Voir l'annuaire",
       "verified": "Vérifiée"
     },
@@ -201,9 +201,16 @@
     "reviews": {
       "label": "Avis",
       "title": "Ce que disent les acheteurs",
-      "subtitle": "Avis laissés sur les fiches des fournisseurs vérifiés.",
+      "subtitle": "Avis laissés par des acheteurs sur les fiches des fournisseurs.",
       "rating": "{{rating}} étoiles sur 5",
       "about": "à propos de"
+    },
+    "facts": {
+      "kyc": "RC et NIF contrôlés pour chaque entreprise",
+      "free": "Inscription gratuite",
+      "wilayas": "58 wilayas",
+      "companies": "{{count}} entreprises vérifiées",
+      "products": "{{count}} produits publiés"
     }
   },
   "directory": {
@@ -244,7 +251,7 @@
     "sell_machines": "Vendez vos machines",
     "add_product": "Ajouter un produit",
     "quotes": "Devis",
-    "hero_desc": "Explorez les meilleures technologies industrielles disponibles en Algérie. Comparez, demandez des devis et connectez-vous aux fournisseurs.",
+    "hero_desc": "Tous les produits viennent d'entreprises vérifiées (RC et NIF contrôlés). Comparez-les et demandez un devis au fournisseur.",
     "no_results": "Aucun produit trouvé.",
     "detail": {
       "notFound": "Produit introuvable",
@@ -392,7 +399,7 @@
     "results_for": "Résultats pour",
     "sector_cat": "Secteur / Catégorie",
     "region": "Wilaya (Région)",
-    "boost_vis": "Booster votre visibilité ?",
+    "boost_vis": "Plus de visibilité ?",
     "everything": "tout le catalogue",
     "found": "{{count}} résultat(s) correspondant à votre recherche.",
     "filterType": "Filtrer par type",
@@ -671,7 +678,7 @@
   },
   "mfa": {
     "title": "Double authentification",
-    "activeStatus": "Active — {{count}} code(s) de secours restant(s).",
+    "activeStatus": "Active : {{count}} code(s) de secours restant(s).",
     "inactiveStatus": "Un code à 6 chiffres de votre téléphone est demandé à chaque connexion, en plus du mot de passe.",
     "requiredForAdmins": "Obligatoire pour les comptes administrateur.",
     "enable": "Activer la double authentification",
@@ -707,7 +714,7 @@
     },
     "status": {
       "pending": "En attente de paiement",
-      "active": "Payée — active",
+      "active": "Payée, active",
       "expired": "Échue",
       "cancelled": "Annulée"
     },
@@ -744,7 +751,7 @@
     "copyReference": "Copier la référence",
     "bankDetailsOnInvoice": "Les coordonnées bancaires figurent sur la facture.",
     "contactUs": "Contactez-nous en cas de question.",
-    "proofReceived": "Justificatif reçu le {{date}} — en cours de vérification.",
+    "proofReceived": "Justificatif reçu le {{date}}, en cours de vérification.",
     "replaceProof": "Remplacer le justificatif",
     "sendProof": "J'ai payé : envoyer le justificatif",
     "byCard": "Par carte CIB / Edahabia",
@@ -1078,7 +1085,7 @@
     "notVerified": "Non vérifiée",
     "quoteTitle": "Demander un devis",
     "quoteText": "Chaque fournisseur reçoit un message dans sa messagerie Industigo avec la liste de ses produits. Les réponses arrivent dans votre tableau de bord.",
-    "notePlaceholder": "Précisions pour les fournisseurs (quantités, délai, lieu de livraison…) — facultatif",
+    "notePlaceholder": "Précisions pour les fournisseurs (quantités, délai, lieu de livraison…), facultatif",
     "sendQuote": "Envoyer la demande",
     "sending": "Envoi…",
     "quoteSent": "Demande envoyée à {{count}} fournisseur(s). Suivez les réponses dans votre messagerie.",
@@ -1254,8 +1261,8 @@
   },
   "exhibitor": {
     "eyebrow": "Fournisseurs industriels",
-    "titleStart": "Boostez votre visibilité",
-    "titleHighlight": "industrielle",
+    "titleStart": "Faites-vous connaître des acheteurs",
+    "titleHighlight": "industriels",
     "subtitle": "Référencez votre entreprise et vos produits dans l'annuaire industriel algérien, et recevez les demandes d'acheteurs professionnels.",
     "cta": "Créer mon compte fournisseur",
     "seePricing": "Voir les tarifs",
@@ -1306,7 +1313,7 @@
     "list": {
       "label": "Entreprises inscrites",
       "title": "Annuaire des fournisseurs",
-      "subtitle": "Découvrez les entreprises industrielles inscrites sur Industigo et contactez-les directement.",
+      "subtitle": "Toutes les entreprises de l'annuaire sont vérifiées : registre du commerce et NIF contrôlés avant publication. Contactez-les directement.",
       "loadError": "Impossible de charger les entreprises.",
       "searchPlaceholder": "Rechercher une entreprise par nom ou activité…",
       "sector": "Secteur d'activité",
@@ -1366,7 +1373,7 @@
     "legalChecked": "Contrôlés par Industigo (KYC)",
     "legalUnchecked": "Non vérifiés",
     "sector": "Secteur d'activité",
-    "productsIntro": "Découvrez la gamme de produits proposée par {{name}}.",
+    "productsIntro": "Les produits proposés par {{name}}.",
     "noProducts": "Aucun produit disponible",
     "noProductsText": "Cette entreprise n'a pas encore ajouté de produits.",
     "onQuote": "Sur devis",
@@ -1381,10 +1388,10 @@
     "noNews": "Aucune actualité disponible",
     "readMore": "Lire la suite",
     "eventsTitle": "Salons & événements",
-    "eventsIntro": "Découvrez les expositions et salons professionnels de {{name}}.",
+    "eventsIntro": "Les salons et expositions auxquels participe {{name}}.",
     "noEvents": "Aucun salon disponible",
     "reviewsTitle": "Avis & évaluations ({{count}})",
-    "reviewsIntro": "Découvrez ce que les autres utilisateurs pensent de {{name}}.",
+    "reviewsIntro": "Les avis des acheteurs sur {{name}}.",
     "averageRating": "Note moyenne",
     "close": "Fermer",
     "leaveReview": "Laisser mon avis",

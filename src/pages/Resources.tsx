@@ -60,9 +60,9 @@ const Resources = () => {
       <div className="bg-white min-h-screen pb-24">
         <header className="border-b border-border-tech">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-secondary mb-3">{t('resources.kicker')}</p>
+            <p className="text-sm font-bold text-secondary mb-3">{t('resources.kicker')}</p>
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-              <h1 className="text-4xl md:text-5xl font-black text-primary tracking-tight">{t('resources.title')}</h1>
+              <h1 className="text-4xl md:text-5xl font-extrabold text-primary tracking-tight">{t('resources.title')}</h1>
               <p className="text-gray-600 max-w-md md:text-end">{t('resources.subtitle')}</p>
             </div>
           </div>
@@ -72,13 +72,13 @@ const Resources = () => {
           {/* Sources officielles, par démarche */}
           <section className="py-12 border-b border-border-tech" aria-labelledby="official-title">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-8">
-              <h2 id="official-title" className="lg:col-span-4 text-2xl font-black text-primary">{t('resources.officialTitle')}</h2>
+              <h2 id="official-title" className="lg:col-span-4 text-2xl font-extrabold text-primary">{t('resources.officialTitle')}</h2>
               <p className="lg:col-span-8 text-gray-600">{t('resources.officialText')}</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-x-8 gap-y-10">
               {OFFICIAL_GROUPS.map((group, gi) => (
                 <div key={group.key}>
-                  <p className="text-xs font-bold uppercase tracking-[0.18em] text-gray-500 pb-3 mb-1 border-b-2 border-primary">
+                  <p className="text-sm font-bold text-gray-500 pb-3 mb-1 border-b-2 border-primary">
                     <span className="text-secondary me-2">{String(gi + 1).padStart(2, '0')}</span>
                     {t(`resources.groups.${group.key}`)}
                   </p>
@@ -104,12 +104,12 @@ const Resources = () => {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 py-12">
             {/* Guides de la plateforme */}
             <section className="lg:col-span-5" aria-labelledby="guides-title">
-              <h2 id="guides-title" className="text-2xl font-black text-primary mb-6">{t('resources.guidesTitle')}</h2>
+              <h2 id="guides-title" className="text-2xl font-extrabold text-primary mb-6">{t('resources.guidesTitle')}</h2>
               <ol className="space-y-px bg-border-tech border border-border-tech rounded-lg overflow-hidden">
                 {GUIDES.map((guide, i) => (
                   <li key={guide.key} className="bg-white">
                     <Link to={guide.to} className="group flex gap-5 p-5 hover:bg-neutral-bg transition-colors">
-                      <span className="text-sm font-black text-gray-300 tabular-nums pt-0.5">{String(i + 1).padStart(2, '0')}</span>
+                      <span className="text-sm font-bold text-gray-300 tabular-nums pt-0.5">{String(i + 1).padStart(2, '0')}</span>
                       <span className="min-w-0 flex-1">
                         <span className="block font-bold text-primary group-hover:text-secondary transition-colors">{t(`resources.guides.${guide.key}.title`)}</span>
                         <span className="block text-sm text-gray-600 mt-1">{t(`resources.guides.${guide.key}.text`)}</span>
@@ -124,7 +124,7 @@ const Resources = () => {
             {/* Dernières publications */}
             <section className="lg:col-span-7" aria-labelledby="latest-title">
               <div className="flex items-end justify-between gap-4 mb-6">
-                <h2 id="latest-title" className="text-2xl font-black text-primary">{t('resources.latest')}</h2>
+                <h2 id="latest-title" className="text-2xl font-extrabold text-primary">{t('resources.latest')}</h2>
                 <Link to="/blog" className="text-sm font-bold text-primary hover:text-secondary inline-flex items-center gap-1">
                   {t('resources.seeAll')} <ArrowRight className="h-4 w-4 rtl:rotate-180" aria-hidden="true" />
                 </Link>
@@ -140,7 +140,7 @@ const Resources = () => {
                       <Link to={`/blog/${generateSlugUrl(a.title, a.id)}`} className="group grid grid-cols-[88px_1fr] gap-4 py-4">
                         <time dateTime={a.created_at} className="text-xs text-gray-500 pt-1">{formatDate(a.created_at)}</time>
                         <span className="min-w-0">
-                          {a.category && <span className="block text-xs font-bold uppercase tracking-[0.18em] text-gray-500 mb-1">{a.category}</span>}
+                          {a.category && <span className="block text-sm font-bold text-gray-500 mb-1">{a.category}</span>}
                           <span className="block font-bold text-primary group-hover:text-secondary transition-colors leading-snug">{a.title}</span>
                         </span>
                       </Link>

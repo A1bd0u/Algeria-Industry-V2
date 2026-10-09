@@ -40,13 +40,13 @@ const CookieBanner = () => {
         <div className="flex gap-3 shrink-0">
           <button
             onClick={() => choose('rejected')}
-            className="px-5 py-3 rounded-xl border border-gray-300 text-xs font-black uppercase tracking-widest text-gray-700 hover:bg-gray-50"
+            className="px-5 py-3 rounded-xl border border-gray-300 text-sm font-semibold text-gray-700 hover:bg-gray-50"
           >
             {t('cookies.reject')}
           </button>
           <button
             onClick={() => choose('accepted')}
-            className="px-5 py-3 rounded-xl bg-primary text-white text-xs font-black uppercase tracking-widest hover:bg-secondary"
+            className="px-5 py-3 rounded-xl bg-primary text-white text-sm font-semibold hover:bg-secondary"
           >
             {t('cookies.accept')}
           </button>

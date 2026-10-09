@@ -103,7 +103,7 @@ const Contact = () => {
                       <Phone className="h-6 w-6" />
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">{t('contact.phone')}</p>
+                      <p className="text-sm font-bold text-gray-500 mb-1">{t('contact.phone')}</p>
                       <a href={telHref(SUPPORT.phone)} className="text-sm text-gray-700 font-medium hover:text-secondary">{SUPPORT.phone}</a>
                       <p className="text-xs text-gray-500 mt-1">{t('contact.phoneHours')}</p>
                     </div>
@@ -116,7 +116,7 @@ const Contact = () => {
                       <Mail className="h-6 w-6" />
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">{t('contact.email')}</p>
+                      <p className="text-sm font-bold text-gray-500 mb-1">{t('contact.email')}</p>
                       <a href={`mailto:${SUPPORT.email}`} className="text-sm text-gray-700 font-medium hover:text-secondary">{SUPPORT.email}</a>
                       <p className="text-xs text-gray-500 mt-1">{t('contact.emailDelay')}</p>
                     </div>
@@ -177,7 +177,7 @@ const Contact = () => {
                     )}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
-                        <label htmlFor="name" className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">{t('contact.name')}</label>
+                        <label htmlFor="name" className="block text-sm font-bold text-gray-500 mb-2">{t('contact.name')}</label>
                         <input 
                           id="name"
                           type="text" 
@@ -189,7 +189,7 @@ const Contact = () => {
                         />
                       </div>
                       <div>
-                        <label htmlFor="email" className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">{t('contact.proEmail')}</label>
+                        <label htmlFor="email" className="block text-sm font-bold text-gray-500 mb-2">{t('contact.proEmail')}</label>
                         <input 
                           id="email"
                           type="email" 
@@ -202,7 +202,7 @@ const Contact = () => {
                       </div>
                     </div>
                     <div>
-                      <label htmlFor="subject" className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">{t('contact.subject')}</label>
+                      <label htmlFor="subject" className="block text-sm font-bold text-gray-500 mb-2">{t('contact.subject')}</label>
                       <select 
                         id="subject"
                         required
@@ -218,7 +218,7 @@ const Contact = () => {
                       </select>
                     </div>
                     <div>
-                      <label htmlFor="message" className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">{t('contact.message')}</label>
+                      <label htmlFor="message" className="block text-sm font-bold text-gray-500 mb-2">{t('contact.message')}</label>
                       <textarea 
                         id="message"
                         required

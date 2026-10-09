@@ -46,9 +46,9 @@ const FAQ = () => {
             className="flex items-center justify-center space-x-2 text-secondary mb-4"
           >
             <HelpCircle className="h-4 w-4" />
-            <span className="text-xs font-black uppercase tracking-wider">{t('faq.subtitle')}</span>
+            <span className="text-sm font-semibold">{t('faq.subtitle')}</span>
           </motion.div>
-          <h1 className="text-4xl md:text-5xl font-black text-primary tracking-tighter mb-8 leading-none">{t('faq.title').split(' ')[0]} <span className="text-secondary">{t('faq.title').split(' ').slice(1).join(' ')}</span></h1>
+          <h1 className="text-4xl md:text-5xl font-extrabold text-primary tracking-tight mb-8 leading-none">{t('faq.title').split(' ')[0]} <span className="text-secondary">{t('faq.title').split(' ').slice(1).join(' ')}</span></h1>
           
           <div className="relative max-w-xl mx-auto">
             <Search className="absolute start-6 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500" />
@@ -65,7 +65,7 @@ const FAQ = () => {
         <div className="space-y-12">
           {filteredFaqs.map((cat, catIdx) => (
             <section key={catIdx}>
-              <h2 className="text-xs font-black text-gray-500 uppercase tracking-wider mb-6 px-4">{cat.category}</h2>
+              <h2 className="text-sm font-semibold text-gray-500 mb-6 px-4">{cat.category}</h2>
               <div className="space-y-4">
                 {cat.questions.map((item, idx) => {
                   const globalIdx = catIdx * 10 + idx;
@@ -122,17 +122,17 @@ const FAQ = () => {
         <div className="mt-20 bg-primary rounded-2xl p-10 text-white flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden">
           <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'linear-gradient(45deg, #fff 25%, transparent 25%, transparent 50%, #fff 50%, #fff 75%, transparent 75%, transparent)', backgroundSize: '20px 20px' }} />
           <div className="relative z-10 text-center md:text-start">
-            <h3 className="text-2xl font-black tracking-tighter mb-2">{t('faq.need_help')}</h3>
+            <h3 className="text-2xl font-extrabold tracking-tight mb-2">{t('faq.need_help')}</h3>
             <p className="text-white/60 font-medium text-sm">{t('faq.help_desc')}</p>
           </div>
           <div className="relative z-10 flex flex-wrap justify-center gap-4">
              {SUPPORT.phone && (
-               <a href={telHref(SUPPORT.phone)} className="flex items-center gap-3 bg-secondary px-6 py-4 rounded-2xl text-xs font-black uppercase tracking-widest shadow-xl hover:scale-105 transition-all">
+               <a href={telHref(SUPPORT.phone)} className="flex items-center gap-3 bg-secondary px-6 py-4 rounded-2xl text-sm font-semibold shadow-xl hover:scale-105 transition-all">
                   <Phone className="h-4 w-4" />
                   <span>{t('faq.call_expert')}</span>
                </a>
              )}
-             <Link to="/contact" className="flex items-center gap-3 bg-white/10 border border-white/20 px-6 py-4 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-white/20 transition-all">
+             <Link to="/contact" className="flex items-center gap-3 bg-white/10 border border-white/20 px-6 py-4 rounded-2xl text-sm font-semibold hover:bg-white/20 transition-all">
                 <Mail className="h-4 w-4" />
                 <span>{t('faq.send_ticket')}</span>
              </Link>

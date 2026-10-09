@@ -41,8 +41,8 @@ const HelpWidget = () => {
             className="absolute bottom-20 end-0 w-[calc(100vw-2rem)] max-w-[380px] bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden"
           >
             <div className="bg-primary p-8 text-white">
-              <h3 className="text-2xl font-black tracking-tighter">{t('help.title')}</h3>
-              <p className="text-xs text-gray-300 font-bold uppercase tracking-wider mt-1">
+              <h3 className="text-2xl font-extrabold tracking-tight">{t('help.title')}</h3>
+              <p className="text-sm text-gray-300 font-bold mt-1">
                 {t('help.hours')}
               </p>
             </div>
@@ -55,7 +55,7 @@ const HelpWidget = () => {
                   className="bg-neutral-bg p-4 rounded-2xl border border-gray-100 hover:border-secondary hover:bg-white transition-all"
                 >
                   <HelpCircle className="h-5 w-5 text-secondary mb-2" />
-                  <p className="text-xs font-black uppercase tracking-widest text-primary">{t('help.faq')}</p>
+                  <p className="text-sm font-semibold text-primary">{t('help.faq')}</p>
                 </Link>
                 <Link
                   to="/resources"
@@ -63,13 +63,13 @@ const HelpWidget = () => {
                   className="bg-neutral-bg p-4 rounded-2xl border border-gray-100 hover:border-secondary hover:bg-white transition-all"
                 >
                   <FileText className="h-5 w-5 text-secondary mb-2" />
-                  <p className="text-xs font-black uppercase tracking-widest text-primary">{t('help.guides')}</p>
+                  <p className="text-sm font-semibold text-primary">{t('help.guides')}</p>
                 </Link>
               </div>
 
               {contactOptions.length > 0 && (
                 <div className="space-y-3">
-                  <p className="text-xs font-black uppercase tracking-wider text-gray-500 px-2">{t('help.direct')}</p>
+                  <p className="text-sm font-semibold text-gray-500 px-2">{t('help.direct')}</p>
                   {contactOptions.map((option) => (
                     <a
                       key={option.label}
@@ -82,7 +82,7 @@ const HelpWidget = () => {
                         <option.icon className="h-5 w-5" />
                       </div>
                       <div className="flex-1">
-                        <p className="text-xs font-black text-gray-500 uppercase tracking-widest leading-none mb-1">{option.label}</p>
+                        <p className="text-sm font-semibold text-gray-500 leading-none mb-1">{option.label}</p>
                         <p className="text-xs font-bold text-primary font-mono">{option.value}</p>
                       </div>
                       <ArrowRight className="h-4 w-4 text-gray-300 rtl:rotate-180" />
@@ -98,8 +98,8 @@ const HelpWidget = () => {
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <h4 className="font-black tracking-tight text-sm">{t('help.write')}</h4>
-                    <p className="text-xs opacity-90 font-bold uppercase tracking-widest">{t('help.responseTime')}</p>
+                    <h4 className="font-bold tracking-tight text-sm">{t('help.write')}</h4>
+                    <p className="text-sm opacity-90 font-bold">{t('help.responseTime')}</p>
                   </div>
                   <Headset className="h-6 w-6" />
                 </div>
