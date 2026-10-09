@@ -132,6 +132,16 @@ gcloud run deploy industigo \
         --uri https://industigo.dz/api/cron/daily --http-method POST \
         --headers "Authorization=Bearer <CRON_SECRET>"
       ```
+- [ ] Intégrations ERP / CRM : un second job, toutes les heures, appelle
+      `POST https://<domaine>/api/cron/integrations` (même en-tête). Il relit les
+      flux catalogue arrivés à échéance et relance les webhooks en échec. La tâche
+      quotidienne le fait aussi, mais seulement une fois par jour.
+      ```bash
+      gcloud scheduler jobs create http industigo-integrations \
+        --location $REGION --schedule "5 * * * *" --time-zone "Africa/Algiers" \
+        --uri https://industigo.dz/api/cron/integrations --http-method POST \
+        --headers "Authorization=Bearer <CRON_SECRET>"
+      ```
 
 ## 7. Mesure d'audience (Plausible)
 

@@ -4,6 +4,8 @@ import { logger } from '../utils/logger';
 import { expireSubscriptions } from '../services/billingService';
 import { notifyExpired, sendExpiryReminders } from '../services/notificationService';
 import { sendOnboardingReminders } from '../services/onboardingReminders';
+import { runDueFeeds } from '../services/integrations/feeds';
+import { retryPendingDeliveries } from '../services/integrations/webhooks';
 
 const router = express.Router();
 
@@ -12,6 +14,25 @@ const isAuthorized = (header: string | undefined, secret: string) => {
   const expected = Buffer.from(`Bearer ${secret}`);
   const received = Buffer.from(header || '');
   return received.length === expected.length && crypto.timingSafeEqual(received, expected);
+};
+
+// Intégrations : flux catalogue arrivés à échéance et reprises des webhooks.
+// Une étape en échec n'empêche pas l'autre.
+const runIntegrations = async () => {
+  const result: Record<string, unknown> = {};
+  try {
+    result.feeds = await runDueFeeds();
+  } catch (err) {
+    logger.error('[Cron] Flux catalogue en échec :', err);
+    result.feeds = { error: true };
+  }
+  try {
+    result.webhooks = await retryPendingDeliveries();
+  } catch (err) {
+    logger.error('[Cron] Reprises des webhooks en échec :', err);
+    result.webhooks = { error: true };
+  }
+  return result;
 };
 
 // POST /api/cron/daily - Tâche quotidienne, appelée par Cloud Scheduler avec
@@ -42,13 +63,29 @@ router.post('/daily', async (req, res) => {
     } catch (err) {
       logger.error('[Cron] Relances d\'accompagnement en échec :', err);
     }
-    const result = { expired, expiredNotices, ...reminders, onboarding };
+    const integrations = await runIntegrations();
+    const result = { expired, expiredNotices, ...reminders, onboarding, integrations };
     logger.info('[Cron] Tâche quotidienne terminée', result);
     return res.json(result);
   } catch (err) {
     logger.error('[Cron] Tâche quotidienne en échec :', err);
     return res.status(500).json({ error: 'La tâche quotidienne a échoué.', code: 'CRON_FAILED' });
   }
+});
+
+// POST /api/cron/integrations - Toutes les heures (même en-tête que la tâche
+// quotidienne) : synchronisations horaires des flux et reprises des webhooks.
+router.post('/integrations', async (req, res) => {
+  const secret = process.env.CRON_SECRET;
+  if (!secret) {
+    return res.status(503).json({ error: 'Tâche planifiée non configurée (CRON_SECRET).', code: 'CRON_DISABLED' });
+  }
+  if (!isAuthorized(req.get('authorization'), secret)) {
+    return res.status(401).json({ error: 'Accès refusé.', code: 'CRON_UNAUTHORIZED' });
+  }
+  const result = await runIntegrations();
+  logger.info('[Cron] Intégrations traitées', result);
+  return res.json(result);
 });
 
 export default router;

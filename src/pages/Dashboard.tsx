@@ -18,6 +18,7 @@ import {
   MessageSquare,
   Package,
   Phone,
+  Plug,
   Plus,
   Search,
   Send,
@@ -35,6 +36,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import Messages from './Messages';
 import SupplierStats from '../components/SupplierStats';
 import CataloguesPanel from '../components/CataloguesPanel';
+import IntegrationsPanel from '../components/IntegrationsPanel';
 import ProductImport from '../components/ProductImport';
 import AddProduct from './AddProduct';
 import React, { useEffect, useState } from 'react';
@@ -746,6 +748,16 @@ const Dashboard = () => {
             <SupplierStats />
           </motion.div>
         );
+      case 'integrations':
+        return (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+          >
+            <IntegrationsPanel notify={showNotify} isSupplier={user?.role === 'fournisseur' || user?.role === 'exposant'} />
+          </motion.div>
+        );
       case 'catalogues':
         return (
           <motion.div
@@ -1048,6 +1060,7 @@ const Dashboard = () => {
     { id: 'subscription', name: t('dashboard.menu.subscription'), icon: CreditCard },
     { id: 'catalogues', name: t('dashboard.menu.catalogues'), icon: FileText, roles: ['fournisseur', 'exposant'] },
     { id: 'stats', name: t('dashboard.menu.stats'), icon: BarChart3, roles: ['fournisseur', 'exposant'] },
+    { id: 'integrations', name: t('dashboard.menu.integrations'), icon: Plug, roles: ['fournisseur', 'exposant', 'acheteur'] },
     { id: 'admin', name: t('dashboard.menu.admin'), icon: ShieldCheck, isExternal: true, roles: ['admin'] },
   ].filter(item => !item.roles || item.roles.includes(user?.role || ''));
 

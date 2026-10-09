@@ -29,6 +29,7 @@ const Compare = () => {
   const { formatPrice } = useCurrency();
   const toast = useToast();
   const [note, setNote] = useState('');
+  const [shareContact, setShareContact] = useState(false);
   const [sending, setSending] = useState(false);
 
   // Une demande de devis va aux fournisseurs des produits comparés, par la
@@ -49,6 +50,7 @@ const Compare = () => {
       const res = await axios.post('/api/messages/quote-requests', {
         product_ids: items.map((p) => p.id),
         note: note.trim() || undefined,
+        share_contact: shareContact,
       });
       toast.success(t('compare.quoteSent', { count: res.data.sent }));
       setNote('');
@@ -211,8 +213,12 @@ const Compare = () => {
               onChange={(e) => setNote(e.target.value)}
               maxLength={2000}
               placeholder={t('compare.notePlaceholder')}
-              className="w-full max-w-2xl mx-auto block bg-white/10 border border-white/20 rounded-2xl p-4 text-sm text-white placeholder:text-white/40 outline-none focus:border-secondary resize-none h-28 mb-8"
+              className="w-full max-w-2xl mx-auto block bg-white/10 border border-white/20 rounded-2xl p-4 text-sm text-white placeholder:text-white/40 outline-none focus:border-secondary resize-none h-28 mb-4"
             />
+            <label className="max-w-2xl mx-auto mb-8 flex items-start gap-3 text-sm text-white/80">
+              <input type="checkbox" checked={shareContact} onChange={(e) => setShareContact(e.target.checked)} className="mt-0.5 h-4 w-4 accent-secondary" />
+              <span>{t('compare.shareContact')}</span>
+            </label>
             <div className="text-center">
               <button
                 type="button"
