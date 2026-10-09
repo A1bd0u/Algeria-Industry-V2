@@ -39,3 +39,42 @@ test('Comparateur : la sélection survit au rechargement et à l\'accès direct'
   await page.getByRole('button', { name: 'Vider la liste' }).click();
   await expect(page.getByText('Comparaison vide')).toBeVisible();
 });
+
+test('Comparer avec : catalogue du secteur, ajout depuis une carte, fermeture de la barre', async ({ page }) => {
+  const OTHER = {
+    id: '55555555-5555-4555-8555-555555555555',
+    name: 'Vérin hydraulique Ø80',
+    category: 'Hydraulique & pneumatique',
+    price: 45000,
+    images: [],
+    company_name: 'Mécanova Rouiba',
+    created_at: '2026-01-01T00:00:00Z',
+  };
+  const api = await mockApi(page, null, {
+    [`GET /api/products/${PRODUCT.id}`]: () => ({ body: { product: PRODUCT, similar: [] } }),
+    'GET /api/products': () => ({ body: { data: [OTHER], total: 1, page: 1, totalPages: 1 } }),
+  });
+
+  await page.goto(`/products/${slug}`);
+  await page.getByRole('button', { name: 'Comparer avec un autre produit' }).click();
+
+  // Catalogue du secteur du produit, le produit est déjà dans la sélection.
+  await expect(page).toHaveURL(/\/products\?category=M%C3%A9canique/);
+  await expect.poll(() => api.calls.some((c) => c.path === '/api/products' && c.search.includes('category='))).toBe(true);
+
+  // Ajout du second produit depuis sa carte.
+  const card = page.locator('article', { hasText: OTHER.name });
+  await card.getByRole('button', { name: 'Comparer' }).click();
+  await expect(card.getByRole('button', { name: 'Comparé' })).toBeVisible();
+
+  // La barre montre 2 produits et se ferme sans vider la sélection.
+  const close = page.getByRole('button', { name: 'Fermer le comparateur' });
+  await expect(close).toBeVisible();
+  await close.click();
+  await expect(close).toBeHidden();
+
+  await page.goto('/compare');
+  await expect(page.getByRole('link', { name: PRODUCT.name })).toBeVisible();
+  await expect(page.getByRole('link', { name: OTHER.name })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Ajouter un produit' })).toBeVisible();
+});

@@ -277,7 +277,8 @@
       "requestQuoteShort": "طلب عرض سعر",
       "zoom": "تكبير الصورة",
       "supplierTitle": "المورّد",
-      "seeSupplier": "عرض صفحة الشركة"
+      "seeSupplier": "عرض صفحة الشركة",
+      "compareWith": "قارن مع منتج آخر"
     },
     "searchPlaceholder": "ابحث عن آلة أو علامة تجارية…",
     "sort": {
@@ -1083,7 +1084,9 @@
     "quoteSent": "تم إرسال الطلب إلى {{count}} مورد(ين). تابع الردود في بريدك.",
     "quoteError": "تعذّر إرسال الطلب.",
     "features": "أبرز الخصائص",
-    "swipeHint": "{{count}} منتجات: اسحب الجدول لرؤيتها كلها ←"
+    "swipeHint": "{{count}} منتجات: اسحب الجدول لرؤيتها كلها ←",
+    "closeBar": "إغلاق شريط المقارنة",
+    "addProduct": "إضافة منتج"
   },
   "contact": {
     "titleStart": "تواصل مع",

@@ -277,7 +277,8 @@
       "requestQuoteShort": "Demander un devis",
       "zoom": "Agrandir l'image",
       "supplierTitle": "Fournisseur",
-      "seeSupplier": "Voir la fiche entreprise"
+      "seeSupplier": "Voir la fiche entreprise",
+      "compareWith": "Comparer avec un autre produit"
     },
     "searchPlaceholder": "Rechercher une machine, une marque…",
     "sort": {
@@ -1083,7 +1084,9 @@
     "quoteSent": "Demande envoyée à {{count}} fournisseur(s). Suivez les réponses dans votre messagerie.",
     "quoteError": "La demande n'a pas pu être envoyée.",
     "features": "Points clés",
-    "swipeHint": "{{count}} produits : faites glisser le tableau pour tous les voir →"
+    "swipeHint": "{{count}} produits : faites glisser le tableau pour tous les voir →",
+    "closeBar": "Fermer le comparateur",
+    "addProduct": "Ajouter un produit"
   },
   "contact": {
     "titleStart": "Contactez",

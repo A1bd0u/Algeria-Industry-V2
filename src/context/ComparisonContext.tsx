@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { productCategories } from '../data/productCategories';
 
 export interface Product {
   id: string;
@@ -19,7 +20,45 @@ interface ComparisonContextType {
   addToCompare: (product: Product) => void;
   removeFromCompare: (productId: string) => void;
   clearCompare: () => void;
+  isCompared: (productId: string) => boolean;
+  // Ajoute ou retire un produit ; « full » si la limite est atteinte.
+  toggleCompare: (product: Product) => 'added' | 'removed' | 'full';
 }
+
+// Lien pour choisir d'autres produits à comparer : le catalogue du secteur
+// (plus large que la sous-catégorie, qui ne compte souvent qu'un ou deux produits).
+export const moreToCompareHref = (category?: string | null) => {
+  const group = category
+    ? productCategories.find((g) => g.name === category || g.subCategories.some((s) => s.name === category))
+    : null;
+  return group ? `/products?category=${encodeURIComponent(group.name)}` : '/products';
+};
+
+// Produit d'une liste (catalogue, accueil) ou d'une fiche, mis au format du
+// comparateur : mêmes libellés de caractéristiques que la fiche produit.
+export const toCompareItem = (p: any): Product => {
+  const specs: Record<string, string> = { ...(p.specs || {}) };
+  if (!p.specs) {
+    if (p.category) specs['Catégorie'] = p.category;
+    if (p.brand) specs['Marque'] = p.brand;
+    if (p.region) specs['Région'] = p.region;
+    if (p.reference_id) specs['Référence'] = p.reference_id;
+  }
+  const images = Array.isArray(p.images) ? p.images.filter((u: unknown) => typeof u === 'string' && u) : [];
+  const price = p.priceValue ?? (p.price === null || p.price === undefined || p.price === '' ? null : Number(p.price));
+  return {
+    id: String(p.id),
+    name: p.name,
+    category: p.category || '',
+    brand: p.companyName || p.company_name || (typeof p.company === 'string' ? p.company : p.company?.name) || '',
+    image: images[0] || p.image || p.file_url || '',
+    priceValue: Number.isFinite(price) && price > 0 ? price : null,
+    sellerId: p.sellerId ?? p.owner_id ?? null,
+    companyVerified: Boolean(p.companyVerified ?? p.company_verified),
+    features: Array.isArray(p.features) ? p.features.slice(0, 8) : [],
+    specs,
+  };
+};
 
 const ComparisonContext = createContext<ComparisonContextType | undefined>(undefined);
 
@@ -73,8 +112,20 @@ export const ComparisonProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
   const clearCompare = () => setComparedProducts([]);
 
+  const isCompared = (productId: string) => comparedProducts.some((p) => p.id === productId);
+
+  const toggleCompare = (product: Product) => {
+    if (isCompared(product.id)) {
+      removeFromCompare(product.id);
+      return 'removed';
+    }
+    if (comparedProducts.length >= MAX_COMPARED) return 'full';
+    addToCompare(product);
+    return 'added';
+  };
+
   return (
-    <ComparisonContext.Provider value={{ comparedProducts, addToCompare, removeFromCompare, clearCompare }}>
+    <ComparisonContext.Provider value={{ comparedProducts, addToCompare, removeFromCompare, clearCompare, isCompared, toggleCompare }}>
       {children}
     </ComparisonContext.Provider>
   );

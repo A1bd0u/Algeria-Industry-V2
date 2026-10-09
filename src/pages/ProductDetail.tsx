@@ -21,7 +21,7 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ProductDetailSkeleton } from '../components/Skeleton';
-import { Product as IProduct, useComparison } from '../context/ComparisonContext';
+import { moreToCompareHref, toCompareItem, useComparison } from '../context/ComparisonContext';
 import { useCurrency } from '../context/CurrencyContext';
 import { useAuth } from '../context/AuthContext';
 import { cn, extractIdFromSlug, generateSlugUrl, productCover } from '../lib/utils';
@@ -41,7 +41,7 @@ const ProductDetail = () => {
   const id = extractIdFromSlug(slugId);
   const navigate = useNavigate();
   const { formatPrice } = useCurrency();
-  const { comparedProducts, addToCompare, removeFromCompare } = useComparison();
+  const { comparedProducts, isCompared: inCompare, toggleCompare: toggleInCompare } = useComparison();
   const [activeImage, setActiveImage] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const { isAuthenticated, user } = useAuth();
@@ -177,30 +177,22 @@ const ProductDetail = () => {
     ? `${whatsappHref(product.companyWhatsapp)}?text=${encodeURIComponent(t('products.detail.whatsappMessage', { name: product.name }))}`
     : null;
 
-  const isCompared = product && comparedProducts.find(p => p.id === product.id);
+  const isCompared = Boolean(product && inCompare(product.id));
 
   const toggleCompare = () => {
     if (!product) return;
-    if (isCompared) {
-      removeFromCompare(product.id);
-    } else {
-      if (comparedProducts.length >= 4) {
-        toast.info(t('products.detail.compareFull'));
-        return;
-      }
-      addToCompare({
-        id: product.id,
-        name: product.name,
-        category: product.category,
-        brand: product.companyName || '',
-        image: product.images?.[0] || '',
-        priceValue: product.priceValue || null,
-        sellerId: product.sellerId || null,
-        companyVerified: Boolean(product.companyVerified),
-        features: Array.isArray(product.features) ? product.features.slice(0, 8) : [],
-        specs: product.specs || {},
-      } as IProduct);
+    if (toggleInCompare(toCompareItem(product)) === 'full') toast.info(t('products.detail.compareFull'));
+  };
+
+  // « Comparer avec… » : le produit rejoint la sélection, puis on choisit les
+  // suivants dans le catalogue de son secteur.
+  const compareWithOthers = () => {
+    if (!product) return;
+    if (!isCompared && toggleInCompare(toCompareItem(product)) === 'full') {
+      toast.info(t('products.detail.compareFull'));
+      return;
     }
+    navigate(moreToCompareHref(product.category));
   };
 
   if (isLoading) {
@@ -398,6 +390,15 @@ const ProductDetail = () => {
                     </button>
                   )}
                 </div>
+                <button
+                  type="button"
+                  onClick={compareWithOthers}
+                  className="w-full inline-flex items-center justify-center gap-2 text-sm font-bold text-secondary hover:underline"
+                >
+                  <GitCompare className="h-4 w-4" aria-hidden="true" />
+                  {t('products.detail.compareWith')}
+                  <ArrowRight className="h-4 w-4 rtl:rotate-180" aria-hidden="true" />
+                </button>
               </div>
             </div>
 
