@@ -182,18 +182,6 @@
       "cta": "Voir l'annuaire",
       "verified": "Vérifiée"
     },
-    "supplierBand": {
-      "title": "Votre catalogue devant les acheteurs industriels",
-      "text": "Créez votre fiche en quelques minutes, faites vérifier votre entreprise et recevez des demandes de devis.",
-      "s1": "Compte gratuit",
-      "s1Text": "Fiche entreprise et 5 produits sans frais.",
-      "s2": "Badge vérifié",
-      "s2Text": "Après contrôle du RC et du NIF : la confiance des acheteurs.",
-      "s3": "Contacts directs",
-      "s3Text": "Demandes de devis par messagerie et WhatsApp.",
-      "cta": "Créer ma fiche gratuitement",
-      "pricing": "Voir les offres"
-    },
     "advertise": {
       "label": "Publicité",
       "title": "Faites connaître votre marque",
@@ -287,7 +275,9 @@
       "quoteMessage": "Bonjour, je souhaite recevoir un devis pour « {{name}} » (réf. {{ref}}). Quantité : … Lieu de livraison : … Délai souhaité : …",
       "whatsappMessage": "Bonjour, je vous contacte via Industigo au sujet de « {{name}} ».",
       "requestQuoteShort": "Demander un devis",
-      "zoom": "Agrandir l'image"
+      "zoom": "Agrandir l'image",
+      "supplierTitle": "Fournisseur",
+      "seeSupplier": "Voir la fiche entreprise"
     },
     "searchPlaceholder": "Rechercher une machine, une marque…",
     "sort": {
@@ -1416,7 +1406,9 @@
     "certifications": "Certifications",
     "gallery": "Galerie",
     "phone": "Téléphone",
-    "email": "E-mail de contact"
+    "email": "E-mail de contact",
+    "reviewsList": "Avis des utilisateurs ({{count}})",
+    "seeAllProducts": "Voir les {{count}} produits"
   },
   "pricing": {
     "eyebrow": "Tarification transparente",

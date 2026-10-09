@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { cn } from '../lib/utils';
 
 // Barre d'onglets en bas d'écran sur mobile : les cinq destinations
-// principales restent à portée de pouce.
+// principales restent à portée de pouce (sauf sur la fiche produit).
 const MobileTabBar = () => {
   const { t } = useTranslation();
   const { pathname, search } = useLocation();
@@ -29,6 +29,10 @@ const MobileTabBar = () => {
       active: (pathname === '/dashboard' && !search.includes('tab=messages')) || pathname === '/login',
     },
   ];
+
+  // Fiche produit : sa propre barre « Devis / WhatsApp » prend le bas de
+  // l'écran ; deux barres empilées mangeraient trop de place.
+  if (/^\/products\/[^/]+$/.test(pathname)) return null;
 
   return (
     <nav

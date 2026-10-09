@@ -1,5 +1,5 @@
 import type React from 'react';
-import { BadgeCheck, Eye, Sparkles, Star } from 'lucide-react';
+import { Eye, Sparkles, Star } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { useCurrency } from '../../context/CurrencyContext';
@@ -7,11 +7,12 @@ import { categoryLabel } from '../../data/productCategories';
 import { cn, generateSlugUrl, productCover } from '../../lib/utils';
 import ProductImage from './ProductImage';
 
-// Carte produit commune (accueil, secteurs, catalogue) : photo, badges
-// « Nouveau » et « Vérifié », fournisseur, prix ou « Sur devis » ; en option,
-// favori et aperçu rapide.
+// Carte produit commune (accueil, secteurs, catalogue) : photo, badge
+// « Nouveau », fournisseur, prix ou « Sur devis » ; en option, favori et
+// aperçu rapide. Pas de badge « Vérifié » : seules les entreprises vérifiées
+// sont publiées.
 
-const NEW_DAYS = 14;
+const NEW_DAYS = 7;
 
 export const isNewProduct = (createdAt?: string | null) =>
   Boolean(createdAt) && Date.now() - Date.parse(createdAt as string) < NEW_DAYS * 86_400_000;
@@ -32,7 +33,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, layout = 'grid', onQ
   const { formatPrice } = useCurrency();
   const href = `/products/${generateSlugUrl(product.name, product.id)}`;
   const company = companyNameOf(product);
-  const verified = Boolean(product.company_verified ?? product.companyVerified);
   const isNew = isNewProduct(product.created_at);
   const priced = Number(product.price) > 0;
   const list = layout === 'list';
@@ -44,7 +44,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, layout = 'grid', onQ
       className,
     )}>
       <div className={cn('relative shrink-0', list ? 'w-28 sm:w-44' : 'mb-4')}>
-        <Link to={href} className="block aspect-square overflow-hidden rounded-xl" tabIndex={-1} aria-hidden="true">
+        <Link to={href} className="block aspect-square overflow-hidden rounded-xl bg-gray-100" tabIndex={-1} aria-hidden="true">
           <ProductImage src={productCover(product)} alt="" category={product.category}
             imgClassName="group-hover:scale-105 transition-transform duration-500" />
         </Link>
@@ -79,8 +79,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, layout = 'grid', onQ
       </div>
       <div className={cn('flex flex-col flex-1 min-w-0', list ? 'py-1' : 'px-1')}>
         {company && (
-          <p className="text-xs text-gray-500 truncate mb-1 flex items-center gap-1">
-            {verified && <BadgeCheck className="h-3.5 w-3.5 text-success shrink-0" aria-label={t('products.badges.verified')} />}
+          <p className="text-xs text-gray-500 truncate mb-1">
             {company}
           </p>
         )}
@@ -97,11 +96,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, layout = 'grid', onQ
           <p className="text-sm font-black text-primary">
             {priced ? formatPrice(Number(product.price)) : <span className="text-secondary">{t('common.onQuote')}</span>}
           </p>
-          {verified && !list && (
-            <span className="hidden sm:inline-flex text-[11px] font-bold text-success items-center gap-0.5">
-              <BadgeCheck className="h-3.5 w-3.5" aria-hidden="true" /> {t('products.badges.verified')}
-            </span>
-          )}
         </div>
       </div>
     </article>

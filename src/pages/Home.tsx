@@ -8,7 +8,7 @@ import { Skeleton } from '../components/Skeleton';
 import { formatNumber } from '../lib/format';
 import { cn, generateSlugUrl } from '../lib/utils';
 import SEO from '../components/SEO';
-import { SITE_NAME, absoluteUrl } from '../config/site';
+import { SHOW_COMPANIES_FROM, SHOW_PRODUCTS_FROM, SITE_NAME, absoluteUrl } from '../config/site';
 import { CompanyAvatar } from '../components/ui/ProductImage';
 import { AlgeriaMapIcon, LanguagesIcon, SectorIcon, StorefrontIcon, VerifiedRegistryIcon } from '../components/ui/IndustryIcons';
 import { productCategories, sectorPath, categoryLabel } from '../data/productCategories';
@@ -91,12 +91,13 @@ const Home = () => {
     })();
   }, []);
 
-  // Bande de faits : chiffres réels si disponibles, sinon engagements vérifiables.
+  // Bande de faits : chiffres réels une fois assez élevés pour rassurer
+  // (sinon « 8 entreprises » dessert la plateforme), engagements vérifiables avant.
   const trust = [
-    stats && stats.verifiedCompanies > 0
+    stats && stats.verifiedCompanies >= SHOW_COMPANIES_FROM
       ? { icon: VerifiedRegistryIcon, value: formatNumber(stats.verifiedCompanies), label: t('home.stats.verifiedCompanies') }
       : { icon: VerifiedRegistryIcon, value: t('home.trust.kycValue'), label: t('home.trust.kycText') },
-    stats && stats.publishedProducts > 0
+    stats && stats.publishedProducts >= SHOW_PRODUCTS_FROM
       ? { icon: StorefrontIcon, value: formatNumber(stats.publishedProducts), label: t('home.stats.publishedProducts') }
       : { icon: StorefrontIcon, value: t('home.trust.freeValue'), label: t('home.trust.freeText') },
     { icon: AlgeriaMapIcon, value: '58', label: t('home.trust.wilayasText') },
@@ -223,22 +224,23 @@ const Home = () => {
               </Link>
             }
           />
-          {/* Index des secteurs, à la manière d'un catalogue industriel */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 border-t-2 border-primary">
+          {/* Index des secteurs, à la manière d'un catalogue industriel. Sur mobile,
+              deux colonnes compactes (icône et nom) : les sous-catégories sont sur la page du secteur. */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 border-t-2 border-primary">
             {productCategories.map((group) => (
               <Link
                 key={group.id}
                 to={sectorPath(group.id)}
-                className="group flex flex-col border-b border-border-tech sm:border-e sm:[&:nth-child(2n)]:border-e-0 lg:[&:nth-child(2n)]:border-e lg:[&:nth-child(4n)]:border-e-0 px-0 sm:px-5 py-6 lg:[&:nth-child(4n+1)]:ps-0 hover:bg-neutral-bg transition-colors"
+                className="group flex flex-col border-b border-border-tech border-e [&:nth-child(2n)]:border-e-0 lg:[&:nth-child(2n)]:border-e lg:[&:nth-child(4n)]:border-e-0 px-3 sm:px-5 py-4 sm:py-6 max-sm:[&:nth-child(2n+1)]:ps-0 lg:[&:nth-child(4n+1)]:ps-0 hover:bg-neutral-bg transition-colors"
               >
-                <div className="flex items-start justify-between gap-3 mb-4">
-                  <SectorIcon id={group.id} className="h-11 w-11 text-primary transition-transform duration-300 group-hover:-translate-y-0.5" />
+                <div className="flex items-start justify-between gap-3 mb-3 sm:mb-4">
+                  <SectorIcon id={group.id} className="h-9 w-9 sm:h-11 sm:w-11 text-primary transition-transform duration-300 group-hover:-translate-y-0.5" />
                   <ArrowRight className="h-4 w-4 mt-1 text-gray-300 group-hover:text-secondary rtl:rotate-180 transition-colors" aria-hidden="true" />
                 </div>
-                <h3 className="text-base font-black text-primary leading-snug mb-4 lg:min-h-[2.75em] group-hover:text-secondary transition-colors">
+                <h3 className="text-sm sm:text-base font-black text-primary leading-snug sm:mb-4 lg:min-h-[2.75em] group-hover:text-secondary transition-colors">
                   {t(`productCategories.${group.id}`)}
                 </h3>
-                <ul className="space-y-1.5 text-sm text-gray-600">
+                <ul className="hidden sm:block space-y-1.5 text-sm text-gray-600">
                   {group.subCategories.map((sub) => (
                     <li key={sub.id} className="leading-snug">{t(`productCategories.${sub.id}`).split(/[:(]/)[0].trim().replace(/\.$/, '')}</li>
                   ))}
@@ -378,37 +380,7 @@ const Home = () => {
         </section>
       )}
 
-      {/* 6. Fournisseurs : bénéfices et appel à l'action */}
-      <section className="relative overflow-hidden bg-primary text-white py-16 md:py-20">
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
-          <div>
-            <h2 className="text-3xl md:text-5xl font-black tracking-tight leading-tight mb-5">{t('home.supplierBand.title')}</h2>
-            <p className="text-lg text-white/70 mb-8 max-w-xl">{t('home.supplierBand.text')}</p>
-            <div className="flex flex-wrap gap-3">
-              <Link to="/register?role=fournisseur" className="inline-flex items-center gap-2 rounded-lg bg-secondary px-6 py-3.5 font-bold hover:bg-white hover:text-primary transition-colors">
-                {t('home.supplierBand.cta')}
-                <ArrowRight className="h-4 w-4 rtl:rotate-180" aria-hidden="true" />
-              </Link>
-              <Link to="/tarifs" className="inline-flex items-center gap-2 rounded-lg border border-white/20 px-6 py-3.5 font-bold hover:bg-white/10 transition-colors">
-                {t('home.supplierBand.pricing')}
-              </Link>
-            </div>
-          </div>
-          <ul className="divide-y divide-white/10 border-y border-white/10">
-            {(['s1', 's2', 's3'] as const).map((key, i) => (
-              <li key={key} className="flex items-baseline gap-5 py-5">
-                <span className="text-sm font-black text-secondary tabular-nums">0{i + 1}</span>
-                <div>
-                  <p className="font-bold">{t(`home.supplierBand.${key}`)}</p>
-                  <p className="text-sm text-white/65 mt-0.5">{t(`home.supplierBand.${key}Text`)}</p>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
-
-      {/* 7. Publicité */}
+      {/* 6. Publicité */}
       <section className="py-12 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-center gap-6 border-y border-border-tech py-8">
@@ -425,7 +397,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* 8. Dernier appel à l'action */}
+      {/* 7. Dernier appel à l'action */}
       <section className="pb-20 pt-8 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-4xl font-black text-primary tracking-tight mb-4">{t('home.final.title')}</h2>

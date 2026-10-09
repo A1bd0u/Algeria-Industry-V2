@@ -6,9 +6,9 @@ import {
   ChevronRight,
   FileText,
   GitCompare,
-  Globe,
   Heart,
   Layers,
+  MapPin,
   MessageSquare,
   Share2,
   ShieldCheck,
@@ -19,7 +19,7 @@ import {
 import { motion } from 'motion/react';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ProductDetailSkeleton } from '../components/Skeleton';
 import { Product as IProduct, useComparison } from '../context/ComparisonContext';
 import { useCurrency } from '../context/CurrencyContext';
@@ -30,7 +30,7 @@ import { categoryGroupId, categoryLabel } from '../data/productCategories';
 import { useToast } from '../context/ToastContext';
 import { whatsappHref } from '../config/site';
 import { apiErrorMessage } from '../lib/apiError';
-import ProductImage from '../components/ui/ProductImage';
+import ProductImage, { CompanyAvatar } from '../components/ui/ProductImage';
 import { useAdCategories } from '../context/AdTargetingContext';
 import { goal, trackAudience } from '../lib/analytics';
 
@@ -232,7 +232,7 @@ const ProductDetail = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
           {/* Gallery Section */}
           <div className="space-y-6">
-            <div className="aspect-square bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm relative group">
+            <div className="aspect-[4/3] bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm relative group">
               {product.images.length > 0 ? (
                 <button
                   type="button"
@@ -256,7 +256,7 @@ const ProductDetail = () => {
                     animate={{ opacity: 1 }}
                     src={product.images[activeImage]}
                     alt={product.name}
-                    className="w-full h-full object-contain p-8"
+                    className="w-full h-full object-contain p-2 sm:p-4"
                     referrerPolicy="no-referrer"
                   />
                 </button>
@@ -334,33 +334,17 @@ const ProductDetail = () => {
             <div className="mb-8">
               <div className="flex items-center justify-between mb-4">
                 <span className="tech-label">{categoryLabel(t, product.category)}</span>
-                {product.companyVerified && (
-                  <span className="flex items-center space-x-1 text-success text-xs font-black uppercase tracking-widest">
-                    <ShieldCheck className="h-4 w-4" />
-                    <span>{t('products.detail.verifiedCompany')}</span>
-                  </span>
-                )}
               </div>
               <h1 className="text-4xl font-black text-primary tracking-tighter leading-tight mb-2">
                 {product.name}
               </h1>
-              {product.companyName && (
-                <p className="text-sm font-bold text-secondary tracking-widest flex items-center space-x-2">
-                  <Globe className="h-4 w-4" />
-                  {product.companyId ? (
-                    <a href={`/directory/${generateSlugUrl(product.companyName, product.companyId)}`} className="hover:underline">{t('products.detail.supplier', { name: product.companyName })}</a>
-                  ) : (
-                    <span>{t('products.detail.supplier', { name: product.companyName })}</span>
-                  )}
-                </p>
-              )}
             </div>
 
             <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm mb-8">
               <div className="flex items-end justify-between mb-8">
                 <div>
                   <p className="text-xs font-black text-gray-500 uppercase tracking-widest mb-1">{t('products.detail.indicativePrice')}</p>
-                  <p className="text-4xl font-mono font-black text-primary tracking-tighter">
+                  <p className="text-4xl font-black text-primary tracking-tight">
                     {product.priceValue ? formatPrice(product.priceValue) : t('common.onQuote')}
                   </p>
                 </div>
@@ -415,6 +399,34 @@ const ProductDetail = () => {
                 </div>
               </div>
             </div>
+
+            {/* Fournisseur : qui vend, où, et accès direct à sa fiche */}
+            {product.companyName && (
+              <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm mb-8 flex items-center gap-4">
+                <CompanyAvatar src={product.companyLogo} name={product.companyName} className="h-14 w-14 shrink-0 rounded-xl border border-gray-100 text-base" />
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-black text-gray-500 uppercase tracking-widest">{t('products.detail.supplierTitle')}</p>
+                  <p className="font-bold text-primary truncate">{product.companyName}</p>
+                  <p className="text-xs text-gray-500 flex flex-wrap items-center gap-x-3 gap-y-1 mt-0.5">
+                    {product.companyWilaya && (
+                      <span className="inline-flex items-center gap-1"><MapPin className="h-3.5 w-3.5" aria-hidden="true" />{product.companyWilaya}</span>
+                    )}
+                    {product.companyVerified && (
+                      <span className="inline-flex items-center gap-1 font-bold text-success"><ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />{t('products.detail.verifiedCompany')}</span>
+                    )}
+                  </p>
+                </div>
+                {product.companyId && (
+                  <Link
+                    to={`/directory/${generateSlugUrl(product.companyName, product.companyId)}`}
+                    className="shrink-0 inline-flex items-center gap-1 text-sm font-bold text-secondary hover:underline"
+                  >
+                    <span className="hidden sm:inline">{t('products.detail.seeSupplier')}</span>
+                    <ArrowRight className="h-4 w-4 rtl:rotate-180" aria-hidden="true" />
+                  </Link>
+                )}
+              </div>
+            )}
 
             {/* Tabs for detailed content */}
             <div className="space-y-6">
@@ -472,7 +484,7 @@ const ProductDetail = () => {
           </div>
         )}
       {/* Barre d'action fixe sur mobile : le devis reste toujours à portée de pouce. */}
-      <div className="lg:hidden fixed bottom-16 inset-x-0 z-40 bg-white/95 backdrop-blur border-t border-gray-200 p-3 flex gap-3">
+      <div className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur border-t border-gray-200 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] flex gap-3">
         <button type="button" onClick={requestQuote} className="btn-primary flex-1 !py-3">
           <FileText className="h-4 w-4" />
           {t('products.detail.requestQuoteShort')}

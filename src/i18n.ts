@@ -40,8 +40,10 @@ export const i18nReady = i18n
     nonExplicitSupportedLngs: true,
     load: 'languageOnly',
     fallbackLng: 'fr',
+    // Français par défaut à la première visite (marché algérien), quelle que soit
+    // la langue du navigateur ; le choix fait dans le sélecteur est mémorisé.
     detection: {
-      order: ['querystring', 'cookie', 'localStorage', 'sessionStorage', 'navigator', 'htmlTag', 'path', 'subdomain'],
+      order: ['querystring', 'cookie', 'localStorage', 'sessionStorage'],
       caches: ['localStorage', 'cookie'],
     },
     interpolation: {
