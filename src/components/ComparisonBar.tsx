@@ -1,7 +1,7 @@
 import { ChevronDown, ChevronUp, Columns, GitCompare, X, Zap } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useComparison } from '../context/ComparisonContext';
 import { useTranslation } from 'react-i18next';
 
@@ -9,8 +9,10 @@ const ComparisonBar = () => {
   const { comparedProducts, removeFromCompare, clearCompare } = useComparison();
   const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
+  const { pathname } = useLocation();
 
-  if (comparedProducts.length === 0) return null;
+  // Sur la page de comparaison, la barre ferait doublon et masquerait le tableau.
+  if (comparedProducts.length === 0 || pathname === '/compare') return null;
 
   return (
     <div className="fixed bottom-20 lg:bottom-24 start-1/2 -translate-x-1/2 z-[9999] w-full max-w-4xl px-4">
