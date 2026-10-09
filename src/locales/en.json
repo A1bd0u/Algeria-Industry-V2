@@ -1081,7 +1081,9 @@
     "sendQuote": "Send the request",
     "sending": "Sending…",
     "quoteSent": "Request sent to {{count}} supplier(s). Follow the replies in your inbox.",
-    "quoteError": "The request could not be sent."
+    "quoteError": "The request could not be sent.",
+    "features": "Key features",
+    "swipeHint": "{{count}} products: swipe the table to see them all →"
   },
   "contact": {
     "titleStart": "Contact",

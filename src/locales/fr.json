@@ -1081,7 +1081,9 @@
     "sendQuote": "Envoyer la demande",
     "sending": "Envoi…",
     "quoteSent": "Demande envoyée à {{count}} fournisseur(s). Suivez les réponses dans votre messagerie.",
-    "quoteError": "La demande n'a pas pu être envoyée."
+    "quoteError": "La demande n'a pas pu être envoyée.",
+    "features": "Points clés",
+    "swipeHint": "{{count}} produits : faites glisser le tableau pour tous les voir →"
   },
   "contact": {
     "titleStart": "Contactez",

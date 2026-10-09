@@ -72,6 +72,7 @@ const Compare = () => {
 
   const specKeys: string[] = Array.from(new Set(items.flatMap((p) => Object.keys(p.specs || {}))));
   const hasSeller = items.some((p) => p.sellerId);
+  const hasFeatures = items.some((p) => p.features?.length);
 
   return (
     <div className={cn("min-h-screen bg-neutral-bg pt-32 pb-20", i18n.language?.startsWith('ar') && "font-arabic")}>
@@ -98,15 +99,18 @@ const Compare = () => {
           </button>
         </div>
 
+        {items.length > 1 && (
+          <p className="sm:hidden mb-3 text-xs font-bold text-gray-500">{t('compare.swipeHint', { count: items.length })}</p>
+        )}
         <div className="bg-white border border-gray-100 shadow-2xl overflow-x-auto no-scrollbar rounded-2xl">
-          <table className="w-full min-w-[800px] border-collapse">
+          <table className="w-full border-collapse">
             <thead>
               <tr className="border-b border-gray-50">
-                <th className="p-8 text-start bg-gray-50/50 w-64 shrink-0">
-                  <span className="text-xs font-black text-primary uppercase tracking-wider">{t('compare.specs')}</span>
+                <th className="p-3 sm:p-8 text-start bg-gray-50 w-28 sm:w-64 sticky start-0 z-10">
+                  <span className="text-[10px] sm:text-xs font-black text-primary uppercase tracking-wider break-words">{t('compare.specs')}</span>
                 </th>
                 {items.map((product) => (
-                  <th key={product.id} className="p-8 text-start relative min-w-[280px] align-top">
+                  <th key={product.id} className="p-4 sm:p-8 text-start relative min-w-[190px] sm:min-w-[260px] align-top">
                     <button
                       onClick={() => removeFromCompare(product.id)}
                       aria-label={t('compare.remove')}
@@ -114,7 +118,7 @@ const Compare = () => {
                     >
                       <X className="h-4 w-4" />
                     </button>
-                    <div className="aspect-[4/3] rounded-2xl overflow-hidden mb-6 border border-gray-100">
+                    <div className="aspect-[4/3] rounded-2xl overflow-hidden mb-4 sm:mb-6 border border-gray-100 bg-gray-100">
                       <ProductImage src={product.image} alt={product.name} category={product.category} />
                     </div>
                     <p className="text-xs font-black text-secondary tracking-widest uppercase mb-1">{product.brand}</p>
@@ -130,11 +134,11 @@ const Compare = () => {
             </thead>
             <tbody className="text-sm">
               <tr className="border-b border-gray-50">
-                <td className="p-8 bg-gray-50/30 font-black text-primary text-xs uppercase tracking-widest">
+                <td className="p-3 sm:p-8 bg-gray-50 sticky start-0 z-10 font-black text-primary text-[10px] sm:text-xs uppercase tracking-wider sm:tracking-widest break-words">
                   {t('compare.verification')}
                 </td>
                 {items.map((product) => (
-                  <td key={product.id} className="p-8 text-xs font-black uppercase tracking-wider">
+                  <td key={product.id} className="p-4 sm:p-8 text-xs font-black uppercase tracking-wider">
                     {product.companyVerified ? (
                       <span className="flex items-center text-emerald-600">
                         <ShieldCheck className="h-4 w-4 me-2" />
@@ -146,13 +150,31 @@ const Compare = () => {
                   </td>
                 ))}
               </tr>
+              {hasFeatures && (
+                <tr className="border-b border-gray-50">
+                  <td className="p-3 sm:p-8 bg-gray-50 sticky start-0 z-10 font-black text-primary text-[10px] sm:text-xs uppercase tracking-wider sm:tracking-widest break-words align-top">
+                    {t('compare.features')}
+                  </td>
+                  {items.map((product) => (
+                    <td key={product.id} className="p-4 sm:p-8 text-[12px] text-gray-600 align-top">
+                      {product.features?.length ? (
+                        <ul className="space-y-1.5">
+                          {product.features.map((f) => (
+                            <li key={f} className="flex gap-2"><span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-secondary" aria-hidden="true" />{f}</li>
+                          ))}
+                        </ul>
+                      ) : '—'}
+                    </td>
+                  ))}
+                </tr>
+              )}
               {specKeys.map((key) => (
                 <tr key={key} className="border-b border-gray-50 hover:bg-gray-50/30 transition-colors">
-                  <td className="p-8 bg-gray-50/30 font-black text-primary text-xs uppercase tracking-widest">
+                  <td className="p-3 sm:p-8 bg-gray-50 sticky start-0 z-10 font-black text-primary text-[10px] sm:text-xs uppercase tracking-wider sm:tracking-widest break-words">
                     {key}
                   </td>
                   {items.map((product) => (
-                    <td key={product.id} className="p-8 font-medium text-gray-600 text-[12px]">
+                    <td key={product.id} className="p-4 sm:p-8 font-medium text-gray-600 text-[12px]">
                       {product.specs?.[key] || '—'}
                     </td>
                   ))}

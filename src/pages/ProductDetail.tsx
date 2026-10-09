@@ -197,6 +197,7 @@ const ProductDetail = () => {
         priceValue: product.priceValue || null,
         sellerId: product.sellerId || null,
         companyVerified: Boolean(product.companyVerified),
+        features: Array.isArray(product.features) ? product.features.slice(0, 8) : [],
         specs: product.specs || {},
       } as IProduct);
     }
