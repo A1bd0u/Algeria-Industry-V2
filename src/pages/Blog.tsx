@@ -23,7 +23,7 @@ const Cover = ({ post, className }: { post: any; className?: string }) =>
       className={cn('h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]', className)} />
   ) : (
     <div className={cn('flex h-full w-full items-end bg-[#ececea] p-5', className)}>
-      <span className="text-xs font-bold uppercase tracking-[0.18em] text-gray-500">{post.category || 'Industigo'}</span>
+      <span className="text-sm font-bold text-gray-500">{post.category || 'Industigo'}</span>
     </div>
   );
 
@@ -78,9 +78,9 @@ const Blog = () => {
         {/* En-tête sobre */}
         <header className="border-b border-border-tech">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-0">
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-secondary mb-3">{t('blog.kicker')}</p>
+            <p className="text-sm font-bold text-secondary mb-3">{t('blog.kicker')}</p>
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
-              <h1 className="text-4xl md:text-5xl font-black text-primary tracking-tight">{t('nav.news')}</h1>
+              <h1 className="text-4xl md:text-5xl font-extrabold text-primary tracking-tight">{t('nav.news')}</h1>
               <p className="text-gray-600 max-w-md md:text-end">{t('blog.subtitle')}</p>
             </div>
             {categories.length > 0 && (
@@ -127,10 +127,10 @@ const Blog = () => {
                     <Link to={href(featured)} className="block aspect-[16/9] overflow-hidden rounded-lg mb-6" tabIndex={-1} aria-hidden="true">
                       <Cover post={featured} />
                     </Link>
-                    <p className="text-xs font-bold uppercase tracking-[0.18em] text-secondary mb-3">
+                    <p className="text-sm font-bold text-secondary mb-3">
                       {t('blog.featured')}{featured.category ? ` · ${featured.category}` : ''}
                     </p>
-                    <h2 className="text-3xl md:text-4xl font-black text-primary leading-tight tracking-tight mb-4">
+                    <h2 className="text-3xl md:text-4xl font-extrabold text-primary leading-tight tracking-tight mb-4">
                       <Link to={href(featured)} className="hover:underline decoration-2 underline-offset-4">{featured.title}</Link>
                     </h2>
                     {featured.excerpt && <p className="text-lg text-gray-600 leading-relaxed mb-4 max-w-3xl">{featured.excerpt}</p>}
@@ -148,9 +148,9 @@ const Blog = () => {
                         <article className="group grid grid-cols-1 sm:grid-cols-[1fr_200px] gap-5">
                           <div className="min-w-0 sm:order-1">
                             {post.category && (
-                              <p className="text-xs font-bold uppercase tracking-[0.18em] text-gray-500 mb-2">{post.category}</p>
+                              <p className="text-sm font-bold text-gray-500 mb-2">{post.category}</p>
                             )}
-                            <h3 className="text-xl font-black text-primary leading-snug mb-2">
+                            <h3 className="text-xl font-bold text-primary leading-snug mb-2">
                               <Link to={href(post)} className="hover:underline decoration-2 underline-offset-4">{post.title}</Link>
                             </h3>
                             {post.excerpt && <p className="text-gray-600 line-clamp-2 mb-3">{post.excerpt}</p>}
@@ -169,7 +169,7 @@ const Blog = () => {
               {/* Colonne : agenda et annuaire */}
               <aside className="lg:col-span-4 space-y-10 lg:border-s lg:border-border-tech lg:ps-10">
                 <section>
-                  <h2 className="text-xs font-bold uppercase tracking-[0.18em] text-gray-500 mb-4">{t('blog.agenda')}</h2>
+                  <h2 className="text-sm font-bold text-gray-500 mb-4">{t('blog.agenda')}</h2>
                   {events.length === 0 ? (
                     <p className="text-sm text-gray-500">{t('blog.noEvents')}</p>
                   ) : (
@@ -179,8 +179,8 @@ const Blog = () => {
                         return (
                           <li key={e.id} className="flex gap-4">
                             <div className="w-14 shrink-0 border border-border-tech rounded-md text-center py-1.5">
-                              <p className="text-xl font-black text-primary leading-none">{d.getDate()}</p>
-                              <p className="text-[11px] font-bold uppercase text-gray-500 mt-1">
+                              <p className="text-xl font-bold text-primary leading-none">{d.getDate()}</p>
+                              <p className="text-[11px] font-bold text-gray-500 mt-1">
                                 {d.toLocaleDateString(currentLocale(), { month: 'short' }).replace('.', '')}
                               </p>
                             </div>
@@ -199,7 +199,7 @@ const Blog = () => {
                 </section>
 
                 <section className="border-t border-border-tech pt-8">
-                  <h2 className="text-lg font-black text-primary mb-2">{t('blog.ctaTitle')}</h2>
+                  <h2 className="text-lg font-bold text-primary mb-2">{t('blog.ctaTitle')}</h2>
                   <p className="text-sm text-gray-600 mb-5">{t('blog.ctaText')}</p>
                   <Link to="/directory" className="btn-primary">{t('blog.ctaButton')}</Link>
                 </section>

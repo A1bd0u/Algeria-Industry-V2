@@ -83,7 +83,7 @@ const AdsRequest = () => {
             <Megaphone className="h-5 w-5" />
             <span className="font-bold text-sm tracking-widest">{t('ads.title')}</span>
           </div>
-          <h1 className="text-4xl md:text-5xl font-black text-primary tracking-tighter mb-6">
+          <h1 className="text-4xl md:text-5xl font-extrabold text-primary tracking-tight mb-6">
             {t('ads.heroTitle')}
           </h1>
           <p className="text-gray-600 text-lg max-w-2xl mx-auto">
@@ -102,7 +102,7 @@ const AdsRequest = () => {
               <div className="w-20 h-20 bg-success/10 rounded-full flex items-center justify-center mx-auto mb-6">
                 <CheckCircle2 className="h-10 w-10 text-success" />
               </div>
-              <h3 className="text-2xl font-black text-primary mb-4">{t('ads.success')}</h3>
+              <h3 className="text-2xl font-extrabold text-primary mb-4">{t('ads.success')}</h3>
               <p className="text-gray-600 mb-8 max-w-md mx-auto">
                 {t('ads.successText')}
               </p>
@@ -117,7 +117,7 @@ const AdsRequest = () => {
             <form onSubmit={handleSubmit} className="space-y-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-gray-500 uppercase">{t('ads.company_name')}</label>
+                  <label className="text-sm font-bold text-gray-500">{t('ads.company_name')}</label>
                   <div className="relative">
                     <Building className="absolute start-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500" />
                     <input 
@@ -133,7 +133,7 @@ const AdsRequest = () => {
                 </div>
                 
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-gray-500 uppercase">{t('ads.contact')}</label>
+                  <label className="text-sm font-bold text-gray-500">{t('ads.contact')}</label>
                   <div className="relative">
                     <User className="absolute start-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500" />
                     <input 
@@ -149,7 +149,7 @@ const AdsRequest = () => {
                 </div>
                 
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-gray-500 uppercase">{t('ads.email')}</label>
+                  <label className="text-sm font-bold text-gray-500">{t('ads.email')}</label>
                   <div className="relative">
                     <Mail className="absolute start-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500" />
                     <input 
@@ -165,7 +165,7 @@ const AdsRequest = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-gray-500 uppercase">{t('ads.phone')}</label>
+                  <label className="text-sm font-bold text-gray-500">{t('ads.phone')}</label>
                   <div className="relative">
                     <Phone className="absolute start-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500" />
                     <input 
@@ -182,7 +182,7 @@ const AdsRequest = () => {
               </div>
 
               <div className="space-y-4">
-                <label className="text-xs font-bold text-gray-500 uppercase">{t('ads.placement')}</label>
+                <label className="text-sm font-bold text-gray-500">{t('ads.placement')}</label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {adPlacements.map((placement) => (
                     <label 
@@ -216,7 +216,7 @@ const AdsRequest = () => {
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-bold text-gray-500 uppercase">{t('ads.details')}</label>
+                <label className="text-sm font-bold text-gray-500">{t('ads.details')}</label>
                 <textarea 
                   name="message"
                   value={formData.message}

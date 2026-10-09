@@ -3,7 +3,6 @@ import {
   MessageSquare,
   Plus,
   Scale,
-  ShieldCheck,
   Trash2,
   X
 } from 'lucide-react';
@@ -66,11 +65,11 @@ const Compare = () => {
         <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center shadow-xl mb-8">
           <Scale className="h-10 w-10 text-gray-200" />
         </div>
-        <h2 className="text-3xl font-black text-primary tracking-tighter mb-4">{t('compare.emptyTitle')}</h2>
+        <h2 className="text-3xl font-extrabold text-primary tracking-tight mb-4">{t('compare.emptyTitle')}</h2>
         <p className="text-gray-500 font-medium max-w-xs mb-8 text-xs tracking-widest">
           {t('compare.emptyText')}
         </p>
-        <Link to="/products" className="btn-primary px-12 py-4 rounded-xl text-xs font-black uppercase tracking-widest">
+        <Link to="/products" className="btn-primary px-12 py-4 rounded-xl text-sm font-semibold">
           {t('compare.explore')}
         </Link>
       </div>
@@ -94,16 +93,16 @@ const Compare = () => {
               className="flex items-center gap-2 text-gray-500 hover:text-primary mb-4 transition-colors"
             >
               <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
-              <span className="text-xs font-black uppercase tracking-widest">{t('compare.back')}</span>
+              <span className="text-sm font-semibold">{t('compare.back')}</span>
             </button>
-            <h1 className="text-4xl font-black text-primary tracking-tighter">
+            <h1 className="text-4xl font-extrabold text-primary tracking-tight">
               {t('compare.title')}
             </h1>
           </div>
           <div className="flex items-center gap-3">
             <button
               onClick={clearCompare}
-              className="flex items-center gap-2 text-red-500 hover:text-red-600 font-black text-xs uppercase tracking-widest px-6 py-3 bg-red-50 rounded-xl transition-all"
+              className="flex items-center gap-2 text-red-500 hover:text-red-600 font-semibold text-sm px-6 py-3 bg-red-50 rounded-xl transition-all"
             >
               <Trash2 className="h-4 w-4" />
               <span>{t('compare.clear')}</span>
@@ -128,7 +127,7 @@ const Compare = () => {
             <thead>
               <tr className="border-b border-gray-50">
                 <th className="p-3 sm:p-8 text-start bg-gray-50 w-28 sm:w-64 sticky start-0 z-10">
-                  <span className="text-[10px] sm:text-xs font-black text-primary uppercase tracking-wider break-words">{t('compare.specs')}</span>
+                  <span className="text-xs sm:text-sm font-semibold text-primary break-words">{t('compare.specs')}</span>
                 </th>
                 {items.map((product) => (
                   <th key={product.id} className="p-4 sm:p-8 text-start relative min-w-[190px] sm:min-w-[260px] align-top">
@@ -142,11 +141,11 @@ const Compare = () => {
                     <div className="aspect-[4/3] rounded-2xl overflow-hidden mb-4 sm:mb-6 border border-gray-100 bg-gray-100">
                       <ProductImage src={product.image} alt={product.name} category={product.category} />
                     </div>
-                    <p className="text-xs font-black text-secondary tracking-widest uppercase mb-1">{product.brand}</p>
-                    <Link to={`/products/${generateSlugUrl(product.name, product.id)}`} className="block text-primary font-black uppercase tracking-tighter leading-tight mb-4 hover:text-secondary">
+                    <p className="text-sm font-semibold text-secondary mb-1">{product.brand}</p>
+                    <Link to={`/products/${generateSlugUrl(product.name, product.id)}`} className="block text-primary font-semibold tracking-tight leading-tight mb-4 hover:text-secondary">
                       {product.name}
                     </Link>
-                    <span className="text-sm font-black text-primary">
+                    <span className="text-sm font-bold text-primary">
                       {product.priceValue ? formatPrice(product.priceValue) : t('common.onQuote')}
                     </span>
                   </th>
@@ -158,34 +157,16 @@ const Compare = () => {
                       className="flex aspect-[4/3] flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-gray-200 text-gray-400 hover:border-secondary hover:text-secondary transition-colors"
                     >
                       <Plus className="h-7 w-7" aria-hidden="true" />
-                      <span className="text-xs font-black uppercase tracking-widest text-center px-2">{t('compare.addProduct')}</span>
+                      <span className="text-sm font-semibold text-center px-2">{t('compare.addProduct')}</span>
                     </Link>
                   </th>
                 )}
               </tr>
             </thead>
             <tbody className="text-sm">
-              <tr className="border-b border-gray-50">
-                <td className="p-3 sm:p-8 bg-gray-50 sticky start-0 z-10 font-black text-primary text-[10px] sm:text-xs uppercase tracking-wider sm:tracking-widest break-words">
-                  {t('compare.verification')}
-                </td>
-                {items.map((product) => (
-                  <td key={product.id} className="p-4 sm:p-8 text-xs font-black uppercase tracking-wider">
-                    {product.companyVerified ? (
-                      <span className="flex items-center text-emerald-600">
-                        <ShieldCheck className="h-4 w-4 me-2" />
-                        {t('compare.verified')}
-                      </span>
-                    ) : (
-                      <span className="text-gray-500">{t('compare.notVerified')}</span>
-                    )}
-                  </td>
-                ))}
-                {canAdd && <td aria-hidden="true" />}
-              </tr>
               {hasFeatures && (
                 <tr className="border-b border-gray-50">
-                  <td className="p-3 sm:p-8 bg-gray-50 sticky start-0 z-10 font-black text-primary text-[10px] sm:text-xs uppercase tracking-wider sm:tracking-widest break-words align-top">
+                  <td className="p-3 sm:p-8 bg-gray-50 sticky start-0 z-10 font-semibold text-primary text-xs sm:text-sm break-words align-top">
                     {t('compare.features')}
                   </td>
                   {items.map((product) => (
@@ -204,7 +185,7 @@ const Compare = () => {
               )}
               {specKeys.map((key) => (
                 <tr key={key} className="border-b border-gray-50 hover:bg-gray-50/30 transition-colors">
-                  <td className="p-3 sm:p-8 bg-gray-50 sticky start-0 z-10 font-black text-primary text-[10px] sm:text-xs uppercase tracking-wider sm:tracking-widest break-words">
+                  <td className="p-3 sm:p-8 bg-gray-50 sticky start-0 z-10 font-semibold text-primary text-xs sm:text-sm break-words">
                     {key}
                   </td>
                   {items.map((product) => (
@@ -221,7 +202,7 @@ const Compare = () => {
 
         {hasSeller && (
           <div className="mt-20 bg-primary p-8 md:p-12 text-white rounded-2xl">
-            <h2 className="text-3xl md:text-4xl font-black tracking-tighter mb-4 text-center">{t('compare.quoteTitle')}</h2>
+            <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-4 text-center">{t('compare.quoteTitle')}</h2>
             <p className="text-white/60 text-sm mb-8 text-center max-w-2xl mx-auto">{t('compare.quoteText')}</p>
             <label htmlFor="compare-note" className="sr-only">{t('compare.notePlaceholder')}</label>
             <textarea
@@ -237,7 +218,7 @@ const Compare = () => {
                 type="button"
                 disabled={sending}
                 onClick={requestQuotes}
-                className="inline-flex items-center gap-3 bg-secondary px-12 py-5 rounded-2xl text-sm font-black tracking-widest shadow-2xl hover:scale-105 transition-all disabled:opacity-60 disabled:hover:scale-100"
+                className="inline-flex items-center gap-3 bg-secondary px-12 py-5 rounded-2xl text-sm font-bold tracking-widest shadow-2xl hover:scale-105 transition-all disabled:opacity-60 disabled:hover:scale-100"
               >
                 <MessageSquare className="h-5 w-5" />
                 {sending ? t('compare.sending') : t('compare.sendQuote')}

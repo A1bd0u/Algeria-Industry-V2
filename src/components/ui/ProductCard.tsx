@@ -101,7 +101,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, layout = 'grid', onQ
           </>
         )}
         <div className="mt-auto pt-3 flex items-center justify-between gap-2">
-          <p className="text-sm font-black text-primary">
+          <p className="text-sm font-bold text-primary">
             {priced ? formatPrice(Number(product.price)) : <span className="text-secondary">{t('common.onQuote')}</span>}
           </p>
           <button

@@ -54,7 +54,7 @@
   },
   "home": {
     "trends": "Latest products",
-    "trends_subtitle": "From suppliers registered on the platform",
+    "trends_subtitle": "The latest items added by suppliers.",
     "featured_products": "Featured Products",
     "featured_subtitle": "A selection of the best equipment currently available.",
     "sectors": "Activity Sectors",
@@ -82,7 +82,7 @@
     "whyTitle": "Why choose Industigo?",
     "why": {
       "visibility": "More visibility for suppliers",
-      "sourcing": "Simpler sourcing for buyers",
+      "sourcing": "Suppliers that are easier to find for buyers",
       "kyc": "Verified companies (KYC)",
       "local": "Support team in Algeria"
     },
@@ -110,7 +110,7 @@
     "hero": {
       "eyebrow": "Verified industrial suppliers",
       "title": "Find the right industrial supplier in Algeria",
-      "subtitle": "Verified companies (trade register and tax ID checked), their catalogues and direct contact to request a quote.",
+      "subtitle": "Every listed company has had its trade register and tax ID checked by our team. Browse their catalogues and ask the supplier for a quote directly.",
       "searchLabel": "Search a product or a company",
       "searchPlaceholder": "Product, machine, company…",
       "browseSuppliers": "Browse suppliers",
@@ -133,7 +133,7 @@
         "step1": "Search",
         "step1Text": "By product, category or province, in French or Arabic.",
         "step2": "Compare",
-        "step2Text": "Up to 4 products side by side, with each supplier's verification status.",
+        "step2Text": "Put up to 4 products side by side: price, specs, supplier.",
         "step3": "Get in touch",
         "step3Text": "Ask for a quote through messaging or WhatsApp.",
         "cta": "Browse the catalogue"
@@ -143,7 +143,7 @@
         "step1": "Create your account",
         "step1Text": "Free, in two minutes.",
         "step2": "Get your company verified",
-        "step2Text": "Upload your trade register and tax ID to get the “verified” badge.",
+        "step2Text": "Send your trade register and tax ID; we check them within 48 hours.",
         "step3": "Publish your products",
         "step3Text": "Receive buyers' requests in your inbox.",
         "cta": "List my company"
@@ -152,7 +152,7 @@
     "supplierCard": {
       "label": "Are you a supplier?",
       "title": "Sell to industrial buyers across Algeria",
-      "p1": "Verified company profile and product catalogue",
+      "p1": "A company profile and a product catalogue",
       "p2": "Quote requests by messaging and WhatsApp",
       "p3": "Free sign-up, no commitment",
       "cta": "List my company"
@@ -171,14 +171,14 @@
     "categories": {
       "label": "Sectors",
       "title": "Browse by sector",
-      "subtitle": "Eight sectors built around Algerian industry, from agri-food to digital.",
+      "subtitle": "Eight sectors, from agri-food to digital.",
       "count": "{{count}} subcategories",
       "all": "Full catalogue"
     },
     "suppliers": {
       "label": "Directory",
       "title": "Verified suppliers",
-      "subtitle": "Trade register and tax ID checked by our team.",
+      "subtitle": "Trade register and tax ID checked for each one.",
       "cta": "See the directory",
       "verified": "Verified"
     },
@@ -201,9 +201,16 @@
     "reviews": {
       "label": "Reviews",
       "title": "What buyers say",
-      "subtitle": "Reviews left on verified suppliers' profiles.",
+      "subtitle": "Reviews left by buyers on supplier profiles.",
       "rating": "{{rating}} out of 5 stars",
       "about": "about"
+    },
+    "facts": {
+      "kyc": "Trade register and tax ID checked for every company",
+      "free": "Free sign-up",
+      "wilayas": "58 wilayas",
+      "companies": "{{count}} verified companies",
+      "products": "{{count}} products listed"
     }
   },
   "directory": {
@@ -244,7 +251,7 @@
     "sell_machines": "Sell your machines",
     "add_product": "Add Product",
     "quotes": "Quotes",
-    "hero_desc": "Explore the best industrial technologies available in Algeria. Compare, request quotes and connect with suppliers.",
+    "hero_desc": "Every product comes from a verified company (trade register and tax ID checked). Compare them and ask the supplier for a quote.",
     "no_results": "No products found.",
     "detail": {
       "notFound": "Product not found",
@@ -392,7 +399,7 @@
     "results_for": "Results for",
     "sector_cat": "Sector / Category",
     "region": "Region (Wilaya)",
-    "boost_vis": "Boost your visibility?",
+    "boost_vis": "Want more visibility?",
     "everything": "the whole catalogue",
     "found": "{{count}} result(s) match your search.",
     "filterType": "Filter by type",
@@ -1254,8 +1261,8 @@
   },
   "exhibitor": {
     "eyebrow": "Industrial suppliers",
-    "titleStart": "Boost your industrial",
-    "titleHighlight": "visibility",
+    "titleStart": "Get found by industrial",
+    "titleHighlight": "buyers",
     "subtitle": "List your company and products in the Algerian industrial directory and receive requests from professional buyers.",
     "cta": "Create my supplier account",
     "seePricing": "See pricing",
@@ -1306,7 +1313,7 @@
     "list": {
       "label": "Registered companies",
       "title": "Supplier directory",
-      "subtitle": "Discover the industrial companies registered on Industigo and contact them directly.",
+      "subtitle": "Every company in the directory is verified: trade register and tax ID are checked before it goes live. Contact them directly.",
       "loadError": "Unable to load companies.",
       "searchPlaceholder": "Search a company by name or activity…",
       "sector": "Business sector",
@@ -1366,7 +1373,7 @@
     "legalChecked": "Checked by Industigo (KYC)",
     "legalUnchecked": "Not verified",
     "sector": "Business sector",
-    "productsIntro": "Discover the product range offered by {{name}}.",
+    "productsIntro": "Products offered by {{name}}.",
     "noProducts": "No products available",
     "noProductsText": "This company has not added any products yet.",
     "onQuote": "Price on request",
@@ -1381,10 +1388,10 @@
     "noNews": "No news available",
     "readMore": "Read more",
     "eventsTitle": "Trade fairs & events",
-    "eventsIntro": "Discover the exhibitions and trade fairs of {{name}}.",
+    "eventsIntro": "Trade fairs and exhibitions {{name}} takes part in.",
     "noEvents": "No trade fairs available",
     "reviewsTitle": "Reviews & ratings ({{count}})",
-    "reviewsIntro": "See what other users think of {{name}}.",
+    "reviewsIntro": "What buyers say about {{name}}.",
     "averageRating": "Average rating",
     "close": "Close",
     "leaveReview": "Leave a review",

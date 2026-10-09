@@ -213,8 +213,7 @@ const Products = () => {
       <div className={cn('min-h-screen bg-neutral-bg pt-10 pb-20', i18n.language?.startsWith('ar') && 'font-arabic')}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <header className="mb-8">
-            <p className="tech-label text-secondary">{t('products.sourcing')}</p>
-            <h1 className="text-3xl md:text-5xl font-black text-primary tracking-tight mb-3">
+            <h1 className="text-3xl md:text-5xl font-extrabold text-primary tracking-tight mb-3">
               {companyName ? t('products.companyProducts', { name: companyName }) : t('products.equipment_catalog')}
             </h1>
             <p className="text-gray-500 max-w-2xl">{t('products.hero_desc')}</p>
@@ -290,7 +289,7 @@ const Products = () => {
                 <Filters category={category} region={region} onChange={(key, value) => update({ [key]: value })} />
               </div>
               <div className="bg-primary rounded-2xl p-6 text-white">
-                <h2 className="text-lg font-black mb-2">{t('products.sell_machines')}</h2>
+                <h2 className="text-lg font-bold mb-2">{t('products.sell_machines')}</h2>
                 <p className="text-white/60 text-sm mb-5">{t('products.join_suppliers')}</p>
                 {isSupplier ? (
                   <button type="button" onClick={() => setShowAddModal(true)} className="btn-secondary w-full">{t('products.add_product')}</button>
@@ -372,7 +371,7 @@ const Products = () => {
           <div className="absolute inset-0 bg-black/40" onClick={() => setDrawerOpen(false)} />
           <div className="absolute inset-y-0 end-0 w-[88%] max-w-sm bg-white shadow-2xl flex flex-col">
             <div className="flex items-center justify-between p-5 border-b border-gray-100">
-              <h2 className="font-black text-primary">{t('products.filters')}</h2>
+              <h2 className="font-bold text-primary">{t('products.filters')}</h2>
               <button type="button" onClick={() => setDrawerOpen(false)} aria-label={t('common.close')} className="p-2"><X className="h-5 w-5" /></button>
             </div>
             <div className="flex-1 overflow-y-auto p-5">

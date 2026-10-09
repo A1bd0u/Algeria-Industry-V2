@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Heart, Package, Building2, Trash2 } from 'lucide-react';
+import { Package, Building2, Trash2 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useAuth } from '../context/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
@@ -58,15 +58,7 @@ const Favorites = () => {
     <div className="min-h-screen bg-neutral-bg pt-32 pb-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-12">
-          <motion.div 
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="flex items-center space-x-2 text-secondary mb-4"
-          >
-            <Heart className="h-4 w-4" />
-            <span className="text-xs font-black uppercase tracking-widest">{t('favorites.eyebrow')}</span>
-          </motion.div>
-          <h1 className="text-4xl md:text-5xl font-black text-primary mb-6">{t('favorites.title')}</h1>
+          <h1 className="text-4xl md:text-5xl font-extrabold text-primary mb-6">{t('favorites.title')}</h1>
           <p className="text-gray-500 font-medium max-w-2xl">
             {t('favorites.subtitle')}
           </p>
@@ -97,9 +89,9 @@ const Favorites = () => {
                       </div>
                     )}
                     <div>
-                      <h4 className="text-lg font-black text-primary line-clamp-1">{fav.name || `Favori (${fav.reference_id || fav.item_id.substring(0,8)})`}</h4>
-                      <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">{fav.category || fav.item_type}</p>
-                      <p className="text-xs font-mono text-gray-500 uppercase mt-1 tracking-widest">
+                      <h4 className="text-lg font-bold text-primary line-clamp-1">{fav.name || `Favori (${fav.reference_id || fav.item_id.substring(0,8)})`}</h4>
+                      <p className="text-sm font-bold text-gray-500">{fav.category || fav.item_type}</p>
+                      <p className="text-sm font-mono text-gray-500 mt-1">
                          {fav.reference_id ? `REF: ${fav.reference_id}` : `ID: ${fav.item_id.substring(0,8)}`}
                       </p>
                     </div>
@@ -109,7 +101,7 @@ const Favorites = () => {
                 <div className="mt-auto pt-4 flex gap-3">
                   <Link 
                     to={fav.item_type === 'product' ? `/products/${fav.item_id}` : `/directory/${fav.item_id}`}
-                    className="flex-1 text-center bg-gray-50 text-primary py-3 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-gray-100 transition-colors"
+                    className="flex-1 text-center bg-gray-50 text-primary py-3 rounded-xl text-sm font-semibold hover:bg-gray-100 transition-colors"
                   >
                     {t('favorites.details')}
                   </Link>

@@ -224,7 +224,7 @@ const Register = () => {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label htmlFor="lastName" className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">{t('auth.register.lastName')}</label>
+                      <label htmlFor="lastName" className="block text-sm font-bold text-gray-700 mb-1">{t('auth.register.lastName')}</label>
                       <input 
                         id="lastName"
                         type="text"
@@ -235,7 +235,7 @@ const Register = () => {
                       {errors.lastName && <p className="text-red-500 text-xs mt-1 font-medium">{t(errors.lastName.message || '')}</p>}
                     </div>
                     <div>
-                      <label htmlFor="firstName" className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">{t('auth.register.firstName')}</label>
+                      <label htmlFor="firstName" className="block text-sm font-bold text-gray-700 mb-1">{t('auth.register.firstName')}</label>
                       <input 
                         id="firstName"
                         type="text" 
@@ -248,7 +248,7 @@ const Register = () => {
                   </div>
 
                   <div>
-                    <label htmlFor="companyName" className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">{t('auth.register.company')}</label>
+                    <label htmlFor="companyName" className="block text-sm font-bold text-gray-700 mb-1">{t('auth.register.company')}</label>
                     <div className="relative">
                       <Building2 className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-500 h-4 w-4" />
                       <input 
@@ -263,7 +263,7 @@ const Register = () => {
                   </div>
 
                   <div>
-                    <label htmlFor="email" className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">{t('auth.register.proEmail')}</label>
+                    <label htmlFor="email" className="block text-sm font-bold text-gray-700 mb-1">{t('auth.register.proEmail')}</label>
                     <div className="relative">
                       <Mail className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-500 h-4 w-4" />
                       <input 
@@ -278,7 +278,7 @@ const Register = () => {
                   </div>
 
                   <div>
-                    <label htmlFor="password" className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">{t('auth.password')}</label>
+                    <label htmlFor="password" className="block text-sm font-bold text-gray-700 mb-1">{t('auth.password')}</label>
                     <div className="relative">
                       <Lock className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-500 h-4 w-4" />
                       <input 

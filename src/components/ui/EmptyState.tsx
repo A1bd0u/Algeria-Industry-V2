@@ -59,7 +59,7 @@ const EmptyState: React.FC<EmptyStateProps> = ({ illustration = 'search', title,
         {DRAWINGS[illustration]}
       </svg>
     </div>
-    <h2 className="text-xl font-black text-primary mb-2">{title}</h2>
+    <h2 className="text-xl font-bold text-primary mb-2">{title}</h2>
     {text && <p className="text-gray-600 text-sm max-w-md mx-auto mb-6">{text}</p>}
     {children && <div className="flex flex-wrap justify-center gap-3">{children}</div>}
   </div>

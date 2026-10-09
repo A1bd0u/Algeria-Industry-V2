@@ -11,7 +11,6 @@ import {
   MapPin,
   MessageSquare,
   Share2,
-  ShieldCheck,
   Star,
   Truck,
   X
@@ -219,7 +218,7 @@ const ProductDetail = () => {
           className="flex items-center space-x-2 text-gray-500 hover:text-primary transition-colors mb-8 group"
         >
           <ArrowLeft className="h-5 w-5 group-hover:-translate-x-1 transition-transform rtl:rotate-180" />
-          <span className="text-xs font-black uppercase tracking-widest">{t('products.detail.backToCatalog')}</span>
+          <span className="text-sm font-semibold">{t('products.detail.backToCatalog')}</span>
         </button>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
@@ -328,7 +327,7 @@ const ProductDetail = () => {
               <div className="flex items-center justify-between mb-4">
                 <span className="tech-label">{categoryLabel(t, product.category)}</span>
               </div>
-              <h1 className="text-4xl font-black text-primary tracking-tighter leading-tight mb-2">
+              <h1 className="text-4xl font-extrabold text-primary tracking-tight leading-tight mb-2">
                 {product.name}
               </h1>
             </div>
@@ -336,14 +335,14 @@ const ProductDetail = () => {
             <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm mb-8">
               <div className="flex items-end justify-between mb-8">
                 <div>
-                  <p className="text-xs font-black text-gray-500 uppercase tracking-widest mb-1">{t('products.detail.indicativePrice')}</p>
-                  <p className="text-4xl font-black text-primary tracking-tight">
+                  <p className="text-sm font-semibold text-gray-500 mb-1">{t('products.detail.indicativePrice')}</p>
+                  <p className="text-4xl font-extrabold text-primary tracking-tight">
                     {product.priceValue ? formatPrice(product.priceValue) : t('common.onQuote')}
                   </p>
                 </div>
                 {product.reference_id && (
                   <div className="text-end">
-                    <p className="text-xs text-gray-500 mt-2 font-bold uppercase tracking-widest">{t('products.detail.reference', { ref: product.reference_id })}</p>
+                    <p className="text-sm text-gray-500 mt-2 font-bold">{t('products.detail.reference', { ref: product.reference_id })}</p>
                   </div>
                 )}
               </div>
@@ -407,14 +406,11 @@ const ProductDetail = () => {
               <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm mb-8 flex items-center gap-4">
                 <CompanyAvatar src={product.companyLogo} name={product.companyName} className="h-14 w-14 shrink-0 rounded-xl border border-gray-100 text-base" />
                 <div className="min-w-0 flex-1">
-                  <p className="text-xs font-black text-gray-500 uppercase tracking-widest">{t('products.detail.supplierTitle')}</p>
+                  <p className="text-sm font-semibold text-gray-500">{t('products.detail.supplierTitle')}</p>
                   <p className="font-bold text-primary truncate">{product.companyName}</p>
                   <p className="text-xs text-gray-500 flex flex-wrap items-center gap-x-3 gap-y-1 mt-0.5">
                     {product.companyWilaya && (
                       <span className="inline-flex items-center gap-1"><MapPin className="h-3.5 w-3.5" aria-hidden="true" />{product.companyWilaya}</span>
-                    )}
-                    {product.companyVerified && (
-                      <span className="inline-flex items-center gap-1 font-bold text-success"><ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />{t('products.detail.verifiedCompany')}</span>
                     )}
                   </p>
                 </div>
@@ -433,8 +429,8 @@ const ProductDetail = () => {
             {/* Tabs for detailed content */}
             <div className="space-y-6">
               <div className="flex space-x-8 border-b border-gray-200">
-                <button className={`pb-4 border-b-2 ${activeTab === 'description' ? 'border-secondary text-primary' : 'border-transparent text-gray-500 hover:text-primary'} text-sm font-black uppercase tracking-widest transition-all`} onClick={() => setActiveTab('description')}>{t('products.detail.description')}</button>
-                <button className={`pb-4 border-b-2 ${activeTab === 'specs' ? 'border-secondary text-primary' : 'border-transparent text-gray-500 hover:text-primary'} text-sm font-black uppercase tracking-widest transition-all`} onClick={() => setActiveTab('specs')}>{t('products.detail.specs')}</button>
+                <button className={`pb-4 border-b-2${activeTab === 'description' ? 'border-secondary text-primary' : 'border-transparent text-gray-500 hover:text-primary'}text-sm font-semibold transition-all`} onClick={() => setActiveTab('description')}>{t('products.detail.description')}</button>
+                <button className={`pb-4 border-b-2${activeTab === 'specs' ? 'border-secondary text-primary' : 'border-transparent text-gray-500 hover:text-primary'}text-sm font-semibold transition-all`} onClick={() => setActiveTab('specs')}>{t('products.detail.specs')}</button>
               </div>
               
               {activeTab === 'description' && (
@@ -453,7 +449,7 @@ const ProductDetail = () => {
                 <div className="grid grid-cols-1 gap-4">
                   {Object.entries(product.specs).map(([key, val], i) => (
                     <div key={i} className="flex items-center justify-between py-3 border-b border-gray-100 last:border-0">
-                      <span className="text-xs font-black text-gray-500 uppercase tracking-widest">{key}</span>
+                      <span className="text-sm font-semibold text-gray-500">{key}</span>
                       <span className="text-sm font-bold text-primary">{val as string}</span>
                     </div>
                   ))}
@@ -467,7 +463,7 @@ const ProductDetail = () => {
         {/* Similar Products */}
         {similarProducts && similarProducts.length > 0 && (
           <div className="mt-20">
-            <h2 className="text-2xl font-black text-primary mb-8 tracking-tight">{t('products.similar')}</h2>
+            <h2 className="text-2xl font-extrabold text-primary mb-8 tracking-tight">{t('products.similar')}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {similarProducts.map((p, idx) => (
                 <div key={idx} className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm hover:shadow-lg transition-all flex flex-col group cursor-pointer" onClick={() => {
@@ -477,9 +473,9 @@ const ProductDetail = () => {
                   <div className="aspect-square bg-gray-50 rounded-2xl mb-4 overflow-hidden relative">
                     <ProductImage src={productCover(p)} alt={p.name} category={p.category} imgClassName="transition-transform group-hover:scale-105" />
                   </div>
-                  {p.companyName && <p className="text-xs font-black text-gray-500 uppercase tracking-widest mb-1">{p.companyName}</p>}
+                  {p.companyName && <p className="text-sm font-semibold text-gray-500 mb-1">{p.companyName}</p>}
                   <h3 className="text-lg font-bold text-primary leading-tight mb-2 flex-1">{p.name}</h3>
-                  <p className="text-xl font-black text-secondary">{Number(p.price) > 0 ? formatPrice(Number(p.price)) : t('common.onQuote')}</p>
+                  <p className="text-xl font-bold text-secondary">{Number(p.price) > 0 ? formatPrice(Number(p.price)) : t('common.onQuote')}</p>
                 </div>
               ))}
             </div>
