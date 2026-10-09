@@ -1086,7 +1086,8 @@
     "features": "أبرز الخصائص",
     "swipeHint": "{{count}} منتجات: اسحب الجدول لرؤيتها كلها ←",
     "closeBar": "إغلاق شريط المقارنة",
-    "addProduct": "إضافة منتج"
+    "addProduct": "إضافة منتج",
+    "closePage": "إغلاق المقارنة"
   },
   "contact": {
     "titleStart": "تواصل مع",

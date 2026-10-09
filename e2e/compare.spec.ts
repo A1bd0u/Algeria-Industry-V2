@@ -68,13 +68,24 @@ test('Comparer avec : catalogue du secteur, ajout depuis une carte, fermeture de
   await expect(card.getByRole('button', { name: 'Comparé' })).toBeVisible();
 
   // La barre montre 2 produits et se ferme sans vider la sélection.
-  const close = page.getByRole('button', { name: 'Fermer le comparateur' });
-  await expect(close).toBeVisible();
+  // Panneau déplié : sa croix reste à l'écran et le ferme.
+  await page.getByRole('button', { name: /Comparer/ }).filter({ has: page.locator('img') }).first().click();
+  const panel = page.getByRole('dialog', { name: 'Comparaison technique' });
+  await expect(panel).toBeInViewport();
+  const close = panel.getByRole('button', { name: 'Fermer le comparateur' });
+  await expect(close).toBeInViewport();
   await close.click();
+  await expect(panel).toBeHidden();
   await expect(close).toBeHidden();
 
   await page.goto('/compare');
   await expect(page.getByRole('link', { name: PRODUCT.name })).toBeVisible();
   await expect(page.getByRole('link', { name: OTHER.name })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Ajouter un produit' })).toBeVisible();
+
+  // La croix quitte la comparaison sans vider la sélection.
+  await page.getByRole('button', { name: 'Fermer la comparaison' }).click();
+  await expect(page).toHaveURL(/\/products$/);
+  await page.goto('/compare');
+  await expect(page.getByRole('link', { name: OTHER.name })).toBeVisible();
 });

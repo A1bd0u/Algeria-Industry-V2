@@ -34,6 +34,12 @@ const Compare = () => {
 
   // Une demande de devis va aux fournisseurs des produits comparés, par la
   // messagerie de la plateforme : chacun reçoit la liste de ses produits.
+  // Fermer : retour à la page précédente, ou au catalogue si on est arrivé directement.
+  const closePage = () => {
+    if ((window.history.state?.idx ?? 0) > 0) navigate(-1);
+    else navigate('/products');
+  };
+
   const requestQuotes = async () => {
     if (!isAuthenticated) {
       navigate(`/login?redirect=${encodeURIComponent('/compare')}`);
@@ -94,19 +100,30 @@ const Compare = () => {
               {t('compare.title')}
             </h1>
           </div>
-          <button
-            onClick={clearCompare}
-            className="flex items-center gap-2 text-red-500 hover:text-red-600 font-black text-xs uppercase tracking-widest px-6 py-3 bg-red-50 rounded-xl transition-all"
-          >
-            <Trash2 className="h-4 w-4" />
-            <span>{t('compare.clear')}</span>
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={clearCompare}
+              className="flex items-center gap-2 text-red-500 hover:text-red-600 font-black text-xs uppercase tracking-widest px-6 py-3 bg-red-50 rounded-xl transition-all"
+            >
+              <Trash2 className="h-4 w-4" />
+              <span>{t('compare.clear')}</span>
+            </button>
+            <button
+              type="button"
+              onClick={closePage}
+              aria-label={t('compare.closePage')}
+              title={t('compare.closePage')}
+              className="h-11 w-11 shrink-0 rounded-xl bg-white border border-gray-200 text-gray-500 hover:text-primary hover:border-primary flex items-center justify-center transition-colors"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
         </div>
 
         {items.length > 1 && (
           <p className="sm:hidden mb-3 text-xs font-bold text-gray-500">{t('compare.swipeHint', { count: items.length })}</p>
         )}
-        <div className="bg-white border border-gray-100 shadow-2xl overflow-x-auto no-scrollbar rounded-2xl">
+        <div className="bg-white border border-gray-100 shadow-2xl overflow-x-auto rounded-2xl">
           <table className="w-full border-collapse">
             <thead>
               <tr className="border-b border-gray-50">
