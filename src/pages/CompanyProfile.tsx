@@ -38,6 +38,7 @@ import { CompanyAvatar } from '../components/ui/ProductImage';
 import ProductCard from '../components/ui/ProductCard';
 import { useToast } from '../context/ToastContext';
 import { useAdCategories } from '../context/AdTargetingContext';
+import Img from '../components/ui/Img';
 
 const CompanyProfile = () => {
   const { t } = useTranslation();
@@ -302,7 +303,7 @@ const CompanyProfile = () => {
     <div className="bg-neutral-bg min-h-screen pb-20">
       {/* Bandeau d'identité : bannière, logo, nom, badge et contact direct. */}
       <div className="relative bg-primary">
-        {company.banner && <img src={company.banner} alt="" className="absolute inset-0 w-full h-full object-cover opacity-60" />}
+        {company.banner && <Img src={company.banner} alt="" fetchPriority="high" className="absolute inset-0 w-full h-full object-cover opacity-60" />}
         <div className="absolute inset-0 bg-gradient-to-t from-primary via-primary/60 to-transparent" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-8 flex flex-col sm:flex-row sm:items-end gap-6">
           <CompanyAvatar src={company.logo} name={company.name} className="w-24 h-24 rounded-2xl text-2xl border-4 border-white shadow-xl shrink-0" />
@@ -580,7 +581,7 @@ const CompanyProfile = () => {
                         <button key={url} type="button" onClick={() => setGalleryIndex(i)}
                           className={cn('relative overflow-hidden rounded-xl border border-gray-100 group', i === 0 && 'col-span-2 row-span-2')}
                           aria-label={`${t('company.gallery')} ${i + 1}`}>
-                          <img src={url} alt="" loading="lazy" className="h-full w-full object-cover aspect-square group-hover:scale-105 transition-transform duration-500" />
+                          <Img src={url} sizes="(max-width: 640px) 50vw, 300px" alt="" loading="lazy" className="h-full w-full object-cover aspect-square group-hover:scale-105 transition-transform duration-500" />
                         </button>
                       ))}
                     </div>
@@ -635,7 +636,7 @@ const CompanyProfile = () => {
                       <Link to={`/products/${generateSlugUrl(product.name, product.id)}`} key={product.id} className="flex items-center p-5 rounded-xl border border-gray-100 hover:border-secondary/20 hover:shadow-md transition-all group bg-white relative">
                         <div className="w-20 h-20 bg-gray-50 rounded-lg flex-shrink-0 flex items-center justify-center text-gray-500 border border-gray-100 group-hover:scale-105 transition-transform overflow-hidden">
                           {productCover(product) ? (
-                            <img src={productCover(product) as string} alt={product.name} className="w-full h-full object-cover" />
+                            <Img src={productCover(product) as string} sizes="(max-width: 640px) 50vw, 320px" alt={product.name} loading="lazy" className="w-full h-full object-cover" />
                           ) : (
                             <Package className="h-10 w-10" />
                           )}
@@ -1017,7 +1018,7 @@ const CompanyProfile = () => {
                 <button type="button" className="absolute top-4 end-4 text-white p-2" aria-label={t('common.close')} onClick={() => setGalleryIndex(null)}>
                   <XCircle className="h-8 w-8" />
                 </button>
-                <img src={company.gallery[galleryIndex]} alt="" className="max-w-full max-h-full object-contain" onClick={(e) => e.stopPropagation()} />
+                <Img src={company.gallery[galleryIndex]} alt="" className="max-w-full max-h-full object-contain" onClick={(e) => e.stopPropagation()} />
                 {company.gallery.length > 1 && (
                   <button type="button" aria-label={t('slides.next')}
                     onClick={(e) => { e.stopPropagation(); setGalleryIndex((galleryIndex + 1) % company.gallery.length); }}

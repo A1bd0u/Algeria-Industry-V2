@@ -3,6 +3,7 @@ import { Cpu, Factory, FlaskConical, ImageOff, Laptop, Package, Truck, Wheat, Wr
 import { useState } from 'react';
 import { productCategories } from '../../data/productCategories';
 import { cn } from '../../lib/utils';
+import Img from './Img';
 
 // Visuel d'un produit. Sans photo (ou si elle ne charge pas), on affiche
 // l'icône du groupe de la catégorie sur un fond doux plutôt qu'un logo géant.
@@ -27,18 +28,22 @@ interface ProductImageProps {
   className?: string;
   imgClassName?: string;
   iconClassName?: string;
+  // Largeur d'affichage, pour que le navigateur choisisse la variante 480 px ou pleine taille.
+  sizes?: string;
 }
 
 const isUsable = (src?: string | null) => Boolean(src) && !/\/(placeholder|favicon)\.svg$/.test(src as string);
 
-const ProductImage = ({ src, alt, category, className, imgClassName, iconClassName }: ProductImageProps) => {
+const ProductImage = ({ src, alt, category, className, imgClassName, iconClassName, sizes = '(max-width: 640px) 50vw, 320px' }: ProductImageProps) => {
   const [failed, setFailed] = useState(false);
   if (isUsable(src) && !failed) {
     return (
-      <img
+      <Img
         src={src as string}
+        sizes={sizes}
         alt={alt}
         loading="lazy"
+        decoding="async"
         referrerPolicy="no-referrer"
         onError={() => setFailed(true)}
         className={cn('w-full h-full object-cover', className, imgClassName)}

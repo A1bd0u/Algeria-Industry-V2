@@ -3,6 +3,7 @@ import request from 'supertest';
 import { createApp } from '../server';
 import express from 'express';
 import jwt from 'jsonwebtoken';
+import sharp from 'sharp';
 import { getSupabase } from '../server/db/supabaseClient';
 import { createSupabaseMock, sessionRow, usersHandler } from './helpers/supabaseMock';
 
@@ -56,8 +57,8 @@ describe('Upload Integration', () => {
     expect(mock.storageBucket.getPublicUrl).not.toHaveBeenCalled();
   });
 
-  it('renvoie une URL publique pour une image produit', async () => {
-    const pngBuffer = Buffer.from('89504e470d0a1a0a0000000d49484452', 'hex');
+  it('convertit une image produit en WebP, avec une variante 480 px, et renvoie son URL publique', async () => {
+    const pngBuffer = await sharp({ create: { width: 900, height: 600, channels: 3, background: '#ff6b00' } }).png().toBuffer();
 
     const res = await request(app)
       .post('/api/upload?bucket=product-images')
@@ -66,5 +67,25 @@ describe('Upload Integration', () => {
 
     expect(res.status).toBe(200);
     expect(res.body.url.startsWith('https://cdn.test/')).toBe(true);
+    expect(res.body.path).toMatch(new RegExp(`^${session.id}/\\d+-[0-9a-f]{16}\\.webp$`));
+
+    const uploads = vi.mocked(mock.storageBucket.upload).mock.calls;
+    expect(uploads.map((call) => call[0])).toEqual([res.body.path, res.body.path.replace(/\.webp$/, '-480.webp')]);
+    expect(uploads.every((call) => (call[2] as any).contentType === 'image/webp')).toBe(true);
+    const small = await sharp(uploads[1][1] as Buffer).metadata();
+    expect(small.format).toBe('webp');
+    expect(small.width).toBe(480);
+  });
+
+  it('refuse une image endommagée', async () => {
+    const brokenPng = Buffer.from('89504e470d0a1a0a0000000d49484452', 'hex');
+
+    const res = await request(app)
+      .post('/api/upload?bucket=product-images')
+      .set('Cookie', ['token=valid-token'])
+      .attach('file', brokenPng, { filename: 'p.png', contentType: 'image/png' });
+
+    expect(res.status).toBe(400);
+    expect(mock.storageBucket.upload).not.toHaveBeenCalled();
   });
 });

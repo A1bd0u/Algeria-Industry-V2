@@ -62,6 +62,7 @@ import billingRoutes from './server/routes/billing';
 import subscriptionRoutes from './server/routes/subscriptions';
 import paymentRoutes from './server/routes/payments';
 import { seoRouter, resolveMeta, injectMeta } from './server/seo';
+import { invalidateOnWrite, publicCache } from './server/middlewares/publicCache';
 
 export async function createApp() {
   const app = express();
@@ -134,6 +135,8 @@ export async function createApp() {
   // Limiter la taille du payload JSON pour prévenir les attaques d'épuisement de mémoire (ex: 2mb)
   // Webhooks de paiement : corps brut requis pour vérifier la signature,
   // donc montés avant le parseur JSON.
+  // Toute écriture vide le cache des lectures publiques.
+  app.use('/api', invalidateOnWrite);
   app.use('/api/payments', paymentRoutes);
 
   // API publique : lots de produits plus volumineux (5 000 produits au plus).
@@ -158,6 +161,14 @@ export async function createApp() {
       res.status(503).json({ status: 'not ready', error: 'Database unavailable' });
     }
   });
+
+  // Lectures publiques mises en cache 60 s pour les visiteurs anonymes.
+  app.get([
+    '/api/products', '/api/products/:id',
+    '/api/companies', '/api/companies/reviews/featured', '/api/companies/:id', '/api/companies/:id/reviews',
+    '/api/articles', '/api/articles/:id', '/api/events', '/api/catalogues',
+    '/api/stats/public', '/api/search',
+  ], publicCache(60));
 
   // Mount API Routes
   app.use('/api/auth/2fa', mfaRoutes);
@@ -217,7 +228,8 @@ async function startServer() {
 
     // Les assets fingerprintés sont mis en cache longtemps ; index.html jamais.
     app.use('/assets', express.static(path.join(distPath, 'assets'), { immutable: true, maxAge: '1y' }));
-    app.use(express.static(distPath, { index: false }));
+    // Fichiers publics (photos de démonstration, icônes) : cache d'un jour.
+    app.use(express.static(distPath, { index: false, maxAge: '1d' }));
 
     // Balises SEO (titre, description, Open Graph, canonical, JSON-LD) injectées côté serveur.
     app.get('*', async (req, res) => {

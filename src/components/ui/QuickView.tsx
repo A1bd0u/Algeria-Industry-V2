@@ -8,6 +8,7 @@ import { categoryLabel } from '../../data/productCategories';
 import { cn, generateSlugUrl } from '../../lib/utils';
 import { companyNameOf } from './ProductCard';
 import ProductImage from './ProductImage';
+import Img from './Img';
 
 // Aperçu d'un produit sans quitter la liste : photos, prix, fournisseur et
 // accès direct à la fiche ou à la demande de devis.
@@ -34,7 +35,7 @@ const QuickView: React.FC<{ product: any; onClose: () => void }> = ({ product, o
         <div>
           <div className="aspect-square overflow-hidden rounded-xl border border-border-tech bg-white">
             {images.length > 0
-              ? <img src={images[active]} alt={product.name} className="h-full w-full object-contain" />
+              ? <Img src={images[active]} sizes="(max-width: 640px) 100vw, 480px" alt={product.name} className="h-full w-full object-contain" />
               : <ProductImage alt={product.name} category={product.category} iconClassName="h-16 w-16" />}
           </div>
           {images.length > 1 && (
@@ -42,7 +43,7 @@ const QuickView: React.FC<{ product: any; onClose: () => void }> = ({ product, o
               {images.map((url, i) => (
                 <button key={url} type="button" onClick={() => setActive(i)} aria-label={`${i + 1} / ${images.length}`}
                   className={cn('aspect-square overflow-hidden rounded-lg border-2', i === active ? 'border-secondary' : 'border-gray-100')}>
-                  <img src={url} alt="" className="h-full w-full object-contain" />
+                  <Img src={url} sizes="64px" alt="" className="h-full w-full object-contain" />
                 </button>
               ))}
             </div>

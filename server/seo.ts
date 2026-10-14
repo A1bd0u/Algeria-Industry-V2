@@ -220,9 +220,23 @@ const withTimeout = <T,>(promise: Promise<T>, ms: number): Promise<T | null> =>
   Promise.race([promise, new Promise<null>((resolve) => setTimeout(() => resolve(null), ms))]);
 
 // La page ne doit jamais attendre la base plus de 1,5 s : au-delà, balises par défaut.
+// Les balises d'une page changent rarement : gardées 5 minutes en mémoire
+// pour ne pas interroger la base à chaque affichage.
+const META_TTL_MS = 5 * 60 * 1000;
+const META_MAX_ENTRIES = 1000;
+const metaCache = new Map<string, { meta: PageMeta; expires: number }>();
+
+export const clearMetaCache = () => metaCache.clear();
+
 export const resolveMeta = async (path: string): Promise<PageMeta> => {
+  const cached = metaCache.get(path);
+  if (cached && cached.expires > Date.now()) return cached.meta;
   const meta = await withTimeout(resolveMetaFromDb(path), META_TIMEOUT_MS);
-  return meta || defaultMeta(path);
+  // Repli après délai dépassé : non mis en cache, la prochaine visite réessaie.
+  if (!meta) return defaultMeta(path);
+  if (metaCache.size >= META_MAX_ENTRIES) metaCache.delete(metaCache.keys().next().value as string);
+  metaCache.set(path, { meta, expires: Date.now() + META_TTL_MS });
+  return meta;
 };
 
 // Pages secteurs : métadonnées connues sans requête.
