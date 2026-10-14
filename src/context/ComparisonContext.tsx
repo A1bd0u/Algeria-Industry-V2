@@ -66,7 +66,7 @@ export const MAX_COMPARED = 4;
 
 // La sélection est gardée dans le navigateur : elle survit à un rechargement,
 // à un lien ouvert dans un nouvel onglet et à l'accès direct à /compare.
-const STORAGE_KEY = 'industigo_compare_v1';
+const STORAGE_KEY = 'icomexpo_compare_v1';
 
 const loadStored = (): Product[] => {
   try {

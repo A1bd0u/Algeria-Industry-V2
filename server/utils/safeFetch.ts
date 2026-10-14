@@ -100,7 +100,7 @@ export const safeRequest = (
   return new Promise((resolve, reject) => {
     const req = client.request(url, {
       method,
-      headers: { 'User-Agent': 'Industigo-Integrations/1.0', ...headers, ...(body ? { 'Content-Length': Buffer.byteLength(body).toString() } : {}) },
+      headers: { 'User-Agent': 'icomexpo-Integrations/1.0', ...headers, ...(body ? { 'Content-Length': Buffer.byteLength(body).toString() } : {}) },
       lookup: guardedLookup,
       timeout: timeoutMs,
     }, (res) => {

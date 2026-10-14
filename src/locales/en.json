@@ -79,7 +79,7 @@
     "noProducts": "No products published yet.",
     "beFirst": "Be the first supplier to publish your catalogue",
     "price": "Price",
-    "whyTitle": "Why choose Industigo?",
+    "whyTitle": "Why choose icomexpo?",
     "why": {
       "visibility": "More visibility for suppliers",
       "sourcing": "Suppliers that are easier to find for buyers",
@@ -235,10 +235,10 @@
   "products": {
     "similar": "Similar Products",
     "report": "Report inappropriate content",
-    "report_desc": "Help us keep Industigo safe. Why are you reporting this product?",
+    "report_desc": "Help us keep icomexpo safe. Why are you reporting this product?",
     "cancel": "Cancel",
     "send_report": "Send Report",
-    "join_suppliers": "Join Industigo's verified suppliers",
+    "join_suppliers": "Join icomexpo's verified suppliers",
     "prev": "Previous",
     "next": "Next",
     "sourcing": "Industrial Sourcing",
@@ -280,7 +280,7 @@
       "reportError": "The report could not be sent.",
       "favoriteError": "Unable to update your favourites.",
       "quoteMessage": "Hello, I would like a quote for “{{name}}” (ref. {{ref}}). Quantity: … Delivery place: … Desired lead time: …",
-      "whatsappMessage": "Hello, I am contacting you via Industigo about “{{name}}”.",
+      "whatsappMessage": "Hello, I am contacting you via icomexpo about “{{name}}”.",
       "requestQuoteShort": "Request a quote",
       "zoom": "Enlarge image",
       "supplierTitle": "Supplier",
@@ -431,7 +431,7 @@
     "call_expert": "Call support",
     "send_ticket": "Write to us",
     "search_placeholder": "Search for a question...",
-    "q1": "What is Industigo?",
+    "q1": "What is icomexpo?",
     "a1": "An online directory and catalogue of Algerian industrial suppliers. Buyers find verified companies and their products there and contact them directly.",
     "q2": "Is the site free for buyers?",
     "a2": "Yes. Browsing the catalogue, comparing products and contacting a supplier is free. An account is required for messaging and favourites.",
@@ -489,18 +489,18 @@
     "formats": "Accepted formats: JPG, PNG, WEBP (Max 5MB)",
     "error_send": "An error occurred while sending. Please try again later.",
     "send_request": "Send Request",
-    "why_advertise": "Why advertise on Industigo?",
+    "why_advertise": "Why advertise on icomexpo?",
     "captchaRequired": "Please complete the captcha.",
     "placementHome": "Home page banner",
     "heroTitle": "Promote your company",
-    "heroText": "Present your offer to the industry professionals who visit Industigo. Fill in the form and our team will get back to you with a proposal.",
+    "heroText": "Present your offer to the industry professionals who visit icomexpo. Fill in the form and our team will get back to you with a proposal.",
     "successText": "Our team has received your advertising request. We will reply by email within 2 business days.",
     "newRequest": "New request",
     "companyPlaceholder": "Your company",
     "contactPlaceholder": "Full name",
     "messagePlaceholder": "Describe your goals, the desired duration…",
     "visualsNote": "Our team will ask for your visuals once the request is approved.",
-    "whyText": "Industigo is aimed at Algerian industrial buyers and suppliers. Your banners are seen by professionals actively looking for products and partners."
+    "whyText": "icomexpo is aimed at Algerian industrial buyers and suppliers. Your banners are seen by professionals actively looking for products and partners."
   },
   "auth": {
     "captchaRequired": "Please complete the captcha to continue.",
@@ -531,7 +531,7 @@
     },
     "login": {
       "title": "Welcome back!",
-      "subtitle": "Sign in to your Industigo account",
+      "subtitle": "Sign in to your icomexpo account",
       "forgot": "Forgot?",
       "remember": "Remember me",
       "submit": "Sign in",
@@ -711,7 +711,7 @@
     "copy": "Copy",
     "download": "Download",
     "savedCodes": "I have saved my codes",
-    "recoveryFileTitle": "Industigo recovery codes",
+    "recoveryFileTitle": "icomexpo recovery codes",
     "newRecoveryCodes": "New recovery codes",
     "disable": "Disable",
     "disableAdminWarning": "Without two-factor authentication, access to the admin console will be blocked.",
@@ -889,7 +889,7 @@
     "favoriteRemoved": "Favourite removed.",
     "profileUpdated": "Profile updated successfully.",
     "exportFailed": "Export failed. Please try again.",
-    "exportFileName": "my-industigo-data.json",
+    "exportFileName": "my-icomexpo-data.json",
     "deleteAccountConfirm": "Permanently delete your account and all your data? This cannot be undone.",
     "deleteFailed": "Deletion failed. Please contact support.",
     "kyc": {
@@ -1043,7 +1043,7 @@
       "gallery": "At least 3 photos in the gallery"
     },
     "onboarding": {
-      "title": "Getting started on Industigo",
+      "title": "Getting started on icomexpo",
       "subtitle": "Four steps to be visible and receive quote requests.",
       "progress": "{{done}} / {{total}} steps",
       "account": {
@@ -1100,7 +1100,7 @@
     "verified": "Verified company",
     "notVerified": "Not verified",
     "quoteTitle": "Request a quote",
-    "quoteText": "Each supplier receives a message in their Industigo inbox listing their products. Replies arrive in your dashboard.",
+    "quoteText": "Each supplier receives a message in their icomexpo inbox listing their products. Replies arrive in your dashboard.",
     "notePlaceholder": "Details for suppliers (quantities, lead time, delivery place…) — optional",
     "sendQuote": "Send the request",
     "sending": "Sending…",
@@ -1154,7 +1154,7 @@
       "q3": "How do I contact a supplier?",
       "a3": "Use the contact button on a company or product page. Your conversations are then grouped in the messages section of your dashboard.",
       "q4": "Is the platform available outside Algeria?",
-      "a4": "Yes, Industigo aims to connect Algerian industry with the whole world. The platform is available in French, Arabic and English."
+      "a4": "Yes, icomexpo aims to connect Algerian industry with the whole world. The platform is available in French, Arabic and English."
     }
   },
   "favorites": {
@@ -1193,7 +1193,7 @@
     "noPast": "No past events.",
     "organizer": "Organised by {{name}}",
     "submitTitle": "Organising an industrial event?",
-    "submitText": "Promote your trade fair, conference or webinar to the whole Industigo community.",
+    "submitText": "Promote your trade fair, conference or webinar to the whole icomexpo community.",
     "submitButton": "Suggest an event"
   },
   "resources": {
@@ -1388,7 +1388,7 @@
     "legalTitle": "Legal information",
     "legalName": "Company name",
     "legalDocs": "Trade register and tax ID",
-    "legalChecked": "Checked by Industigo (KYC)",
+    "legalChecked": "Checked by icomexpo (KYC)",
     "legalUnchecked": "Not verified",
     "sector": "Business sector",
     "productsIntro": "Products offered by {{name}}.",
@@ -1428,7 +1428,7 @@
     "cataloguesCtaText": "View the catalogues published by {{name}}.",
     "cataloguesCtaButton": "View catalogues",
     "whatsapp": "WhatsApp",
-    "whatsappMessage": "Hello, I am contacting you via Industigo about {{name}}.",
+    "whatsappMessage": "Hello, I am contacting you via icomexpo about {{name}}.",
     "verifiedOn": "Trade register and tax ID checked on {{date}}",
     "foundedYear": "Founded",
     "employees": "Employees",
@@ -1541,7 +1541,7 @@
       "profileText": "Add your company information."
     },
     "createdTitle": "Account created successfully",
-    "welcome": "Welcome to Industigo, the marketplace of verified Algerian industrial suppliers.",
+    "welcome": "Welcome to icomexpo, the marketplace of verified Algerian industrial suppliers.",
     "nextSteps": "Next steps",
     "progressLabel": "Step {{done}} of {{total}}",
     "progress": "Progress",
@@ -1608,7 +1608,7 @@
       "intro": "Basic chemicals, plastics, medicines, medical devices, paints and detergents: suppliers meeting process-industry standards."
     },
     "code": "Sector {{code}}",
-    "label": "Industigo classification",
+    "label": "icomexpo classification",
     "F": {
       "intro": "Components, sensors, PLCs, robotics, electrical equipment and appliances: electrical and electronic engineering serving production."
     },
@@ -1813,7 +1813,7 @@
     },
     "apiKeys": {
       "title": "API keys",
-      "text": "So your ERP or CRM can read and update your data on Industigo.",
+      "text": "So your ERP or CRM can read and update your data on icomexpo.",
       "locked": "Included in the Pro plan.",
       "name": "Key name",
       "namePlaceholder": "Sage ERP, sales CRM…",
@@ -1828,9 +1828,9 @@
   },
   "developers": {
     "seoTitle": "API and ERP / CRM integrations",
-    "seoDescription": "Sync your catalogue from your ERP and get Industigo quote requests in your CRM.",
+    "seoDescription": "Sync your catalogue from your ERP and get icomexpo quote requests in your CRM.",
     "title": "API and integrations",
-    "intro": "Three ways to connect Industigo to your software: a file read automatically, webhooks to your CRM, and an API for everything else.",
+    "intro": "Three ways to connect icomexpo to your software: a file read automatically, webhooks to your CRM, and an API for everything else.",
     "toc": "Contents",
     "start": {
       "title": "Getting started",
@@ -1854,7 +1854,7 @@
       "title": "Webhooks",
       "text": "A webhook sends a JSON POST request to your address on each event:",
       "payload": "Example delivery:",
-      "consent": "The buyer's email is only included if they agreed to share it when making the request (Algerian law 18-07 on personal data). Otherwise, reply through Industigo messaging (reply_url link).",
+      "consent": "The buyer's email is only included if they agreed to share it when making the request (Algerian law 18-07 on personal data). Otherwise, reply through icomexpo messaging (reply_url link).",
       "verifyTitle": "Verify the signature",
       "verifyText": "Each delivery is signed with the secret shown when the webhook was created. Recompute the HMAC-SHA256 of “t.body” and refuse deliveries older than 5 minutes.",
       "retries": "Reply with a 2xx code within 10 seconds. Otherwise we retry after 1 min, 5 min, 30 min, 2 h, 6 h and 24 h; each webhook's log is visible in the dashboard. After 20 consecutive failures the webhook is paused."

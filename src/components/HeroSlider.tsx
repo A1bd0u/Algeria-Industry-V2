@@ -153,7 +153,7 @@ const HeroSlider: React.FC<{ placement: AdPlacement }> = ({ placement }) => {
     return () => window.clearInterval(timer);
   }, [paused, hovered, count]);
 
-  // Sans annonceur, l'auto-promotion d'Industigo n'occupe que l'accueil : sur
+  // Sans annonceur, l'auto-promotion d'icomexpo n'occupe que l'accueil : sur
   // les autres pages, le bandeau n'apparaît que pour une annonce payante.
   if (!slide || (compact && ads.length === 0)) return null;
 

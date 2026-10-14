@@ -292,8 +292,8 @@ describe('Envoi des webhooks', () => {
         expect(mock.queries.some((q) => q.table === 'webhook_deliveries' && q.op === 'update' && q.payload.status === 'success')).toBe(true);
       });
       expect(received).not.toBeNull();
-      expect(received!.headers['x-industigo-event']).toBe('quote_request.received');
-      expect(verifySignature('whsec_local', received!.body, received!.headers['x-industigo-signature'])).toBe(true);
+      expect(received!.headers['x-icomexpo-event']).toBe('quote_request.received');
+      expect(verifySignature('whsec_local', received!.body, received!.headers['x-icomexpo-signature'])).toBe(true);
       expect(JSON.parse(received!.body).data).toEqual({ text: 'Devis' });
       // Un événement auquel le webhook n'est pas abonné n'est pas envoyé.
       const before = mock.queries.filter((q) => q.table === 'webhook_deliveries' && q.op === 'insert').length;

@@ -1,4 +1,4 @@
-// Nomenclature Industigo : huit grands secteurs pensés pour le tissu
+// Nomenclature icomexpo : huit grands secteurs pensés pour le tissu
 // industriel algérien (agroalimentaire, BTP, hydrocarbures, mécanique,
 // chimie et pharmacie, électrique, numérique, services). Les produits
 // stockent le libellé français de la sous-catégorie.

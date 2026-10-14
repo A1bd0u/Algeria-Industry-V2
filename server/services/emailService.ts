@@ -33,14 +33,14 @@ export type TemplateType =
   | 'notification';
 
 const SUBJECTS: Record<TemplateType, string> = {
-  verificationCode: 'Votre code de vérification - Industigo',
-  resetPassword: 'Réinitialisation de votre mot de passe - Industigo',
-  kycApproved: 'Votre dossier KYC a été approuvé - Industigo',
-  kycRejected: 'Mise à jour concernant votre dossier KYC - Industigo',
-  securityAlert: 'Alerte de sécurité - Industigo',
-  accountExists: 'Tentative d\'inscription avec votre adresse - Industigo',
-  contactMessage: 'Nouveau message de contact - Industigo',
-  notification: 'Industigo',
+  verificationCode: 'Votre code de vérification - icomexpo',
+  resetPassword: 'Réinitialisation de votre mot de passe - icomexpo',
+  kycApproved: 'Votre dossier KYC a été approuvé - icomexpo',
+  kycRejected: 'Mise à jour concernant votre dossier KYC - icomexpo',
+  securityAlert: 'Alerte de sécurité - icomexpo',
+  accountExists: 'Tentative d\'inscription avec votre adresse - icomexpo',
+  contactMessage: 'Nouveau message de contact - icomexpo',
+  notification: 'icomexpo',
 };
 
 // Les templates sont copiés dans l'image Docker (voir Dockerfile) :
@@ -145,7 +145,7 @@ export async function sendNotificationEmail(to: string | null | undefined, mail:
       ctaLabel: mail.ctaLabel,
       ctaUrl: `${getAppUrl()}${mail.ctaPath}`,
     },
-    `${mail.subject} - Industigo`,
+    `${mail.subject} - icomexpo`,
   );
 }
 
