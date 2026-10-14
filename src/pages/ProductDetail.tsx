@@ -32,6 +32,7 @@ import { apiErrorMessage } from '../lib/apiError';
 import ProductImage, { CompanyAvatar } from '../components/ui/ProductImage';
 import { useAdCategories } from '../context/AdTargetingContext';
 import { goal, trackAudience } from '../lib/analytics';
+import Img from '../components/ui/Img';
 
 const ProductDetail = () => {
   const { t } = useTranslation();
@@ -242,15 +243,16 @@ const ProductDetail = () => {
                   className="w-full h-full cursor-zoom-in"
                   aria-label={t('products.detail.zoom')}
                 >
-                  <motion.img
-                    key={activeImage}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    src={product.images[activeImage]}
-                    alt={product.name}
-                    className="w-full h-full object-contain p-2 sm:p-4"
-                    referrerPolicy="no-referrer"
-                  />
+                  <motion.div key={activeImage} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="w-full h-full">
+                    <Img
+                      src={product.images[activeImage]}
+                      sizes="(max-width: 1024px) 100vw, 640px"
+                      alt={product.name}
+                      fetchPriority="high"
+                      className="w-full h-full object-contain p-2 sm:p-4"
+                      referrerPolicy="no-referrer"
+                    />
+                  </motion.div>
                 </button>
               ) : (
                 <ProductImage alt={product.name} category={product.category} iconClassName="h-20 w-20" />
@@ -315,7 +317,7 @@ const ProductDetail = () => {
                     activeImage === i ? "border-secondary" : "border-gray-100 opacity-70 hover:opacity-100"
                   )}
                 >
-                  <img src={img} alt="" loading="lazy" className="w-full h-full object-contain" referrerPolicy="no-referrer" />
+                  <Img src={img} sizes="96px" alt="" loading="lazy" className="w-full h-full object-contain" referrerPolicy="no-referrer" />
                 </button>
               ))}
             </div>}
@@ -498,7 +500,7 @@ const ProductDetail = () => {
           <button type="button" className="absolute top-4 end-4 text-white p-2" aria-label={t('common.close')} onClick={() => setZoomOpen(false)}>
             <X className="h-7 w-7" />
           </button>
-          <img src={product.images[activeImage]} alt={product.name} className="max-w-full max-h-full object-contain" referrerPolicy="no-referrer" onClick={(e) => e.stopPropagation()} />
+          <Img src={product.images[activeImage]} alt={product.name} className="max-w-full max-h-full object-contain" referrerPolicy="no-referrer" onClick={(e) => e.stopPropagation()} />
           {product.images.length > 1 && (
             <>
               <button type="button" onClick={(e) => { e.stopPropagation(); stepImage(-1); }} aria-label={t('slides.prev')}

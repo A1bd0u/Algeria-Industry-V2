@@ -5,6 +5,7 @@ import { requireAuth } from '../middlewares/authMiddleware';
 import { getSupabase } from '../db/supabaseClient';
 import { logger } from '../utils/logger';
 import { PRODUCT_BUCKET } from '../utils/storageUrl';
+import { toWebpVariants } from '../utils/imageVariants';
 
 const router = express.Router();
 
@@ -62,18 +63,38 @@ router.post('/', requireAuth, upload.single('file'), async (req: any, res: any) 
     const bucket = BUCKETS[bucketName];
 
     const user = req.user;
-    const filename = `${user.id}/${Date.now()}-${crypto.randomBytes(8).toString('hex')}.${fileType.ext}`;
-
+    const stem = `${user.id}/${Date.now()}-${crypto.randomBytes(8).toString('hex')}`;
     const supabase = getSupabase();
+
+    // Photos publiques (produits, logos, galerie) : converties en WebP, plus
+    // une variante de 480 px pour les cartes et le mobile. Les pièces KYC et
+    // les PDF sont conservés tels quels.
+    let variants: Awaited<ReturnType<typeof toWebpVariants>> | null = null;
+    if (!bucket.isPrivate && isImage) {
+      try {
+        variants = await toWebpVariants(req.file.buffer);
+      } catch {
+        return res.status(400).json({ error: "Image illisible ou endommagée. Essayez avec un autre fichier JPEG, PNG ou WEBP." });
+      }
+    }
+    const filename = variants ? `${stem}.webp` : `${stem}.${fileType.ext}`;
+
     const { error } = await supabase.storage
       .from(bucketName)
-      .upload(filename, req.file.buffer, {
-         contentType: fileType.mime,
+      .upload(filename, variants ? variants.full : req.file.buffer, {
+         contentType: variants ? 'image/webp' : fileType.mime,
          upsert: false
       });
 
     if (error) {
       throw error;
+    }
+
+    if (variants) {
+      const { error: smallError } = await supabase.storage
+        .from(bucketName)
+        .upload(`${stem}-480.webp`, variants.small, { contentType: 'image/webp', upsert: false });
+      if (smallError) logger.warn('Upload : variante 480 px non enregistrée', smallError);
     }
 
     if (bucket.isPrivate) {

@@ -64,6 +64,7 @@
     "read-excel-file": "^9.3.10",
     "recharts": "^3.8.1",
     "resend": "^6.17.2",
+    "sharp": "^0.35.5",
     "tailwind-merge": "^3.5.0",
     "winston": "^3.19.0",
     "zod": "^4.4.3"
