@@ -47,10 +47,6 @@ const Terms = () => {
       {/* Content Section */}
       <section className="max-w-4xl mx-auto px-4 -mt-10 relative z-20">
         <div className="bg-white p-8 md:p-12 border border-gray-100 shadow-2xl space-y-12" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
-          
-          <div className="p-4 bg-orange-50 border-l-4 border-orange-500 text-orange-800 text-sm font-medium rounded-r-md">
-            {content.validationWarning}
-          </div>
 
           {/* Mentions Légales */}
           <div className="space-y-6">
@@ -77,7 +73,7 @@ const Terms = () => {
             </div>
             
             <div className={cn("space-y-8 text-gray-600 leading-relaxed text-sm font-medium", lang === 'ar' ? 'pe-16' : 'ps-16')}>
-              {content.cgu.sections.map((section: any, idx: number) => (
+              {content.cgu.sections.map((section, idx) => (
                 <div key={idx} className="space-y-2">
                   <h3 className="font-bold text-gray-900">{section.subtitle}</h3>
                   <p>{section.text}</p>
@@ -86,13 +82,6 @@ const Terms = () => {
             </div>
           </div>
 
-        </div>
-
-        {/* Footer info */}
-        <div className="mt-12 text-center pb-8">
-          <p className="text-xs font-black text-gray-500 uppercase tracking-wider">
-            {lang === 'ar' ? 'متوافق مع القوانين' : lang === 'en' ? 'Compliant with Laws' : 'Certifié Conforme - Conformité Légale'}
-          </p>
         </div>
       </section>
     </div>
