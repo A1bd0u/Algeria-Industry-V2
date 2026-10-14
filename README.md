@@ -1,7 +1,7 @@
-# Industigo - Plateforme B2B
+# icomexpo - Plateforme B2B
 
 ## Description du projet
-Industigo est une plateforme B2B complète dédiée à l'industrie algérienne. Elle connecte les acheteurs, les fournisseurs et les exposants à travers un annuaire interactif, un catalogue de produits, une gestion d'appels d'offres, et une messagerie intégrée. 
+icomexpo est une plateforme B2B complète dédiée à l'industrie algérienne. Elle connecte les acheteurs, les fournisseurs et les exposants à travers un annuaire interactif, un catalogue de produits, une gestion d'appels d'offres, et une messagerie intégrée. 
 
 L'application est construite avec une architecture Full-Stack moderne (React, Vite, Express, Tailwind CSS, et Supabase pour la base de données).
 

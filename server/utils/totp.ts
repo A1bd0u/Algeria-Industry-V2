@@ -80,7 +80,7 @@ export const verifyTotp = (
   return null;
 };
 
-export const otpauthUri = (secret: string, account: string, issuer = 'Industigo') =>
+export const otpauthUri = (secret: string, account: string, issuer = 'icomexpo') =>
   `otpauth://totp/${encodeURIComponent(`${issuer}:${account}`)}?secret=${secret}&issuer=${encodeURIComponent(issuer)}&algorithm=SHA1&digits=${TOTP_DIGITS}&period=${TOTP_PERIOD_SECONDS}`;
 
 // --- Chiffrement du secret au repos (AES-256-GCM) ---------------------------

@@ -84,7 +84,7 @@ const Navbar = () => {
         <div className={cn("flex justify-between h-24 items-center gap-4 lg:gap-6")}>
           <div className={cn("flex items-center space-x-4 lg:space-x-6")}>
             {/* Logo */}
-            <Link to="/" onClick={handleLogoClick} className="min-w-max" aria-label="Industigo">
+            <Link to="/" onClick={handleLogoClick} className="min-w-max" aria-label="icomexpo">
               <Logo className="xl:hidden" compact />
               <Logo className="hidden xl:inline-flex" />
             </Link>

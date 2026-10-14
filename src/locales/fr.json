@@ -79,7 +79,7 @@
     "noProducts": "Aucun produit publié pour le moment.",
     "beFirst": "Soyez le premier fournisseur à publier votre catalogue",
     "price": "Prix",
-    "whyTitle": "Pourquoi choisir Industigo ?",
+    "whyTitle": "Pourquoi choisir icomexpo ?",
     "why": {
       "visibility": "Plus de visibilité pour les fournisseurs",
       "sourcing": "Des fournisseurs plus faciles à trouver pour les acheteurs",
@@ -235,10 +235,10 @@
   "products": {
     "similar": "Produits Similaires",
     "report": "Signaler un contenu inapproprié",
-    "report_desc": "Aidez-nous à garder Industigo sûr. Pourquoi signalez-vous ce produit ?",
+    "report_desc": "Aidez-nous à garder icomexpo sûr. Pourquoi signalez-vous ce produit ?",
     "cancel": "Annuler",
     "send_report": "Envoyer le signalement",
-    "join_suppliers": "Rejoignez les fournisseurs vérifiés d'Industigo",
+    "join_suppliers": "Rejoignez les fournisseurs vérifiés d'icomexpo",
     "prev": "Précédent",
     "next": "Suivant",
     "sourcing": "Sourcing Industriel",
@@ -280,7 +280,7 @@
       "reportError": "Le signalement n'a pas pu être envoyé.",
       "favoriteError": "Impossible de mettre à jour vos favoris.",
       "quoteMessage": "Bonjour, je souhaite recevoir un devis pour « {{name}} » (réf. {{ref}}). Quantité : … Lieu de livraison : … Délai souhaité : …",
-      "whatsappMessage": "Bonjour, je vous contacte via Industigo au sujet de « {{name}} ».",
+      "whatsappMessage": "Bonjour, je vous contacte via icomexpo au sujet de « {{name}} ».",
       "requestQuoteShort": "Demander un devis",
       "zoom": "Agrandir l'image",
       "supplierTitle": "Fournisseur",
@@ -431,7 +431,7 @@
     "call_expert": "Appeler le support",
     "send_ticket": "Nous écrire",
     "search_placeholder": "Rechercher une question...",
-    "q1": "Qu'est-ce qu'Industigo ?",
+    "q1": "Qu'est-ce qu'icomexpo ?",
     "a1": "Un annuaire et un catalogue en ligne des fournisseurs industriels algériens. Les acheteurs y trouvent des entreprises vérifiées et leurs produits, et les contactent directement.",
     "q2": "Le site est-il gratuit pour les acheteurs ?",
     "a2": "Oui. Consulter le catalogue, comparer des produits et contacter un fournisseur est gratuit. Un compte est nécessaire pour la messagerie et les favoris.",
@@ -489,18 +489,18 @@
     "formats": "Formats acceptés: JPG, PNG, WEBP (Max 5MB)",
     "error_send": "Une erreur est survenue lors de l'envoi. Veuillez réessayer plus tard.",
     "send_request": "Envoyer la Demande",
-    "why_advertise": "Pourquoi annoncer sur Industigo ?",
+    "why_advertise": "Pourquoi annoncer sur icomexpo ?",
     "captchaRequired": "Validez le captcha.",
     "placementHome": "Bandeau de la page d'accueil",
     "heroTitle": "Faites connaître votre entreprise",
-    "heroText": "Présentez votre offre aux professionnels de l'industrie qui visitent Industigo. Remplissez le formulaire : notre équipe vous recontacte avec une proposition.",
+    "heroText": "Présentez votre offre aux professionnels de l'industrie qui visitent icomexpo. Remplissez le formulaire : notre équipe vous recontacte avec une proposition.",
     "successText": "Notre équipe a bien reçu votre demande d'espace publicitaire. Nous vous répondons par e-mail sous 48 h ouvrées.",
     "newRequest": "Nouvelle demande",
     "companyPlaceholder": "Votre entreprise",
     "contactPlaceholder": "Nom et prénom",
     "messagePlaceholder": "Décrivez vos objectifs, la durée souhaitée…",
     "visualsNote": "Vos visuels vous seront demandés par notre équipe après validation de la demande.",
-    "whyText": "Industigo s'adresse aux acheteurs et fournisseurs industriels algériens. Vos bannières sont vues par des professionnels qui recherchent activement des produits et des partenaires."
+    "whyText": "icomexpo s'adresse aux acheteurs et fournisseurs industriels algériens. Vos bannières sont vues par des professionnels qui recherchent activement des produits et des partenaires."
   },
   "auth": {
     "captchaRequired": "Veuillez valider le captcha pour continuer.",
@@ -531,7 +531,7 @@
     },
     "login": {
       "title": "Bon retour !",
-      "subtitle": "Connectez-vous à votre espace Industigo",
+      "subtitle": "Connectez-vous à votre espace icomexpo",
       "forgot": "Oublié ?",
       "remember": "Se souvenir de moi",
       "submit": "Se connecter",
@@ -711,7 +711,7 @@
     "copy": "Copier",
     "download": "Télécharger",
     "savedCodes": "J'ai enregistré mes codes",
-    "recoveryFileTitle": "Codes de secours Industigo",
+    "recoveryFileTitle": "Codes de secours icomexpo",
     "newRecoveryCodes": "Nouveaux codes de secours",
     "disable": "Désactiver",
     "disableAdminWarning": "Sans double authentification, l'accès à la console admin sera bloqué.",
@@ -889,7 +889,7 @@
     "favoriteRemoved": "Favori supprimé.",
     "profileUpdated": "Profil mis à jour avec succès.",
     "exportFailed": "L'export a échoué. Veuillez réessayer.",
-    "exportFileName": "mes-donnees-industigo.json",
+    "exportFileName": "mes-donnees-icomexpo.json",
     "deleteAccountConfirm": "Supprimer définitivement votre compte et toutes vos données ? Cette action est irréversible.",
     "deleteFailed": "La suppression a échoué. Contactez le support.",
     "kyc": {
@@ -1043,7 +1043,7 @@
       "gallery": "Au moins 3 photos dans la galerie"
     },
     "onboarding": {
-      "title": "Bien démarrer sur Industigo",
+      "title": "Bien démarrer sur icomexpo",
       "subtitle": "Quatre étapes pour être visible et recevoir des demandes de devis.",
       "progress": "{{done}} / {{total}} étapes",
       "account": {
@@ -1100,7 +1100,7 @@
     "verified": "Entreprise vérifiée",
     "notVerified": "Non vérifiée",
     "quoteTitle": "Demander un devis",
-    "quoteText": "Chaque fournisseur reçoit un message dans sa messagerie Industigo avec la liste de ses produits. Les réponses arrivent dans votre tableau de bord.",
+    "quoteText": "Chaque fournisseur reçoit un message dans sa messagerie icomexpo avec la liste de ses produits. Les réponses arrivent dans votre tableau de bord.",
     "notePlaceholder": "Précisions pour les fournisseurs (quantités, délai, lieu de livraison…), facultatif",
     "sendQuote": "Envoyer la demande",
     "sending": "Envoi…",
@@ -1154,7 +1154,7 @@
       "q3": "Comment contacter un fournisseur ?",
       "a3": "Depuis la fiche d'une entreprise ou d'un produit, utilisez le bouton de contact. Vos échanges sont ensuite regroupés dans la messagerie de votre tableau de bord.",
       "q4": "La plateforme est-elle disponible en dehors de l'Algérie ?",
-      "a4": "Oui, Industigo a pour vocation de connecter l'industrie algérienne au monde entier. La plateforme est disponible en français, en arabe et en anglais."
+      "a4": "Oui, icomexpo a pour vocation de connecter l'industrie algérienne au monde entier. La plateforme est disponible en français, en arabe et en anglais."
     }
   },
   "favorites": {
@@ -1193,7 +1193,7 @@
     "noPast": "Aucun événement passé.",
     "organizer": "Organisé par {{name}}",
     "submitTitle": "Vous organisez un événement industriel ?",
-    "submitText": "Faites connaître votre salon, conférence ou webinaire à toute la communauté Industigo.",
+    "submitText": "Faites connaître votre salon, conférence ou webinaire à toute la communauté icomexpo.",
     "submitButton": "Proposer un événement"
   },
   "resources": {
@@ -1388,7 +1388,7 @@
     "legalTitle": "Informations légales",
     "legalName": "Dénomination",
     "legalDocs": "Registre du commerce et NIF",
-    "legalChecked": "Contrôlés par Industigo (KYC)",
+    "legalChecked": "Contrôlés par icomexpo (KYC)",
     "legalUnchecked": "Non vérifiés",
     "sector": "Secteur d'activité",
     "productsIntro": "Les produits proposés par {{name}}.",
@@ -1428,7 +1428,7 @@
     "cataloguesCtaText": "Consultez les catalogues publiés par {{name}}.",
     "cataloguesCtaButton": "Voir les catalogues",
     "whatsapp": "WhatsApp",
-    "whatsappMessage": "Bonjour, je vous contacte via Industigo au sujet de {{name}}.",
+    "whatsappMessage": "Bonjour, je vous contacte via icomexpo au sujet de {{name}}.",
     "verifiedOn": "RC et NIF contrôlés le {{date}}",
     "foundedYear": "Année de création",
     "employees": "Effectif",
@@ -1541,7 +1541,7 @@
       "profileText": "Ajoutez les informations de votre entreprise."
     },
     "createdTitle": "Compte créé avec succès",
-    "welcome": "Bienvenue sur Industigo, la place de marché des fournisseurs industriels algériens vérifiés.",
+    "welcome": "Bienvenue sur icomexpo, la place de marché des fournisseurs industriels algériens vérifiés.",
     "nextSteps": "Prochaines étapes",
     "progressLabel": "Étape {{done}} sur {{total}}",
     "progress": "Progression",
@@ -1608,7 +1608,7 @@
       "intro": "Chimie de base, plastiques, médicaments, dispositifs médicaux, peintures et détergents : des fournisseurs aux normes de l'industrie de transformation."
     },
     "code": "Secteur {{code}}",
-    "label": "Nomenclature Industigo",
+    "label": "Nomenclature icomexpo",
     "F": {
       "intro": "Composants, capteurs, automates, robotique, matériel électrique et électroménager : l'électricité et l'électronique au service de la production."
     },
@@ -1813,7 +1813,7 @@
     },
     "apiKeys": {
       "title": "Clés d'API",
-      "text": "Pour que votre ERP ou votre CRM lise et mette à jour vos données sur Industigo.",
+      "text": "Pour que votre ERP ou votre CRM lise et mette à jour vos données sur icomexpo.",
       "locked": "Incluses dans l'offre Pro.",
       "name": "Nom de la clé",
       "namePlaceholder": "ERP Sage, CRM commercial…",
@@ -1828,9 +1828,9 @@
   },
   "developers": {
     "seoTitle": "API et intégrations ERP / CRM",
-    "seoDescription": "Synchronisez votre catalogue depuis votre ERP et recevez les demandes de devis Industigo dans votre CRM.",
+    "seoDescription": "Synchronisez votre catalogue depuis votre ERP et recevez les demandes de devis icomexpo dans votre CRM.",
     "title": "API et intégrations",
-    "intro": "Trois façons de relier Industigo à vos logiciels : un fichier relu automatiquement, des webhooks vers votre CRM et une API pour tout le reste.",
+    "intro": "Trois façons de relier icomexpo à vos logiciels : un fichier relu automatiquement, des webhooks vers votre CRM et une API pour tout le reste.",
     "toc": "Sommaire",
     "start": {
       "title": "Démarrer",
@@ -1854,7 +1854,7 @@
       "title": "Webhooks",
       "text": "Un webhook envoie une requête POST en JSON à votre adresse à chaque événement :",
       "payload": "Exemple d'envoi :",
-      "consent": "L'e-mail de l'acheteur n'est transmis que s'il a accepté de le partager au moment de sa demande (loi 18-07 sur la protection des données personnelles). Sinon, répondez-lui par la messagerie Industigo (lien reply_url).",
+      "consent": "L'e-mail de l'acheteur n'est transmis que s'il a accepté de le partager au moment de sa demande (loi 18-07 sur la protection des données personnelles). Sinon, répondez-lui par la messagerie icomexpo (lien reply_url).",
       "verifyTitle": "Vérifier la signature",
       "verifyText": "Chaque envoi est signé avec le secret affiché à la création du webhook. Recalculez l'empreinte HMAC-SHA256 de « t.corps » et refusez les envois de plus de 5 minutes.",
       "retries": "Répondez par un code 2xx en moins de 10 secondes. Sinon, nous réessayons après 1 min, 5 min, 30 min, 2 h, 6 h et 24 h ; le journal de chaque webhook est visible dans le tableau de bord. Après 20 échecs consécutifs, le webhook est suspendu."

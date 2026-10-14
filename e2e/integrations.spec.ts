@@ -38,10 +38,10 @@ test('Intégrations : flux catalogue, webhook vers le CRM et clé d\'API', async
   expect(api.find('PUT', '/api/integrations/feed')?.body).toMatchObject({ url: 'https://erp.hydrosud.dz/export/articles.csv', frequency: 'hourly' });
 
   // Webhook : le secret n'est montré qu'une fois.
-  await page.getByLabel('Adresse de réception').fill('https://crm.hydrosud.dz/hooks/industigo');
+  await page.getByLabel('Adresse de réception').fill('https://crm.hydrosud.dz/hooks/icomexpo');
   await page.getByRole('button', { name: 'Ajouter le webhook' }).click();
   await expect(page.getByText('whsec_demo123')).toBeVisible();
-  await expect(page.getByText('https://crm.hydrosud.dz/hooks/industigo')).toBeVisible();
+  await expect(page.getByText('https://crm.hydrosud.dz/hooks/icomexpo')).toBeVisible();
   expect(api.find('POST', '/api/integrations/webhooks')?.body.events).toEqual(PRO_RIGHTS.events);
 
   // Clé d'API.

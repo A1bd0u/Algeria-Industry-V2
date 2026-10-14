@@ -40,9 +40,9 @@ const attemptDelivery = async (delivery: DeliveryRow, webhook: WebhookRow) => {
       maxBytes: 64_000,
       headers: {
         'Content-Type': 'application/json',
-        'X-Industigo-Event': delivery.event,
-        'X-Industigo-Delivery': delivery.id,
-        'X-Industigo-Signature': signPayload(secret, body),
+        'X-Icomexpo-Event': delivery.event,
+        'X-Icomexpo-Delivery': delivery.id,
+        'X-Icomexpo-Signature': signPayload(secret, body),
       },
     });
     status = res.status;
@@ -121,7 +121,7 @@ export const emitEvent = async (userId: string, event: WebhookEvent, data: unkno
 
 // Envoi de test depuis le tableau de bord : attend le résultat.
 export const sendTestEvent = async (webhook: WebhookRow) => {
-  const { delivery, done } = await queue(webhook, 'ping', { message: 'Test de votre webhook Industigo.' });
+  const { delivery, done } = await queue(webhook, 'ping', { message: 'Test de votre webhook icomexpo.' });
   const ok = await done;
   const { data } = await getSupabase()
     .from('webhook_deliveries')

@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 
 // Signature des webhooks, à la manière de Stripe :
-//   X-Industigo-Signature: t=<horodatage unix>,v1=<HMAC-SHA256 hex de "t.corps">
+//   X-Icomexpo-Signature: t=<horodatage unix>,v1=<HMAC-SHA256 hex de "t.corps">
 // Le destinataire recalcule l'empreinte avec son secret et refuse les envois
 // de plus de 5 minutes (protection contre le rejeu).
 

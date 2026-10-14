@@ -78,11 +78,11 @@ GANT-NIT-100;Gants nitrile (carton de 100);E3;;Prix sur devis`}</Code>
                 ))}
               </ul>
               <p>{t('developers.webhooks.payload')}</p>
-              <Code>{`POST https://votre-crm.example/hooks/industigo
+              <Code>{`POST https://votre-crm.example/hooks/icomexpo
 Content-Type: application/json
-X-Industigo-Event: quote_request.received
-X-Industigo-Delivery: 6f1c…
-X-Industigo-Signature: t=1760000000,v1=5d2a…
+X-Icomexpo-Event: quote_request.received
+X-Icomexpo-Delivery: 6f1c…
+X-Icomexpo-Signature: t=1760000000,v1=5d2a…
 
 {
   "id": "6f1c…",
@@ -103,10 +103,10 @@ X-Industigo-Signature: t=1760000000,v1=5d2a…
               <Code>{`// Node.js (Express) : corps brut nécessaire pour vérifier la signature.
 const crypto = require('crypto');
 
-app.post('/hooks/industigo', express.raw({ type: 'application/json' }), (req, res) => {
-  const header = req.get('X-Industigo-Signature') || '';
+app.post('/hooks/icomexpo', express.raw({ type: 'application/json' }), (req, res) => {
+  const header = req.get('X-Icomexpo-Signature') || '';
   const { t, v1 } = Object.fromEntries(header.split(',').map((p) => p.split('=')));
-  const expected = crypto.createHmac('sha256', process.env.INDUSTIGO_WEBHOOK_SECRET)
+  const expected = crypto.createHmac('sha256', process.env.ICOMEXPO_WEBHOOK_SECRET)
     .update(t + '.' + req.body).digest('hex');
   const fresh = Math.abs(Date.now() / 1000 - Number(t)) < 300;
   if (!fresh || !v1 || !crypto.timingSafeEqual(Buffer.from(v1, 'hex'), Buffer.from(expected, 'hex'))) {
@@ -118,8 +118,8 @@ app.post('/hooks/industigo', express.raw({ type: 'application/json' }), (req, re
 });`}</Code>
               <Code>{`<?php // PHP
 $body = file_get_contents('php://input');
-parse_str(str_replace(',', '&', $_SERVER['HTTP_X_INDUSTIGO_SIGNATURE'] ?? ''), $sig);
-$expected = hash_hmac('sha256', $sig['t'] . '.' . $body, getenv('INDUSTIGO_WEBHOOK_SECRET'));
+parse_str(str_replace(',', '&', $_SERVER['HTTP_X_ICOMEXPO_SIGNATURE'] ?? ''), $sig);
+$expected = hash_hmac('sha256', $sig['t'] . '.' . $body, getenv('ICOMEXPO_WEBHOOK_SECRET'));
 if (abs(time() - (int) $sig['t']) > 300 || !hash_equals($expected, $sig['v1'] ?? '')) {
   http_response_code(400); exit;
 }

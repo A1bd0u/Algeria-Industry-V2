@@ -82,7 +82,7 @@ const Footer = () => {
         </div>
 
         <div className="border-t border-white/5 pt-6 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-500">
-          <p>© {year} Industigo</p>
+          <p>© {year} icomexpo</p>
           <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
             <Link to="/terms" className="hover:text-white transition-colors">{t('footer.legal')}</Link>
             <Link to="/privacy" className="hover:text-white transition-colors">{t('footer.privacy')}</Link>

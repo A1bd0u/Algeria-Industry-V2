@@ -282,7 +282,7 @@ function WebhooksSection({ state, notify }: { state: State; notify: Notify }) {
           <form onSubmit={(e) => { e.preventDefault(); create.mutate(); }} className="space-y-4">
             <div>
               <label htmlFor="webhook-url" className={label}>{t('integrations.webhooks.url')}</label>
-              <input id="webhook-url" type="url" required value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://crm.example.dz/hooks/industigo" className="field" />
+              <input id="webhook-url" type="url" required value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://crm.example.dz/hooks/icomexpo" className="field" />
               <p className="text-xs text-gray-500 mt-1.5">{t('integrations.webhooks.urlHint')}</p>
             </div>
             <fieldset>

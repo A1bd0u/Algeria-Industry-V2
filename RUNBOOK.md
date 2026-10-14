@@ -51,6 +51,6 @@ En cas de mise en production d'une version défectueuse du code (bug bloquant, p
 5. Cliquez sur **Enregistrer**. Le rollback est instantané.
 
 ### Si déployé manuellement avec Docker
-1. Identifiez le tag de l'image précédente qui fonctionnait (ex: `industigo:v1.2.0`).
-2. Arrêtez le conteneur actuel : `docker stop industigo-prod && docker rm industigo-prod`
-3. Relancez l'ancienne image : `docker run -d -p 3000:3000 --name industigo-prod --env-file .env industigo:v1.2.0`
+1. Identifiez le tag de l'image précédente qui fonctionnait (ex: `icomexpo:v1.2.0`).
+2. Arrêtez le conteneur actuel : `docker stop icomexpo-prod && docker rm icomexpo-prod`
+3. Relancez l'ancienne image : `docker run -d -p 3000:3000 --name icomexpo-prod --env-file .env icomexpo:v1.2.0`
