@@ -50,6 +50,8 @@ import adRoutes from './server/routes/ads';
 import userRoutes from './server/routes/users';
 import uploadRoutes from './server/routes/upload';
 import statsRoutes from './server/routes/stats';
+import { adminInsightsRouter, collectRouter } from './server/routes/insights';
+import { activityLogger } from './server/middlewares/activityLogger';
 import cronRoutes from './server/routes/cron';
 import integrationRoutes from './server/routes/integrations';
 import apiV1Routes from './server/routes/apiV1';
@@ -143,6 +145,8 @@ export async function createApp() {
   app.use('/api/v1', express.json({ limit: '10mb' }));
   app.use(express.json({ limit: '2mb' }));
   app.use(cookieParser());
+  // Journal d'activité : écritures et erreurs de l'API.
+  app.use('/api', activityLogger);
 
   // Endpoints de supervision (Probes)
   app.get('/health', (req, res) => {
@@ -185,9 +189,11 @@ export async function createApp() {
   app.use('/api/users', userRoutes);
   app.use('/api/upload', uploadRoutes);
   app.use('/api/stats', statsRoutes);
+  app.use('/api/analytics', collectRouter);
   app.use('/api/ai', aiRoutes);
   app.use('/api/admin/billing', billingRoutes);
   app.use('/api/subscriptions', subscriptionRoutes);
+  app.use('/api/admin/insights', adminInsightsRouter);
   app.use('/api/admin', adminRoutes);
   app.use('/api/search', searchRoutes);
   app.use('/api/contact', contactRoutes);

@@ -630,7 +630,7 @@
   },
   "cookies": {
     "label": "Gestion des cookies",
-    "text": "Nous utilisons uniquement des cookies nécessaires au fonctionnement du site (session, langue). Avec votre accord, nous activons aussi un outil de diagnostic des erreurs (relecture de session anonymisée).",
+    "text": "Nous utilisons des cookies nécessaires au fonctionnement du site (session, langue) et une mesure anonyme de la navigation, sans identifiant ni adresse IP. Si vous acceptez, votre navigation est reliée à votre compte pour améliorer nos services et un outil de diagnostic des erreurs est activé.",
     "more": "En savoir plus",
     "reject": "Refuser",
     "accept": "Accepter"

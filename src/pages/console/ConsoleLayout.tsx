@@ -3,9 +3,9 @@ import { motion, AnimatePresence } from 'motion/react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import {
-  AlertTriangle, BarChart3, Building2, Calendar, CheckCircle, CreditCard, ExternalLink, FileText,
+  Activity, AlertTriangle, BarChart3, Building2, Calendar, CheckCircle, CreditCard, ExternalLink, FileText,
   LayoutDashboard, Lock, LogOut, Menu, MessageSquare, Newspaper, PackagePlus,
-  ShieldCheck, Users, X, Zap
+  MousePointerClick, ShieldCheck, Users, X, Zap
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { useAuth } from '../../context/AuthContext';
@@ -24,6 +24,8 @@ import GovProducts from './views/GovProducts';
 import GovCatalogues from './views/GovCatalogues';
 import SiteCms from './views/SiteCms';
 import GovEvents from './views/GovEvents';
+import GovInsights from './views/GovInsights';
+import GovActivity from './views/GovActivity';
 
 type PendingKey = 'kyc' | 'support' | 'ads' | 'reports' | 'invoices';
 
@@ -40,6 +42,8 @@ const MENU: { title: string; items: MenuItem[] }[] = [
     items: [
       { id: 'gov-overview', name: "Vue d'ensemble", icon: LayoutDashboard },
       { id: 'gov-analytics', name: 'Analytique', icon: BarChart3 },
+      { id: 'gov-insights', name: 'Parcours visiteurs', icon: MousePointerClick },
+      { id: 'gov-activity', name: "Journal d'activité", icon: Activity },
       { id: 'gov-revenue', name: 'Abonnements', icon: CreditCard, pendingKey: 'invoices' },
     ],
   },
@@ -83,6 +87,8 @@ export default function ConsoleLayout({ state }: { state: any }) {
     switch (activeTab) {
       case 'gov-overview': return <GovOverview state={state} />;
       case 'gov-analytics': return <GovAnalytics state={state} />;
+      case 'gov-insights': return <GovInsights />;
+      case 'gov-activity': return <GovActivity />;
       case 'gov-revenue': return <GovRevenue state={state} />;
       case 'gov-companies': return <GovCompanies state={state} />;
       case 'gov-moderation': return <GovModeration state={state} />;

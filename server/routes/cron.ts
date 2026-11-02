@@ -6,6 +6,7 @@ import { notifyExpired, sendExpiryReminders } from '../services/notificationServ
 import { sendOnboardingReminders } from '../services/onboardingReminders';
 import { runDueFeeds } from '../services/integrations/feeds';
 import { retryPendingDeliveries } from '../services/integrations/webhooks';
+import { purgeInsights } from '../services/insightsService';
 
 const router = express.Router();
 
@@ -64,7 +65,14 @@ router.post('/daily', async (req, res) => {
       logger.error('[Cron] Relances d\'accompagnement en échec :', err);
     }
     const integrations = await runIntegrations();
-    const result = { expired, expiredNotices, ...reminders, onboarding, integrations };
+    // Analytique et journaux d'activité : conservés 13 mois.
+    let insights: Record<string, unknown> = { error: true };
+    try {
+      insights = await purgeInsights();
+    } catch (err) {
+      logger.error('[Cron] Purge de l\'analytique en échec :', err);
+    }
+    const result = { expired, expiredNotices, ...reminders, onboarding, integrations, insights };
     logger.info('[Cron] Tâche quotidienne terminée', result);
     return res.json(result);
   } catch (err) {
