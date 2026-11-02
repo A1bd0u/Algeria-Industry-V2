@@ -8,6 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Turnstile } from '@marsidev/react-turnstile';
 import { useTranslation } from 'react-i18next';
+import { safeRedirect, isMessagingRedirect } from '../lib/redirect';
 
 const loginSchema = z.object({
   email: z.string().email('auth.validation.emailInvalid'),
@@ -30,8 +31,12 @@ const Login = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   // Redirection interne uniquement (pas d'URL absolue ni protocol-relative).
-  const rawRedirect = searchParams.get('redirect');
-  const redirectUrl = rawRedirect && rawRedirect.startsWith('/') && !rawRedirect.startsWith('//') && !rawRedirect.startsWith('/\\') ? rawRedirect : null;
+  const redirectUrl = safeRedirect(searchParams.get('redirect'));
+  // Le visiteur a cliqué sur « Contacter » : il lui faut un compte pour écrire.
+  const wantsToMessage = isMessagingRedirect(redirectUrl);
+  const registerLink = redirectUrl
+    ? `/register?${wantsToMessage ? 'role=acheteur&' : ''}redirect=${encodeURIComponent(redirectUrl)}`
+    : '/register';
 
   const { register, handleSubmit, formState: { errors } } = useForm<LoginForm>({
     resolver: zodResolver(loginSchema)
@@ -101,6 +106,16 @@ const Login = () => {
             <h2 className="text-3xl font-bold text-primary">{t('auth.login.title')}</h2>
             <p className="text-gray-500 mt-2">{t('auth.login.subtitle')}</p>
           </div>
+
+          {wantsToMessage && !mfaStep && (
+            <div role="status" className="mb-6 p-4 bg-secondary/5 border border-secondary/20 rounded-2xl text-sm text-gray-700">
+              <p className="font-bold text-primary">{t('auth.login.messageGateTitle')}</p>
+              <p className="mt-1">{t('auth.login.messageGateText')}</p>
+              <Link to={registerLink} className="inline-block mt-3 font-bold text-secondary hover:underline">
+                {t('auth.login.messageGateCta')}
+              </Link>
+            </div>
+          )}
 
           {mfaStep ? (
             <form onSubmit={onSubmitMfa} className="space-y-6">
@@ -241,7 +256,7 @@ const Login = () => {
         <div className="bg-gray-50 p-6 text-center border-t border-gray-100 space-y-4">
           <p className="text-sm text-gray-600">
             {t('auth.login.noAccount')}{' '}
-            <Link to="/register" className="font-bold text-secondary hover:underline">
+            <Link to={registerLink} className="font-bold text-secondary hover:underline">
               {t('auth.login.registerFree')}
             </Link>
           </p>

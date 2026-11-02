@@ -1,11 +1,12 @@
 import { ArrowRight, Building2, CheckCircle2, LayoutDashboard, Mail, Package, RefreshCw, Search, Settings, ShieldCheck } from 'lucide-react';
 import { motion } from 'motion/react';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Turnstile } from '@marsidev/react-turnstile';
 import { useAuth } from '../context/AuthContext';
 import { cn } from '../lib/utils';
+import { takeRedirect } from '../lib/redirect';
 
 // Étape 1 : saisie du code reçu par e-mail. La session s'ouvre à la validation.
 const EmailCodeStep = ({ initialEmail }: { initialEmail: string }) => {
@@ -141,8 +142,18 @@ const RegisterSuccess = () => {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const initialEmail = (location.state as any)?.email || user?.email || '';
   const isAr = i18n.language?.startsWith('ar');
+  const verified = !!user?.emailVerified;
+
+  // Compte confirmé : retour à la page qui a demandé l'inscription
+  // (ex. écrire à un fournisseur depuis sa fiche).
+  useEffect(() => {
+    if (!verified) return;
+    const target = takeRedirect();
+    if (target) navigate(target, { replace: true });
+  }, [verified, navigate]);
 
   if (!user || !user.emailVerified) {
     return <EmailCodeStep initialEmail={initialEmail} />;

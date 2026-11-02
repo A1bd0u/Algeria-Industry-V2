@@ -34,6 +34,7 @@ import {
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import Messages from './Messages';
+import { useUnreadMessages } from '../hooks/useUnreadMessages';
 import SupplierStats from '../components/SupplierStats';
 import CataloguesPanel from '../components/CataloguesPanel';
 import IntegrationsPanel from '../components/IntegrationsPanel';
@@ -66,6 +67,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'overview');
+  const unreadMessages = useUnreadMessages();
   // Offre réelle de l'entreprise (même cache que l'onglet Abonnement).
   const { data: subscriptionInfo } = useQuery({
     queryKey: ['my-subscription'],
@@ -1101,7 +1103,12 @@ const Dashboard = () => {
                     "h-5 w-5 transition-colors",
                     isActive ? "text-white" : "text-gray-500 group-hover:text-secondary"
                   )} />
-                  <span>{item.name}</span>
+                  <span className="flex-1">{item.name}</span>
+                  {item.id === 'messages' && unreadMessages > 0 && (
+                    <span className={cn("min-w-5 h-5 px-1.5 rounded-full text-[11px] font-black flex items-center justify-center", isActive ? "bg-white text-primary" : "bg-secondary text-white")} aria-label={t('messages.unread', { count: unreadMessages })}>
+                      {unreadMessages > 99 ? '99+' : unreadMessages}
+                    </span>
+                  )}
                 </Link>
               );
             })}

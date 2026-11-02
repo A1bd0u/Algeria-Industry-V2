@@ -133,3 +133,82 @@ describe('Notification de nouveau message', () => {
     expect(emailLookups).toHaveLength(0);
   });
 });
+
+describe('Lecture des conversations', () => {
+  let app: express.Express;
+
+  beforeEach(async () => {
+    app = await createApp();
+    vi.mocked(jwt.verify).mockReturnValue({ id: 'u', token_version: 1 } as any);
+  });
+
+  it('exige une connexion pour lire ou écrire', async () => {
+    setup();
+    vi.mocked(getSupabase).mockReturnValue(createSupabaseMock({ users: usersHandler(null) }).client as any);
+    expect((await request(app).get('/api/messages/conversations')).status).toBe(401);
+    expect((await request(app).post('/api/messages').send({ text: 'Bonjour', receiver_id: SELLER_A })).status).toBe(401);
+  });
+
+  it('refuse l\'envoi tant que l\'adresse e-mail n\'est pas confirmée', async () => {
+    const mock = createSupabaseMock({ users: usersHandler(sessionRow({ id: BUYER_ID, role: 'acheteur', email_verified: false })) });
+    vi.mocked(getSupabase).mockReturnValue(mock.client as any);
+    const res = await request(app).post('/api/messages').set('Cookie', ['token=t']).send({ text: 'Bonjour', receiver_id: SELLER_A });
+    expect(res.status).toBe(403);
+    expect(res.body.code).toBe('EMAIL_NOT_VERIFIED');
+    expect(mock.queries.some((q) => q.table === 'messages')).toBe(false);
+  });
+
+  it('compte les messages non lus par conversation et affiche la société', async () => {
+    setup({
+      messages: () => ({
+        data: [
+          { id: 'm3', sender_id: SELLER_A, receiver_id: BUYER_ID, text: 'Voici le devis', read: false, created_at: '2026-11-02T10:00:00Z', sender: { id: SELLER_A, name: 'Karim', company: 'EURL Métal Est' }, receiver: { id: BUYER_ID, name: 'Acheteur' } },
+          { id: 'm2', sender_id: SELLER_A, receiver_id: BUYER_ID, text: 'Bonjour', read: false, created_at: '2026-11-02T09:00:00Z', sender: { id: SELLER_A, name: 'Karim', company: 'EURL Métal Est' }, receiver: { id: BUYER_ID, name: 'Acheteur' } },
+          { id: 'm1', sender_id: BUYER_ID, receiver_id: SELLER_A, text: 'Un devis ?', read: true, created_at: '2026-11-02T08:00:00Z', sender: { id: BUYER_ID, name: 'Acheteur' }, receiver: { id: SELLER_A, name: 'Karim', company: 'EURL Métal Est' } },
+        ],
+      }),
+    });
+    const res = await request(app).get('/api/messages/conversations').set('Cookie', ['token=t']);
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveLength(1);
+    expect(res.body[0]).toMatchObject({ id: SELLER_A, name: 'EURL Métal Est', unread: 2 });
+    expect(res.body[0].lastMessage.text).toBe('Voici le devis');
+  });
+
+  it('marque comme lus les messages reçus à l\'ouverture de la conversation', async () => {
+    const mock = setup({
+      messages: (q) => {
+        if (q.op === 'select') return { data: [{ id: 'm1', sender_id: SELLER_A, receiver_id: BUYER_ID, text: 'Bonjour', read: false, created_at: '2026-11-02T09:00:00Z' }] };
+      },
+    });
+    const res = await request(app).get(`/api/messages/${SELLER_A}`).set('Cookie', ['token=t']);
+    expect(res.status).toBe(200);
+    expect(res.body[0].sender).toBe('them');
+    const update = mock.queries.find((q) => q.table === 'messages' && q.op === 'update');
+    expect(update?.payload).toEqual({ read: true });
+    expect(filterValue(update!, 'eq', 'receiver_id')?.[1]).toBe(BUYER_ID);
+    expect(filterValue(update!, 'eq', 'sender_id')?.[1]).toBe(SELLER_A);
+  });
+
+  it('renvoie le nombre total de messages non lus', async () => {
+    const mock = setup({ messages: () => ({ count: 3 }) });
+    const res = await request(app).get('/api/messages/unread-count').set('Cookie', ['token=t']);
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({ count: 3 });
+    const q = mock.queries.find((x) => x.table === 'messages');
+    expect(filterValue(q!, 'eq', 'receiver_id')?.[1]).toBe(BUYER_ID);
+    expect(filterValue(q!, 'eq', 'read')?.[1]).toBe(false);
+  });
+
+  it('donne le nom d\'un destinataire sans exposer son e-mail', async () => {
+    setup();
+    vi.mocked(getSupabase).mockReturnValue(createSupabaseMock({
+      users: usersHandler(sessionRow({ id: BUYER_ID, role: 'acheteur' }), () => ({ data: { id: SELLER_A, name: 'Karim', company: 'EURL Métal Est', email: 'secret@example.com' } })),
+    }).client as any);
+    const res = await request(app).get(`/api/messages/contact/${SELLER_A}`).set('Cookie', ['token=t']);
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({ id: SELLER_A, name: 'EURL Métal Est' });
+    const bad = await request(app).get('/api/messages/contact/pas-un-uuid').set('Cookie', ['token=t']);
+    expect(bad.status).toBe(400);
+  });
+});
