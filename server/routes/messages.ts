@@ -82,7 +82,10 @@ export async function notifyNewMessage(supabase: any, message: { id: string; sen
 const formatTime = (iso: string) =>
   new Date(iso).toLocaleTimeString('fr-DZ', { hour: '2-digit', minute: '2-digit' });
 
-// GET /api/messages/conversations - List conversations for the logged in user
+// Nom affiché d'un interlocuteur : sa société si elle est renseignée, sinon son nom.
+const displayName = (u: any) => (u?.company || u?.name || 'Utilisateur');
+
+// GET /api/messages/conversations - Conversations de l'utilisateur, la plus récente d'abord
 router.get('/conversations', requireAuth, async (req, res, next) => {
   const user = (req as any).user;
   // L'identifiant vient de la base (requireAuth), mais on le revalide
@@ -95,7 +98,7 @@ router.get('/conversations', requireAuth, async (req, res, next) => {
 
     const { data: messages, error } = await supabase
       .from('messages')
-      .select('*, sender:users!sender_id(id, name), receiver:users!receiver_id(id, name)')
+      .select('*, sender:users!sender_id(id, name, company), receiver:users!receiver_id(id, name, company)')
       .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
       .order('created_at', { ascending: false });
 
@@ -110,7 +113,7 @@ router.get('/conversations', requireAuth, async (req, res, next) => {
           const otherUser = m.sender_id === user.id ? m.receiver : m.sender;
           convos.set(otherId, {
              id: otherId,
-             name: otherUser?.name || 'Utilisateur',
+             name: displayName(otherUser),
              lastMessage: {
                 text: m.text,
                 time: formatTime(m.created_at),
@@ -119,11 +122,50 @@ router.get('/conversations', requireAuth, async (req, res, next) => {
              unread: 0
           });
        }
+       // Messages reçus pas encore lus dans cette conversation.
+       if (m.receiver_id === user.id && !m.read) convos.get(otherId).unread += 1;
     });
 
     return res.json(Array.from(convos.values()));
   } catch (err: any) {
     logger.error("Error GET /conversations:", err);
+    next(err);
+  }
+});
+
+// GET /api/messages/unread-count - Nombre de messages reçus non lus (pastille du menu)
+router.get('/unread-count', requireAuth, async (req, res, next) => {
+  const user = (req as any).user;
+  try {
+    const { count, error } = await getSupabase()
+      .from('messages')
+      .select('id', { count: 'exact', head: true })
+      .eq('receiver_id', user.id)
+      .eq('read', false);
+    if (error) throw error;
+    return res.json({ count: count || 0 });
+  } catch (err: any) {
+    logger.error('Error GET /messages/unread-count:', err);
+    next(err);
+  }
+});
+
+// GET /api/messages/contact/:userId - Nom d'un interlocuteur, pour ouvrir une
+// nouvelle conversation depuis une fiche (aucune donnée privée renvoyée).
+router.get('/contact/:userId', requireAuth, requireUuidParams('userId'), async (req, res, next) => {
+  try {
+    const { data: contact, error } = await getSupabase()
+      .from('users')
+      .select('id, name, company')
+      .eq('id', req.params.userId)
+      .maybeSingle();
+    if (error) throw error;
+    if (!contact) {
+      return res.status(404).json({ error: 'Destinataire introuvable', code: 'RECEIVER_NOT_FOUND' });
+    }
+    return res.json({ id: contact.id, name: displayName(contact) });
+  } catch (err: any) {
+    logger.error('Error GET /messages/contact:', err);
     next(err);
   }
 });
@@ -145,6 +187,17 @@ router.get('/:conversationId', requireAuth, requireUuidParams('conversationId'),
       .order('created_at', { ascending: true });
 
     if (error) throw error;
+
+    // Ouvrir la conversation marque comme lus les messages reçus.
+    if ((messages || []).some((m: any) => m.receiver_id === user.id && !m.read)) {
+      const { error: readError } = await supabase
+        .from('messages')
+        .update({ read: true })
+        .eq('receiver_id', user.id)
+        .eq('sender_id', conversationId)
+        .eq('read', false);
+      if (readError) logger.warn('Messages non marqués comme lus', readError);
+    }
 
     const mapped = (messages || []).map((m: any) => ({
        ...m,

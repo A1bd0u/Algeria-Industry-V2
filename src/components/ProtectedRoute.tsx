@@ -29,9 +29,11 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowe
     );
   }
 
-  // Not authenticated? Redirect to login page
+  // Non connecté : page de connexion, puis retour à la page demandée
+  // (ex. /dashboard?tab=messages&to=… depuis le bouton « Contacter »).
   if (!user) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    const target = location.pathname + location.search;
+    return <Navigate to={`/login?redirect=${encodeURIComponent(target)}`} replace />;
   }
 
   // Console admin : la double authentification doit être activée avant tout accès.

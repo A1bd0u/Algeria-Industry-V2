@@ -2,7 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Search, ArrowUpRight, Paperclip, Send, Loader2, File } from 'lucide-react';
 import { motion } from 'motion/react';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import { cn } from '../lib/utils';
 import { useTranslation } from 'react-i18next';
 import EmptyState from '../components/ui/EmptyState';
@@ -22,6 +23,9 @@ interface Message {
 
 export default function Messages() {
   const { t } = useTranslation();
+  const { user } = useAuth();
+  // Envoyer exige une adresse e-mail confirmée (le serveur le vérifie aussi).
+  const canSend = !!user?.emailVerified;
   const queryClient = useQueryClient();
   const [searchParams] = useSearchParams();
   // ?to=<userId> : ouvre directement une conversation (bouton « Contacter » d'une fiche).
@@ -63,6 +67,27 @@ export default function Messages() {
     refetchInterval: 5000, // Polling frequent for active chat
   });
 
+  // Ouvrir une conversation marque ses messages comme lus : la pastille du menu suit.
+  useEffect(() => {
+    if (!selectedContact) return;
+    queryClient.invalidateQueries({ queryKey: ['messages-unread'] });
+  }, [selectedContact, activeMessages.length, queryClient]);
+
+  // Nouvelle conversation ouverte depuis une fiche : le nom du destinataire
+  // n'est pas encore dans la liste des conversations.
+  const knownContact = conversations.find((c: any) => c.id === selectedContact);
+  const { data: newContact } = useQuery<{ id: string; name: string }>({
+    queryKey: ['message-contact', selectedContact],
+    queryFn: async () => {
+      const res = await fetch(`/api/messages/contact/${selectedContact}`);
+      if (!res.ok) throw new Error('Contact introuvable');
+      return res.json();
+    },
+    enabled: !!selectedContact && !isLoadingConvos && !knownContact,
+    staleTime: Infinity,
+  });
+  const contactName = knownContact?.name || newContact?.name || t('messages.contact');
+
   const isLoading = isLoadingConvos || isLoadingMessages;
   const visibleConversations = filter.trim()
     ? conversations.filter((c: any) => String(c.name || '').toLowerCase().includes(filter.trim().toLowerCase()))
@@ -86,7 +111,10 @@ export default function Messages() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text, receiver_id, ...quote })
       });
-      if (!res.ok) throw new Error('Failed to send message');
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw Object.assign(new Error(body.error || 'Failed to send message'), { code: body.code, status: res.status });
+      }
       return res.json();
     },
     onSuccess: () => {
@@ -98,16 +126,21 @@ export default function Messages() {
       setSendError('');
       setQuoteProductId(null);
     },
-    onError: () => setSendError(t('messages.sendError')),
+    onError: (err: any) => {
+      const key = err?.code === 'EMAIL_NOT_VERIFIED' ? 'messages.errors.emailNotVerified'
+        : err?.code === 'RECEIVER_NOT_FOUND' ? 'messages.errors.receiverNotFound'
+        : err?.code === 'MESSAGE_SELF' ? 'messages.errors.self'
+        : err?.status === 401 ? 'messages.errors.sessionExpired'
+        : err?.status === 429 ? 'messages.errors.tooMany'
+        : 'messages.sendError';
+      setSendError(t(key));
+    },
   });
 
   const handleSend = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inputText.trim() && !isUploading) return;
-    sendMessageMutation.mutate({ 
-      text: inputText, 
-      receiver_id: selectedContact === 'general' ? null : selectedContact 
-    });
+    if (!inputText.trim() || !selectedContact) return;
+    sendMessageMutation.mutate({ text: inputText.trim(), receiver_id: selectedContact });
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -133,7 +166,7 @@ export default function Messages() {
       
       sendMessageMutation.mutate({
         text: inputText ? inputText + attachmentText : attachmentText,
-        receiver_id: selectedContact === 'general' ? null : selectedContact
+        receiver_id: selectedContact
       });
       
     } catch (err) {
@@ -240,11 +273,18 @@ export default function Messages() {
                   <p className={cn("text-xs font-black uppercase tracking-tight truncate", selectedContact === c.id ? "text-white" : "text-primary")}>
                     {c.name}
                   </p>
-                  <span className={cn("text-xs font-bold", selectedContact === c.id ? "text-white/60" : "text-gray-500")}>
-                    {c.lastMessage.time}
+                  <span className="flex items-center gap-2">
+                    <span className={cn("text-xs font-bold", selectedContact === c.id ? "text-white/60" : "text-gray-500")}>
+                      {c.lastMessage.time}
+                    </span>
+                    {c.unread > 0 && selectedContact !== c.id && (
+                      <span className="min-w-5 h-5 px-1.5 rounded-full bg-secondary text-white text-[11px] font-black flex items-center justify-center" aria-label={t('messages.unread', { count: c.unread })}>
+                        {c.unread}
+                      </span>
+                    )}
                   </span>
                 </div>
-                <p className={cn("text-xs font-medium truncate", selectedContact === c.id ? "text-white/80" : "text-gray-500")}>
+                <p className={cn("text-xs truncate", selectedContact === c.id ? "text-white/80 font-medium" : c.unread > 0 ? "text-primary font-bold" : "text-gray-500 font-medium")}>
                   {c.lastMessage.text}
                 </p>
               </div>
@@ -259,17 +299,20 @@ export default function Messages() {
             <div className="p-6 border-b border-gray-50 flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 <div className="w-10 h-10 bg-secondary/10 rounded-xl flex items-center justify-center font-black text-secondary">
-                  {conversations.find(c => c.id === selectedContact)?.name.charAt(0) || 'C'}
+                  {contactName.charAt(0)}
                 </div>
                 <div>
                   <h4 className="text-xs font-black text-primary uppercase tracking-tight">
-                    {conversations.find(c => c.id === selectedContact)?.name || t('messages.contact')}
+                    {contactName}
                   </h4>
                 </div>
               </div>
             </div>
 
             <div className="flex-1 p-8 overflow-y-auto no-scrollbar space-y-8 bg-gray-50/30">
+              {!isLoadingMessages && activeMessages.length === 0 && (
+                <p className="text-center text-sm text-gray-500 py-8">{t('messages.firstMessage', { name: contactName })}</p>
+              )}
               {activeMessages.map((m) => (
                 <div key={m.id} className={cn("flex space-x-4 max-w-[80%]", m.sender === 'me' ? "flex-row-reverse space-x-reverse ms-auto" : "")}>
                   <div className={cn("w-8 h-8 rounded-lg shrink-0", m.sender === 'me' ? "bg-secondary" : "bg-gray-200")} />
@@ -286,6 +329,12 @@ export default function Messages() {
             </div>
 
             <div className="p-6 bg-white border-t border-gray-50">
+              {!canSend && (
+                <div role="status" className="mb-3 p-3 rounded-xl bg-orange-50 border border-orange-100 text-xs text-gray-700">
+                  {t('messages.verifyEmailFirst')}{' '}
+                  <Link to="/register-success" className="font-bold text-secondary hover:underline">{t('messages.verifyEmailCta')}</Link>
+                </div>
+              )}
               {sendError && <p role="alert" className="mb-3 text-xs font-bold text-red-600">{sendError}</p>}
               {quoteProductId && selectedContact === initialContact && (
                 <label className="mb-3 flex items-start gap-2 text-xs text-gray-600">
@@ -300,7 +349,7 @@ export default function Messages() {
                     id="file-upload" 
                     className="hidden" 
                     onChange={handleFileUpload}
-                    disabled={isUploading}
+                    disabled={isUploading || !canSend}
                     accept=".pdf,.png,.jpg,.jpeg,.webp"
                   />
                   <label 
@@ -319,11 +368,11 @@ export default function Messages() {
                   placeholder={t('messages.placeholder')}
                   aria-label={t('messages.placeholder')}
                   className="flex-1 bg-gray-50 border-none px-6 py-4 rounded-2xl text-sm font-medium outline-none focus:ring-2 focus:ring-secondary/20 transition-all"
-                  disabled={sendMessageMutation.isPending || isUploading}
+                  disabled={sendMessageMutation.isPending || isUploading || !canSend}
                 />
                 <button 
                   type="submit"
-                  disabled={sendMessageMutation.isPending || (!inputText.trim() && !isUploading)}
+                  disabled={!canSend || sendMessageMutation.isPending || !inputText.trim()}
                   aria-label={t('messages.send')}
                   className="p-4 bg-primary text-white rounded-2xl hover:bg-secondary disabled:opacity-50 transition-colors"
                 >

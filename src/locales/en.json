@@ -539,7 +539,10 @@
       "invalid": "Invalid credentials. Please try again.",
       "noAccount": "Don't have an account yet?",
       "registerFree": "Sign up for free",
-      "proConsole": "Professional console"
+      "proConsole": "Professional console",
+      "messageGateTitle": "You need an account to message a supplier",
+      "messageGateText": "Sign in, or create a free buyer account: your conversation will open right after.",
+      "messageGateCta": "Create a free buyer account"
     },
     "mfa": {
       "intro": "Enter the 6-digit code shown in your authenticator app.",
@@ -1180,7 +1183,18 @@
     "uploadError": "The file upload failed.",
     "sendError": "The message could not be sent. Please try again.",
     "title": "Messages",
-    "shareContact": "Send my email address to the supplier with this quote request (it may be stored in their customer management software)."
+    "shareContact": "Send my email address to the supplier with this quote request (it may be stored in their customer management software).",
+    "firstMessage": "Write your first message to {{name}}.",
+    "verifyEmailFirst": "Confirm your email address to send messages.",
+    "verifyEmailCta": "Enter the code you received",
+    "errors": {
+      "emailNotVerified": "Please confirm your email address with the code you received first.",
+      "receiverNotFound": "This recipient no longer exists.",
+      "self": "You cannot message yourself.",
+      "sessionExpired": "Your session has expired. Sign in again to send this message.",
+      "tooMany": "Too many messages in a short time. Try again in a few minutes."
+    },
+    "unread": "Unread messages: {{count}}"
   },
   "events": {
     "titleStart": "Industry",

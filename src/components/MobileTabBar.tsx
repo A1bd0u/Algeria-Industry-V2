@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { cn } from '../lib/utils';
+import { useUnreadMessages } from '../hooks/useUnreadMessages';
 
 // Barre d'onglets en bas d'écran sur mobile : les cinq destinations
 // principales restent à portée de pouce (sauf sur la fiche produit).
@@ -11,6 +12,7 @@ const MobileTabBar = () => {
   const { pathname, search } = useLocation();
   const { isAuthenticated } = useAuth();
   const messagesPath = '/dashboard?tab=messages';
+  const unread = useUnreadMessages();
 
   const tabs = [
     { to: '/', label: t('nav.home'), icon: Home, active: pathname === '/' },
@@ -21,6 +23,7 @@ const MobileTabBar = () => {
       label: t('messages.title'),
       icon: MessageSquare,
       active: pathname === '/dashboard' && search.includes('tab=messages'),
+      badge: unread,
     },
     {
       to: isAuthenticated ? '/dashboard' : '/login',
@@ -50,7 +53,14 @@ const MobileTabBar = () => {
                 tab.active ? 'text-secondary' : 'text-gray-500 hover:text-primary'
               )}
             >
-              <tab.icon className="h-5 w-5" aria-hidden="true" />
+              <span className="relative">
+                <tab.icon className="h-5 w-5" aria-hidden="true" />
+                {!!tab.badge && (
+                  <span className="absolute -top-1.5 -end-2.5 min-w-4 h-4 px-1 rounded-full bg-secondary text-white text-[9px] font-black flex items-center justify-center" aria-label={t('messages.unread', { count: tab.badge })}>
+                    {tab.badge > 9 ? '9+' : tab.badge}
+                  </span>
+                )}
+              </span>
               <span className="max-w-full px-0.5 text-center">{tab.label}</span>
             </Link>
           </li>

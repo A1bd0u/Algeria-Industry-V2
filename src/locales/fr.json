@@ -539,7 +539,10 @@
       "invalid": "Identifiants invalides. Veuillez réessayer.",
       "noAccount": "Pas encore de compte ?",
       "registerFree": "Inscrivez-vous gratuitement",
-      "proConsole": "Console Professionnelle"
+      "proConsole": "Console Professionnelle",
+      "messageGateTitle": "Un compte est nécessaire pour écrire à un fournisseur",
+      "messageGateText": "Connectez-vous, ou créez gratuitement un compte acheteur : votre conversation s’ouvrira juste après.",
+      "messageGateCta": "Créer un compte acheteur gratuit"
     },
     "mfa": {
       "intro": "Saisissez le code à 6 chiffres affiché par votre application d'authentification.",
@@ -1180,7 +1183,18 @@
     "uploadError": "L'envoi du fichier a échoué.",
     "sendError": "Le message n'a pas pu être envoyé. Réessayez.",
     "title": "Messages",
-    "shareContact": "Transmettre mon e-mail au fournisseur avec cette demande de devis (il pourra être enregistré dans son logiciel de gestion clients)."
+    "shareContact": "Transmettre mon e-mail au fournisseur avec cette demande de devis (il pourra être enregistré dans son logiciel de gestion clients).",
+    "firstMessage": "Écrivez votre premier message à {{name}}.",
+    "verifyEmailFirst": "Confirmez votre adresse e-mail pour pouvoir envoyer des messages.",
+    "verifyEmailCta": "Saisir le code reçu",
+    "errors": {
+      "emailNotVerified": "Confirmez d’abord votre adresse e-mail avec le code reçu.",
+      "receiverNotFound": "Ce destinataire n’existe plus.",
+      "self": "Vous ne pouvez pas vous écrire à vous-même.",
+      "sessionExpired": "Votre session a expiré. Reconnectez-vous pour envoyer ce message.",
+      "tooMany": "Trop de messages envoyés en peu de temps. Réessayez dans quelques minutes."
+    },
+    "unread": "Messages non lus : {{count}}"
   },
   "events": {
     "titleStart": "Agenda des",

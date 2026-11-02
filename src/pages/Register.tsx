@@ -10,6 +10,7 @@ import { z } from 'zod';
 import { Turnstile } from '@marsidev/react-turnstile';
 import { PasswordStrengthIndicator } from '../components/PasswordStrengthIndicator';
 import { useTranslation } from 'react-i18next';
+import { safeRedirect, rememberRedirect } from '../lib/redirect';
 
 const registerSchema = z.object({
   // Les messages sont des clés de traduction, résolues à l'affichage.
@@ -30,6 +31,8 @@ const Register = () => {
   const [searchParams] = useSearchParams();
   const initialRole = searchParams.get('role');
   const validInitialRole = (initialRole === 'acheteur' || initialRole === 'fournisseur') ? initialRole : null;
+  // Page à rouvrir une fois le compte confirmé (ex. la conversation avec un fournisseur).
+  const redirectUrl = safeRedirect(searchParams.get('redirect'));
   
   const [role, setRole] = useState<'acheteur' | 'fournisseur' | null>(validInitialRole);
   const [step, setStep] = useState(validInitialRole ? 2 : 1);
@@ -62,6 +65,7 @@ const Register = () => {
         password: data.password,
         captchaToken: captchaToken
       });
+      rememberRedirect(redirectUrl);
       navigate('/register-success', { state: { email: data.email.trim().toLowerCase() } });
     } catch (err: any) {
       setAuthError(err.message || t('auth.genericError'));
@@ -333,7 +337,7 @@ const Register = () => {
             <div className="mt-8 text-center">
               <p className="text-sm text-gray-500">
                 {t('auth.register.alreadyMember')}{' '}
-                <Link to="/login" className="font-bold text-primary hover:underline">{t('auth.register.signIn')}</Link>
+                <Link to={redirectUrl ? `/login?redirect=${encodeURIComponent(redirectUrl)}` : '/login'} className="font-bold text-primary hover:underline">{t('auth.register.signIn')}</Link>
               </p>
             </div>
           </div>
