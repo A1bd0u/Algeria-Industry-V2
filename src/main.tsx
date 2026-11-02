@@ -7,6 +7,7 @@ import { i18nReady } from './i18n';
 import './index.css';
 import { getConsent, onConsentChange } from './lib/consent';
 import { initAnalytics } from './lib/analytics';
+import { initTracker } from './lib/tracker';
 
 // Initialisation Sentry (client), chargé à part pour ne pas alourdir le premier
 // affichage : les erreurs survenues avant son chargement ne sont pas remontées.
@@ -56,6 +57,7 @@ if (import.meta.env.VITE_SENTRY_DSN && import.meta.env.VITE_SENTRY_DSN.startsWit
 }
 
 initAnalytics();
+initTracker();
 
 const render = () => createRoot(document.getElementById('root')!).render(
   <StrictMode>

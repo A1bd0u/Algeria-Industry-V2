@@ -630,7 +630,7 @@
   },
   "cookies": {
     "label": "Cookie settings",
-    "text": "We only use cookies needed for the site to work (session, language). With your consent, we also enable an error diagnostics tool (anonymised session replay).",
+    "text": "We use cookies needed for the site to work (session, language) and anonymous browsing measurement, with no identifier or IP address. If you accept, your browsing is linked to your account to improve our services and an error diagnostics tool is enabled.",
     "more": "Learn more",
     "reject": "Reject",
     "accept": "Accept"

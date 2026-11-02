@@ -58,6 +58,7 @@ import { CurrencyProvider } from './context/CurrencyContext';
 import { ToastProvider } from './context/ToastContext';
 import VerifyAccountModal from './components/VerifyAccountModal';
 import CookieBanner from './components/CookieBanner';
+import { trackPageview } from './lib/tracker';
 import { Navigate } from 'react-router-dom';
 
 // Create a client for React Query (API data management)
@@ -75,6 +76,11 @@ export default function App() {
   // Bandeau publicitaire : grand sur l'accueil, compact sur les pages du
   // catalogue, des fournisseurs et des contenus ; absent ailleurs.
   const adPlacement = isExtranet ? null : adPlacementForPath(location.pathname);
+
+  // Analytique détaillée : une page vue par changement d'URL.
+  useEffect(() => {
+    trackPageview();
+  }, [location.pathname, location.search]);
 
   useEffect(() => {
     const handleLanguageChange = (lng: string) => {

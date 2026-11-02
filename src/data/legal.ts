@@ -95,7 +95,7 @@ ${LEGAL.host || HOST.fr}`,
     },
     privacy: {
       title: 'Politique de confidentialité',
-      lastUpdated: 'Dernière mise à jour : 15 octobre 2026',
+      lastUpdated: 'Dernière mise à jour : 2 novembre 2026',
       sections: [
         {
           subtitle: '1. Cadre légal et responsable du traitement',
@@ -119,7 +119,7 @@ ${LEGAL.host || HOST.fr}`,
         },
         {
           subtitle: '6. Durée de conservation',
-          text: "Les données du compte sont conservées tant que le compte est actif, puis supprimées à sa fermeture. Les factures et pièces comptables sont conservées pendant la durée imposée par la loi. Les journaux de sécurité sont conservés pour une durée limitée, nécessaire à la prévention des fraudes.",
+          text: "Les données du compte sont conservées tant que le compte est actif, puis supprimées à sa fermeture. Les factures et pièces comptables sont conservées pendant la durée imposée par la loi. Les journaux de sécurité sont conservés pour une durée limitée, nécessaire à la prévention des fraudes. Les statistiques de navigation et le journal d'activité sont supprimés au bout de 13 mois.",
         },
         {
           subtitle: '7. Vos droits',
@@ -127,7 +127,7 @@ ${LEGAL.host || HOST.fr}`,
         },
         {
           subtitle: '8. Cookies et traceurs',
-          text: "Seuls les cookies strictement nécessaires (session de connexion, choix de la langue) sont déposés sans votre accord. La mesure d'audience et la relecture des sessions en cas d'erreur ne sont activées qu'après votre consentement, que vous pouvez modifier à tout moment depuis le pied de page.",
+          text: "Seuls les cookies strictement nécessaires (session de connexion, choix de la langue) sont déposés sans votre accord. Pour améliorer le site, nous mesurons de façon anonyme les pages consultées, les clics, le temps passé, le navigateur, le type d'appareil et le pays : sans votre accord, aucun identifiant n'est stocké sur votre appareil, la visite n'est pas reliée à votre compte et aucune adresse IP n'est enregistrée. Si vous acceptez, un identifiant de mesure est stocké sur votre appareil et votre navigation est reliée à votre compte lorsque vous êtes connecté ; la relecture des sessions en cas d'erreur est aussi activée. Ces données ne sont consultables que par les administrateurs de la plateforme. Vous pouvez modifier votre choix à tout moment depuis le pied de page.",
         },
       ],
     },
@@ -202,7 +202,7 @@ ${LEGAL.host || HOST.en}`,
     },
     privacy: {
       title: 'Privacy policy',
-      lastUpdated: 'Last updated: 15 October 2026',
+      lastUpdated: 'Last updated: 2 November 2026',
       sections: [
         {
           subtitle: '1. Legal framework and data controller',
@@ -226,7 +226,7 @@ ${LEGAL.host || HOST.en}`,
         },
         {
           subtitle: '6. Retention',
-          text: 'Account data is kept while the account is active, then deleted when it is closed. Invoices and accounting records are kept for the period required by law. Security logs are kept for a limited period, as needed to prevent fraud.',
+          text: 'Account data is kept while the account is active, then deleted when it is closed. Invoices and accounting records are kept for the period required by law. Security logs are kept for a limited period, as needed to prevent fraud. Browsing statistics and the activity log are deleted after 13 months.',
         },
         {
           subtitle: '7. Your rights',
@@ -234,7 +234,7 @@ ${LEGAL.host || HOST.en}`,
         },
         {
           subtitle: '8. Cookies and trackers',
-          text: 'Only strictly necessary cookies (login session, language choice) are set without your consent. Audience measurement and session replay on errors are only enabled after you consent, which you can change at any time from the footer.',
+          text: 'Only strictly necessary cookies (login session, language choice) are set without your consent. To improve the site, we anonymously measure pages viewed, clicks, time spent, browser, device type and country: without your consent, no identifier is stored on your device, the visit is not linked to your account and no IP address is recorded. If you accept, a measurement identifier is stored on your device and your browsing is linked to your account when you are logged in; session replay on errors is also enabled. Only platform administrators can view this data. You can change your choice at any time from the footer.',
         },
       ],
     },
@@ -309,7 +309,7 @@ ${LEGAL.host || HOST.ar}`,
     },
     privacy: {
       title: 'سياسة الخصوصية',
-      lastUpdated: 'آخر تحديث: 15 أكتوبر 2026',
+      lastUpdated: 'آخر تحديث: 2 نوفمبر 2026',
       sections: [
         {
           subtitle: '1. الإطار القانوني والمسؤول عن المعالجة',
@@ -333,7 +333,7 @@ ${LEGAL.host || HOST.ar}`,
         },
         {
           subtitle: '6. مدة الحفظ',
-          text: 'تُحفظ معطيات الحساب ما دام الحساب نشطًا، ثم تُحذف عند إغلاقه. تُحفظ الفواتير والوثائق المحاسبية طوال المدة التي يفرضها القانون. تُحفظ سجلات الأمان لمدة محدودة لازمة للوقاية من الاحتيال.',
+          text: 'تُحفظ معطيات الحساب ما دام الحساب نشطًا، ثم تُحذف عند إغلاقه. تُحفظ الفواتير والوثائق المحاسبية طوال المدة التي يفرضها القانون. تُحفظ سجلات الأمان لمدة محدودة لازمة للوقاية من الاحتيال. تُحذف إحصاءات التصفح وسجل النشاط بعد 13 شهرًا.',
         },
         {
           subtitle: '7. حقوقك',
@@ -341,7 +341,7 @@ ${LEGAL.host || HOST.ar}`,
         },
         {
           subtitle: '8. ملفات تعريف الارتباط وأدوات التتبع',
-          text: 'لا تُوضع دون موافقتك إلا ملفات تعريف الارتباط الضرورية (جلسة الدخول، اختيار اللغة). لا يُفعَّل قياس الجمهور وإعادة تشغيل الجلسات عند الأخطاء إلا بعد موافقتك، ويمكنك تعديلها في أي وقت من تذييل الصفحة.',
+          text: 'لا تُوضع دون موافقتك إلا ملفات تعريف الارتباط الضرورية (جلسة الدخول، اختيار اللغة). لتحسين الموقع، نقيس بشكل مجهول الصفحات المعروضة والنقرات والوقت المستغرق والمتصفح ونوع الجهاز والبلد: دون موافقتك، لا يُخزَّن أي معرّف على جهازك ولا تُربط الزيارة بحسابك ولا يُسجَّل أي عنوان IP. إذا وافقت، يُخزَّن معرّف قياس على جهازك وتُربط تصفحاتك بحسابك عند تسجيل الدخول، كما تُفعَّل إعادة تشغيل الجلسات عند الأخطاء. لا يطّلع على هذه المعطيات إلا مسيّرو المنصة. يمكنك تعديل اختيارك في أي وقت من تذييل الصفحة.',
         },
       ],
     },
