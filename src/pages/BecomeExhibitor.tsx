@@ -7,9 +7,9 @@ import { formatDzd } from '../lib/format';
 
 // Offres identiques à /tarifs et au serveur (server/services/billingService.ts).
 const PLANS = [
-  { id: 'free', price: 0, products: 5 },
-  { id: 'basic', price: 18000, products: 15, popular: true },
-  { id: 'pro', price: 29900, products: null },
+  { id: 'starter', price: 10000, products: 5 },
+  { id: 'basic', price: 19000, products: 15, popular: true },
+  { id: 'pro', price: 35000, products: null },
 ] as const;
 
 const BENEFITS = [

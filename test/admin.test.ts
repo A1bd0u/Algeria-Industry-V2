@@ -59,7 +59,7 @@ describe('Console admin', () => {
 
       expect(res.status).toBe(201);
       const insert = mock.queries.find((q) => q.table === 'subscriptions' && q.op === 'insert');
-      expect(insert?.payload[0]).toMatchObject({ plan: 'pro', amount_dzd: 29900, status: 'pending', user_id: OWNER_ID });
+      expect(insert?.payload[0]).toMatchObject({ plan: 'pro', amount_dzd: 35000, status: 'pending', user_id: OWNER_ID });
     });
 
     it('refuse de facturer une fiche non revendiquée', async () => {

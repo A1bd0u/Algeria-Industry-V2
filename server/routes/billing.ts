@@ -19,7 +19,7 @@ router.use(verifyRole(['admin']));
 
 const createSchema = z.object({
   company_id: z.string().uuid('Entreprise invalide'),
-  plan: z.enum(['basic', 'pro', 'founder']),
+  plan: z.enum(['starter', 'basic', 'pro', 'founder']),
   notes: z.string().trim().max(1000).optional(),
 });
 

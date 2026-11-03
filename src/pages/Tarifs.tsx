@@ -13,10 +13,10 @@ const Tarifs = () => {
 
   const exhibitorPlans = [
     {
-      id: 'free',
-      name: 'Free',
-      price: `0 ${t('common.dzd')}`,
-      description: t('pricing.free.description'),
+      id: 'starter',
+      name: 'Starter',
+      price: `10 000 ${t('common.dzd')}`,
+      description: t('pricing.starter.description'),
       features: [
         { text: t('pricing.features.products', { count: 5 }) },
         { text: t('pricing.features.images', { count: 2 }) },
@@ -26,14 +26,14 @@ const Tarifs = () => {
       ],
       badge: null,
       bgClass: 'bg-neutral-bg text-primary border-[#E0E0E0]',
-      buttonText: t('pricing.start'),
-      buttonAction: '/register',
+      buttonText: t('subscription.choose', { plan: 'Starter' }),
+      buttonAction: subscribeLink,
       buttonClass: 'bg-neutral-200 text-neutral-800 border-transparent hover:bg-neutral-300'
     },
     {
       id: 'basic',
       name: 'Basic',
-      price: `18 000 ${t('common.dzd')}`,
+      price: `19 000 ${t('common.dzd')}`,
       description: t('pricing.basic.description'),
       features: [
         { text: t('pricing.features.products', { count: 15 }) },
@@ -53,7 +53,7 @@ const Tarifs = () => {
     {
       id: 'pro',
       name: 'Pro',
-      price: `29 900 ${t('common.dzd')}`,
+      price: `35 000 ${t('common.dzd')}`,
       description: t('pricing.pro.description'),
       features: [
         { text: t('pricing.features.unlimitedProducts'), isBold: true },
@@ -73,9 +73,9 @@ const Tarifs = () => {
 
   const no = 'no';
   const yes = 'yes';
-  // Tableau comparatif : [libellé, Free, Basic, Pro] ; 'yes' / 'no' = icônes.
+  // Tableau comparatif : [libellé, Starter, Basic, Pro] ; 'yes' / 'no' = icônes.
   const comparisonRows: [string, string, string, string][] = [
-    [t('pricing.table.price'), `0 ${t('common.dzd')}`, `18 000 ${t('common.dzd')}${t('pricing.perYear')}`, `29 900 ${t('common.dzd')}${t('pricing.perYear')}`],
+    [t('pricing.table.price'), `10 000 ${t('common.dzd')}${t('pricing.perYear')}`, `19 000 ${t('common.dzd')}${t('pricing.perYear')}`, `35 000 ${t('common.dzd')}${t('pricing.perYear')}`],
     [t('pricing.table.products'), '5', '15', t('subscription.unlimited')],
     [t('pricing.table.images'), '2', '5', '10'],
     [t('pricing.table.stats'), no, t('pricing.table.statsBasic'), t('pricing.table.statsAdvanced')],
@@ -206,7 +206,7 @@ const Tarifs = () => {
                 <thead>
                   <tr className="bg-gray-50/50">
                     <th className="px-6 py-4 text-start text-sm font-bold text-gray-700 tracking-widest">{t('pricing.table.feature')}</th>
-                    <th className="px-6 py-4 text-center text-sm font-bold text-primary tracking-widest bg-gray-100/30">Free</th>
+                    <th className="px-6 py-4 text-center text-sm font-bold text-primary tracking-widest bg-gray-100/30">Starter</th>
                     <th className="px-6 py-4 text-center text-sm font-bold text-white tracking-widest bg-secondary">Basic</th>
                     <th className="px-6 py-4 text-center text-sm font-bold text-white tracking-widest bg-neutral-950">Pro</th>
                   </tr>

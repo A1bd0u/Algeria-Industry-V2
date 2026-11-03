@@ -114,7 +114,7 @@
       "searchLabel": "Search a product or a company",
       "searchPlaceholder": "Product, machine, company…",
       "browseSuppliers": "Browse suppliers",
-      "listCompany": "List my company for free",
+      "listCompany": "List my company",
       "founder": "Premium free for 12 months for the first 100 verified suppliers.",
       "popular": "Popular searches",
       "chips": {
@@ -190,7 +190,7 @@
     },
     "final": {
       "title": "Ready to find your next supplier?",
-      "text": "Search verified companies, or list yours for free.",
+      "text": "Search verified companies, or list yours.",
       "buyer": "Explore the catalogue",
       "supplier": "List my company",
       "help": "A question? Read the FAQ or contact us."
@@ -444,7 +444,7 @@
     "q5": "How do I register my company?",
     "a5": "Create a “Supplier” account, confirm your email address, then upload your trade register and tax ID from your dashboard. Once the file is approved, you can publish your products.",
     "q6": "How many products can I publish?",
-    "a6": "5 with the free plan, 15 with Basic and unlimited with Pro. Details are on the Pricing page.",
+    "a6": "5 with Starter, 15 with Basic and unlimited with Pro. Details are on the Pricing page.",
     "q7": "What payment methods are available?",
     "a7": "Subscriptions are invoiced in dinars, VAT included. You pay by bank transfer or cheque against the invoice, or online with a CIB / Edahabia card when available.",
     "q8": "How will I know my file has been reviewed?",
@@ -725,10 +725,11 @@
   },
   "subscription": {
     "plans": {
-      "free": "Free",
+      "free": "No subscription",
       "basic": "Basic",
       "pro": "Pro",
-      "founder": "Founding member"
+      "founder": "Founding member",
+      "starter": "Starter"
     },
     "status": {
       "pending": "Awaiting payment",
@@ -747,13 +748,14 @@
     "paymentFailed": "The payment did not go through. Nothing was charged; you can try again or pay by bank transfer.",
     "currentPlan": "Current plan",
     "validUntil": "Valid until {{date}}.",
-    "freePlanText": "Free plan, no commitment.",
+    "freePlanText": "No active subscription: choose Starter, Basic or Pro.",
     "publishedProducts": "Published products",
     "unlimited": "unlimited",
     "perYearVat": "incl. VAT / year",
     "features": {
       "basic": "15 products, 5 images per product, 5 PDF catalogues, view statistics, support within 48 h.",
-      "pro": "Unlimited products and PDF catalogues, 10 images per product, advanced statistics (views, WhatsApp clicks, contacts), support within 24 h."
+      "pro": "Unlimited products and PDF catalogues, 10 images per product, advanced statistics (views, WhatsApp clicks, contacts), support within 24 h.",
+      "starter": "5 products, 2 images per product, 1 PDF catalogue, messages."
     },
     "choose": "Choose {{plan}}",
     "ownerRequired": "To subscribe, you must own a company profile.",
@@ -879,10 +881,11 @@
   },
   "dashboard": {
     "planBadge": {
-      "free": "Free plan",
+      "free": "No active subscription",
       "basic": "Basic plan active",
       "pro": "Pro plan active",
-      "founder": "Founding member"
+      "founder": "Founding member",
+      "starter": "Starter plan active"
     },
     "noCompany": "No company is linked to your account.",
     "updateError": "Error while updating.",
@@ -1153,7 +1156,7 @@
       "q1": "How do I list my company in the directory?",
       "a1": "Sign up with the “Supplier” profile, then submit your legal documents (trade register, tax ID) from your dashboard. Once our team has verified them, your profile and products are published.",
       "q2": "What are the paid plans?",
-      "a2": "The free plan lets you publish 5 products. Basic (18,000 DZD incl. VAT per year) allows 15, and Pro (29,900 DZD incl. VAT per year) is unlimited with support within 24 h. You subscribe and pay by bank transfer or CIB / Edahabia card from the Subscription tab of your dashboard.",
+      "a2": "Starter (10,000 DZD incl. VAT per year) lets you publish 5 products, Basic (19,000 DZD incl. VAT per year) 15, and Pro (35,000 DZD incl. VAT per year) is unlimited with support within 24 h. You subscribe and pay by bank transfer or CIB / Edahabia card from the Subscription tab of your dashboard.",
       "q3": "How do I contact a supplier?",
       "a3": "Use the contact button on a company or product page. Your conversations are then grouped in the messages section of your dashboard.",
       "q4": "Is the platform available outside Algeria?",
@@ -1283,7 +1286,7 @@
       },
       "pricing": {
         "title": "Choose a plan",
-        "text": "Free, Basic or Pro: products, photos and visibility."
+        "text": "Starter, Basic or Pro: products, photos and visibility."
       },
       "advertising": {
         "title": "Advertise on the site",
@@ -1338,7 +1341,8 @@
     "planExtra": {
       "free": "Company profile and messages",
       "basic": "5 images per product, support within 48 h",
-      "pro": "10 images per product, support within 24 h"
+      "pro": "10 images per product, support within 24 h",
+      "starter": "Verified company profile, 1 PDF catalogue and messages"
     },
     "start": "Get started",
     "comparePlans": "Compare plans in detail",
@@ -1357,7 +1361,7 @@
       "none": "No company found",
       "visit": "View profile",
       "ctaTitle": "List your company",
-      "ctaText": "Show your products to industrial buyers across all 58 provinces. Registration is free.",
+      "ctaText": "Show your products to industrial buyers across all 58 provinces, from 10,000 DZD per year.",
       "ctaButton": "Create my supplier account",
       "ctaPricing": "See the plans"
     }
@@ -1520,6 +1524,9 @@
       "text": "All subscriptions are invoiced in Algerian dinars (DZD), 19% VAT included. You pay by bank transfer against the invoice or, when available, online with a CIB / Edahabia card. Your subscription is activated as soon as payment is received.",
       "termsBefore": "Duration, renewal, cancellation and refunds: see our",
       "termsLink": "terms and conditions"
+    },
+    "starter": {
+      "description": "To be present on the platform"
     }
   },
   "registerSuccess": {
@@ -1584,7 +1591,7 @@
       "cta": "Book this space"
     },
     "listing": {
-      "title": "List your company for free",
+      "title": "List your company",
       "subtitle": "Verified profile, product catalogue and quote requests from buyers.",
       "cta": "Create my profile"
     },

@@ -32,7 +32,7 @@ export const cgvContent: Record<'fr' | 'en' | 'ar', Cgv> = {
       {
         title: '2. Offres et prix',
         paragraphs: [
-          "Trois offres sont proposées : Gratuit (0 DA), Basic (18 000 DA par an) et Pro (29 900 DA par an). Les prix sont exprimés en dinars algériens, toutes taxes comprises (TVA 19 % incluse).",
+          "Trois offres payantes sont proposées aux fournisseurs : Starter (10 000 DA par an), Basic (19 000 DA par an) et Pro (35 000 DA par an). Il n'existe pas d'offre gratuite pour les fournisseurs. Les prix sont exprimés en dinars algériens, toutes taxes comprises (TVA 19 % incluse).",
           "Le contenu de chaque offre (nombre de produits, de photos par produit, de catalogues PDF, niveau de statistiques et délai du support) est celui décrit sur la page Tarifs à la date de la souscription.",
           "L'offre « membre fondateur » est attribuée gratuitement, pour 12 mois, aux entreprises qui remplissent les conditions annoncées sur la page Tarifs. Elle ne donne lieu à aucun paiement.",
         ],
@@ -118,7 +118,7 @@ export const cgvContent: Record<'fr' | 'en' | 'ar', Cgv> = {
       {
         title: '2. Plans and prices',
         paragraphs: [
-          'Three plans are offered: Free (DZD 0), Basic (DZD 18,000 per year) and Pro (DZD 29,900 per year). Prices are in Algerian dinars, all taxes included (19% VAT).',
+          'Three paid plans are offered to suppliers: Starter (DZD 10,000 per year), Basic (DZD 19,000 per year) and Pro (DZD 35,000 per year). There is no free plan for suppliers. Prices are in Algerian dinars, all taxes included (19% VAT).',
           'The content of each plan (number of products, photos per product, PDF catalogues, statistics level and support response time) is the one described on the Pricing page on the date of subscription.',
           'The "founding member" offer is granted free of charge for 12 months to companies meeting the conditions stated on the Pricing page. It involves no payment.',
         ],
@@ -204,7 +204,7 @@ export const cgvContent: Record<'fr' | 'en' | 'ar', Cgv> = {
       {
         title: '2. العروض والأسعار',
         paragraphs: [
-          'تُقترح ثلاثة عروض: مجاني (0 دج)، أساسي (18 000 دج سنويًا) واحترافي (29 900 دج سنويًا). الأسعار بالدينار الجزائري وتشمل جميع الرسوم (الرسم على القيمة المضافة 19 %).',
+          'تُقترح على المورّدين ثلاثة عروض مدفوعة: Starter ‏(10 000 دج سنويًا)، أساسي (19 000 دج سنويًا) واحترافي (35 000 دج سنويًا). لا يوجد عرض مجاني للمورّدين. الأسعار بالدينار الجزائري وتشمل جميع الرسوم (الرسم على القيمة المضافة 19 %).',
           'محتوى كل عرض (عدد المنتجات وعدد الصور لكل منتج وعدد كتالوجات PDF ومستوى الإحصائيات ومدة الرد من الدعم) هو المحتوى الموصوف في صفحة الأسعار في تاريخ الاشتراك.',
           'يُمنح عرض «العضو المؤسس» مجانًا لمدة 12 شهرًا للمؤسسات التي تستوفي الشروط المعلنة في صفحة الأسعار، ولا يترتب عليه أي دفع.',
         ],
