@@ -45,7 +45,7 @@ export default function SubscriptionPanel({ notify }: { notify: (message: string
   const refresh = () => queryClient.invalidateQueries({ queryKey: ['my-subscription'] });
 
   const subscribe = useMutation({
-    mutationFn: (plan: 'basic' | 'pro') => api('/api/subscriptions', { method: 'POST', body: JSON.stringify({ plan, acceptTerms: true }) }),
+    mutationFn: (plan: 'starter' | 'basic' | 'pro') => api('/api/subscriptions', { method: 'POST', body: JSON.stringify({ plan, acceptTerms: true }) }),
     onSuccess: (sub: any) => {
       goal('Souscription', { plan: String(sub.plan || '') });
       notify(t(data?.payment?.online ? 'subscription.invoiceReadyOnline' : 'subscription.invoiceReady', { invoice: sub.invoice_number }), 'success');
@@ -165,7 +165,7 @@ export default function SubscriptionPanel({ notify }: { notify: (message: string
               </span>
             </label>
           )}
-          {(['basic', 'pro'] as const).filter((p) => p !== data.plan).map((plan) => (
+          {(['starter', 'basic', 'pro'] as const).filter((p) => p !== data.plan).map((plan) => (
             <div key={plan} className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm flex flex-col">
               <h4 className="text-xl font-black text-primary">{planName(plan)}</h4>
               <p className="text-2xl font-black text-primary mt-2">{dzd(data.prices[plan])} <span className="text-xs font-bold text-gray-500">{t('subscription.perYearVat')}</span></p>

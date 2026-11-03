@@ -6,8 +6,9 @@ import { cn } from '../../../lib/utils';
 import { adminFetch, formatDate, formatDzd } from '../adminApi';
 
 const PLAN_LABELS: Record<string, string> = {
-  basic: 'Basic — 18 000 DA/an',
-  pro: 'Pro — 29 900 DA/an',
+  starter: 'Starter — 10 000 DA/an',
+  basic: 'Basic — 19 000 DA/an',
+  pro: 'Pro — 35 000 DA/an',
   founder: 'Membre fondateur — offert 12 mois',
 };
 
@@ -94,7 +95,7 @@ export default function GovRevenue({ state }: { state: any }) {
   const [filter, setFilter] = useState('');
   const [showCreate, setShowCreate] = useState(false);
   const [company, setCompany] = useState<any>(null);
-  const [plan, setPlan] = useState<'basic' | 'pro' | 'founder'>('basic');
+  const [plan, setPlan] = useState<'starter' | 'basic' | 'pro' | 'founder'>('basic');
   const [notes, setNotes] = useState('');
   const [activating, setActivating] = useState<any>(null);
   const [paymentMethod, setPaymentMethod] = useState<'virement' | 'cheque' | 'gratuit'>('virement');

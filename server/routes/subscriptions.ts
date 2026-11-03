@@ -21,7 +21,7 @@ router.use(requireAuth);
 export const TERMS_VERSION = '2026-10';
 
 const subscribeSchema = z.object({
-  plan: z.enum(['basic', 'pro']),
+  plan: z.enum(['starter', 'basic', 'pro']),
   acceptTerms: z.literal(true, { message: 'Vous devez accepter les conditions générales de vente.' }),
 });
 
@@ -76,7 +76,7 @@ router.get('/me', async (req, res, next) => {
       usage: { products: productCount || 0 },
       canSubscribe: Boolean(company),
       subscriptions: subscriptions || [],
-      prices: { basic: PLANS.basic.amount, pro: PLANS.pro.amount },
+      prices: { starter: PLANS.starter.amount, basic: PLANS.basic.amount, pro: PLANS.pro.amount },
       payment: {
         online: isOnlinePaymentEnabled(),
         rib: legalSetting('RIB') || null,
@@ -92,7 +92,7 @@ router.get('/me', async (req, res, next) => {
 // POST /api/subscriptions - Souscrire : génère la facture (ou renvoie celle en attente)
 router.post('/', requireEmailVerified, validate(subscribeSchema), async (req, res, next) => {
   const user = (req as any).user;
-  const { plan } = req.body as { plan: 'basic' | 'pro' };
+  const { plan } = req.body as { plan: 'starter' | 'basic' | 'pro' };
   try {
     const company = await loadOwnedCompany(user);
     if (!company) {
@@ -203,7 +203,7 @@ router.post('/:id/checkout', requireUuidParams('id'), async (req, res, next) => 
     const appUrl = getAppUrl().replace(/\/+$/, '');
     const checkout = await createCheckout({
       amount: Number(sub.amount_dzd),
-      description: `icomexpo — abonnement ${PLANS[sub.plan as 'basic' | 'pro'].label} 12 mois (${sub.invoice_number})`,
+      description: `icomexpo — abonnement ${PLANS[sub.plan as 'starter' | 'basic' | 'pro'].label} 12 mois (${sub.invoice_number})`,
       successUrl: `${appUrl}/dashboard?tab=subscription&payment=success`,
       failureUrl: `${appUrl}/dashboard?tab=subscription&payment=failed`,
       webhookUrl: `${appUrl}/api/payments/chargily/webhook`,

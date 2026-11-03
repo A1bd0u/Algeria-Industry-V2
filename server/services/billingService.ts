@@ -3,9 +3,12 @@ import { escapeHtml } from '../utils/html';
 import { notifyPaymentReceived } from './notificationService';
 
 // Offres et prix annuels TTC (TVA 19 % incluse), identiques à la page /tarifs.
+// Pas d'offre gratuite pour les fournisseurs : « free » désigne une entreprise
+// sans abonnement actif.
 export const PLANS = {
-  basic: { label: 'Basic', amount: 18000 },
-  pro: { label: 'Pro', amount: 29900 },
+  starter: { label: 'Starter', amount: 10000 },
+  basic: { label: 'Basic', amount: 19000 },
+  pro: { label: 'Pro', amount: 35000 },
   // Offre membre fondateur : Premium offert 12 mois (attribuée par un admin).
   founder: { label: 'Membre fondateur (Premium offert)', amount: 0 },
 } as const;
@@ -26,6 +29,7 @@ export const PLAN_LIMITS: Record<CompanyPlan, {
   stats: StatsLevel;
 }> = {
   free: { products: 5, imagesPerProduct: 2, catalogues: 1, stats: 'none' },
+  starter: { products: 5, imagesPerProduct: 2, catalogues: 1, stats: 'none' },
   basic: { products: 15, imagesPerProduct: 5, catalogues: 5, stats: 'basic' },
   pro: { products: null, imagesPerProduct: 10, catalogues: null, stats: 'advanced' },
   founder: { products: null, imagesPerProduct: 10, catalogues: null, stats: 'advanced' },

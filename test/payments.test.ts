@@ -76,7 +76,7 @@ describe('Abonnements client', () => {
     const insert = mock.queries.find((q) => q.table === 'subscriptions' && q.op === 'insert');
     expect(insert?.payload[0]).toMatchObject({
       plan: 'basic',
-      amount_dzd: 18000,
+      amount_dzd: 19000,
       status: 'pending',
       source: 'self_service',
       company_id: COMPANY_ID,
@@ -84,6 +84,24 @@ describe('Abonnements client', () => {
       terms_version: '2026-10',
     });
     expect(insert?.payload[0].terms_accepted_at).toBeTruthy();
+  });
+
+  it('facture l’offre Starter à 10 000 DA', async () => {
+    const mock = setup({
+      companies: ownedCompany,
+      subscriptions: (q) => {
+        if (q.op === 'insert') return { data: { id: SUB_ID, ...q.payload[0] } };
+      },
+    });
+
+    const res = await request(app)
+      .post('/api/subscriptions')
+      .set('Cookie', ['token=t'])
+      .send({ plan: 'starter', acceptTerms: true });
+
+    expect(res.status).toBe(201);
+    const insert = mock.queries.find((q) => q.table === 'subscriptions' && q.op === 'insert');
+    expect(insert?.payload[0]).toMatchObject({ plan: 'starter', amount_dzd: 10000, status: 'pending' });
   });
 
   it('refuse la souscription sans acceptation des CGV', async () => {

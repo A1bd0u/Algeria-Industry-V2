@@ -114,7 +114,7 @@
       "searchLabel": "Rechercher un produit ou une entreprise",
       "searchPlaceholder": "Produit, machine, entreprise…",
       "browseSuppliers": "Parcourir les fournisseurs",
-      "listCompany": "Référencer mon entreprise gratuitement",
+      "listCompany": "Référencer mon entreprise",
       "founder": "Premium offert 12 mois aux 100 premiers fournisseurs vérifiés.",
       "popular": "Recherches fréquentes",
       "chips": {
@@ -190,7 +190,7 @@
     },
     "final": {
       "title": "Prêt à trouver votre prochain fournisseur ?",
-      "text": "Cherchez parmi les entreprises vérifiées, ou référencez la vôtre gratuitement.",
+      "text": "Cherchez parmi les entreprises vérifiées, ou référencez la vôtre.",
       "buyer": "Explorer le catalogue",
       "supplier": "Référencer mon entreprise",
       "help": "Une question ? Consultez la FAQ ou contactez-nous."
@@ -444,7 +444,7 @@
     "q5": "Comment inscrire mon entreprise ?",
     "a5": "Créez un compte « Fournisseur », confirmez votre adresse e-mail, puis déposez votre registre du commerce et votre NIF depuis votre tableau de bord. Une fois le dossier validé, vous pouvez publier vos produits.",
     "q6": "Combien de produits puis-je publier ?",
-    "a6": "5 avec l'offre gratuite, 15 avec l'offre Basic et sans limite avec l'offre Pro. Le détail est sur la page Tarifs.",
+    "a6": "5 avec l'offre Starter, 15 avec l'offre Basic et sans limite avec l'offre Pro. Le détail est sur la page Tarifs.",
     "q7": "Quels sont les moyens de paiement ?",
     "a7": "Les abonnements sont facturés en dinars, TVA comprise. Vous payez par virement bancaire ou par chèque sur facture, ou en ligne par carte CIB / Edahabia lorsque ce moyen est proposé.",
     "q8": "Comment suis-je informé de la validation de mon dossier ?",
@@ -725,10 +725,11 @@
   },
   "subscription": {
     "plans": {
-      "free": "Gratuit",
+      "free": "Sans abonnement",
       "basic": "Basic",
       "pro": "Pro",
-      "founder": "Membre fondateur"
+      "founder": "Membre fondateur",
+      "starter": "Starter"
     },
     "status": {
       "pending": "En attente de paiement",
@@ -747,13 +748,14 @@
     "paymentFailed": "Le paiement n'a pas abouti. Aucun montant n'a été débité ; vous pouvez réessayer ou régler par virement.",
     "currentPlan": "Offre actuelle",
     "validUntil": "Valable jusqu'au {{date}}.",
-    "freePlanText": "Offre gratuite, sans engagement.",
+    "freePlanText": "Aucun abonnement actif : choisissez Starter, Basic ou Pro.",
     "publishedProducts": "Produits publiés",
     "unlimited": "illimité",
     "perYearVat": "TTC / an",
     "features": {
       "basic": "15 produits, 5 images par produit, 5 catalogues PDF, statistiques de vues, support sous 48 h.",
-      "pro": "Produits et catalogues PDF illimités, 10 images par produit, statistiques avancées (vues, clics WhatsApp, contacts), support sous 24 h."
+      "pro": "Produits et catalogues PDF illimités, 10 images par produit, statistiques avancées (vues, clics WhatsApp, contacts), support sous 24 h.",
+      "starter": "5 produits, 2 images par produit, 1 catalogue PDF, messagerie."
     },
     "choose": "Choisir {{plan}}",
     "ownerRequired": "Pour souscrire, vous devez être titulaire d'une fiche entreprise.",
@@ -879,10 +881,11 @@
   },
   "dashboard": {
     "planBadge": {
-      "free": "Offre gratuite",
+      "free": "Aucun abonnement actif",
       "basic": "Abonnement Basic actif",
       "pro": "Abonnement Pro actif",
-      "founder": "Membre fondateur"
+      "founder": "Membre fondateur",
+      "starter": "Abonnement Starter actif"
     },
     "noCompany": "Aucune entreprise n'est rattachée à votre compte.",
     "updateError": "Erreur lors de la mise à jour.",
@@ -1153,7 +1156,7 @@
       "q1": "Comment inscrire mon entreprise sur l'annuaire ?",
       "a1": "Inscrivez-vous en choisissant le profil « Fournisseur », puis transmettez vos documents légaux (registre du commerce, NIF) depuis votre tableau de bord. Après vérification par notre équipe, votre fiche et vos produits sont publiés.",
       "q2": "Quelles sont les offres payantes ?",
-      "a2": "L'offre gratuite permet de publier 5 produits. L'offre Basic (18 000 DA TTC par an) en permet 15, l'offre Pro (29 900 DA TTC par an) est illimitée avec un support sous 24 h. Vous souscrivez et payez par virement ou carte CIB / Edahabia depuis l'onglet Abonnement de votre tableau de bord.",
+      "a2": "L'offre Starter (10 000 DA TTC par an) permet de publier 5 produits, l'offre Basic (19 000 DA TTC par an) 15 produits, et l'offre Pro (35 000 DA TTC par an) est illimitée avec un support sous 24 h. Vous souscrivez et payez par virement ou carte CIB / Edahabia depuis l'onglet Abonnement de votre tableau de bord.",
       "q3": "Comment contacter un fournisseur ?",
       "a3": "Depuis la fiche d'une entreprise ou d'un produit, utilisez le bouton de contact. Vos échanges sont ensuite regroupés dans la messagerie de votre tableau de bord.",
       "q4": "La plateforme est-elle disponible en dehors de l'Algérie ?",
@@ -1283,7 +1286,7 @@
       },
       "pricing": {
         "title": "Choisir une offre",
-        "text": "Gratuit, Basic ou Pro : produits, photos et visibilité."
+        "text": "Starter, Basic ou Pro : produits, photos et visibilité."
       },
       "advertising": {
         "title": "Annoncer sur le site",
@@ -1338,7 +1341,8 @@
     "planExtra": {
       "free": "Fiche entreprise et messagerie",
       "basic": "5 images par produit, support sous 48 h",
-      "pro": "10 images par produit, support sous 24 h"
+      "pro": "10 images par produit, support sous 24 h",
+      "starter": "Fiche entreprise vérifiée, 1 catalogue PDF et messagerie"
     },
     "start": "Commencer",
     "comparePlans": "Comparer les offres en détail",
@@ -1357,7 +1361,7 @@
       "none": "Aucune entreprise trouvée",
       "visit": "Voir la fiche",
       "ctaTitle": "Référencez votre entreprise",
-      "ctaText": "Présentez vos produits aux acheteurs industriels des 58 wilayas. L'inscription est gratuite.",
+      "ctaText": "Présentez vos produits aux acheteurs industriels des 58 wilayas, à partir de 10 000 DA par an.",
       "ctaButton": "Créer mon compte fournisseur",
       "ctaPricing": "Voir les offres"
     }
@@ -1520,6 +1524,9 @@
       "text": "Tous nos abonnements sont facturés en dinars algériens (DZD), TVA 19 % incluse. Le règlement se fait par virement bancaire sur facture ou, lorsqu'il est proposé, en ligne par carte CIB / Edahabia. Votre abonnement est activé dès réception du paiement.",
       "termsBefore": "Durée, renouvellement, résiliation et remboursement : voir nos",
       "termsLink": "conditions générales"
+    },
+    "starter": {
+      "description": "Pour être présent sur la plateforme"
     }
   },
   "registerSuccess": {
@@ -1584,7 +1591,7 @@
       "cta": "Réserver cet espace"
     },
     "listing": {
-      "title": "Référencez votre entreprise gratuitement",
+      "title": "Référencez votre entreprise",
       "subtitle": "Fiche vérifiée, catalogue produits et demandes de devis des acheteurs.",
       "cta": "Créer ma fiche"
     },
