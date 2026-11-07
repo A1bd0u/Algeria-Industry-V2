@@ -154,7 +154,7 @@ describe('Console admin', () => {
       expect(res.status).toBe(200);
       expect(res.text).not.toContain('<script>alert(1)</script>');
       expect(res.text).toContain('FA-2026-00002');
-      expect(res.text).toContain('TVA 19 %');
+      expect(res.text).toContain('TVA non applicable');
     });
   });
 

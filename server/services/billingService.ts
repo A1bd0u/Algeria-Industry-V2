@@ -2,7 +2,7 @@ import { getSupabase } from '../db/supabaseClient';
 import { escapeHtml } from '../utils/html';
 import { notifyPaymentReceived } from './notificationService';
 
-// Offres et prix annuels TTC (TVA 19 % incluse), identiques à la page /tarifs.
+// Offres et prix annuels hors taxes, identiques à la page /tarifs (TVA non applicable).
 // Pas d'offre gratuite pour les fournisseurs : « free » désigne une entreprise
 // sans abonnement actif.
 export const PLANS = {
@@ -36,7 +36,8 @@ export const PLAN_LIMITS: Record<CompanyPlan, {
 };
 
 export const DURATION_MONTHS = 12;
-export const VAT_RATE = 0.19;
+// TVA : non appliquée (VAT_RATE=0). Mettre par ex. VAT_RATE=0.19 dans l'environnement si l'entreprise y devient assujettie.
+export const VAT_RATE = Number(process.env.VAT_RATE ?? 0) || 0;
 
 export const SUBSCRIPTION_COLUMNS =
   'id, invoice_number, user_id, company_id, plan, amount_dzd, status, starts_at, ends_at, paid_at, payment_method, payment_reference, notes, source, transfer_proof_path, transfer_proof_uploaded_at, checkout_id, created_at, company:companies(id, name, wilaya, nif, rc), user:users!subscriptions_user_id_fkey(id, name, email)';
@@ -236,8 +237,11 @@ ${escapeHtml(user.name || '')} — ${escapeHtml(user.email || '')}</p>
     <td>${sub.starts_at ? `${formatDate(sub.starts_at)} → ${formatDate(sub.ends_at)}` : `${DURATION_MONTHS} mois à compter de l'activation`}</td>
     <td class="right">${formatDzd(totalHt)}</td></tr></tbody>
   <tfoot>
-    <tr><td colspan="2" class="right">TVA 19 %</td><td class="right">${formatDzd(vat)}</td></tr>
-    <tr class="total"><td colspan="2" class="right">Total TTC</td><td class="right">${formatDzd(totalTtc)}</td></tr>
+    ${VAT_RATE > 0
+      ? `<tr><td colspan="2" class="right">TVA ${Math.round(VAT_RATE * 100)} %</td><td class="right">${formatDzd(vat)}</td></tr>
+    <tr class="total"><td colspan="2" class="right">Total TTC</td><td class="right">${formatDzd(totalTtc)}</td></tr>`
+      : `<tr><td colspan="2" class="right">TVA non applicable</td><td class="right">—</td></tr>
+    <tr class="total"><td colspan="2" class="right">Total à payer</td><td class="right">${formatDzd(totalTtc)}</td></tr>`}
   </tfoot>
 </table>
 ${sub.status === 'pending' && totalTtc > 0 ? `<p><strong>Règlement par virement bancaire</strong> en indiquant la référence <strong>${escapeHtml(sub.invoice_number)}</strong>.<br>

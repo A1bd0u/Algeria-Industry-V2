@@ -59,7 +59,7 @@ export const notifyInvoiceIssued = (sub: SubscriptionLike) => safely('Facture é
     intro: `Une facture a été émise pour l'abonnement ${PLAN_LABELS[sub.plan] || sub.plan} (12 mois).`,
     details: [
       `Facture : ${sub.invoice_number || '—'}`,
-      `Montant : ${formatDzd(amount)} TTC`,
+      `Montant : ${formatDzd(amount)} HT`,
       amount > 0 ? "Règlement : virement bancaire en indiquant le numéro de facture, ou en ligne s'il est proposé dans votre espace." : '',
     ].filter(Boolean).join('\n'),
     ctaLabel: 'Voir ma facture',

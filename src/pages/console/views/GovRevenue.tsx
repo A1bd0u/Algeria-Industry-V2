@@ -270,7 +270,7 @@ export default function GovRevenue({ state }: { state: any }) {
                 <th className="px-6 py-4 text-start">Facture</th>
                 <th className="px-6 py-4 text-start">Entreprise</th>
                 <th className="px-6 py-4 text-start">Offre</th>
-                <th className="px-6 py-4 text-start">Montant TTC</th>
+                <th className="px-6 py-4 text-start">Montant HT</th>
                 <th className="px-6 py-4 text-start">Période</th>
                 <th className="px-6 py-4 text-start">Statut</th>
                 <th className="px-6 py-4 text-end">Actions</th>
